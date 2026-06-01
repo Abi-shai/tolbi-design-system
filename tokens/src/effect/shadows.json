@@ -1,0 +1,11 @@
+{
+  "shadow": {
+    "xs":  { "value": "0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 5%, transparent)" },
+    "sm":  { "value": "0px 1px 3px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 10%, transparent), 0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 6%, transparent)" },
+    "md":  { "value": "0px 4px 8px -2px color-mix(in srgb, var(--ds-color-gray-light-900) 10%, transparent), 0px 2px 4px -2px color-mix(in srgb, var(--ds-color-gray-light-900) 6%, transparent)" },
+    "lg":  { "value": "0px 12px 16px -4px color-mix(in srgb, var(--ds-color-gray-light-900) 8%, transparent), 0px 4px 6px -2px color-mix(in srgb, var(--ds-color-gray-light-900) 3%, transparent)" },
+    "xl":  { "value": "0px 20px 24px -4px color-mix(in srgb, var(--ds-color-gray-light-900) 8%, transparent), 0px 8px 8px -4px color-mix(in srgb, var(--ds-color-gray-light-900) 3%, transparent)" },
+    "2xl": { "value": "0px 24px 48px -12px color-mix(in srgb, var(--ds-color-gray-light-900) 18%, transparent)" },
+    "3xl": { "value": "0px 32px 64px -12px color-mix(in srgb, var(--ds-color-gray-light-900) 14%, transparent)" }
+  }
+}

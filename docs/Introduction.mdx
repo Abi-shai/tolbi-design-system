@@ -1,0 +1,71 @@
+import { Meta } from '@storybook/blocks'
+
+<Meta title="Introduction" />
+
+# Tolbi Design System
+
+Le design system multi-produit de Tolbi — composants Vue 3, tokens de design, et guidelines d'usage.
+
+---
+
+## Stack technique
+
+| Élément | Technologie |
+|---|---|
+| Framework | Vue 3 + TypeScript |
+| Build | Vite (mode library, ESM) |
+| Tokens | Style Dictionary v5 |
+| Documentation | Storybook 8 |
+
+---
+
+## Architecture des tokens
+
+Les tokens sont organisés en deux niveaux :
+
+**Primitives** — les valeurs brutes de la palette (couleurs, typographie, espacement, effets). Ne sont jamais utilisées directement dans les composants.
+
+**Sémantiques** — les usages nommés (`bg-brand-solid`, `fg-secondary`, `border-error`…) qui référencent les primitives. Ce sont ces tokens que les composants consomment.
+
+```
+tokens/src/
+├── color/
+│   ├── primitives.json        ← palette brute
+│   ├── semantic.light.json    ← couche sémantique light
+│   └── semantic.dark.json     ← overrides dark mode
+├── effect/
+│   ├── shadows.json
+│   ├── focus-rings.json
+│   └── blurs.json
+├── spacing/
+│   ├── primitives.json
+│   └── semantic.json
+└── typography/
+    └── primitives.json
+```
+
+Regénérer les CSS après toute modification source :
+
+```bash
+npm run tokens
+```
+
+---
+
+## Utiliser un composant
+
+```bash
+# Le DS est un package npm privé
+import { Button } from 'tolbi-design-system'
+```
+
+```vue
+<script setup lang="ts">
+import { Button } from 'tolbi-design-system'
+</script>
+
+<template>
+  <Button label="Enregistrer" variant="primary" @click="save" />
+</template>
+```
+

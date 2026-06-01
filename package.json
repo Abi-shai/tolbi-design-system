@@ -1,0 +1,52 @@
+{
+  "name": "@abi-shai/tolbi-design-system",
+  "version": "0.1.0",
+  "description": "Tolbi multi-product Design System — Vue 3 components",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "tokens": "node tokens/build.js",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "build": "npm run tokens && vue-tsc --noEmit && vite build",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "keywords": [
+    "design-system",
+    "vue3",
+    "nuxt",
+    "tolbi"
+  ],
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
+  "dependencies": {
+    "vue": "^3.0.0"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/test": "^8.6.15",
+    "@storybook/vue3-vite": "^8.6.18",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "storybook": "^8.6.18",
+    "style-dictionary": "^5.4.1",
+    "typescript": "^6.0.3",
+    "vite": "^6.4.2",
+    "vue-tsc": "^3.3.2"
+  }
+}

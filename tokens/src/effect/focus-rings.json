@@ -1,0 +1,29 @@
+{
+  "focus-ring": {
+    "brand":          { "value": "0px 0px 0px 4px color-mix(in srgb, var(--ds-color-brand-500) 24%, transparent)",        "description": "brand-500 · 24%" },
+    "gray":           { "value": "0px 0px 0px 4px color-mix(in srgb, var(--ds-color-gray-light-400) 14%, transparent)",    "description": "gray-light-400 · 14%" },
+    "gray-secondary": { "value": "0px 0px 0px 4px color-mix(in srgb, var(--ds-color-gray-light-400) 20%, transparent)",    "description": "gray-light-400 · 20%" },
+    "error":          { "value": "0px 0px 0px 4px color-mix(in srgb, var(--ds-color-error-500) 24%, transparent)",         "description": "error-500 · 24%" },
+
+    "brand-shadow-xs": {
+      "value": "0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 5%, transparent), 0px 0px 0px 4px color-mix(in srgb, var(--ds-color-brand-500) 24%, transparent)",
+      "description": "shadow-xs + brand-500 · 24%"
+    },
+    "brand-shadow-sm": {
+      "value": "0px 1px 3px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 10%, transparent), 0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 6%, transparent), 0px 0px 0px 4px color-mix(in srgb, var(--ds-color-brand-500) 24%, transparent)",
+      "description": "shadow-sm + brand-500 · 24%"
+    },
+    "gray-shadow-xs": {
+      "value": "0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 5%, transparent), 0px 0px 0px 4px color-mix(in srgb, var(--ds-color-gray-light-400) 14%, transparent)",
+      "description": "shadow-xs + gray-light-400 · 14%"
+    },
+    "gray-shadow-sm": {
+      "value": "0px 1px 3px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 10%, transparent), 0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 6%, transparent), 0px 0px 0px 4px color-mix(in srgb, var(--ds-color-gray-light-400) 14%, transparent)",
+      "description": "shadow-sm + gray-light-400 · 14%"
+    },
+    "error-shadow-xs": {
+      "value": "0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 5%, transparent), 0px 0px 0px 4px color-mix(in srgb, var(--ds-color-error-500) 24%, transparent)",
+      "description": "shadow-xs + error-500 · 24%"
+    }
+  }
+}

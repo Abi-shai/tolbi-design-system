@@ -1,0 +1,87 @@
+import { Meta, Canvas, Controls, ArgTypes } from '@storybook/blocks'
+import * as ButtonStories from './Button.stories'
+
+<Meta of={ButtonStories} />
+
+# Button
+
+Le composant d'action du DS. Déclenche une action immédiate — **ne sert pas à naviguer** (utiliser `<a>` ou le composant `Link`).
+
+<Canvas of={ButtonStories.Primary} />
+
+<Controls of={ButtonStories.Primary} />
+
+---
+
+## Variantes
+
+| Variante | Usage | Règle |
+|---|---|---|
+| `primary` | Action principale de la page | **1 seul par vue** au maximum |
+| `secondary-gray` | Action secondaire neutre | Accompagne un `primary` |
+| `secondary-color` | Action secondaire brandée | Sur fond blanc avec contexte de marque |
+| `tertiary` | Action tertiaire, zones denses | N'attire pas l'attention |
+| `link` | Lien d'action inline | Dans du texte ou des listes |
+| `danger` | Suppression, révocation — action irréversible | Toujours demander confirmation |
+| `danger-secondary` | Variante outline de l'action destructive | Moins d'impact visuel que `danger` |
+
+<Canvas of={ButtonStories.AllVariants} />
+
+<Canvas of={ButtonStories.SecondaryGray} />
+<Canvas of={ButtonStories.SecondaryColor} />
+<Canvas of={ButtonStories.Tertiary} />
+<Canvas of={ButtonStories.Link} />
+<Canvas of={ButtonStories.Danger} />
+<Canvas of={ButtonStories.DangerSecondary} />
+
+---
+
+## Tailles
+
+| Taille | Contexte |
+|---|---|
+| `sm` | Tableaux, cards, toolbars |
+| `md` | Défaut — formulaires, dialogues |
+| `lg` | Call-to-action saillant |
+| `xl` | Hero sections, onboarding |
+| `2xl` | Landing pages, grandes surfaces |
+
+<Canvas of={ButtonStories.AllSizes} />
+
+---
+
+## États
+
+### Loading
+
+Afficher l'état `loading` pendant les opérations asynchrones. Le bouton devient non-cliquable automatiquement et expose `aria-busy="true"`.
+
+<Canvas of={ButtonStories.Loading} />
+
+### Disabled
+
+Utiliser `disabled` **uniquement** quand l'action est structurellement impossible. Toujours accompagner d'une explication visible.
+
+<Canvas of={ButtonStories.Disabled} />
+
+---
+
+## Règles de contenu
+
+- Le label est un **verbe d'action** court : *Enregistrer*, *Supprimer*, *Continuer*
+- Pas de majuscules entières (ALL CAPS)
+- Pas de ponctuation finale sauf les points de suspension (`…`) pour les actions longues
+- **Maximum ~3 mots** — au-delà, revoir le libellé ou le flux
+
+---
+
+## Props
+
+<ArgTypes of={ButtonStories} />
+
+---
+
+## Ce qu'il ne fait pas
+
+- Pas de navigation → utiliser `<a>` ou le composant `Link`
+- Pas de toggle / état actif persistant → utiliser `ToggleButton` (v2)
