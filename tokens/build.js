@@ -1,4 +1,5 @@
 import StyleDictionary from 'style-dictionary'
+import { readFileSync, writeFileSync } from 'fs'
 
 const [
   sdColors, sdTypography,
@@ -92,3 +93,12 @@ await Promise.all([
   sdDark.buildAllPlatforms(),
   sdRadius.buildAllPlatforms(),
 ])
+
+const tokenFiles = [
+  'colors', 'typography', 'radius', 'space', 'spacing',
+  'shadows', 'focus-rings', 'blurs', 'semantic', 'semantic-dark',
+]
+const combined = tokenFiles
+  .map(f => readFileSync(`tokens/dist/${f}.css`, 'utf8'))
+  .join('\n')
+writeFileSync('tokens/dist/index.css', combined)

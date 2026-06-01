@@ -10,7 +10,9 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    }
+    },
+    "./tokens": "./dist/tokens/index.css",
+    "./tokens/*": "./dist/tokens/*.css"
   },
   "files": [
     "dist"
