@@ -1,0 +1,96 @@
+import { Canvas, Controls, ArgTypes } from '@storybook/blocks'
+import * as InputFieldStories from './InputField.stories'
+
+# InputField
+
+Champ de saisie textuelle. Supporte le label, le hint, un icône ou texte en leading, un tooltip d'aide, et les états disabled et destructif.
+
+<Canvas of={InputFieldStories.Default} />
+
+<Controls of={InputFieldStories.Default} />
+
+---
+
+## États
+
+<Canvas of={InputFieldStories.AllStates} />
+
+| État | Visuel |
+|---|---|
+| Default | Bordure grise, shadow-xs |
+| Focused | Bordure brand + focus ring brand (CSS `:focus-within`) |
+| Disabled | Fond gris, curseur `not-allowed` |
+| Destructive | Bordure rouge + icône `alert-circle` + hint rouge |
+
+---
+
+## Variantes de contenu
+
+### Avec icône leading
+
+<Canvas of={InputFieldStories.WithIconLeading} />
+
+Utiliser le slot `#icon-leading` avec un `<Icon>` du DS.
+
+```vue
+<InputField label="Email" placeholder="...">
+  <template #icon-leading>
+    <Icon name="mail-01" :size="20" />
+  </template>
+</InputField>
+```
+
+### Avec texte leading
+
+<Canvas of={InputFieldStories.WithLeadingText} />
+
+Utiliser le slot `#leading-text` pour un préfixe textuel.
+
+```vue
+<InputField label="Website">
+  <template #leading-text>https://</template>
+</InputField>
+```
+
+### Avec help icon
+
+<Canvas of={InputFieldStories.WithHelpIcon} />
+
+La prop `help-tooltip` affiche un `<HelpIcon>` dans le label avec le texte passé.
+
+---
+
+## Tailles
+
+<Canvas of={InputFieldStories.SizeSm} />
+
+| Taille | Padding input | Texte |
+|---|---|---|
+| `sm` | `8px 14px` | 14px |
+| `md` | `10px 14px` | 16px |
+
+---
+
+## v-model
+
+Le composant expose `v-model` (string) en standard :
+
+```vue
+<InputField v-model="email" label="Email" placeholder="..." />
+```
+
+---
+
+## Slots
+
+| Slot | Description |
+|---|---|
+| `#icon-leading` | Icône à gauche du texte de saisie |
+| `#leading-text` | Texte fixe à gauche (ex: `"https://"`, `"$"`) |
+| `#trailing` | Contenu à droite (bouton, dropdown…) |
+
+---
+
+## Props
+
+<ArgTypes of={InputFieldStories} />

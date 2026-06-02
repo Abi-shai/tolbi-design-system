@@ -1,0 +1,57 @@
+import { Canvas, Controls, ArgTypes } from '@storybook/blocks'
+import * as HelpIconStories from './HelpIcon.stories'
+
+# HelpIcon
+
+Icône `?` interactive qui affiche un `Tooltip` au survol ou au focus. Composant autonome — gère lui-même l'état ouvert/fermé.
+
+<Canvas of={HelpIconStories.Default} />
+
+<Controls of={HelpIconStories.Default} />
+
+---
+
+## Avec texte secondaire
+
+<Canvas of={HelpIconStories.WithSupportingText} />
+
+---
+
+## Toutes les positions
+
+Survoler chaque icône pour voir le tooltip positionné.
+
+<Canvas of={HelpIconStories.AllPlacements} />
+
+| Valeur | Position du tooltip | Flèche |
+|---|---|---|
+| `top` | Au-dessus, centré | Aucune |
+| `top-arrow` | Au-dessus, centré | `bottom-center` |
+| `top-left` | Au-dessus, aligné à gauche | `bottom-right` |
+| `top-right` | Au-dessus, aligné à droite | `bottom-left` |
+| `bottom` | En dessous, centré | `top-center` |
+| `left` | À gauche | `right` |
+| `right` | À droite | `left` |
+
+---
+
+## Réutilisation DS
+
+Compose en interne :
+- `<Icon name="help-circle">` — l'icône question
+- `<Tooltip>` — la bulle avec tout son système de flèches
+
+---
+
+## Accessibilité
+
+- `role="button"` implicite via `<button>`
+- `aria-label` = `title` (contenu du tooltip)
+- `aria-expanded` reflète l'état ouvert/fermé
+- Activable au clavier via `focus`
+
+---
+
+## Props
+
+<ArgTypes of={HelpIconStories} />

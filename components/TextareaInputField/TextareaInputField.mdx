@@ -1,0 +1,64 @@
+import { Canvas, Controls, ArgTypes } from '@storybook/blocks'
+import * as TextareaInputFieldStories from './TextareaInputField.stories'
+
+# TextareaInputField
+
+Champ de saisie multilignes. Deux types : `default` (textarea libre) et `tags` (chips interactifs + saisie).
+
+<Canvas of={TextareaInputFieldStories.Default} />
+
+<Controls of={TextareaInputFieldStories.Default} />
+
+---
+
+## États
+
+<Canvas of={TextareaInputFieldStories.AllStates} />
+
+| État | Visuel |
+|---|---|
+| Default | Bordure grise, shadow-xs |
+| Focused | Bordure brand + focus ring (CSS `:focus-within`) |
+| Disabled | Fond alt, curseur `not-allowed` |
+| Destructive | Bordure rouge + hint rouge |
+
+---
+
+## Mode Tags
+
+<Canvas of={TextareaInputFieldStories.TagsEmpty} />
+<Canvas of={TextareaInputFieldStories.TagsWithValues} />
+
+Les tags sont gérés par l'app consommatrice via `tags` (prop) et les événements `add-tag` / `remove-tag`.
+
+**Comportement clavier :**
+- `Enter` ou `,` → confirme le tag en cours de saisie
+- `Backspace` sur champ vide → supprime le dernier tag
+
+```vue
+<TextareaInputField
+  v-model="currentInput"
+  type="tags"
+  label="Description"
+  :tags="tags"
+  @add-tag="tags.push($event)"
+  @remove-tag="tags.splice($event, 1)"
+/>
+```
+
+---
+
+## Différences vs InputField
+
+| | InputField | TextareaInputField |
+|---|---|---|
+| Multilignes | Non | Oui (`resize: none`) |
+| Taille | `sm` / `md` | Hauteur libre (min 128px) |
+| Mode tags | Non | Oui |
+| Help icon | Oui | Non |
+
+---
+
+## Props
+
+<ArgTypes of={TextareaInputFieldStories} />

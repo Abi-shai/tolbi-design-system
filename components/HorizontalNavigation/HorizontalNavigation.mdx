@@ -1,0 +1,71 @@
+import { Canvas, Controls, ArgTypes } from '@storybook/blocks'
+import * as HorizontalNavigationStories from './HorizontalNavigation.stories'
+
+# HorizontalNavigation
+
+Barre de navigation principale de l'app Tolbi. Fond vert foncé semi-transparent, présente le logo, un fil d'Ariane contextuel, les actions rapides et l'avatar utilisateur.
+
+<Canvas of={HorizontalNavigationStories.Accueil} />
+
+<Controls of={HorizontalNavigationStories.Accueil} />
+
+---
+
+## États
+
+Le composant adapte son contenu selon la profondeur de navigation via la prop `state`.
+
+| État | Breadcrumbs | Usage |
+|---|---|---|
+| `Accueil` | Aucun | Page d'accueil de la plateforme |
+| `Module` | 1 niveau | Vue principale d'un module (ex: Carbone) |
+| `Project` | 2 niveaux | Vue d'un projet dans un module |
+| `tabs` | 3 niveaux | Vue d'un onglet dans un projet |
+
+<Canvas of={HorizontalNavigationStories.Accueil} />
+<Canvas of={HorizontalNavigationStories.Module} />
+<Canvas of={HorizontalNavigationStories.Project} />
+<Canvas of={HorizontalNavigationStories.Tabs} />
+
+---
+
+## Notifications
+
+Le point rouge sur la cloche s'affiche via `hasNotification`.
+
+<Canvas of={HorizontalNavigationStories.WithNotification} />
+
+---
+
+## Breadcrumbs
+
+La prop `breadcrumbs` est un tableau d'objets `{ label, active? }`. Le dernier élément actif (`active: true`) reçoit un style en surbrillance (fond vert sombre, Poppins SemiBold). Les éléments inactifs sont en Inter Medium grisé.
+
+La maison (icône `home-05`) est toujours présente comme racine et émet l'événement `learn` au clic.
+
+---
+
+## Événements
+
+| Événement | Déclencheur |
+|---|---|
+| `learn` | Clic sur le bouton "Apprendre" ou l'icône maison |
+| `settings` | Clic sur l'icône paramètres |
+| `notifications` | Clic sur la cloche |
+| `apps` | Clic sur la grille d'apps |
+| `user` | Clic sur l'avatar |
+
+---
+
+## Réutilisation DS
+
+Ce composant utilise en interne :
+- `<Logo>` — logo Tolbi
+- `<Icon name="home-05">`, `<Icon name="chevron-right">` — breadcrumbs
+- `<Icon name="book-open-01">`, `<Icon name="settings-01">`, `<Icon name="bell-01">`, `<Icon name="dots-grid">` — actions
+
+---
+
+## Props
+
+<ArgTypes of={HorizontalNavigationStories} />

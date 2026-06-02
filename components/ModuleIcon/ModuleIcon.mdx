@@ -1,0 +1,63 @@
+import { Canvas, Controls, ArgTypes } from '@storybook/blocks'
+import * as ModuleIconStories from './ModuleIcon.stories'
+
+# ModuleIcon
+
+Icône représentant un module produit Tolbi. Chaque module a son propre SVG bundlé — aucune dépendance réseau à l'exécution.
+
+<Canvas of={ModuleIconStories.Default} />
+
+<Controls of={ModuleIconStories.Default} />
+
+---
+
+## Modules disponibles
+
+<Canvas of={ModuleIconStories.AllModules} />
+
+| Module | Description |
+|---|---|
+| `Carbone` | Suivi d'empreinte carbone |
+| `Source` | Traçabilité des approvisionnements |
+| `Call` | Collecte terrain par appel |
+| `Scan` | Collecte terrain par scan |
+| `Data` | Gestion et analyse de données |
+| `ID` | Identification des producteurs |
+| `Redd+` | Projets REDD+ et déforestation |
+| `Survey` | Enquêtes et formulaires terrain |
+| `Yield` | Suivi des rendements |
+| `Forest` | Monitoring forestier |
+| `Trace` | Traçabilité bout-en-bout |
+| `Eudr` | Conformité EUDR |
+
+---
+
+## Tailles
+
+La prop `size` accepte un nombre (px) ou une string CSS (`"2rem"`, `"100%"`).
+
+<Canvas of={ModuleIconStories.Large} />
+<Canvas of={ModuleIconStories.Small} />
+
+---
+
+## Usage
+
+```vue
+<ModuleIcon module="Carbone" :size="48" />
+<ModuleIcon module="Survey" :size="32" />
+```
+
+---
+
+## Règles d'usage
+
+- Toujours accompagner d'un label textuel dans l'interface — le composant expose `aria-label` mais reste insuffisant seul
+- Ne pas redimensionner en dessous de `24px` — les détails visuels deviennent illisibles
+- `Eudr` n'a pas encore d'asset graphique — affiche un espace vide
+
+---
+
+## Props
+
+<ArgTypes of={ModuleIconStories} />

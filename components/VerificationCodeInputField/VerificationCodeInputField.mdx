@@ -1,0 +1,69 @@
+import { Canvas, Controls, ArgTypes } from '@storybook/blocks'
+import * as Stories from './VerificationCodeInputField.stories'
+
+# VerificationCodeInputField
+
+Champ de saisie de code OTP ou de vérification. Affiche N cellules de saisie individuelles avec auto-avancement, support du paste et navigation clavier.
+
+<Canvas of={Stories.FourDigits} />
+
+<Controls of={Stories.FourDigits} />
+
+---
+
+## Nombre de chiffres
+
+<Canvas of={Stories.FourDigits} />
+<Canvas of={Stories.SixDigits} />
+
+Le mode 6 chiffres affiche un séparateur `-` entre les groupes de 3.
+
+---
+
+## Tailles
+
+<Canvas of={Stories.AllSizes} />
+<Canvas of={Stories.AllSizesSix} />
+
+| Taille | Cellule | Radius | Font |
+|---|---|---|---|
+| `sm` | 64×64px | `radius-md` (8px) | 48px Inter Medium |
+| `md` | 80×80px | `radius-lg` (10px) | 48px Inter Medium |
+| `lg` | 96×96px | `radius-xl` (12px) | 60px Inter Medium |
+
+---
+
+## Comportement clavier
+
+| Touche | Action |
+|---|---|
+| Chiffre 0-9 | Saisit et avance à la cellule suivante |
+| `Backspace` | Efface et recule à la cellule précédente |
+| `←` / `→` | Navigue entre les cellules |
+| `Ctrl/Cmd+V` | Colle et distribue le code sur toutes les cellules |
+
+---
+
+## v-model + événements
+
+```vue
+<VerificationCodeInputField
+  v-model="code"
+  :digits="6"
+  size="md"
+  label="Secure code"
+  hint="Check your email."
+  @complete="onComplete"
+/>
+```
+
+| Événement | Payload | Déclenché quand |
+|---|---|---|
+| `update:modelValue` | `string` | À chaque frappe |
+| `complete` | `string` | Toutes les cellules remplies |
+
+---
+
+## Props
+
+<ArgTypes of={Stories} />

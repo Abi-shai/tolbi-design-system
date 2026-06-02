@@ -1,18 +1,32 @@
 <script setup lang="ts">
+import logoNavSrc from './logo-nav.svg'
+
 // Asset URLs sourced from Figma — replace with hosted SVG files before production.
 const ICON_INNER = 'https://www.figma.com/api/mcp/asset/fdea7f63-a81b-45f8-a462-4bce0d0ad617'
 const ICON_OUTER = 'https://www.figma.com/api/mcp/asset/64e34a7d-bb08-4ab2-a58e-237d9fe9e0c9'
 const WORDMARK   = 'https://www.figma.com/api/mcp/asset/1b65a47d-8f82-43fd-aad7-13abe10f9f96'
 
+export type LogoVariant = 'default' | 'nav'
+
 interface Props {
-  alt?: string
+  alt?:     string
+  variant?: LogoVariant
 }
 
-withDefaults(defineProps<Props>(), { alt: 'Tolbi' })
+withDefaults(defineProps<Props>(), { alt: 'Tolbi', variant: 'default' })
 </script>
 
 <template>
-  <div class="ds-logo">
+  <!-- Variante nav : wordmark compact sur fond sombre (46.578×20px) -->
+  <img
+    v-if="variant === 'nav'"
+    class="ds-logo ds-logo--nav"
+    :src="logoNavSrc"
+    :alt="alt"
+  />
+
+  <!-- Variante default : icon + wordmark -->
+  <div v-else class="ds-logo">
     <div class="ds-logo__icon">
       <img class="ds-logo__icon-inner" :src="ICON_INNER" alt="" />
       <img class="ds-logo__icon-outer" :src="ICON_OUTER" alt="" />
@@ -22,6 +36,14 @@ withDefaults(defineProps<Props>(), { alt: 'Tolbi' })
 </template>
 
 <style scoped>
+/* Variante nav */
+.ds-logo--nav {
+  display: block;
+  width: 46.578px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
 .ds-logo {
   display: inline-flex;
   align-items: center;

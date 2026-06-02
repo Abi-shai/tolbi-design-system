@@ -1,0 +1,67 @@
+import { Canvas, Controls, ArgTypes } from '@storybook/blocks'
+import * as Stories from './CreditsChip.stories'
+
+# CreditsChip
+
+Pastille de crédits affichée dans la `HorizontalNavigation`. Indique le solde de crédits de l'utilisateur ou du projet, avec trois niveaux d'urgence.
+
+<Canvas of={Stories.AllStates} />
+
+<Controls of={Stories.GoodHome} />
+
+---
+
+## États
+
+| État | Visuel | Usage |
+|---|---|---|
+| `good` | Fond jaune warning-50 | Solde suffisant |
+| `low` | Fond rouge error-50 + bordure error-700 + CTA | Moins de 10 crédits |
+| `empty` | Identique à `low` | Solde épuisé |
+
+---
+
+## Contexte
+
+La prop `context` change le label affiché en état `good` :
+
+<Canvas of={Stories.GoodHome} />
+<Canvas of={Stories.GoodProject} />
+
+---
+
+## États critiques
+
+<Canvas of={Stories.Low} />
+<Canvas of={Stories.Empty} />
+
+En état critique, le bouton "Contacter sales" émet l'événement `contact-sales`.
+
+```vue
+<CreditsChip
+  :credits="5"
+  state="low"
+  :avatar-src="user.avatarUrl"
+  @contact-sales="openSalesModal"
+/>
+```
+
+---
+
+## Utilisation dans HorizontalNavigation
+
+```vue
+<CreditsChip
+  :credits="userCredits"
+  :state="creditState"
+  context="home"
+  :avatar-src="user.avatarUrl"
+  @contact-sales="handleContactSales"
+/>
+```
+
+---
+
+## Props
+
+<ArgTypes of={Stories} />

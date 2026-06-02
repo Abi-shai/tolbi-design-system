@@ -1,0 +1,66 @@
+import { Canvas, Controls, ArgTypes } from '@storybook/blocks'
+import * as TooltipStories from './Tooltip.stories'
+
+# Tooltip
+
+Bulle d'information contextuelle affichée au survol ou au focus d'un élément. Fond sombre fixe, 7 positions de flèche, texte secondaire optionnel.
+
+<Canvas of={TooltipStories.Default} />
+
+<Controls of={TooltipStories.Default} />
+
+---
+
+## Contenu
+
+Deux modes selon la présence de `supporting-text` :
+
+| Mode | Padding | Largeur |
+|---|---|---|
+| Titre seul | `8px 12px` | `auto` (nowrap) |
+| Titre + texte secondaire | `12px` | `320px` fixe |
+
+<Canvas of={TooltipStories.Default} />
+<Canvas of={TooltipStories.WithSupportingText} />
+
+---
+
+## Directions de flèche
+
+<Canvas of={TooltipStories.AllArrows} />
+<Canvas of={TooltipStories.AllArrowsRich} />
+
+| Valeur | Flèche pointe vers |
+|---|---|
+| `none` | Aucune flèche |
+| `bottom-center` | Bas, centrée |
+| `bottom-left` | Bas, alignée à gauche |
+| `bottom-right` | Bas, alignée à droite |
+| `top-center` | Haut, centrée |
+| `left` | Gauche |
+| `right` | Droite |
+
+---
+
+## Positionnement
+
+Ce composant expose uniquement le **visuel** du tooltip. Le positionnement flottant (ancré à un élément déclencheur) est à gérer côté app avec une librairie comme [Floating UI](https://floating-ui.com/).
+
+Exemple d'intégration :
+```vue
+<div style="position: relative;">
+  <button @mouseenter="show = true" @mouseleave="show = false">Survole-moi</button>
+  <Tooltip
+    v-if="show"
+    title="Mon tooltip"
+    arrow="top-center"
+    style="position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);"
+  />
+</div>
+```
+
+---
+
+## Props
+
+<ArgTypes of={TooltipStories} />

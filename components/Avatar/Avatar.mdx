@@ -1,0 +1,79 @@
+import { Canvas, Controls, ArgTypes } from '@storybook/blocks'
+import * as AvatarStories from './Avatar.stories'
+
+# Avatar
+
+Représentation visuelle d'un utilisateur ou d'une entité. Supporte trois types de contenu (photo, initiales, placeholder) et quatre statuts indicateurs.
+
+<Canvas of={AvatarStories.Initials} />
+
+<Controls of={AvatarStories.Initials} />
+
+---
+
+## Types de contenu
+
+| Prop | Comportement |
+|---|---|
+| `src` fourni | Affiche la photo en `object-fit: cover` |
+| `initials` fourni, pas de `src` | Fond gris + initiales Poppins SemiBold |
+| Aucun des deux | Silhouette placeholder |
+
+<Canvas of={AvatarStories.Initials} />
+<Canvas of={AvatarStories.WithImage} />
+<Canvas of={AvatarStories.Placeholder} />
+
+---
+
+## Statuts
+
+<Canvas of={AvatarStories.AllStatuses} />
+
+| Valeur | Visuel | Usage |
+|---|---|---|
+| `online` | Point vert en bas à droite | Utilisateur connecté |
+| `company` | Badge logo entreprise | Compte associé à une société |
+| `verified` | Badge vert avec coche | Compte certifié |
+
+### Online
+<Canvas of={AvatarStories.Online} />
+
+### Company
+<Canvas of={AvatarStories.WithCompany} />
+
+Passer `company-src` avec l'URL du logo de l'entreprise.
+
+### Verified
+<Canvas of={AvatarStories.Verified} />
+
+---
+
+## Tailles
+
+6 tailles disponibles, toutes accessibles via la prop `size`.
+
+<Canvas of={AvatarStories.AllSizes} />
+<Canvas of={AvatarStories.AllSizesWithImage} />
+
+| Taille | px | Contexte |
+|---|---|---|
+| `xs` | 24 | Tableaux denses, listes compactes |
+| `sm` | 32 | Commentaires, mentions inline |
+| `md` | 40 | Défaut — nav, cards |
+| `lg` | 48 | Profils, sidebars |
+| `xl` | 56 | Pages profil, headers |
+| `2xl` | 64 | Grands affichages, onboarding |
+
+---
+
+## Accessibilité
+
+- Le composant expose `role="img"` et `aria-label` (valeur de `alt` ou `initials`)
+- Le badge de statut expose son propre `aria-label` ("En ligne", "Vérifié")
+- La photo passe son `alt` à l'`<img>` interne
+
+---
+
+## Props
+
+<ArgTypes of={AvatarStories} />

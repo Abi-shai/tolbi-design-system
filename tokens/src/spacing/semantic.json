@@ -2,6 +2,7 @@
   "spacing": {
     "xxs":  { "value": "{space.0-5}", "description": "2px" },
     "xs":   { "value": "{space.1}",   "description": "4px" },
+    "sm":   { "value": "0.375rem",    "description": "6px" },
     "md":   { "value": "{space.2}",   "description": "8px" },
     "lg":   { "value": "{space.3}",   "description": "12px" },
     "xl":   { "value": "{space.4}",   "description": "16px" },

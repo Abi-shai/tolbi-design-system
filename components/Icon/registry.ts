@@ -10,6 +10,15 @@ import SearchMd        from './icons/search-md.vue'
 import Eye             from './icons/eye.vue'
 import EyeOff          from './icons/eye-off.vue'
 import Home01          from './icons/home-01.vue'
+import Home05          from './icons/home-05.vue'
+import Bell01          from './icons/bell-01.vue'
+import ChevronRight    from './icons/chevron-right.vue'
+import DotsGrid        from './icons/dots-grid.vue'
+import BookOpen01      from './icons/book-open-01.vue'
+import HelpCircle      from './icons/help-circle.vue'
+import AlertCircle     from './icons/alert-circle.vue'
+import ArrowRight      from './icons/arrow-right.vue'
+import Mail01          from './icons/mail-01.vue'
 import Heart           from './icons/heart.vue'
 import FilterFunnel01  from './icons/filter-funnel-01.vue'
 import Trash01         from './icons/trash-01.vue'
@@ -99,6 +108,15 @@ export const icons = {
   'eye':              Eye,
   'eye-off':          EyeOff,
   'home-01':          Home01,
+  'home-05':          Home05,
+  'bell-01':          Bell01,
+  'chevron-right':    ChevronRight,
+  'dots-grid':        DotsGrid,
+  'book-open-01':     BookOpen01,
+  'help-circle':      HelpCircle,
+  'alert-circle':     AlertCircle,
+  'arrow-right':      ArrowRight,
+  'mail-01':          Mail01,
   'heart':            Heart,
   'filter-funnel-01': FilterFunnel01,
   'trash-01':         Trash01,
