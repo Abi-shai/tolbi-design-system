@@ -1,11 +1,12 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
-import { copyFileSync, mkdirSync, readdirSync } from 'fs'
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
 
 const copyTokens = () => ({
   name: 'copy-tokens',
   closeBundle() {
+    if (!existsSync('tokens/dist')) return
     mkdirSync('dist/tokens', { recursive: true })
     readdirSync('tokens/dist').forEach(file => {
       copyFileSync(`tokens/dist/${file}`, `dist/tokens/${file}`)

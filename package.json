@@ -20,7 +20,7 @@
   "scripts": {
     "tokens": "node tokens/build.js",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
+    "build-storybook": "npm run tokens && storybook build",
     "build": "npm run tokens && vue-tsc --noEmit && vite build",
     "typecheck": "vue-tsc --noEmit"
   },
