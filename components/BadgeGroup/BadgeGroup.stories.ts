@@ -6,7 +6,7 @@ const COLORS = ['brand', 'error', 'warning', 'success', 'gray'] as const
 const meta: Meta<typeof BadgeGroup> = {
   title: 'Components/BadgeGroup',
   component: BadgeGroup,
-  tags: [],
+  tags: ['wip'],
   parameters: {
     layout: 'centered',
     docs: {

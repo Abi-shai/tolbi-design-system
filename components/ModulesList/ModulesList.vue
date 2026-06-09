@@ -70,11 +70,28 @@ function onSelect(item: ModulesListItem) {
   display: inline-flex;
   align-items: flex-start;
   flex-shrink: 0;
-  scrollbar-width: none;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ds-semantic-bg-quaternary) transparent;
 }
 
 .ds-modules-list::-webkit-scrollbar {
-  display: none;
+  width: 16px;
+}
+
+.ds-modules-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ds-modules-list::-webkit-scrollbar-thumb {
+  background-color: var(--ds-semantic-bg-quaternary);
+  border-radius: var(--ds-radius-full);
+  border: 4px solid transparent;
+  background-clip: padding-box;
+}
+
+.ds-modules-list::-webkit-scrollbar-thumb:hover {
+  background-color: var(--ds-semantic-fg-senary);
 }
 
 .ds-modules-list__inner {

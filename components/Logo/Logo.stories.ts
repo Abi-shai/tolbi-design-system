@@ -4,7 +4,7 @@ import Logo from './Logo.vue'
 const meta: Meta<typeof Logo> = {
   title: 'Components/Logo',
   component: Logo,
-  tags: ['autodocs'],
+  tags: ['wip'],
   parameters: {
     layout: 'centered',
   },

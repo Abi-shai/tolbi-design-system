@@ -8,7 +8,7 @@ const allNames = Object.keys(icons) as IconName[]
 const meta: Meta<typeof Icon> = {
   title: 'Components/Icon',
   component: Icon,
-  tags: ['autodocs'],
+  tags: ['wip'],
   parameters: {
     layout: 'centered',
     docs: {

@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { fn, userEvent, within, expect } from '@storybook/test'
 import CloseButton from './CloseButton.vue'
+import StoryGrid from '../../stories/StoryGrid.vue'
 
 const meta: Meta<typeof CloseButton> = {
   title: 'Components/CloseButton',
   component: CloseButton,
-  tags: [],
+  tags: ['wip'],
   parameters: {
     layout: 'centered',
     docs: {
@@ -102,14 +103,11 @@ export const AllSizes: Story = {
   name: 'All sizes',
   parameters: { layout: 'padded' },
   render: () => ({
-    components: { CloseButton },
-    template: `
-      <div style="display:flex; gap:12px; align-items:center;">
-        <CloseButton size="sm" aria-label="Fermer" />
-        <CloseButton size="md" aria-label="Fermer" />
-        <CloseButton size="lg" aria-label="Fermer" />
-      </div>
-    `,
+    components: { StoryGrid },
+    setup: () => ({
+      items: ['sm', 'md', 'lg'].map(size => ({ component: CloseButton, props: { size, ariaLabel: 'Fermer' } })),
+    }),
+    template: `<StoryGrid :items="items" wrap="nowrap" />`,
   }),
 }
 
@@ -120,13 +118,10 @@ export const AllSizesDark: Story = {
     backgrounds: { default: 'Dark' },
   },
   render: () => ({
-    components: { CloseButton },
-    template: `
-      <div style="display:flex; gap:12px; align-items:center;">
-        <CloseButton size="sm" :dark-background="true" aria-label="Fermer" />
-        <CloseButton size="md" :dark-background="true" aria-label="Fermer" />
-        <CloseButton size="lg" :dark-background="true" aria-label="Fermer" />
-      </div>
-    `,
+    components: { StoryGrid },
+    setup: () => ({
+      items: ['sm', 'md', 'lg'].map(size => ({ component: CloseButton, props: { size, ariaLabel: 'Fermer', darkBackground: true } })),
+    }),
+    template: `<StoryGrid :items="items" wrap="nowrap" />`,
   }),
 }

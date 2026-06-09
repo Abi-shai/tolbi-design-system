@@ -4,7 +4,7 @@ import ButtonGroupItem from './ButtonGroupItem.vue'
 
 const meta: Meta = {
   title: 'Components/ButtonGroup',
-  tags: [],
+  tags: ['wip'],
   parameters: {
     layout: 'centered',
     docs: {

@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import logoNavSrc from './logo-nav.svg'
-
-// Asset URLs sourced from Figma — replace with hosted SVG files before production.
-const ICON_INNER = 'https://www.figma.com/api/mcp/asset/fdea7f63-a81b-45f8-a462-4bce0d0ad617'
-const ICON_OUTER = 'https://www.figma.com/api/mcp/asset/64e34a7d-bb08-4ab2-a58e-237d9fe9e0c9'
-const WORDMARK   = 'https://www.figma.com/api/mcp/asset/1b65a47d-8f82-43fd-aad7-13abe10f9f96'
+import logoNavSrc    from './logo-nav.svg'
+import logoIconInner from './logo-icon-inner.svg'
+import logoIconOuter from './logo-icon-outer.svg'
+import logoWordmark  from './logo-wordmark.svg'
 
 export type LogoVariant = 'default' | 'nav'
 
@@ -28,10 +26,10 @@ withDefaults(defineProps<Props>(), { alt: 'Tolbi', variant: 'default' })
   <!-- Variante default : icon + wordmark -->
   <div v-else class="ds-logo">
     <div class="ds-logo__icon">
-      <img class="ds-logo__icon-inner" :src="ICON_INNER" alt="" />
-      <img class="ds-logo__icon-outer" :src="ICON_OUTER" alt="" />
+      <img class="ds-logo__icon-inner" :src="logoIconInner" alt="" />
+      <img class="ds-logo__icon-outer" :src="logoIconOuter" alt="" />
     </div>
-    <img class="ds-logo__wordmark" :src="WORDMARK" :alt="alt" />
+    <img class="ds-logo__wordmark" :src="logoWordmark" :alt="alt" />
   </div>
 </template>
 

@@ -1,16 +1,7 @@
 import type { Preview } from '@storybook/vue3'
 import theme from './theme'
 import '../tokens/fonts.css'
-import '../tokens/dist/colors.css'
-import '../tokens/dist/typography.css'
-import '../tokens/dist/shadows.css'
-import '../tokens/dist/focus-rings.css'
-import '../tokens/dist/blurs.css'
-import '../tokens/dist/space.css'
-import '../tokens/dist/spacing.css'
-import '../tokens/dist/semantic.css'
-import '../tokens/dist/semantic-dark.css'
-import '../tokens/dist/radius.css'
+import '../tokens/dist/index.css'
 
 const preview: Preview = {
   parameters: {

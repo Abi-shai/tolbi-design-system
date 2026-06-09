@@ -1,0 +1,12 @@
+<template>
+  <div class="ds-dropdown-divider" role="separator" aria-orientation="horizontal" />
+</template>
+
+<style scoped>
+.ds-dropdown-divider {
+  height: 1px;
+  margin: 4px 0;
+  background-color: var(--ds-semantic-border-secondary);
+  flex-shrink: 0;
+}
+</style>

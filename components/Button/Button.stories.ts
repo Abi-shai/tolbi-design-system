@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { fn, userEvent, within, expect } from '@storybook/test'
 import Button from './Button.vue'
+import StoryGrid from '../../stories/StoryGrid.vue'
 
 const meta: Meta<typeof Button> = {
   title: 'Components/Button',
@@ -8,12 +9,7 @@ const meta: Meta<typeof Button> = {
   tags: [],
   parameters: {
     layout: 'centered',
-    docs: {
-      description: {
-        component:
-          'Composant d\'action principal. Déclenche une action immédiate — **ne sert pas à naviguer** (utiliser `<a>` ou le composant `Link`).',
-      },
-    },
+    docs: {},
   },
   argTypes: {
     variant: {
@@ -189,18 +185,19 @@ export const AllVariants: Story = {
   name: 'All variants',
   parameters: { layout: 'padded' },
   render: () => ({
-    components: { Button },
-    template: `
-      <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-        <Button label="Primary"          variant="primary"          />
-        <Button label="Secondary gray"   variant="secondary-gray"   />
-        <Button label="Secondary color"  variant="secondary-color"  />
-        <Button label="Tertiary"         variant="tertiary"         />
-        <Button label="Link"             variant="link"             />
-        <Button label="Danger"           variant="danger"           />
-        <Button label="Danger secondary" variant="danger-secondary" />
-      </div>
-    `,
+    components: { StoryGrid },
+    setup: () => ({
+      items: [
+        { component: Button, props: { label: 'Primary',          variant: 'primary'          } },
+        { component: Button, props: { label: 'Secondary gray',   variant: 'secondary-gray'   } },
+        { component: Button, props: { label: 'Secondary color',  variant: 'secondary-color'  } },
+        { component: Button, props: { label: 'Tertiary',         variant: 'tertiary'         } },
+        { component: Button, props: { label: 'Link',             variant: 'link'             } },
+        { component: Button, props: { label: 'Danger',           variant: 'danger'           } },
+        { component: Button, props: { label: 'Danger secondary', variant: 'danger-secondary' } },
+      ],
+    }),
+    template: `<StoryGrid :items="items" />`,
   }),
 }
 
@@ -208,15 +205,16 @@ export const AllSizes: Story = {
   name: 'All sizes',
   parameters: { layout: 'padded' },
   render: () => ({
-    components: { Button },
-    template: `
-      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-        <Button label="sm"  size="sm"  />
-        <Button label="md"  size="md"  />
-        <Button label="lg"  size="lg"  />
-        <Button label="xl"  size="xl"  />
-        <Button label="2xl" size="2xl" />
-      </div>
-    `,
+    components: { StoryGrid },
+    setup: () => ({
+      items: [
+        { component: Button, props: { label: 'sm',  size: 'sm'  } },
+        { component: Button, props: { label: 'md',  size: 'md'  } },
+        { component: Button, props: { label: 'lg',  size: 'lg'  } },
+        { component: Button, props: { label: 'xl',  size: 'xl'  } },
+        { component: Button, props: { label: '2xl', size: '2xl' } },
+      ],
+    }),
+    template: `<StoryGrid :items="items" />`,
   }),
 }

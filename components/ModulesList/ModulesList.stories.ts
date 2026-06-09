@@ -17,7 +17,7 @@ const FIGMA_MODULES = [
 const meta: Meta<typeof ModulesList> = {
   title: 'Components/ModulesList',
   component: ModulesList,
-  tags: ['autodocs'],
+  tags: ['wip'],
   parameters: {
     layout: 'centered',
   },

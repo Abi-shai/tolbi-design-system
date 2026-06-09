@@ -1,10 +1,50 @@
-import { Meta } from '@storybook/blocks'
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as ButtonStories from '../components/Button/Button.stories'
 
 <Meta title="Introduction" />
 
-# Tolbi Design System
+# Tolbi Design System <span style={{fontSize:'0.55em', fontWeight:400, verticalAlign:'middle', background:'#E8F5E9', color:'#1B5E20', borderRadius:'4px', padding:'2px 8px', marginLeft:'8px'}}>v0.3.0</span>
 
 Le design system multi-produit de Tolbi — composants Vue 3, tokens de design, et guidelines d'usage.
+
+---
+
+## Démarrage rapide
+
+```bash
+npm install tolbi-design-system
+```
+
+```vue
+<script setup lang="ts">
+import { Button } from 'tolbi-design-system'
+</script>
+
+<template>
+  <Button label="Enregistrer" variant="primary" @click="save" />
+</template>
+```
+
+<Canvas of={ButtonStories.Primary} />
+<Controls of={ButtonStories.Primary} />
+
+---
+
+## Architecture des tokens
+
+Les tokens sont organisés en deux niveaux :
+
+**Primitives** — les valeurs brutes de la palette (couleurs, typographie, espacement, effets). Ne sont jamais utilisées directement dans les composants.
+
+**Sémantiques** — les usages nommés (`bg-brand-solid`, `fg-secondary`, `border-error`…) qui référencent les primitives. Ce sont ces tokens que les composants consomment.
+
+Tous les tokens sont préfixés `--ds-` et exposés comme variables CSS sur `:root`.
+
+Après toute modification des sources de tokens :
+
+```bash
+npm run tokens
+```
 
 ---
 
@@ -19,53 +59,42 @@ Le design system multi-produit de Tolbi — composants Vue 3, tokens de design, 
 
 ---
 
-## Architecture des tokens
+## Statut des composants
 
-Les tokens sont organisés en deux niveaux :
+| Composant | Statut | Description |
+|---|---|---|
+| Avatar | ✅ Stable | Avatar utilisateur avec initiales ou image |
+| Button | ✅ Stable | Composant d'action principal |
+| CreditsChip | ✅ Stable | Affichage du solde de crédits |
+| HelpIcon | ✅ Stable | Icône d'aide avec tooltip |
+| HorizontalNavigation | ✅ Stable | Barre de navigation horizontale |
+| InputField | ✅ Stable | Champ de saisie texte |
+| ModuleIcon | ✅ Stable | Icône de module applicatif |
+| TextareaInputField | ✅ Stable | Champ de saisie multi-lignes |
+| Tooltip | ✅ Stable | Infobulle contextuelle |
+| VerificationCodeInputField | ✅ Stable | Saisie de code de vérification |
+| Badge | 🚧 WIP | Étiquette de statut ou de catégorie |
+| BadgeGroup | 🚧 WIP | Groupe de badges |
+| ButtonGroup | 🚧 WIP | Groupe de boutons liés |
+| CloseButton | 🚧 WIP | Bouton de fermeture |
+| Icon | 🚧 WIP | Icône SVG du système |
+| Logo | 🚧 WIP | Logo Tolbi |
+| ModulesList | 🚧 WIP | Liste de modules |
+| Dropdown | 🚧 WIP | Menu déroulant avec déclencheurs bouton, icône et avatar |
+| Tag | 🚧 WIP | Étiquette avec actions et variantes |
 
-**Primitives** — les valeurs brutes de la palette (couleurs, typographie, espacement, effets). Ne sont jamais utilisées directement dans les composants.
-
-**Sémantiques** — les usages nommés (`bg-brand-solid`, `fg-secondary`, `border-error`…) qui référencent les primitives. Ce sont ces tokens que les composants consomment.
-
-```
-tokens/src/
-├── color/
-│   ├── primitives.json        ← palette brute
-│   ├── semantic.light.json    ← couche sémantique light
-│   └── semantic.dark.json     ← overrides dark mode
-├── effect/
-│   ├── shadows.json
-│   ├── focus-rings.json
-│   └── blurs.json
-├── spacing/
-│   ├── primitives.json
-│   └── semantic.json
-└── typography/
-    └── primitives.json
-```
-
-Regénérer les CSS après toute modification source :
-
-```bash
-npm run tokens
-```
+**Stable** — composant documenté, testé, utilisable en production.
+**WIP** — composant fonctionnel mais documentation incomplète. Peut évoluer sans préavis.
 
 ---
 
-## Utiliser un composant
+## Contribuer
 
-```bash
-# Le DS est un package npm privé
-import { Button } from 'tolbi-design-system'
-```
+Le dépôt est ouvert aux contributions internes. Pour ajouter un composant :
 
-```vue
-<script setup lang="ts">
-import { Button } from 'tolbi-design-system'
-</script>
+1. Créer le dossier `components/NomComposant/`
+2. Ajouter `NomComposant.vue`, `NomComposant.stories.ts`, et `NomComposant.mdx`
+3. Exporter depuis `components/index.ts`
+4. Ouvrir une PR sur [GitHub](https://github.com/Abi-shai/tolbi-design-system)
 
-<template>
-  <Button label="Enregistrer" variant="primary" @click="save" />
-</template>
-```
-
+Un composant est **stable** quand sa page MDX est présente et sa description dédupliquée.

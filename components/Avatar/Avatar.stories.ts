@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import Avatar from './Avatar.vue'
 import AvatarDocs from './Avatar.mdx'
+import StoryGrid from '../../stories/StoryGrid.vue'
 
 const meta: Meta<typeof Avatar> = {
   title: 'Components/Avatar',
@@ -101,17 +102,11 @@ export const AllSizes: Story = {
   name: 'All sizes',
   parameters: { layout: 'padded' },
   render: () => ({
-    components: { Avatar },
-    template: `
-      <div style="display:flex; gap:16px; align-items:flex-end;">
-        <Avatar size="xs" initials="OR" />
-        <Avatar size="sm" initials="OR" />
-        <Avatar size="md" initials="OR" />
-        <Avatar size="lg" initials="OR" />
-        <Avatar size="xl" initials="OR" />
-        <Avatar size="2xl" initials="OR" />
-      </div>
-    `,
+    components: { StoryGrid },
+    setup: () => ({
+      items: ['xs', 'sm', 'md', 'lg', 'xl', '2xl'].map(size => ({ component: Avatar, props: { size, initials: 'OR' } })),
+    }),
+    template: `<StoryGrid :items="items" gap="var(--ds-space-4)" align="flex-end" wrap="nowrap" />`,
   }),
 }
 
@@ -119,17 +114,14 @@ export const AllSizesWithImage: Story = {
   name: 'All sizes — avec photo',
   parameters: { layout: 'padded' },
   render: () => ({
-    components: { Avatar },
-    template: `
-      <div style="display:flex; gap:16px; align-items:flex-end;">
-        <Avatar size="xs" src="https://i.pravatar.cc/150?img=47" />
-        <Avatar size="sm" src="https://i.pravatar.cc/150?img=47" />
-        <Avatar size="md" src="https://i.pravatar.cc/150?img=47" />
-        <Avatar size="lg" src="https://i.pravatar.cc/150?img=47" />
-        <Avatar size="xl" src="https://i.pravatar.cc/150?img=47" />
-        <Avatar size="2xl" src="https://i.pravatar.cc/150?img=47" />
-      </div>
-    `,
+    components: { StoryGrid },
+    setup: () => ({
+      items: ['xs', 'sm', 'md', 'lg', 'xl', '2xl'].map(size => ({
+        component: Avatar,
+        props: { size, src: 'https://i.pravatar.cc/150?img=47' },
+      })),
+    }),
+    template: `<StoryGrid :items="items" gap="var(--ds-space-4)" align="flex-end" wrap="nowrap" />`,
   }),
 }
 
