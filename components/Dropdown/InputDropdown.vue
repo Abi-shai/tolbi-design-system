@@ -274,7 +274,7 @@ onUnmounted(() => {
   text-align: left;
   font: inherit;
   color: inherit;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-input-dropdown__trigger--open,

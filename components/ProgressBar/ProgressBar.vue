@@ -91,7 +91,7 @@ const hasFloatingLabel = computed(() => props.label === 'top-floating' || props.
   max-width: 100%;
   background-color: var(--ds-semantic-fg-brand-primary);
   border-radius: var(--ds-radius-full, 9999px);
-  transition: width 0.3s ease;
+  transition: width var(--ds-motion-duration-process) var(--ds-motion-easing-out);
 }
 
 /* ── Inline label ──────────────────────────────────────────────────── */

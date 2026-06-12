@@ -229,7 +229,7 @@ const dotSize = computed(() => {
   cursor: pointer;
   line-height: 0;
   opacity: 0.7;
-  transition: opacity 0.1s ease;
+  transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-badge__dismiss:hover {

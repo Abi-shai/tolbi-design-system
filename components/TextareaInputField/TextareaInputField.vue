@@ -170,7 +170,7 @@ function onKeydown(e: KeyboardEvent) {
   border-radius: var(--ds-radius-md);
   box-shadow: var(--ds-shadow-xs);
   overflow: hidden;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
   /* Default : px-14px py-12px */
   padding: var(--ds-spacing-lg) 14px;
 }
@@ -290,7 +290,7 @@ function onKeydown(e: KeyboardEvent) {
   cursor: pointer;
   color: var(--ds-semantic-text-secondary);
   line-height: 0;
-  transition: background 0.1s ease;
+  transition: background var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-textarea__tag-remove:hover {

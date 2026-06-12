@@ -11,6 +11,7 @@ export type ButtonVariant =
   | 'link'
   | 'danger'
   | 'danger-secondary'
+  | 'ghost'
 
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 
@@ -20,6 +21,7 @@ interface Props {
   size?: ButtonSize
   iconLeading?: IconName
   iconTrailing?: IconName
+  iconOnly?: boolean
   disabled?: boolean
   loading?: boolean
   type?: 'button' | 'submit' | 'reset'
@@ -28,6 +30,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   variant: 'primary',
   size: 'md',
+  iconOnly: false,
   disabled: false,
   loading: false,
   type: 'button',
@@ -50,15 +53,16 @@ function handleClick(event: MouseEvent) {
   <button
     :type="type"
     :disabled="disabled || loading"
-    :class="['ds-button', `ds-button--${variant}`, `ds-button--${size}`]"
+    :class="['ds-button', `ds-button--${variant}`, `ds-button--${size}`, { 'ds-button--icon-only': iconOnly }]"
     :aria-busy="loading || undefined"
+    :aria-label="iconOnly ? label : undefined"
     @click="handleClick"
   >
     <span v-if="loading" class="ds-button__spinner" aria-hidden="true" />
     <template v-else>
       <Icon v-if="iconLeading" :name="iconLeading" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
-      <span class="ds-button__label">{{ label }}</span>
-      <Icon v-if="iconTrailing" :name="iconTrailing" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
+      <span v-if="!iconOnly" class="ds-button__label">{{ label }}</span>
+      <Icon v-if="iconTrailing && !iconOnly" :name="iconTrailing" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
     </template>
   </button>
 </template>
@@ -82,10 +86,10 @@ function handleClick(event: MouseEvent) {
   box-shadow: var(--ds-shadow-xs);
   outline: none;
   transition:
-    background-color 0.15s ease,
-    color 0.15s ease,
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+    background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    color            var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    border-color     var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    box-shadow       var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
@@ -215,6 +219,32 @@ function handleClick(event: MouseEvent) {
 .ds-button--danger-secondary:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-error-shadow-xs);
 }
+
+/* ── Ghost ────────────────────────────────────────────────────────── */
+.ds-button--ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--ds-semantic-text-tertiary);
+  box-shadow: none;
+}
+.ds-button--ghost:hover:not(:disabled) {
+  background-color: var(--ds-semantic-bg-primary-hover);
+  color: var(--ds-semantic-text-secondary);
+}
+.ds-button--ghost:focus-visible:not(:disabled) {
+  box-shadow: var(--ds-focus-ring-gray-shadow-xs);
+}
+
+/* ── Icon-only ────────────────────────────────────────────────────── */
+.ds-button--icon-only {
+  padding: 0;
+  gap: 0;
+}
+.ds-button--icon-only.ds-button--sm  { width: 36px; height: 36px; }
+.ds-button--icon-only.ds-button--md  { width: 40px; height: 40px; }
+.ds-button--icon-only.ds-button--lg  { width: 44px; height: 44px; }
+.ds-button--icon-only.ds-button--xl  { width: 48px; height: 48px; }
+.ds-button--icon-only.ds-button--2xl { width: 56px; height: 56px; }
 
 /* ── Disabled ─────────────────────────────────────────────────────── */
 .ds-button:disabled {

@@ -1,5 +1,5 @@
 import StyleDictionary from 'style-dictionary'
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync, writeFileSync, appendFileSync } from 'fs'
 
 async function buildTokenFile(source, dest, opts = {}) {
   const {
@@ -55,11 +55,22 @@ await Promise.all([
   ),
 
   buildTokenFile('tokens/src/radius/primitives.json', 'radius.css'),
+  buildTokenFile('tokens/src/motion/primitives.json', 'motion.css'),
 ])
+
+appendFileSync('tokens/dist/motion.css', `
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+`)
 
 const tokenFiles = [
   'colors', 'typography', 'radius', 'space', 'spacing',
-  'shadows', 'focus-rings', 'blurs', 'semantic', 'semantic-dark',
+  'shadows', 'focus-rings', 'blurs', 'semantic', 'semantic-dark', 'motion',
 ]
 const combined = tokenFiles
   .map(f => readFileSync(`tokens/dist/${f}.css`, 'utf8'))

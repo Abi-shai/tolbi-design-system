@@ -63,7 +63,7 @@ const emit = defineEmits<{
   min-width: 0;
   padding: 9px 10px;
   border-radius: var(--ds-radius-sm);
-  transition: background-color 0.1s ease;
+  transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-dropdown-item:hover:not(.ds-dropdown-item--disabled) .ds-dropdown-item__content {

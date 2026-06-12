@@ -224,6 +224,6 @@ const labelFont = computed(() => LABEL_FONT[props.size])
 
 <style scoped>
 .ds-progress-circle__fill {
-  transition: stroke-dashoffset 0.3s ease;
+  transition: stroke-dashoffset var(--ds-motion-duration-process) var(--ds-motion-easing-out);
 }
 </style>

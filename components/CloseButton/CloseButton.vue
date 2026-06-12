@@ -64,8 +64,8 @@ function handleClick(event: MouseEvent) {
   cursor: pointer;
   outline: none;
   transition:
-    background-color 0.15s ease,
-    box-shadow 0.15s ease;
+    background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    box-shadow       var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
@@ -76,7 +76,7 @@ function handleClick(event: MouseEvent) {
 /* ── Icon color — light background ───────────────────────────────── */
 .ds-close-button__icon {
   color: var(--ds-semantic-fg-quaternary);
-  transition: color 0.15s ease, opacity 0.15s ease;
+  transition: color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-close-button:hover:not(:disabled) .ds-close-button__icon {
