@@ -23,14 +23,17 @@ withDefaults(defineProps<Props>(), {
 .ds-scrollbar {
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-gutter: stable;
   scrollbar-width: thin;
-  scrollbar-color: var(--ds-semantic-bg-quaternary) transparent;
+  scrollbar-color: transparent transparent;
 }
 
 .ds-scrollbar--horizontal {
   overflow-x: auto;
   overflow-y: hidden;
+}
+
+.ds-scrollbar:hover {
+  scrollbar-color: var(--ds-semantic-bg-quaternary) transparent;
 }
 
 .ds-scrollbar::-webkit-scrollbar {
@@ -43,13 +46,17 @@ withDefaults(defineProps<Props>(), {
 }
 
 .ds-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--ds-semantic-bg-quaternary);
+  background-color: transparent;
   border-radius: var(--ds-radius-full);
   border: 4px solid transparent;
   background-clip: padding-box;
 }
 
-.ds-scrollbar::-webkit-scrollbar-thumb:hover {
+.ds-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: var(--ds-semantic-bg-quaternary);
+}
+
+.ds-scrollbar:hover::-webkit-scrollbar-thumb:hover {
   background-color: var(--ds-semantic-fg-senary);
 }
 </style>
