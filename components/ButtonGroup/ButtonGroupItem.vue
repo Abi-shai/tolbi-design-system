@@ -76,9 +76,9 @@ function handleClick(event: MouseEvent) {
   cursor: pointer;
   outline: none;
   transition:
-    background-color 0.15s ease,
-    color 0.15s ease,
-    box-shadow 0.15s ease;
+    background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    color            var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    box-shadow       var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 /* Remove right border on last child — container border handles the edge */

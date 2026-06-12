@@ -241,7 +241,7 @@ function onTagClick() {
   cursor: pointer;
   line-height: 0;
   opacity: 0.7;
-  transition: opacity 0.1s ease, background-color 0.1s ease;
+  transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-default), background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
   flex-shrink: 0;
 }
 .ds-tag__close:hover {

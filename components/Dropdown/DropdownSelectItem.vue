@@ -102,7 +102,7 @@ const emit = defineEmits<{
   min-width: 0;
   padding: 10px 10px 10px 8px;
   border-radius: var(--ds-radius-sm);
-  transition: background-color 0.1s ease;
+  transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-dropdown-select-item--selected .ds-dropdown-select-item__content {

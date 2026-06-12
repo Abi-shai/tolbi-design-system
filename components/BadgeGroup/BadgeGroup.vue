@@ -119,7 +119,7 @@ const emit = defineEmits<{
   font-weight: 500;
   white-space: nowrap;
   cursor: default;
-  transition: background-color 0.15s ease;
+  transition: background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-badge-group:hover {

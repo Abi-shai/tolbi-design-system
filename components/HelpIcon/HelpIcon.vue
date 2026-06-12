@@ -108,7 +108,7 @@ const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
   background: transparent;
   cursor: pointer;
   color: var(--ds-semantic-fg-quinary);
-  transition: color 0.15s ease;
+  transition: color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
   border-radius: var(--ds-radius-full);
 }
 
@@ -129,9 +129,13 @@ const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
 }
 
 /* Transition */
-.ds-help-icon__tooltip-enter-active,
+.ds-help-icon__tooltip-enter-active {
+  transition: opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-out),
+              transform var(--ds-motion-duration-enter) var(--ds-motion-easing-out);
+}
 .ds-help-icon__tooltip-leave-active {
-  transition: opacity 0.1s ease, transform 0.1s ease;
+  transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-in),
+              transform var(--ds-motion-duration-moderate) var(--ds-motion-easing-in);
 }
 .ds-help-icon__tooltip-enter-from,
 .ds-help-icon__tooltip-leave-to {

@@ -67,3 +67,12 @@ export type { ProgressBarLabel } from './ProgressBar'
 
 export { ProgressCircle } from './ProgressCircle'
 export type { ProgressCircleSize, ProgressCircleShape } from './ProgressCircle'
+
+export { Slider } from './Slider'
+export type { SliderLabel } from './Slider'
+
+export { Tabs } from './Tabs'
+export type { TabsSize, TabsItem } from './Tabs'
+
+export { Table } from './Table'
+export type { TableColumn, TableRow } from './Table'

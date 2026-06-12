@@ -105,6 +105,7 @@ onUnmounted(() => {
     </button>
 
     <!-- ── Panel ──────────────────────────────────────────────────── -->
+    <Transition name="ds-dropdown__panel">
     <div
       v-if="open"
       class="ds-dropdown__panel"
@@ -124,6 +125,7 @@ onUnmounted(() => {
         <slot />
       </div>
     </div>
+    </Transition>
   </div>
 </template>
 
@@ -154,7 +156,7 @@ onUnmounted(() => {
   line-height: 1.25rem;
   color: var(--ds-semantic-text-secondary);
   white-space: nowrap;
-  transition: background-color 0.1s ease, box-shadow 0.1s ease;
+  transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-dropdown__trigger--button:hover {
@@ -178,7 +180,7 @@ onUnmounted(() => {
   color: var(--ds-semantic-fg-secondary);
   border-radius: var(--ds-radius-sm);
   padding: 0;
-  transition: color 0.1s ease;
+  transition: color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-dropdown__trigger--icon:hover {
@@ -285,5 +287,20 @@ onUnmounted(() => {
 
 .ds-dropdown__items::-webkit-scrollbar-thumb:hover {
   background-color: var(--ds-semantic-fg-senary);
+}
+
+/* ── Panel transition ──────────────────────────────────────────────── */
+.ds-dropdown__panel-enter-active {
+  transition: opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-out),
+              transform var(--ds-motion-duration-enter) var(--ds-motion-easing-out);
+}
+.ds-dropdown__panel-leave-active {
+  transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-in),
+              transform var(--ds-motion-duration-moderate) var(--ds-motion-easing-in);
+}
+.ds-dropdown__panel-enter-from,
+.ds-dropdown__panel-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
 }
 </style>

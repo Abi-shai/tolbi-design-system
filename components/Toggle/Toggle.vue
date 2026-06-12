@@ -80,7 +80,7 @@ function toggle() {
   background-color: var(--ds-semantic-bg-tertiary);
   cursor: pointer;
   flex-shrink: 0;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  transition: background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-toggle--sm {
@@ -126,7 +126,7 @@ function toggle() {
   background-color: var(--ds-color-base-white);
   box-shadow: var(--ds-shadow-sm);
   flex-shrink: 0;
-  transition: transform 0.15s ease;
+  transition: transform var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-toggle--sm .ds-toggle__thumb {

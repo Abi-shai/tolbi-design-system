@@ -191,7 +191,7 @@ const goodLabel = computed(() =>
   line-height: 1.5rem;
   color: var(--ds-semantic-fg-error-primary, #d92d20);
   white-space: nowrap;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-credits-chip__cta:hover {

@@ -256,7 +256,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   font-weight: 500;
   line-height: 1.25rem;
   white-space: nowrap;
-  transition: background 0.15s ease;
+  transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-hnav__crumb-btn:hover {
@@ -319,7 +319,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   line-height: 1.25rem;
   white-space: nowrap;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-hnav__learn-btn:hover {
@@ -337,7 +337,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   border: none;
   cursor: pointer;
   color: rgba(255, 255, 255, 0.85);
-  transition: background 0.15s ease;
+  transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-hnav__icon-btn:hover,
