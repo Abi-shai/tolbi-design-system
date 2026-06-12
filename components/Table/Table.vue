@@ -2,8 +2,8 @@
 import { computed } from 'vue'
 import { Checkbox } from '../Checkbox'
 import { HelpIcon } from '../HelpIcon'
-import { Icon } from '../Icon'
 import { Scrollbar } from '../Scrollbar'
+import { Pagination } from '../Pagination'
 
 export interface TableColumn {
   key: string
@@ -75,29 +75,6 @@ function colStyle(col: TableColumn) {
 }
 
 const showPagination = computed(() => (props.totalPages ?? 1) > 1)
-
-const visiblePages = computed((): (number | '...')[] => {
-  const total = props.totalPages ?? 1
-  const current = props.currentPage ?? 1
-
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
-
-  const near = new Set(
-    [1, current - 1, current, current + 1, total].filter(p => p >= 1 && p <= total),
-  )
-  const sorted = [...near].sort((a, b) => a - b)
-  const result: (number | '...')[] = []
-  for (let i = 0; i < sorted.length; i++) {
-    if (i > 0 && sorted[i] - sorted[i - 1] > 1) result.push('...')
-    result.push(sorted[i])
-  }
-  return result
-})
-
-function goToPage(page: number) {
-  if (page === props.currentPage || page < 1 || page > (props.totalPages ?? 1)) return
-  emit('page-change', page)
-}
 </script>
 
 <template>
@@ -177,41 +154,12 @@ function goToPage(page: number) {
       </table>
     </Scrollbar>
 
-    <div v-if="showPagination" class="ds-table__pagination">
-      <button
-        class="ds-table__page-nav"
-        :disabled="currentPage <= 1"
-        @click="goToPage(currentPage - 1)"
-      >
-        <Icon name="arrow-left" :size="14" />
-        <span>Précédent</span>
-      </button>
-
-      <div class="ds-table__page-numbers">
-        <button
-          v-for="(page, i) in visiblePages"
-          :key="i"
-          class="ds-table__page-num"
-          :class="{
-            'ds-table__page-num--active': page === currentPage,
-            'ds-table__page-num--ellipsis': page === '...',
-          }"
-          :disabled="page === '...'"
-          @click="typeof page === 'number' && goToPage(page)"
-        >
-          {{ page }}
-        </button>
-      </div>
-
-      <button
-        class="ds-table__page-nav"
-        :disabled="currentPage >= (totalPages ?? 1)"
-        @click="goToPage(currentPage + 1)"
-      >
-        <span>Suivant</span>
-        <Icon name="arrow-right" :size="14" />
-      </button>
-    </div>
+    <Pagination
+      v-if="showPagination"
+      :current-page="currentPage"
+      :total-pages="totalPages"
+      @page-change="emit('page-change', $event)"
+    />
   </div>
 </template>
 
@@ -328,92 +276,6 @@ function goToPage(page: number) {
   white-space: nowrap;
 }
 
-/* ── Pagination ────────────────────────────────────────────────────── */
-.ds-table__pagination {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 24px 16px;
-  border-top: 1px solid var(--ds-semantic-border-secondary);
-  gap: 8px;
-}
-
-/* ── Pagination nav buttons (Previous / Next) ──────────────────────── */
-.ds-table__page-nav {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border: 1px solid var(--ds-semantic-border-primary);
-  border-radius: var(--ds-radius-md);
-  background-color: var(--ds-semantic-bg-primary);
-  font-family: var(--ds-typography-font-family-inter);
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--ds-semantic-text-secondary);
-  cursor: pointer;
-  transition:
-    background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),
-    color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),
-    box-shadow var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
-  white-space: nowrap;
-}
-
-.ds-table__page-nav:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-primary-hover);
-}
-
-.ds-table__page-nav:disabled {
-  color: var(--ds-semantic-text-disabled);
-  border-color: var(--ds-semantic-border-secondary);
-  cursor: not-allowed;
-}
-
-/* ── Pagination page numbers ───────────────────────────────────────── */
-.ds-table__page-numbers {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.ds-table__page-num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  height: 40px;
-  padding: 0 4px;
-  border: none;
-  border-radius: var(--ds-radius-md);
-  background-color: transparent;
-  font-family: var(--ds-typography-font-family-inter);
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--ds-semantic-text-secondary);
-  cursor: pointer;
-  transition:
-    background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),
-    color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
-}
-
-.ds-table__page-num:hover:not(:disabled):not(.ds-table__page-num--active) {
-  background-color: var(--ds-semantic-bg-primary-hover);
-}
-
-.ds-table__page-num--active {
-  background-color: var(--ds-semantic-bg-brand-primary);
-  color: var(--ds-semantic-fg-brand-primary);
-  font-weight: 600;
-}
-
-.ds-table__page-num--ellipsis {
-  cursor: default;
-  color: var(--ds-semantic-text-tertiary);
-}
-
-.ds-table__page-num--ellipsis:disabled {
-  cursor: default;
-}
 
 /* ── Skeleton ──────────────────────────────────────────────────────── */
 @keyframes ds-skeleton-shimmer {
