@@ -74,5 +74,13 @@ export type { SliderLabel } from './Slider'
 export { Tabs } from './Tabs'
 export type { TabsSize, TabsItem } from './Tabs'
 
+export { Pagination } from './Pagination'
+
+export { ProgressSteps } from './ProgressSteps'
+export type { ProgressStep, ProgressStepsType, ProgressStepsSize } from './ProgressSteps'
+
 export { Table } from './Table'
 export type { TableColumn, TableRow } from './Table'
+
+export { Breadcrumbs } from './Breadcrumbs'
+export type { BreadcrumbsItem } from './Breadcrumbs'
