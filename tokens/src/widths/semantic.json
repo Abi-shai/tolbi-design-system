@@ -1,0 +1,16 @@
+{
+  "width": {
+    "xxs": { "value": "{space.80}",  "description": "320px" },
+    "xs":  { "value": "{space.96}",  "description": "384px" },
+    "sm":  { "value": "{space.120}", "description": "480px" },
+    "md":  { "value": "{space.140}", "description": "560px" },
+    "lg":  { "value": "{space.160}", "description": "640px" },
+    "xl":  { "value": "{space.192}", "description": "768px" },
+    "2xl": { "value": "{space.256}", "description": "1024px" },
+    "3xl": { "value": "{space.320}", "description": "1280px" },
+    "4xl": { "value": "{space.360}", "description": "1440px" },
+    "5xl": { "value": "{space.400}", "description": "1600px" },
+    "6xl": { "value": "{space.480}", "description": "1920px" },
+    "paragraph-max": { "value": "{space.180}", "description": "720px — measure ceiling for long-form copy" }
+  }
+}

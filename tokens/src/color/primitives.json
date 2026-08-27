@@ -2,7 +2,8 @@
   "color": {
     "base": {
       "white": { "value": "#FFFFFF", "description": "Pure white" },
-      "black": { "value": "#000000", "description": "Pure black" }
+      "black": { "value": "#000000", "description": "Pure black" },
+      "transparent": { "value": "transparent", "description": "Fully transparent" }
     },
     "gray-light": {
       "25":  { "value": "#FCFCFD" },
@@ -18,20 +19,6 @@
       "900": { "value": "#101828" },
       "950": { "value": "#0C111D" }
     },
-    "gray-dark": {
-      "25":  { "value": "#FAFAFA" },
-      "50":  { "value": "#F5F5F6" },
-      "100": { "value": "#F0F1F1" },
-      "200": { "value": "#ECECED" },
-      "300": { "value": "#CECFD2" },
-      "400": { "value": "#94969C" },
-      "500": { "value": "#85888E" },
-      "600": { "value": "#61646C" },
-      "700": { "value": "#333741" },
-      "800": { "value": "#1F242F" },
-      "900": { "value": "#161B26" },
-      "950": { "value": "#0C111D" }
-    },
     "brand": {
       "25":  { "value": "#F6F9F8" },
       "50":  { "value": "#E6F0EB" },
@@ -45,6 +32,20 @@
       "800": { "value": "#033A1F" },
       "900": { "value": "#032C18" },
       "950": { "value": "#022112" }
+    },
+    "accent": {
+      "25":  { "value": "#FEFDF0" },
+      "50":  { "value": "#FEFBE8" },
+      "100": { "value": "#FEF7C3" },
+      "200": { "value": "#FEEE95" },
+      "300": { "value": "#FDE272" },
+      "400": { "value": "#FAC720", "description": "Secondary brand color. Anchored at step 400 - its true perceptual position (L*=82.5). Text on top must be dark: white only reaches 1.58:1." },
+      "500": { "value": "#EAAA08" },
+      "600": { "value": "#CA8504" },
+      "700": { "value": "#A15C07" },
+      "800": { "value": "#854A0E" },
+      "900": { "value": "#713B12" },
+      "950": { "value": "#542C0D" }
     },
     "error": {
       "25":  { "value": "#FFFBFA" },

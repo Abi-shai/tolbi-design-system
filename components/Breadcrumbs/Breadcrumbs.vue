@@ -19,7 +19,7 @@ defineProps<Props>()
       <!-- Home icon -->
       <li class="ds-breadcrumbs__item">
         <button type="button" class="ds-breadcrumbs__home" aria-label="Accueil">
-          <Icon name="home-line" :size="20" />
+          <Icon name="house" :size="20" />
         </button>
       </li>
 
@@ -90,9 +90,9 @@ defineProps<Props>()
   align-items: center;
   padding: var(--ds-spacing-xs, 4px) var(--ds-spacing-md, 8px);
   border-radius: var(--ds-radius-sm);
-  font-family: var(--ds-typography-font-family-inter);
-  font-size: var(--ds-typography-font-size-text-sm);
-  line-height: var(--ds-typography-line-height-text-sm);
+  font-family: var(--ds-typography-font-family-poppins);
+  font-size: var(--ds-font-size-label-lg);
+  line-height: var(--ds-line-height-label-lg);
   font-weight: 500;
   color: var(--ds-semantic-fg-tertiary);
   text-decoration: none;

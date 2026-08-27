@@ -9,7 +9,7 @@ const tokens = Object.entries(shadows.shadow).map(([name, token]) => ({
 }))
 
 const meta: Meta = {
-  title: 'Tokens/Effect Styles/Shadows',
+  title: 'Foundations/Effects/Shadows',
   tags: ['autodocs'],
   render: () => ({
     components: { EffectCard },

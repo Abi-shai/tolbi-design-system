@@ -96,10 +96,10 @@ const hasFloatingLabel = computed(() => props.label === 'top-floating' || props.
 
 /* ── Inline label ──────────────────────────────────────────────────── */
 .ds-progress-bar__label {
-  font-family: var(--ds-typography-font-family-inter);
-  font-size: var(--ds-typography-font-size-text-sm);
+  font-family: var(--ds-typography-font-family-poppins);
+  font-size: var(--ds-font-size-label-lg);
   font-weight: 500;
-  line-height: var(--ds-typography-line-height-text-sm);
+  line-height: var(--ds-line-height-label-lg);
   color: var(--ds-semantic-text-secondary);
   white-space: nowrap;
   flex-shrink: 0;
@@ -110,14 +110,14 @@ const hasFloatingLabel = computed(() => props.label === 'top-floating' || props.
   position: absolute;
   right: 0;
   transform: translateX(50%);
-  background-color: var(--ds-semantic-bg-primary-alt, #fff);
+  background-color: var(--ds-semantic-bg-primary, #fff);
   border: 1px solid var(--ds-semantic-border-secondary);
   border-radius: 8px;
   padding: 8px 12px;
   font-family: var(--ds-typography-font-family-poppins);
-  font-size: var(--ds-typography-font-size-text-xs);
+  font-size: var(--ds-font-size-body-sm);
   font-weight: 600;
-  line-height: var(--ds-typography-line-height-text-xs);
+  line-height: var(--ds-line-height-body-sm);
   color: var(--ds-semantic-text-secondary);
   white-space: nowrap;
   box-shadow:

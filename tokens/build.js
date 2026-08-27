@@ -1,6 +1,9 @@
 import StyleDictionary from 'style-dictionary'
 import { readFileSync, writeFileSync, appendFileSync } from 'fs'
 
+const TYPE_ROLE_ROOTS = ['font-size', 'line-height', 'letter-spacing', 'font-weight']
+const isTypeRole = (token) => TYPE_ROLE_ROOTS.includes(token.path[0])
+
 async function buildTokenFile(source, dest, opts = {}) {
   const {
     filter,
@@ -48,10 +51,31 @@ await Promise.all([
     { filter: (token) => token.path[0] === 'semantic', outputReferences: true },
   ),
 
+  // Typography roles. Web is the default scale; the mobile scale is opt-in via
+  // [data-typography="mobile"] because "mobile" here means a native/webview
+  // context (sp on Android, Dynamic Type on iOS), not a narrow browser window.
   buildTokenFile(
-    ['tokens/src/color/primitives.json', 'tokens/src/color/semantic.dark.json'],
-    'semantic-dark.css',
-    { filter: (token) => token.path[0] === 'semantic', selector: '[data-theme="dark"]', outputReferences: true },
+    ['tokens/src/typography/primitives.json', 'tokens/src/typography/semantic.web.json'],
+    'type-roles.css',
+    { filter: isTypeRole, outputReferences: true },
+  ),
+
+  buildTokenFile(
+    ['tokens/src/typography/primitives.json', 'tokens/src/typography/semantic.mobile.json'],
+    'type-roles-mobile.css',
+    { filter: isTypeRole, selector: '[data-typography="mobile"]', outputReferences: true },
+  ),
+
+  buildTokenFile(
+    ['tokens/src/spacing/primitives.json', 'tokens/src/widths/semantic.json'],
+    'widths.css',
+    { filter: (token) => token.path[0] === 'width', outputReferences: true },
+  ),
+
+  buildTokenFile(
+    ['tokens/src/spacing/primitives.json', 'tokens/src/containers/semantic.json'],
+    'containers.css',
+    { filter: (token) => token.path[0] === 'container', outputReferences: true },
   ),
 
   buildTokenFile('tokens/src/radius/primitives.json', 'radius.css'),
@@ -69,8 +93,9 @@ appendFileSync('tokens/dist/motion.css', `
 `)
 
 const tokenFiles = [
-  'colors', 'typography', 'radius', 'space', 'spacing',
-  'shadows', 'focus-rings', 'blurs', 'semantic', 'semantic-dark', 'motion',
+  'colors', 'typography', 'type-roles', 'type-roles-mobile',
+  'radius', 'space', 'spacing', 'widths', 'containers',
+  'shadows', 'focus-rings', 'blurs', 'semantic', 'motion',
 ]
 const combined = tokenFiles
   .map(f => readFileSync(`tokens/dist/${f}.css`, 'utf8'))
