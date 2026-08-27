@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import Logo from './Logo.vue'
 
 const meta: Meta<typeof Logo> = {
-  title: 'Components/Logo',
+  title: 'Primitives/Logo',
   component: Logo,
   tags: ['wip'],
   parameters: {
@@ -54,11 +54,11 @@ export const BothVariants: Story = {
     template: `
       <div style="display:flex;flex-direction:column;gap:32px;">
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <span style="font-size:12px;color:#667085;font-family:Inter,sans-serif;">default — fond clair</span>
+          <span style="font-size:12px;color:#667085;font-family:Poppins,sans-serif;">default — fond clair</span>
           <Logo variant="default" />
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;background:#066938;padding:16px;border-radius:8px;">
-          <span style="font-size:12px;color:rgba(255,255,255,0.6);font-family:Inter,sans-serif;">nav — fond sombre</span>
+          <span style="font-size:12px;color:rgba(255,255,255,0.6);font-family:Poppins,sans-serif;">nav — fond sombre</span>
           <Logo variant="nav" />
         </div>
       </div>

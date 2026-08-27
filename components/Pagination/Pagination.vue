@@ -125,7 +125,7 @@ function goToPage(page: number) {
   border: none;
   border-radius: var(--ds-radius-full);
   background-color: transparent;
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.25rem;

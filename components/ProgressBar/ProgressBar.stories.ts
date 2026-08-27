@@ -95,7 +95,7 @@ export const AllLabelTypes: Story = {
     template: `
       <div style="display: flex; flex-direction: column; gap: 40px; width: 320px; padding: 60px 0">
         <div v-for="item in labels" :key="item.label" style="display: flex; flex-direction: column; gap: 8px">
-          <span style="font-size: 12px; color: #667085; font-family: Inter, sans-serif">{{ item.name }}</span>
+          <span style="font-size: 12px; color: #667085; font-family: Poppins, sans-serif">{{ item.name }}</span>
           <ProgressBar :label="item.label" :value="60" />
         </div>
       </div>

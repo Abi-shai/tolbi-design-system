@@ -115,7 +115,7 @@ const emit = defineEmits<{
   border-radius: var(--ds-radius-full);
   background-color: var(--bg-default);
   color: var(--text);
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   white-space: nowrap;
   cursor: default;

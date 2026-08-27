@@ -77,8 +77,8 @@ export const Default: Story = {
           <div style="display:flex;align-items:center;gap:12px;min-width:0">
             <Avatar size="sm" :initials="initials(row.name)" />
             <div style="min-width:0">
-              <div style="font-family:var(--ds-typography-font-family-inter);font-size:0.875rem;font-weight:500;color:var(--ds-semantic-text-primary);line-height:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div>
-              <div style="font-family:var(--ds-typography-font-family-inter);font-size:0.75rem;color:var(--ds-semantic-text-tertiary);line-height:1.125rem">{{ row.handle }}</div>
+              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.875rem;font-weight:500;color:var(--ds-semantic-text-primary);line-height:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div>
+              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.75rem;color:var(--ds-semantic-text-tertiary);line-height:1.125rem">{{ row.handle }}</div>
             </div>
           </div>
         </template>
@@ -107,8 +107,8 @@ export const Default: Story = {
 
         <template #cell-actions="{ row }">
           <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px">
-            <Button variant="ghost" size="sm" :icon-only="true" icon-leading="trash-01" :label="'Supprimer ' + row.name" />
-            <Button variant="ghost" size="sm" :icon-only="true" icon-leading="edit-01" :label="'Modifier ' + row.name" />
+            <Button variant="ghost" size="sm" :icon-only="true" icon-leading="trash-2" :label="'Supprimer ' + row.name" />
+            <Button variant="ghost" size="sm" :icon-only="true" icon-leading="square-pen" :label="'Modifier ' + row.name" />
           </div>
         </template>
       </Table>
@@ -145,8 +145,8 @@ export const WithPagination: Story = {
           <div style="display:flex;align-items:center;gap:12px;min-width:0">
             <Avatar size="sm" :initials="initials(row.name)" />
             <div style="min-width:0">
-              <div style="font-family:var(--ds-typography-font-family-inter);font-size:0.875rem;font-weight:500;color:var(--ds-semantic-text-primary);line-height:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div>
-              <div style="font-family:var(--ds-typography-font-family-inter);font-size:0.75rem;color:var(--ds-semantic-text-tertiary);line-height:1.125rem">{{ row.handle }}</div>
+              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.875rem;font-weight:500;color:var(--ds-semantic-text-primary);line-height:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div>
+              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.75rem;color:var(--ds-semantic-text-tertiary);line-height:1.125rem">{{ row.handle }}</div>
             </div>
           </div>
         </template>
@@ -161,8 +161,8 @@ export const WithPagination: Story = {
         </template>
         <template #cell-actions="{ row }">
           <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px">
-            <Button variant="ghost" size="sm" :icon-only="true" icon-leading="trash-01" :label="'Supprimer ' + row.name" />
-            <Button variant="ghost" size="sm" :icon-only="true" icon-leading="edit-01" :label="'Modifier ' + row.name" />
+            <Button variant="ghost" size="sm" :icon-only="true" icon-leading="trash-2" :label="'Supprimer ' + row.name" />
+            <Button variant="ghost" size="sm" :icon-only="true" icon-leading="square-pen" :label="'Modifier ' + row.name" />
           </div>
         </template>
       </Table>

@@ -68,20 +68,20 @@ const withMenu = (trigger: 'button' | 'icon' | 'avatar') => ({
       user-name="Olivia Rhye"
       user-email="olivia@untitledui.com"
     >
-      <DropdownItem icon="user-01"    label="View profile"       shortcut="⌘K→P" @click="open = false" />
-      <DropdownItem icon="settings-01" label="Settings"          shortcut="⌘S"   @click="open = false" />
+      <DropdownItem icon="user"    label="View profile"       shortcut="⌘K→P" @click="open = false" />
+      <DropdownItem icon="settings" label="Settings"          shortcut="⌘S"   @click="open = false" />
       <DropdownItem icon="zap"        label="Keyboard shortcuts" shortcut="?"    @click="open = false" />
       <DropdownDivider />
-      <DropdownItem icon="home-line"  label="Company profile"    shortcut="⌘K→C" @click="open = false" />
-      <DropdownItem icon="users-01"   label="Team"               shortcut="⌘K→T" @click="open = false" />
-      <DropdownItem icon="user-plus-01" label="Invite colleagues" shortcut="⌘I"  @click="open = false" />
+      <DropdownItem icon="house"  label="Company profile"    shortcut="⌘K→C" @click="open = false" />
+      <DropdownItem icon="users"   label="Team"               shortcut="⌘K→T" @click="open = false" />
+      <DropdownItem icon="user-plus" label="Invite colleagues" shortcut="⌘I"  @click="open = false" />
       <DropdownDivider />
-      <DropdownItem icon="layers-two-01"      label="Changelog"        shortcut="⌘K→C" @click="open = false" />
-      <DropdownItem icon="message-smile-circle" label="Slack Community" shortcut="⌘K→S" @click="open = false" />
-      <DropdownItem icon="help-circle"        label="Support"          shortcut="⌘/"   @click="open = false" />
+      <DropdownItem icon="layers"      label="Changelog"        shortcut="⌘K→C" @click="open = false" />
+      <DropdownItem icon="message-circle-more" label="Slack Community" shortcut="⌘K→S" @click="open = false" />
+      <DropdownItem icon="circle-question-mark"        label="Support"          shortcut="⌘/"   @click="open = false" />
       <DropdownItem icon="container"          label="API"              shortcut="⌘A"   @click="open = false" />
       <DropdownDivider />
-      <DropdownItem icon="log-out-01" label="Log out" shortcut="⌥⇧Q" @click="open = false" />
+      <DropdownItem icon="log-out" label="Log out" shortcut="⌥⇧Q" @click="open = false" />
     </Dropdown>
   `,
 })
@@ -123,10 +123,10 @@ export const SelectItemTypes: Story = {
         </div>
         <div style="width: 240px; display: flex; flex-direction: column;">
           <p style="font: 600 12px/20px sans-serif; color: #667085; margin: 0 0 4px 6px;">Icon leading</p>
-          <DropdownSelectItem type="icon" icon="user-01" label="Olivia Rhye" supporting-text="@olivia" :selected="selected === 'olivia'" @click="selected = 'olivia'" />
-          <DropdownSelectItem type="icon" icon="user-01" label="Phoenix Baker" supporting-text="@phoenix" :selected="selected === 'phoenix'" @click="selected = 'phoenix'" />
-          <DropdownSelectItem type="icon" icon="user-01" label="Lana Steiner" supporting-text="@lana" :selected="selected === 'lana'" @click="selected = 'lana'" />
-          <DropdownSelectItem type="icon" icon="user-01" label="Disabled" supporting-text="@disabled" :disabled="true" />
+          <DropdownSelectItem type="icon" icon="user" label="Olivia Rhye" supporting-text="@olivia" :selected="selected === 'olivia'" @click="selected = 'olivia'" />
+          <DropdownSelectItem type="icon" icon="user" label="Phoenix Baker" supporting-text="@phoenix" :selected="selected === 'phoenix'" @click="selected = 'phoenix'" />
+          <DropdownSelectItem type="icon" icon="user" label="Lana Steiner" supporting-text="@lana" :selected="selected === 'lana'" @click="selected = 'lana'" />
+          <DropdownSelectItem type="icon" icon="user" label="Disabled" supporting-text="@disabled" :disabled="true" />
         </div>
         <div style="width: 240px; display: flex; flex-direction: column;">
           <p style="font: 600 12px/20px sans-serif; color: #667085; margin: 0 0 4px 6px;">Avatar leading</p>
@@ -161,24 +161,24 @@ export const AllTriggers: Story = {
     template: `
       <div style="display: flex; gap: 48px; align-items: flex-start; padding: 16px;">
         <Dropdown trigger="button" v-model:open="openButton" button-label="Account" user-name="Olivia Rhye" user-email="olivia@untitledui.com">
-          <DropdownItem icon="user-01"  label="View profile" shortcut="⌘K→P" @click="openButton = false" />
-          <DropdownItem icon="settings-01" label="Settings"  shortcut="⌘S"   @click="openButton = false" />
+          <DropdownItem icon="user"  label="View profile" shortcut="⌘K→P" @click="openButton = false" />
+          <DropdownItem icon="settings" label="Settings"  shortcut="⌘S"   @click="openButton = false" />
           <DropdownDivider />
-          <DropdownItem icon="log-out-01" label="Log out"    shortcut="⌥⇧Q"  @click="openButton = false" />
+          <DropdownItem icon="log-out" label="Log out"    shortcut="⌥⇧Q"  @click="openButton = false" />
         </Dropdown>
 
         <Dropdown trigger="icon" v-model:open="openIcon" user-name="Olivia Rhye" user-email="olivia@untitledui.com">
-          <DropdownItem icon="user-01"  label="View profile" shortcut="⌘K→P" @click="openIcon = false" />
-          <DropdownItem icon="settings-01" label="Settings"  shortcut="⌘S"   @click="openIcon = false" />
+          <DropdownItem icon="user"  label="View profile" shortcut="⌘K→P" @click="openIcon = false" />
+          <DropdownItem icon="settings" label="Settings"  shortcut="⌘S"   @click="openIcon = false" />
           <DropdownDivider />
-          <DropdownItem icon="log-out-01" label="Log out"    shortcut="⌥⇧Q"  @click="openIcon = false" />
+          <DropdownItem icon="log-out" label="Log out"    shortcut="⌥⇧Q"  @click="openIcon = false" />
         </Dropdown>
 
         <Dropdown trigger="avatar" v-model:open="openAvatar" user-name="Olivia Rhye" user-email="olivia@untitledui.com">
-          <DropdownItem icon="user-01"  label="View profile" shortcut="⌘K→P" @click="openAvatar = false" />
-          <DropdownItem icon="settings-01" label="Settings"  shortcut="⌘S"   @click="openAvatar = false" />
+          <DropdownItem icon="user"  label="View profile" shortcut="⌘K→P" @click="openAvatar = false" />
+          <DropdownItem icon="settings" label="Settings"  shortcut="⌘S"   @click="openAvatar = false" />
           <DropdownDivider />
-          <DropdownItem icon="log-out-01" label="Log out"    shortcut="⌥⇧Q"  @click="openAvatar = false" />
+          <DropdownItem icon="log-out" label="Log out"    shortcut="⌥⇧Q"  @click="openAvatar = false" />
         </Dropdown>
       </div>
     `,

@@ -20,7 +20,7 @@ Champ de saisie textuelle. Supporte le label, le hint, un icône ou texte en lea
 | Default | Bordure grise, shadow-xs |
 | Focused | Bordure brand + focus ring brand (CSS `:focus-within`) |
 | Disabled | Fond gris, curseur `not-allowed` |
-| Destructive | Bordure rouge + icône `alert-circle` + hint rouge |
+| Destructive | Bordure rouge + icône `circle-alert` + hint rouge |
 
 ---
 
@@ -35,7 +35,7 @@ Utiliser le slot `#icon-leading` avec un `<Icon>` du DS.
 ```vue
 <InputField label="Email" placeholder="...">
   <template #icon-leading>
-    <Icon name="mail-01" :size="20" />
+    <Icon name="mail" :size="20" />
   </template>
 </InputField>
 ```

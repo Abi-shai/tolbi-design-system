@@ -3,7 +3,7 @@ import * as ButtonStories from '../components/Button/Button.stories'
 
 <Meta title="Introduction" />
 
-# Tolbi Design System <span style={{fontSize:'0.55em', fontWeight:400, verticalAlign:'middle', background:'#E8F5E9', color:'#1B5E20', borderRadius:'4px', padding:'2px 8px', marginLeft:'8px'}}>v0.3.0</span>
+# Tolbi Design System <span style={{fontSize:'0.55em', fontWeight:400, verticalAlign:'middle', background:'#E8F5E9', color:'#1B5E20', borderRadius:'4px', padding:'2px 8px', marginLeft:'8px'}}>v0.4.0</span>
 
 Le design system multi-produit de Tolbi — composants Vue 3, tokens de design, et guidelines d'usage.
 
@@ -27,6 +27,62 @@ import { Button } from 'tolbi-design-system'
 
 <Canvas of={ButtonStories.Primary} />
 <Controls of={ButtonStories.Primary} />
+
+---
+
+## Organisation de la documentation
+
+La navigation suit l'ordre de construction du système — des décisions vers les assemblages.
+
+| Niveau | Contenu | Règle d'appartenance |
+|---|---|---|
+| **Foundations** | Couleur, typographie, espacement, rayons, largeurs, conteneurs, effets, motion | Les décisions de design. Aucun composant, uniquement des tokens. |
+| **Primitives** | `Icon`, `ModuleIcon`, `Logo`, `Avatar`, `Badge`, `Scrollbar` | Rend un seul élément. Aucune composition, aucun état interne. |
+
+| **Subcomponents** | `ButtonGroupItem`, `DropdownItem`, `DropdownSelectItem`, `DropdownDivider` | N'a de sens qu'à l'intérieur d'un parent. Ne s'utilise jamais seul. |
+| **Components** | Tout le reste | Porte des variantes, des états ou de l'interaction, et compose éventuellement les niveaux inférieurs. |
+
+L'ordre du volet latéral est figé dans `.storybook/preview.ts` (`options.storySort`). Les entrées
+non listées se rangent après leurs voisines déclarées ; l'ordre des stories *à l'intérieur* d'un
+fichier reste celui du code, jamais alphabétique.
+
+---
+
+## Icônes
+
+Le jeu d'icônes est [Lucide](https://lucide.dev) (ISC) — **189 icônes**, exactement le sous-ensemble
+publié dans la frame Figma `Icons/Lucide`, pas la bibliothèque entière.
+
+Les fichiers sont **générés**, jamais écrits à la main :
+
+```bash
+# 1. ajouter/retirer un nom Lucide dans scripts/icons.manifest.txt
+# 2. régénérer
+npm run icons
+```
+
+Quatre tailles : `16 | 20 | 24 | 32`. Les icônes sont dessinées sur une grille de 24px en
+`stroke-width: 2` et le stroke suit la boîte — le stroke effectif vaut donc `2 × taille / 24`
+(1,33 / 1,67 / 2,00 / 2,67). Il n'est pas compensé aux petites tailles. Les glyphes *à l'intérieur*
+d'un contrôle (coche de `Checkbox`, fermeture de `Tag`) sont des ornements et échappent au plancher
+de 16px.
+
+---
+
+## Artwork des modules
+
+`ModuleIcon` porte les deux niveaux publiés dans Figma, sur le modèle des tokens :
+`variant="illustration"` est la **primitive** (le dessin seul), `variant="logo"` la **sémantique**
+(le même dessin sur sa tuile) — et c'est la valeur par défaut.
+
+Comme les icônes, les fichiers sont générés depuis les exports Figma bruts :
+
+```bash
+npm run module-art
+```
+
+11 modules. `Eudr` est absent de `ModuleName` : la variante est vide dans Figma et son artwork se
+trouve en réalité sur `Trace` — voir ADR-0005.
 
 ---
 

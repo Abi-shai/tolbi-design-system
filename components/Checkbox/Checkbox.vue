@@ -328,7 +328,7 @@ function handleChange(event: Event) {
 
 /* ── Label ─────────────────────────────────────────────────────────── */
 .ds-checkbox__label {
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   color: var(--ds-semantic-text-secondary);
 }

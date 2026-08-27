@@ -87,7 +87,7 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
       </span>
       <Icon
         v-else-if="destructive"
-        name="alert-circle"
+        name="circle-alert"
         :size="iconSize"
         class="ds-input-field__error-icon"
         aria-hidden="true"
@@ -130,7 +130,7 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
 .ds-input-field__label {
   margin: 0;
   display: block;
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.25rem;
@@ -190,7 +190,7 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
 
 /* Disabled */
 .ds-input-field__wrapper--disabled {
-  background: var(--ds-semantic-bg-primary-alt);
+  background: var(--ds-semantic-bg-primary);
   border-color: var(--ds-semantic-border-primary);
   box-shadow: none;
   cursor: not-allowed;

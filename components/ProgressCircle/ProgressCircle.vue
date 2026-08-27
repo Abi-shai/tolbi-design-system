@@ -183,7 +183,7 @@ const labelFont = computed(() => LABEL_FONT[props.size])
       <span
         v-if="hasLabel && !isXxs"
         :style="{
-          fontFamily: 'var(--ds-typography-font-family-inter)',
+          fontFamily: 'var(--ds-typography-font-family-poppins)',
           fontSize:   labelFont.size,
           fontWeight: '500',
           lineHeight: labelFont.line,
@@ -211,7 +211,7 @@ const labelFont = computed(() => LABEL_FONT[props.size])
         left:       '50%',
         top:        `${externalLabelTop}px`,
         transform:  'translateX(-50%)',
-        fontFamily: 'var(--ds-typography-font-family-inter)',
+        fontFamily: 'var(--ds-typography-font-family-poppins)',
         fontSize:   labelFont.size,
         fontWeight: '500',
         lineHeight: labelFont.line,

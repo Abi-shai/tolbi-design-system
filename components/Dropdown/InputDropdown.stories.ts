@@ -14,12 +14,12 @@ const teamMembers: InputDropdownOption[] = [
   { value: 'orlando', label: 'Orlando Diggs',  supportingText: '@orlando' },
 ]
 
-const iconMembers: InputDropdownOption[] = teamMembers.map(m => ({ ...m, icon: 'user-01' as const }))
+const iconMembers: InputDropdownOption[] = teamMembers.map(m => ({ ...m, icon: 'user' as const }))
 
 const dotMembers: InputDropdownOption[] = [
   { value: 'active',   label: 'Active',   supportingText: 'Online now',    dotColor: 'var(--ds-semantic-fg-success-primary)' },
   { value: 'away',     label: 'Away',     supportingText: 'Be right back', dotColor: 'var(--ds-semantic-fg-warning-primary)' },
-  { value: 'offline',  label: 'Offline',  supportingText: 'Not available', dotColor: 'var(--ds-semantic-fg-quaternary)'      },
+  { value: 'offline',  label: 'Offline',  supportingText: 'Not available', dotColor: 'var(--ds-semantic-fg-quarterary)'      },
   { value: 'busy',     label: 'Busy',     supportingText: 'Do not disturb',dotColor: 'var(--ds-semantic-fg-error-primary)'   },
 ]
 
@@ -114,11 +114,11 @@ export const AllTypes: Story = {
         { value: 'natali',  label: 'Natali Craig',   supportingText: '@natali'  },
         { value: 'drew',    label: 'Drew Cano',      supportingText: '@drew'    },
       ]
-      const iconMembers: InputDropdownOption[]   = teamMembers.map(m => ({ ...m, icon: 'user-01' as const }))
+      const iconMembers: InputDropdownOption[]   = teamMembers.map(m => ({ ...m, icon: 'user' as const }))
       const dotMembers: InputDropdownOption[] = [
         { value: 'active',  label: 'Active',  supportingText: 'Online now',     dotColor: 'var(--ds-semantic-fg-success-primary)' },
         { value: 'away',    label: 'Away',    supportingText: 'Be right back',  dotColor: 'var(--ds-semantic-fg-warning-primary)' },
-        { value: 'offline', label: 'Offline', supportingText: 'Not available',  dotColor: 'var(--ds-semantic-fg-quaternary)'      },
+        { value: 'offline', label: 'Offline', supportingText: 'Not available',  dotColor: 'var(--ds-semantic-fg-quarterary)'      },
       ]
       return { defaultVal, iconVal, avatarVal, dotVal, searchVal, teamMembers, iconMembers, dotMembers }
     },
@@ -140,7 +140,7 @@ export const AllTypes: Story = {
             label="Icon leading"
             placeholder="Select team member"
             hint-text="This is a hint text to help user."
-            leading-icon="user-01"
+            leading-icon="user"
             :options="iconMembers"
             v-model="iconVal"
           />
@@ -192,7 +192,7 @@ export const Placeholder: Story = {
         { value: 'olivia', label: 'Olivia Rhye', supportingText: '@olivia' },
         { value: 'lana',   label: 'Lana Steiner', supportingText: '@lana'  },
       ]
-      const iconMembers = teamMembers.map(m => ({ ...m, icon: 'user-01' as const }))
+      const iconMembers = teamMembers.map(m => ({ ...m, icon: 'user' as const }))
       const dotMembers: InputDropdownOption[] = [
         { value: 'active', label: 'Active', supportingText: 'Online now', dotColor: 'var(--ds-semantic-fg-success-primary)' },
       ]
@@ -204,7 +204,7 @@ export const Placeholder: Story = {
           <InputDropdown type="default"       label="Default"       placeholder="Select team member" :options="teamMembers" />
         </div>
         <div style="width: 320px;">
-          <InputDropdown type="icon-leading"  label="Icon leading"  placeholder="Select team member" leading-icon="user-01" :options="iconMembers" />
+          <InputDropdown type="icon-leading"  label="Icon leading"  placeholder="Select team member" leading-icon="user" :options="iconMembers" />
         </div>
         <div style="width: 320px;">
           <InputDropdown type="avatar-leading" label="Avatar leading" placeholder="Select team member" :options="teamMembers" />

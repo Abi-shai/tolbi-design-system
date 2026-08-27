@@ -164,7 +164,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
 .ds-otp__label {
   margin: 0;
   display: block;
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.25rem;
@@ -193,7 +193,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
   border-radius: var(--ds-radius-md);
   box-shadow: var(--ds-shadow-xs);
   box-sizing: border-box;
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   color: var(--ds-semantic-text-primary);
   transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
@@ -219,7 +219,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
 
 /* Disabled */
 .ds-otp__cell:disabled {
-  background: var(--ds-semantic-bg-primary-alt);
+  background: var(--ds-semantic-bg-primary);
   cursor: not-allowed;
   color: var(--ds-semantic-text-placeholder);
 }
@@ -257,7 +257,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
 
 /* ── Séparateur ───────────────────────────────────────────────────── */
 .ds-otp__separator {
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   color: var(--ds-semantic-text-placeholder-subtle);
   flex-shrink: 0;

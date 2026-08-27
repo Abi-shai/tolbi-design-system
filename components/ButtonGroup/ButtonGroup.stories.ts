@@ -40,7 +40,7 @@ export const LeadingIcon: Story = {
     template: `
       <ButtonGroup aria-label="Vues">
         <ButtonGroupItem icon="list"     label="Liste" />
-        <ButtonGroupItem icon="grid-01"  label="Grille" :active="true" />
+        <ButtonGroupItem icon="layout-grid"  label="Grille" :active="true" />
         <ButtonGroupItem icon="table"    label="Tableau" />
       </ButtonGroup>
     `,
@@ -55,7 +55,7 @@ export const IconOnly: Story = {
       <ButtonGroup aria-label="Navigation">
         <ButtonGroupItem icon="minus"  aria-label="Précédent" />
         <ButtonGroupItem icon="plus"   aria-label="Ajouter" />
-        <ButtonGroupItem icon="search-md" aria-label="Suivant" />
+        <ButtonGroupItem icon="search" aria-label="Suivant" />
       </ButtonGroup>
     `,
   }),
@@ -67,9 +67,9 @@ export const WithDisabled: Story = {
     components: { ButtonGroup, ButtonGroupItem },
     template: `
       <ButtonGroup aria-label="Actions">
-        <ButtonGroupItem label="Modifier" icon="edit-01" />
-        <ButtonGroupItem label="Télécharger" icon="download-01" :active="true" />
-        <ButtonGroupItem label="Supprimer" icon="trash-01" :disabled="true" />
+        <ButtonGroupItem label="Modifier" icon="square-pen" />
+        <ButtonGroupItem label="Télécharger" icon="download" :active="true" />
+        <ButtonGroupItem label="Supprimer" icon="trash-2" :disabled="true" />
       </ButtonGroup>
     `,
   }),

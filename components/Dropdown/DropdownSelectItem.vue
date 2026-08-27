@@ -45,7 +45,7 @@ const emit = defineEmits<{
     <div class="ds-dropdown-select-item__content">
       <Icon
         v-if="type === 'icon'"
-        :name="icon || 'user-01'"
+        :name="icon || 'user'"
         :size="20"
         class="ds-dropdown-select-item__leading-icon"
         aria-hidden="true"
@@ -154,7 +154,7 @@ const emit = defineEmits<{
 }
 
 .ds-dropdown-select-item__label {
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   font-size: 1rem;
   line-height: 1.5rem;

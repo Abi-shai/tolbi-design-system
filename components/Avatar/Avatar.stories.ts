@@ -4,7 +4,7 @@ import AvatarDocs from './Avatar.mdx'
 import StoryGrid from '../../stories/StoryGrid.vue'
 
 const meta: Meta<typeof Avatar> = {
-  title: 'Components/Avatar',
+  title: 'Primitives/Avatar',
   component: Avatar,
   tags: ['autodocs'],
   parameters: {

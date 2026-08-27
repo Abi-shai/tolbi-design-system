@@ -89,7 +89,7 @@ const dotSize = computed(() => {
       aria-label="Retirer"
       @click.stop="emit('dismiss')"
     >
-      <Icon name="x-close" :size="iconSize" aria-hidden="true" />
+      <Icon name="x" :size="iconSize" aria-hidden="true" />
     </button>
   </span>
 </template>
@@ -146,7 +146,7 @@ const dotSize = computed(() => {
   align-items: center;
   gap: 4px;
   border-radius: var(--ds-radius-full);
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   white-space: nowrap;
   line-height: 1;

@@ -50,7 +50,7 @@ const meta: Meta<typeof BadgeGroup> = {
     color:   'brand',
     size:    'md',
     badge:   'leading',
-    icon:    'edit-01',
+    icon:    'square-pen',
   },
 }
 
@@ -101,7 +101,7 @@ export const AllColors: Story = {
           :message="item.message"
           :color="item.color"
           badge="leading"
-          icon="edit-01"
+          icon="square-pen"
         />
       </div>
     `,
@@ -131,7 +131,7 @@ export const AllColorsTrailing: Story = {
           :message="item.message"
           :color="item.color"
           badge="trailing"
-          icon="edit-01"
+          icon="square-pen"
         />
       </div>
     `,

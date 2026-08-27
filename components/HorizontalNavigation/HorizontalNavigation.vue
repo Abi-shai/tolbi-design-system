@@ -93,7 +93,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 
       <nav v-if="hasBreadcrumbs" class="ds-hnav__breadcrumbs" aria-label="Navigation">
         <button class="ds-hnav__crumb-btn" @click="emit('learn')" aria-label="Accueil">
-          <Icon name="home-05" :size="20" />
+          <Icon name="house" :size="20" />
         </button>
 
         <template v-for="(crumb, i) in breadcrumbs" :key="i">
@@ -124,7 +124,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 
         <!-- Bouton Apprendre -->
         <button class="ds-hnav__learn-btn" @click="emit('learn')">
-          <Icon name="book-open-01" :size="20" aria-hidden="true" />
+          <Icon name="book-open" :size="20" aria-hidden="true" />
           <span>Apprendre</span>
         </button>
 
@@ -135,7 +135,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
           @mouseleave="hideTooltip"
         >
           <button class="ds-hnav__icon-btn" @click="emit('settings')" aria-label="Paramètres">
-            <Icon name="settings-01" :size="20" />
+            <Icon name="settings" :size="20" />
           </button>
           <Tooltip
             v-if="activeTooltip === 'settings'"
@@ -152,7 +152,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
           @mouseleave="hideTooltip"
         >
           <button class="ds-hnav__icon-btn ds-hnav__notif" @click="emit('notifications')" aria-label="Notifications">
-            <Icon name="bell-01" :size="20" />
+            <Icon name="bell" :size="20" />
             <span v-if="hasNotification" class="ds-hnav__notif-dot" aria-hidden="true" />
           </button>
           <Tooltip
@@ -178,7 +178,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
             aria-label="Modules"
             @click="toggleModules"
           >
-            <Icon name="dots-grid" :size="20" />
+            <Icon name="layout-grid" :size="20" />
           </button>
 
           <Tooltip
@@ -251,7 +251,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   border: none;
   cursor: pointer;
   color: var(--ds-color-gray-light-300);
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.25rem;
