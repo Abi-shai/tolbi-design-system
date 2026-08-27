@@ -101,15 +101,15 @@ export const AllLabelTypes: Story = {
     template: `
       <div style="display: flex; flex-direction: column; gap: 64px; width: 320px; padding: 60px 0 48px">
         <div style="display: flex; flex-direction: column; gap: 8px">
-          <span style="font-size: 12px; color: #667085; font-family: Inter, sans-serif">None</span>
+          <span style="font-size: 12px; color: #667085; font-family: Poppins, sans-serif">None</span>
           <Slider v-model="none" />
         </div>
         <div style="display: flex; flex-direction: column; gap: 8px">
-          <span style="font-size: 12px; color: #667085; font-family: Inter, sans-serif">Bottom</span>
+          <span style="font-size: 12px; color: #667085; font-family: Poppins, sans-serif">Bottom</span>
           <Slider v-model="bottom" label="bottom" />
         </div>
         <div style="display: flex; flex-direction: column; gap: 8px">
-          <span style="font-size: 12px; color: #667085; font-family: Inter, sans-serif">Top floating</span>
+          <span style="font-size: 12px; color: #667085; font-family: Poppins, sans-serif">Top floating</span>
           <Slider v-model="floating" label="top-floating" />
         </div>
       </div>

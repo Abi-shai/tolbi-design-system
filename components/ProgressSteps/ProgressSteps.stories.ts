@@ -22,9 +22,9 @@ export default meta
 type Story = StoryObj<typeof ProgressSteps>
 
 const STEPS_WITH_ICONS: ProgressStep[] = [
-  { title: 'Vos informations',      description: 'Renseignez votre nom et votre adresse e-mail',   icon: 'user-01' },
-  { title: 'Détails de l\'entreprise', description: 'Quelques informations sur votre entreprise',  icon: 'briefcase-01' },
-  { title: 'Inviter votre équipe',  description: 'Commencez à collaborer avec votre équipe',       icon: 'users-01' },
+  { title: 'Vos informations',      description: 'Renseignez votre nom et votre adresse e-mail',   icon: 'user' },
+  { title: 'Détails de l\'entreprise', description: 'Quelques informations sur votre entreprise',  icon: 'building-2' },
+  { title: 'Inviter votre équipe',  description: 'Commencez à collaborer avec votre équipe',       icon: 'users' },
 ]
 
 const STEPS_PLAIN: ProgressStep[] = [

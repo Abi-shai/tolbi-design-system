@@ -5,7 +5,7 @@ export { Logo } from './Logo'
 export type { LogoVariant } from './Logo'
 
 export { Icon, icons } from './Icon'
-export type { IconName } from './Icon'
+export type { IconName, IconSize } from './Icon'
 
 export { CloseButton } from './CloseButton'
 export type { CloseButtonSize } from './CloseButton'
@@ -18,8 +18,8 @@ export type { BadgeColor, BadgeVariant, BadgeSize } from './Badge'
 export { BadgeGroup } from './BadgeGroup'
 export type { BadgeGroupColor, BadgeGroupSize, BadgeGroupBadge } from './BadgeGroup'
 
-export { ModuleIcon } from './ModuleIcon'
-export type { ModuleName } from './ModuleIcon'
+export { ModuleIcon, moduleNames } from './ModuleIcon'
+export type { ModuleName, ModuleVariant } from './ModuleIcon'
 
 export { ModulesList } from './ModulesList'
 export type { ModulesListItem } from './ModulesList'

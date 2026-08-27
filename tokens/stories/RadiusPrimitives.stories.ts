@@ -10,7 +10,7 @@ const scale = Object.entries(primitives.radius).map(([key, token]) => ({
 }))
 
 const meta: Meta = {
-  title: 'Tokens/Radius/Radius Primitives',
+  title: 'Foundations/Radius',
   tags: ['autodocs'],
   render: () => ({
     components: { RadiusCard },

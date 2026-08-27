@@ -74,11 +74,11 @@ export const BothSizes: Story = {
     template: `
       <div style="display: flex; flex-direction: column; gap: 24px">
         <div>
-          <p style="font-family: Inter, sans-serif; font-size: 12px; color: #667085; margin-bottom: 8px">md</p>
+          <p style="font-family: Poppins, sans-serif; font-size: 12px; color: #667085; margin-bottom: 8px">md</p>
           <Tabs v-model="md" :tabs="defaultTabs" size="md" />
         </div>
         <div>
-          <p style="font-family: Inter, sans-serif; font-size: 12px; color: #667085; margin-bottom: 8px">sm</p>
+          <p style="font-family: Poppins, sans-serif; font-size: 12px; color: #667085; margin-bottom: 8px">sm</p>
           <Tabs v-model="sm" :tabs="defaultTabs" size="sm" />
         </div>
       </div>

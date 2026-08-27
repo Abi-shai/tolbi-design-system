@@ -9,7 +9,7 @@ const named = Object.entries(semantic.spacing).map(([name, token]) => ({
 }))
 
 const meta: Meta = {
-  title: 'Tokens/Spacing/Spacing Semantic',
+  title: 'Foundations/Spacing/Semantic',
   tags: ['autodocs'],
   render: () => ({
     components: { SpacingRow },

@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
+import { Scrollbar } from '../Scrollbar'
 
 export type DropdownTrigger = 'button' | 'icon' | 'avatar'
 
@@ -88,7 +89,7 @@ onUnmounted(() => {
       aria-label="Options"
       @click="toggle"
     >
-      <Icon name="dots-vertical" :size="20" aria-hidden="true" />
+      <Icon name="ellipsis-vertical" :size="20" aria-hidden="true" />
     </button>
 
     <!-- ── Avatar trigger ─────────────────────────────────────────── -->
@@ -121,9 +122,11 @@ onUnmounted(() => {
       </div>
 
       <!-- Items slot -->
-      <div class="ds-dropdown__items">
-        <slot />
-      </div>
+      <Scrollbar max-height="320px">
+        <div class="ds-dropdown__items">
+          <slot />
+        </div>
+      </Scrollbar>
     </div>
     </Transition>
   </div>
@@ -259,34 +262,12 @@ onUnmounted(() => {
 }
 
 /* ── Items wrapper ────────────────────────────────────────────────── */
+/* Scroll is delegated to <Scrollbar> (ADR-0001) — its thumb overlays the list
+ * instead of reserving a gutter, so the items keep the panel's full width. */
 .ds-dropdown__items {
   display: flex;
   flex-direction: column;
   padding: 4px 0;
-  max-height: 320px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: var(--ds-semantic-bg-quaternary) transparent;
-}
-
-.ds-dropdown__items::-webkit-scrollbar {
-  width: 16px;
-}
-
-.ds-dropdown__items::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.ds-dropdown__items::-webkit-scrollbar-thumb {
-  background-color: var(--ds-semantic-bg-quaternary);
-  border-radius: var(--ds-radius-full);
-  border: 4px solid transparent;
-  background-clip: padding-box;
-}
-
-.ds-dropdown__items::-webkit-scrollbar-thumb:hover {
-  background-color: var(--ds-semantic-fg-senary);
 }
 
 /* ── Panel transition ──────────────────────────────────────────────── */

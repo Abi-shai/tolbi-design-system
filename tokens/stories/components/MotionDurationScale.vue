@@ -56,7 +56,7 @@ function play() {
 
 <style scoped>
 .root {
-  font-family: var(--ds-typography-font-family-inter, 'Inter', sans-serif);
+  font-family: var(--ds-typography-font-family-poppins, 'Poppins', sans-serif);
   max-width: 760px;
   padding: 1.5rem;
 }

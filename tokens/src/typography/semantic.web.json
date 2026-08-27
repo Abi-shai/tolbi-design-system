@@ -1,0 +1,62 @@
+{
+  "font-size": {
+    "heading-2xl": { "value": "{typography.font-size.32}", "description": "Onboarding, empty states" },
+    "heading-xl":  { "value": "{typography.font-size.24}", "description": "Page title" },
+    "heading-lg":  { "value": "{typography.font-size.20}", "description": "Section heading, modal/drawer title" },
+    "heading-md":  { "value": "{typography.font-size.16}", "description": "Card title, list-group header" },
+    "heading-sm":  { "value": "{typography.font-size.14}", "description": "Dense sub-headers, table column headers" },
+    "body-lg":     { "value": "{typography.font-size.16}", "description": "Long-form on web" },
+    "body-md":     { "value": "{typography.font-size.14}", "description": "Default body on web. Table cells, form values" },
+    "body-sm":     { "value": "{typography.font-size.12}", "description": "Helper text, timestamps, tooltips" },
+    "label-lg":    { "value": "{typography.font-size.14}", "description": "Buttons, tabs, nav items" },
+    "label-md":    { "value": "{typography.font-size.12}", "description": "Field labels, chips, badges" },
+    "label-xs":    { "value": "{typography.font-size.11}", "description": "Tab-bar labels, chart axes. Floor — never content" },
+    "metric-lg":   { "value": "{typography.font-size.32}", "description": "Dashboard KPI values. Needs tabular-nums" },
+    "code-md":     { "value": "{typography.font-size.13}", "description": "IDs, API keys, snippets" }
+  },
+  "line-height": {
+    "heading-2xl": { "value": "{typography.line-height.40}" },
+    "heading-xl":  { "value": "{typography.line-height.32}" },
+    "heading-lg":  { "value": "{typography.line-height.28}" },
+    "heading-md":  { "value": "{typography.line-height.24}" },
+    "heading-sm":  { "value": "{typography.line-height.20}" },
+    "body-lg":     { "value": "{typography.line-height.24}" },
+    "body-md":     { "value": "{typography.line-height.20}" },
+    "body-sm":     { "value": "{typography.line-height.16}" },
+    "label-lg":    { "value": "{typography.line-height.20}" },
+    "label-md":    { "value": "{typography.line-height.16}" },
+    "label-xs":    { "value": "{typography.line-height.16}" },
+    "metric-lg":   { "value": "{typography.line-height.36}" },
+    "code-md":     { "value": "{typography.line-height.20}" }
+  },
+  "letter-spacing": {
+    "heading-2xl": { "value": "{typography.letter-spacing.tighter}", "description": "32px → -1%" },
+    "heading-xl":  { "value": "{typography.letter-spacing.tight}",   "description": "24px → -0.5%" },
+    "heading-lg":  { "value": "{typography.letter-spacing.none}" },
+    "heading-md":  { "value": "{typography.letter-spacing.none}" },
+    "heading-sm":  { "value": "{typography.letter-spacing.none}" },
+    "body-lg":     { "value": "{typography.letter-spacing.none}" },
+    "body-md":     { "value": "{typography.letter-spacing.none}" },
+    "body-sm":     { "value": "{typography.letter-spacing.none}" },
+    "label-lg":    { "value": "{typography.letter-spacing.none}" },
+    "label-md":    { "value": "{typography.letter-spacing.none}" },
+    "label-xs":    { "value": "{typography.letter-spacing.none}" },
+    "metric-lg":   { "value": "{typography.letter-spacing.tighter}", "description": "32px → -1%" },
+    "code-md":     { "value": "{typography.letter-spacing.none}" }
+  },
+  "font-weight": {
+    "heading-2xl": { "value": "{typography.font-weight.semibold}" },
+    "heading-xl":  { "value": "{typography.font-weight.semibold}" },
+    "heading-lg":  { "value": "{typography.font-weight.semibold}" },
+    "heading-md":  { "value": "{typography.font-weight.semibold}" },
+    "heading-sm":  { "value": "{typography.font-weight.semibold}" },
+    "body-lg":     { "value": "{typography.font-weight.regular}" },
+    "body-md":     { "value": "{typography.font-weight.regular}", "description": "Body/md emphasis raises this to medium" },
+    "body-sm":     { "value": "{typography.font-weight.regular}" },
+    "label-lg":    { "value": "{typography.font-weight.medium}",  "description": "Label/lg strong raises this to semibold" },
+    "label-md":    { "value": "{typography.font-weight.medium}" },
+    "label-xs":    { "value": "{typography.font-weight.medium}" },
+    "metric-lg":   { "value": "{typography.font-weight.semibold}" },
+    "code-md":     { "value": "{typography.font-weight.regular}" }
+  }
+}

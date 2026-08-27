@@ -4,7 +4,7 @@ import MotionEasingScale from './components/MotionEasingScale.vue'
 import MotionEnterExit from './components/MotionEnterExit.vue'
 
 const meta: Meta = {
-  title: 'Tokens/Motion',
+  title: 'Foundations/Motion',
   tags: ['autodocs'],
   parameters: {
     layout: 'padded',

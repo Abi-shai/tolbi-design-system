@@ -1,7 +1,13 @@
 <template>
-  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g transform="translate(3.9014, 1.8692)">
-      <path d="M1 3.12036C1 2.1492 1 1.66362 1.20249 1.39594C1.3789 1.16276 1.64853 1.01846 1.9404 1.00103C2.27544 0.981024 2.67947 1.25038 3.48752 1.78908L14.0031 8.79945C14.6708 9.24458 15.0046 9.46714 15.1209 9.74766C15.2227 9.99292 15.2227 10.2686 15.1209 10.5138C15.0046 10.7943 14.6708 11.0169 14.0031 11.462L3.48752 18.4724C2.67947 19.0111 2.27544 19.2804 1.9404 19.2604C1.64853 19.243 1.3789 19.0987 1.20249 18.8655C1 18.5979 1 18.1123 1 17.1411V3.12036Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
   </svg>
 </template>

@@ -111,7 +111,7 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
 
 .ds-tooltip__supporting {
   margin: 0;
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.75rem;
   font-weight: 500;
   line-height: 1.125rem;

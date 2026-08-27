@@ -172,7 +172,7 @@ function display(v: number): string {
   height: 24px;
   margin-top: -8px;
   border-radius: 50%;
-  background: var(--ds-semantic-bg-primary-alt, #fff);
+  background: var(--ds-semantic-bg-primary, #fff);
   border: 2px solid var(--ds-semantic-bg-brand-solid);
   box-shadow:
     0 4px 8px -2px rgba(16, 24, 40, 0.1),
@@ -195,7 +195,7 @@ function display(v: number): string {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--ds-semantic-bg-primary-alt, #fff);
+  background: var(--ds-semantic-bg-primary, #fff);
   border: 2px solid var(--ds-semantic-bg-brand-solid);
   box-shadow:
     0 4px 8px -2px rgba(16, 24, 40, 0.1),
@@ -224,14 +224,14 @@ function display(v: number): string {
   bottom: 32px; /* 24px thumb height + 8px gap */
   left: 50%;
   transform: translateX(-50%);
-  background: var(--ds-semantic-bg-primary-alt, #fff);
+  background: var(--ds-semantic-bg-primary, #fff);
   border: 1px solid var(--ds-semantic-border-secondary);
   border-radius: 8px;
   padding: 8px 12px;
   font-family: var(--ds-typography-font-family-poppins);
-  font-size: var(--ds-typography-font-size-text-xs);
+  font-size: var(--ds-font-size-body-sm);
   font-weight: 600;
-  line-height: var(--ds-typography-line-height-text-xs);
+  line-height: var(--ds-line-height-body-sm);
   color: var(--ds-semantic-text-secondary);
   white-space: nowrap;
   box-shadow:
@@ -248,10 +248,10 @@ function display(v: number): string {
 }
 
 .ds-slider__label {
-  font-family: var(--ds-typography-font-family-inter);
-  font-size: var(--ds-typography-font-size-text-md);
+  font-family: var(--ds-typography-font-family-poppins);
+  font-size: var(--ds-font-size-body-lg);
   font-weight: 500;
-  line-height: var(--ds-typography-line-height-text-md);
+  line-height: var(--ds-line-height-body-lg);
   color: var(--ds-semantic-text-primary);
   white-space: nowrap;
 }

@@ -94,7 +94,7 @@ export const WithDot: Story = {
 
 export const WithIcon: Story = {
   name: 'With icon',
-  args: { icon: 'home-05' },
+  args: { icon: 'house' },
 }
 
 export const WithCheckbox: Story = {

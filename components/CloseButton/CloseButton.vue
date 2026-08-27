@@ -44,7 +44,7 @@ function handleClick(event: MouseEvent) {
     @click="handleClick"
   >
     <Icon
-      name="x-close"
+      name="x"
       :size="iconSize"
       class="ds-close-button__icon"
       aria-hidden="true"
@@ -75,7 +75,7 @@ function handleClick(event: MouseEvent) {
 
 /* ── Icon color — light background ───────────────────────────────── */
 .ds-close-button__icon {
-  color: var(--ds-semantic-fg-quaternary);
+  color: var(--ds-semantic-fg-quarterary);
   transition: color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ModuleIcon } from '../ModuleIcon'
+import { Scrollbar } from '../Scrollbar'
 import type { ModuleName } from '../ModuleIcon'
 
 export interface ModulesListItem {
@@ -29,29 +30,42 @@ function onSelect(item: ModulesListItem) {
 
 <template>
   <div class="ds-modules-list">
-    <div class="ds-modules-list__inner">
-      <button
-        v-for="mod in modules"
-        :key="mod.name"
-        class="ds-modules-list__item"
-        :class="{
-          'ds-modules-list__item--active':   mod.active,
-          'ds-modules-list__item--disabled': mod.disabled,
-        }"
-        :disabled="mod.disabled"
-        @click="onSelect(mod)"
-      >
-        <ModuleIcon :module="mod.name" :size="48" />
-        <span class="ds-modules-list__label">{{ mod.label ?? mod.name }}</span>
-      </button>
-    </div>
+    <Scrollbar class="ds-modules-list__viewport">
+      <div class="ds-modules-list__inner">
+        <button
+          v-for="mod in modules"
+          :key="mod.name"
+          class="ds-modules-list__item"
+          :class="{
+            'ds-modules-list__item--active':   mod.active,
+            'ds-modules-list__item--disabled': mod.disabled,
+          }"
+          :disabled="mod.disabled"
+          @click="onSelect(mod)"
+        >
+          <!--
+            The primitive, not the logo: the item button already supplies the surface
+            (its own radius, hover background, and bg-brand-primary when active), so the
+            logo's tile would be a tile inside a tile and would fight the active state.
+            aria-label is null because the visible label below already names the module.
+          -->
+          <ModuleIcon
+            :module="mod.name"
+            variant="illustration"
+            :size="48"
+            :aria-label="null"
+          />
+          <span class="ds-modules-list__label">{{ mod.label ?? mod.name }}</span>
+        </button>
+      </div>
+    </Scrollbar>
   </div>
 </template>
 
 <style scoped>
 /*
  * Figma node 518:15253
- * Outer  : h-224px fixe, p-sm (6px), overflow-y auto, align-items flex-start
+ * Outer  : h-224px fixe, p-sm (6px), scroll délégué à <Scrollbar>, align-items flex-start
  *          → content area = 224 - 12 = 212px
  * Inner  : w-246px, p-md (8px), flex wrap, gap-xl (16px)
  *          2 rangées = 8+90+16+90+8 = 212px → fit exact, green visible 4 côtés
@@ -59,39 +73,24 @@ function onSelect(item: ModulesListItem) {
  * Item   : w-66px, h-90px, p-md (8px), flex-col, gap-md (8px)
  */
 
+/*
+ * Scrolling is delegated to <Scrollbar> (ADR-0001), whose thumb is absolutely
+ * positioned over the content. Nothing here reserves a gutter: the panel keeps
+ * its full 246px and the thumb floats above its right edge.
+ */
 .ds-modules-list {
   height: 224px;
   box-sizing: border-box;
   background: var(--ds-semantic-bg-secondary);
   border-radius: var(--ds-radius-2xl);
   padding: var(--ds-spacing-sm);
-  overflow-y: auto;
-  overflow-x: hidden;
   display: inline-flex;
   align-items: flex-start;
   flex-shrink: 0;
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
-  scrollbar-color: var(--ds-semantic-bg-quaternary) transparent;
 }
 
-.ds-modules-list::-webkit-scrollbar {
-  width: 16px;
-}
-
-.ds-modules-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.ds-modules-list::-webkit-scrollbar-thumb {
-  background-color: var(--ds-semantic-bg-quaternary);
-  border-radius: var(--ds-radius-full);
-  border: 4px solid transparent;
-  background-clip: padding-box;
-}
-
-.ds-modules-list::-webkit-scrollbar-thumb:hover {
-  background-color: var(--ds-semantic-fg-senary);
+.ds-modules-list__viewport {
+  max-height: 100%;
 }
 
 .ds-modules-list__inner {
@@ -138,7 +137,7 @@ function onSelect(item: ModulesListItem) {
 }
 
 .ds-modules-list__label {
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.75rem;
   font-weight: 500;
   line-height: 1.125rem;

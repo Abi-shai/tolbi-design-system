@@ -97,7 +97,7 @@ const emit = defineEmits<{
 }
 
 .ds-dropdown-item__label {
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   font-size: 0.875rem;
   line-height: 1.25rem;

@@ -3,7 +3,15 @@ import * as ModuleIconStories from './ModuleIcon.stories'
 
 # ModuleIcon
 
-Icône représentant un module produit Tolbi. Chaque module a son propre SVG bundlé — aucune dépendance réseau à l'exécution.
+Artwork d'un module produit Tolbi. Un seul composant porte les **deux** niveaux publiés dans
+Figma, sur le même modèle que les tokens :
+
+- **`variant="illustration"`** — le dessin original, sans tuile. La **primitive**.
+- **`variant="logo"`** — le même dessin posé sur sa tuile arrondie. La **sémantique**, et la
+  valeur par défaut : c'est ce que les surfaces produit consomment.
+
+Le logo n'est pas un redessin de l'illustration : c'est exactement le même artwork, aux mêmes
+coordonnées, avec la tuile ajoutée dessous.
 
 <Canvas of={ModuleIconStories.Default} />
 
@@ -11,9 +19,17 @@ Icône représentant un module produit Tolbi. Chaque module a son propre SVG bun
 
 ---
 
-## Modules disponibles
+## Primitive → sémantique
 
-<Canvas of={ModuleIconStories.AllModules} />
+<Canvas of={ModuleIconStories.Pairing} />
+
+---
+
+## Les deux jeux
+
+<Canvas of={ModuleIconStories.Logos} />
+
+<Canvas of={ModuleIconStories.Illustrations} />
 
 | Module | Description |
 |---|---|
@@ -24,37 +40,81 @@ Icône représentant un module produit Tolbi. Chaque module a son propre SVG bun
 | `Data` | Gestion et analyse de données |
 | `ID` | Identification des producteurs |
 | `Redd+` | Projets REDD+ et déforestation |
+| `Forest` | Monitoring forestier |
 | `Survey` | Enquêtes et formulaires terrain |
 | `Yield` | Suivi des rendements |
-| `Forest` | Monitoring forestier |
 | `Trace` | Traçabilité bout-en-bout |
-| `Eudr` | Conformité EUDR |
+
+---
+
+## Provenance
+
+Les fichiers sont **générés**, jamais écrits à la main :
+
+```bash
+# les exports Figma bruts vivent dans scripts/module-art-raw/
+npm run module-art
+```
+
+Un export SVG Figma d'un nœud situé dans une frame embarque le canvas autour de lui — un rect
+gris `#8F8F8F` et deux chemins de fond en coordonnées négatives. Le générateur n'extrait que le
+sous-arbre `<g id="Module=…">`, donc tout ce qui n'est pas l'artwork disparaît par construction et
+les vecteurs eux-mêmes ne sont jamais retouchés. Il préfixe aussi chaque `id` interne : Figma
+numérote les masques par frame, si bien que les 22 exports réutilisent `mask0_1083_118533`.
+
+Sources : `Module illustration` (nœud 9945:197) et `Modules logos` (nœud 9892:11717) dans
+`00 — Core Brand Visual Identity`.
 
 ---
 
 ## Tailles
 
-La prop `size` accepte un nombre (px) ou une string CSS (`"2rem"`, `"100%"`).
+<Canvas of={ModuleIconStories.Sizes} />
 
-<Canvas of={ModuleIconStories.Large} />
-<Canvas of={ModuleIconStories.Small} />
+`size` accepte un nombre (px) ou une longueur CSS (`"2rem"`, `"100%"`). L'artwork est un carré
+de 48px.
 
 ---
 
 ## Usage
 
 ```vue
+<!-- sémantique — le cas courant -->
 <ModuleIcon module="Carbone" :size="48" />
-<ModuleIcon module="Survey" :size="32" />
+
+<!-- primitive — quand le module est déjà cadré par sa propre surface -->
+<ModuleIcon module="Carbone" variant="illustration" :size="48" />
+
+<!-- décoratif, à côté d'un libellé visible -->
+<ModuleIcon module="Survey" :aria-label="null" />
 ```
 
 ---
 
 ## Règles d'usage
 
-- Toujours accompagner d'un label textuel dans l'interface — le composant expose `aria-label` mais reste insuffisant seul
-- Ne pas redimensionner en dessous de `24px` — les détails visuels deviennent illisibles
-- `Eudr` n'a pas encore d'asset graphique — affiche un espace vide
+- Toujours accompagner d'un libellé textuel dans l'interface — `aria-label` ne suffit pas seul.
+- Ne pas descendre sous `24px` : les détails deviennent illisibles.
+- Par défaut, `logo`. `illustration` est une primitive : on ne la place pas dans l'interface
+  sans raison, de la même façon qu'on ne consomme pas un token de couleur primitif.
+- La raison valable, c'est **une surface qui cadre déjà le module**. `ModulesList` en est le cas
+  de référence : son bouton porte son propre rayon, son propre survol et `bg-brand-primary` à
+  l'état actif — le logo y poserait une tuile dans une tuile, en conflit avec l'état actif. Il
+  consomme donc `variant="illustration"`.
+- Dans ce cas de figure, passer aussi `:aria-label="null"` : le libellé visible nomme déjà le
+  module, et l'artwork n'a pas à être annoncé deux fois.
+
+---
+
+## Problème ouvert — `Trace` / `Eudr`
+
+Dans **les deux** jeux Figma, l'artwork du badge EUDR est posé sur la variante nommée `Trace`,
+et la variante `Eudr` est vide (elle n'existe même pas dans le jeu illustration). Les libellés
+semblent inversés côté design.
+
+Conséquence en code : `Eudr` n'est pas une valeur de `ModuleName` — il n'y a aucun artwork à
+rendre — et `module="Trace"` affiche le mot-repère EUDR. À trancher côté Figma : soit renommer
+`Trace` en `Eudr`, soit dessiner les deux.
 
 ---
 

@@ -1,0 +1,7 @@
+{
+  "container": {
+    "padding-mobile":    { "value": "{space.4}",   "description": "16px — gutter below the desktop breakpoint" },
+    "padding-desktop":   { "value": "{space.8}",   "description": "32px — gutter at desktop" },
+    "max-width-desktop": { "value": "{space.320}", "description": "1280px — content column ceiling" }
+  }
+}

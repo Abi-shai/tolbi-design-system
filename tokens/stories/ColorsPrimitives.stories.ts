@@ -15,7 +15,7 @@ const groups = Object.entries(colors.color).map(([name, group]) => ({
 }))
 
 const meta: Meta = {
-  title: 'Tokens/Colors/Colors Primitives',
+  title: 'Foundations/Color/Primitives',
   tags: ['autodocs'],
   render: () => ({
     components: { ColorSwatchGroup },

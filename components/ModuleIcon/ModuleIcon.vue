@@ -1,129 +1,64 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-
-import carboneImg    from './assets/carbone.svg'
-import sourceImg     from './assets/source.svg'
-import callImg       from './assets/call.svg'
-import scanImg       from './assets/scan.svg'
-import dataImg       from './assets/data.svg'
-import idImg         from './assets/id.svg'
-import reddImg       from './assets/redd.svg'
-import surveyImg     from './assets/survey.svg'
-import yieldImg      from './assets/yield.svg'
-import traceImg      from './assets/trace.svg'
-import yieldMaskImg  from './assets/yield-mask.svg'
-import forestMaskImg from './assets/forest-mask.svg'
-import yieldOverlay  from './assets/yield-overlay.svg'
-import forestOverlay from './assets/forest-overlay.svg'
-import traceVector   from './assets/trace-vector.svg'
-
-export type ModuleName =
-  | 'Carbone' | 'Source' | 'Call' | 'Scan' | 'Data'
-  | 'ID' | 'Redd+' | 'Survey' | 'Yield' | 'Forest'
-  | 'Trace' | 'Eudr'
+import { illustrations, logos, type ModuleName, type ModuleVariant } from './registry'
 
 interface Props {
   module?: ModuleName
+  /**
+   * `logo` — the artwork on its rounded tile. The semantic value: this is what
+   * product surfaces consume (module switcher, nav, cards).
+   *
+   * `illustration` — the same artwork with no tile. The primitive value: the
+   * original drawing the logo is built from. Reach for it when the module is
+   * already framed by its own surface, the way a raw colour primitive is only
+   * used to define a semantic one.
+   */
+  variant?: ModuleVariant
+  /** Rendered box in px, or any CSS length. Artwork is a 48px square. */
   size?: number | string
+  /**
+   * Accessible name. Defaults to the module name; pass `null` for artwork that
+   * is decorative next to a visible label, which hides it from assistive tech.
+   */
+  ariaLabel?: string | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
   module: 'Carbone',
+  variant: 'logo',
   size: 48,
+  ariaLabel: undefined,
 })
 
-const assets: Partial<Record<ModuleName, string>> = {
-  Carbone: carboneImg,
-  Source:  sourceImg,
-  Call:    callImg,
-  Scan:    scanImg,
-  Data:    dataImg,
-  ID:      idImg,
-  'Redd+': reddImg,
-  Survey:  surveyImg,
-  Yield:   yieldImg,
-  Forest:  yieldImg,
-  Trace:   traceImg,
-}
+const art = computed(() =>
+  props.variant === 'illustration' ? illustrations[props.module] : logos[props.module],
+)
 
-const src      = computed(() => assets[props.module])
-const isYield  = computed(() => props.module === 'Yield')
-const isForest = computed(() => props.module === 'Forest')
-const isTrace  = computed(() => props.module === 'Trace')
-const hasMask  = computed(() => isYield.value || isForest.value)
+const label = computed(() =>
+  props.ariaLabel === undefined ? props.module : props.ariaLabel,
+)
 
-const maskSrc    = computed(() => isForest.value ? forestMaskImg : yieldMaskImg)
-const overlaySrc = computed(() => isForest.value ? forestOverlay : yieldOverlay)
-
-const sizeStyle = computed(() => ({
-  width:  typeof props.size === 'number' ? `${props.size}px` : props.size,
-  height: typeof props.size === 'number' ? `${props.size}px` : props.size,
-}))
+const sizeStyle = computed(() => {
+  const v = typeof props.size === 'number' ? `${props.size}px` : props.size
+  return { width: v, height: v }
+})
 </script>
 
 <template>
-  <div class="ds-module-icon" :style="sizeStyle" :aria-label="module" role="img">
-    <img v-if="src" :src="src" alt="" class="ds-module-icon__img" />
-
-    <div v-if="hasMask" class="ds-module-icon__mask-group">
-      <div
-        class="ds-module-icon__mask"
-        :style="{ maskImage: `url('${maskSrc}')` }"
-      >
-        <img :src="overlaySrc" alt="" class="ds-module-icon__overlay" />
-      </div>
-    </div>
-
-    <div v-if="isTrace" class="ds-module-icon__trace">
-      <img :src="traceVector" alt="" class="ds-module-icon__trace-img" />
-    </div>
-  </div>
+  <component
+    :is="art"
+    class="ds-module-icon"
+    :style="sizeStyle"
+    :role="label ? 'img' : undefined"
+    :aria-label="label || undefined"
+    :aria-hidden="label ? undefined : true"
+  />
 </template>
 
 <style scoped>
 .ds-module-icon {
-  position: relative;
-  display: inline-flex;
-  overflow: hidden;
+  display: inline-block;
   flex-shrink: 0;
-}
-
-.ds-module-icon__img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.ds-module-icon__mask-group {
-  position: absolute;
-  inset: 16.6%;
-}
-
-.ds-module-icon__mask {
-  position: absolute;
-  inset: 0;
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-mode: alpha;
-}
-
-.ds-module-icon__overlay {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.ds-module-icon__trace {
-  position: absolute;
-  inset: 41% 18% 41% 18.7%;
-}
-
-.ds-module-icon__trace-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  vertical-align: middle;
 }
 </style>

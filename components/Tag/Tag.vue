@@ -120,7 +120,7 @@ function onTagClick() {
       aria-label="Retirer"
       @click.stop="emit('close')"
     >
-      <Icon name="x-close" :size="closeIconSizePx" aria-hidden="true" />
+      <Icon name="x" :size="closeIconSizePx" aria-hidden="true" />
     </button>
   </span>
 </template>
@@ -136,7 +136,7 @@ function onTagClick() {
   border: 1px solid var(--ds-semantic-border-primary);
   border-radius: var(--ds-radius-sm);
   color: var(--ds-semantic-text-secondary);
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   font-size: 0.75rem;
   line-height: 1.125rem;

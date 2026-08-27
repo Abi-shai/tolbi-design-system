@@ -83,7 +83,7 @@ function onKeydown(e: KeyboardEvent) {
                 :aria-label="`Retirer ${tag}`"
                 @click="emit('remove-tag', i)"
               >
-                <Icon name="x-close" :size="12" />
+                <Icon name="x" :size="12" />
               </button>
             </span>
           </div>
@@ -145,7 +145,7 @@ function onKeydown(e: KeyboardEvent) {
 .ds-textarea__label {
   margin: 0;
   display: block;
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.25rem;
@@ -193,7 +193,7 @@ function onKeydown(e: KeyboardEvent) {
 
 /* Disabled */
 .ds-textarea__wrapper--disabled {
-  background: var(--ds-semantic-bg-primary-alt);
+  background: var(--ds-semantic-bg-primary);
   border-color: var(--ds-semantic-border-primary);
   box-shadow: none;
   cursor: not-allowed;
@@ -271,7 +271,7 @@ function onKeydown(e: KeyboardEvent) {
 }
 
 .ds-textarea__tag-label {
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.25rem;

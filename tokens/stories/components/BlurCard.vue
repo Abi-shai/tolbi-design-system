@@ -42,7 +42,7 @@ defineProps<Props>()
   font-weight: 500;
 }
 .card--light .card__name { color: var(--ds-color-gray-light-900, #101828); }
-.card--dark  .card__name { color: var(--ds-color-gray-dark-50, #F5F5F6); }
+.card--dark  .card__name { color: #F5F5F6; }
 
 .card__footer { display: flex; align-items: center; justify-content: space-between; }
 
@@ -53,5 +53,5 @@ defineProps<Props>()
 .card--light .card__mode  { color: var(--ds-color-gray-light-500, #667085); }
 
 .card--dark .card__value,
-.card--dark .card__mode   { color: var(--ds-color-gray-dark-300, #CECFD2); }
+.card--dark .card__mode   { color: #CECFD2; }
 </style>

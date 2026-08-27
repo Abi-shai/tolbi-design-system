@@ -9,7 +9,7 @@ const scale = Object.entries(primitives.space).map(([key, token]) => ({
 }))
 
 const meta: Meta = {
-  title: 'Tokens/Spacing/Spacing Primitives',
+  title: 'Foundations/Spacing/Primitives',
   tags: ['autodocs'],
   render: () => ({
     components: { SpacingRow },

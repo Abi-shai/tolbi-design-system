@@ -49,7 +49,7 @@ const goodLabel = computed(() =>
       @click="emit('contact-sales')"
     >
       <span>Contacter sales</span>
-      <Icon name="arrow-right" :size="17" aria-hidden="true" />
+      <Icon name="arrow-right" :size="16" aria-hidden="true" />
     </button>
   </div>
 
@@ -140,7 +140,7 @@ const goodLabel = computed(() =>
 }
 
 .ds-credits-chip__label {
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.5rem;
@@ -150,7 +150,7 @@ const goodLabel = computed(() =>
 /* ── Texte inline (critical) ──────────────────────────────────────── */
 .ds-credits-chip__text--inline {
   margin: 0;
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.5rem;
@@ -185,7 +185,7 @@ const goodLabel = computed(() =>
   border: none;
   cursor: pointer;
   padding: 0;
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.5rem;

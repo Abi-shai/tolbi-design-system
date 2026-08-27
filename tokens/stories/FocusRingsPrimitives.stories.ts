@@ -13,7 +13,7 @@ const withShadow = Object.entries(focusRings['focus-ring'])
 const SECTION_LABEL = 'font-family: var(--ds-typography-font-family-poppins); font-weight: 600; font-size: 0.875rem; color: var(--ds-semantic-text-tertiary, #475467); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 1.25rem;'
 
 const meta: Meta = {
-  title: 'Tokens/Effect Styles/Focus Rings',
+  title: 'Foundations/Effects/Focus Rings',
   tags: ['autodocs'],
   render: () => ({
     components: { EffectCard },

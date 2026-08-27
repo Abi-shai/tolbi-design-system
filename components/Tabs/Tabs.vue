@@ -125,7 +125,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
   display: flex;
   align-items: center;
   width: 100%;
-  background-color: var(--ds-semantic-bg-secondary-alt);
+  background-color: var(--ds-semantic-bg-secondary);
   border: 1px solid var(--ds-semantic-border-secondary);
   gap: 4px;
 }
@@ -146,7 +146,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
   left: 0;
   top: 0;
   border-radius: var(--ds-radius-sm);
-  background-color: var(--ds-semantic-bg-primary-alt);
+  background-color: var(--ds-semantic-bg-primary);
   box-shadow: var(--ds-shadow-sm);
   pointer-events: none;
   z-index: 0;
@@ -217,12 +217,12 @@ function onKeydown(e: KeyboardEvent, i: number) {
 }
 
 .ds-tabs--md .ds-tabs__label {
-  font-size: var(--ds-typography-font-size-text-md);
-  line-height: var(--ds-typography-line-height-text-md);
+  font-size: var(--ds-font-size-heading-md);
+  line-height: var(--ds-line-height-heading-md);
 }
 
 .ds-tabs--sm .ds-tabs__label {
-  font-size: var(--ds-typography-font-size-text-sm);
-  line-height: var(--ds-typography-line-height-text-sm);
+  font-size: var(--ds-font-size-heading-sm);
+  line-height: var(--ds-line-height-heading-sm);
 }
 </style>

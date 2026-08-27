@@ -73,7 +73,7 @@ const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
       :aria-label="title"
       :aria-expanded="isOpen"
     >
-      <Icon name="help-circle" :size="16" />
+      <Icon name="circle-question-mark" :size="16" />
     </button>
 
     <Transition name="ds-help-icon__tooltip">

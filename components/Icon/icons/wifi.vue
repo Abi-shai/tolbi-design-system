@@ -1,7 +1,16 @@
 <template>
-  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g transform="translate(0.1935, 3.5)">
-      <path d="M11.8066 16H11.8166M22.6131 5.20076C19.7662 2.59199 15.9723 1 11.8065 1C7.64079 1 3.84688 2.59199 1.00001 5.20076M4.53858 8.74297C6.4767 7.03566 9.02072 6 11.8066 6C14.5925 6 17.1365 7.03566 19.0747 8.74297M15.505 12.2751C14.4859 11.4763 13.2018 11 11.8065 11C10.3901 11 9.08837 11.4908 8.06202 12.3116" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M12 20h.01" />
+    <path d="M2 8.82a15 15 0 0 1 20 0" />
+    <path d="M5 12.859a10 10 0 0 1 14 0" />
+    <path d="M8.5 16.429a5 5 0 0 1 7 0" />
   </svg>
 </template>

@@ -9,7 +9,7 @@ const steps = Object.entries(blurs.blur).map(([name, token]) => ({
 }))
 
 const meta: Meta = {
-  title: 'Tokens/Effect Styles/Backdrop Blurs',
+  title: 'Foundations/Effects/Backdrop Blurs',
   tags: ['autodocs'],
   render: () => ({
     components: { BlurCard },

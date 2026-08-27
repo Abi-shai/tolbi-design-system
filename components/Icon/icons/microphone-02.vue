@@ -1,7 +1,0 @@
-<template>
-  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g transform="translate(3, 2)">
-      <path d="M17 10V11C17 15.4183 13.4183 19 9 19C4.58172 19 1 15.4183 1 11V10M9 15C6.79086 15 5 13.2091 5 11V5C5 2.79086 6.79086 1 9 1C11.2091 1 13 2.79086 13 5V11C13 13.2091 11.2091 15 9 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
-  </svg>
-</template>

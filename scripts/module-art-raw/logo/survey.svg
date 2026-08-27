@@ -1,0 +1,25 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="48" height="48" fill="#8F8F8F"/>
+<g id="Module icons">
+<path d="M-126 -345C-126 -346.105 -125.105 -347 -124 -347H949C950.105 -347 951 -346.105 951 -345V167C951 168.105 950.105 169 949 169H-124C-125.105 169 -126 168.105 -126 167V-345Z" fill="#444444"/>
+<path d="M-124 -347V-346H949V-347V-348H-124V-347ZM951 -345H950V167H951H952V-345H951ZM949 169V168H-124V169V170H949V169ZM-126 167H-125V-345H-126H-127V167H-126ZM-124 169V168C-124.552 168 -125 167.552 -125 167H-126H-127C-127 168.657 -125.657 170 -124 170V169ZM951 167H950C950 167.552 949.552 168 949 168V169V170C950.657 170 952 168.657 952 167H951ZM949 -347V-346C949.552 -346 950 -345.552 950 -345H951H952C952 -346.657 950.657 -348 949 -348V-347ZM-124 -347V-348C-125.657 -348 -127 -346.657 -127 -345H-126H-125C-125 -345.552 -124.552 -346 -124 -346V-347Z" fill="white" fill-opacity="0.1"/>
+<g id="Modules logos">
+<g id="Module=Survey" clip-path="url(#clip0_1083_118533)">
+<g id="surface1">
+<path id="Vector" d="M0 14.207C0 6.35938 6.35938 0 14.207 0H33.793C41.6406 0 48 6.35938 48 14.207V33.793C48 41.6406 41.6406 48 33.793 48H14.207C6.35938 48 0 41.6406 0 33.793V14.207Z" fill="#E6F0EB" fill-opacity="0.3"/>
+<path id="Vector_2" d="M24.9805 14.5703L38.5429 17.7344" stroke="#FAC720" stroke-width="2.36803" stroke-linecap="round"/>
+<path id="Vector_3" d="M22.7187 24.2539L36.2812 27.4219" stroke="#FAC720" stroke-width="2.36803" stroke-linecap="round"/>
+<path id="Vector_4" d="M20.4609 33.9414L29.4062 36.0313" stroke="#FAC720" stroke-width="2.36803" stroke-linecap="round"/>
+<path id="Vector_5" d="M13.9297 12.7461L15.5234 14.8906L19.7226 11.6875" stroke="#066938" stroke-width="1.89442" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_6" d="M11.7539 22.0625L13.3477 24.207L17.5469 21.0039" stroke="#066938" stroke-width="1.89442" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_7" d="M9.58984 31.3281L11.1914 33.4297L15.3711 30.3203" stroke="#066938" stroke-width="1.89442" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_1083_118533">
+<rect width="48" height="48" fill="white"/>
+</clipPath>
+</defs>
+</svg>
