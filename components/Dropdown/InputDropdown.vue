@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { Icon } from '../Icon'
+import { Scrollbar } from '../Scrollbar'
 import { Avatar } from '../Avatar'
 import type { IconName } from '../Icon'
 import DropdownSelectItem from './DropdownSelectItem.vue'
@@ -129,7 +130,7 @@ onUnmounted(() => {
           @click="openPanel"
         >
           <div class="ds-input-dropdown__content">
-            <Icon name="search-md" :size="20" class="ds-input-dropdown__search-icon" aria-hidden="true" />
+            <Icon name="search" :size="20" class="ds-input-dropdown__search-icon" aria-hidden="true" />
             <input
               v-if="open"
               ref="searchInputEl"
@@ -202,22 +203,24 @@ onUnmounted(() => {
 
         <!-- ── Dropdown panel ──────────────────────────────────────── -->
         <div v-if="open" class="ds-input-dropdown__panel" role="listbox">
-          <div class="ds-input-dropdown__panel-items">
-            <DropdownSelectItem
-              v-for="option in filteredOptions"
-              :key="option.value"
-              :type="itemType"
-              :label="option.label"
-              :supporting-text="option.supportingText"
-              :icon="option.icon || leadingIcon"
-              :avatar-src="option.avatarSrc"
-              :avatar-alt="option.avatarAlt"
-              :dot-color="option.dotColor"
-              :selected="option.value === modelValue"
-              :disabled="option.disabled"
-              @click="selectOption(option)"
-            />
-          </div>
+          <Scrollbar max-height="320px">
+            <div class="ds-input-dropdown__panel-items">
+              <DropdownSelectItem
+                v-for="option in filteredOptions"
+                :key="option.value"
+                :type="itemType"
+                :label="option.label"
+                :supporting-text="option.supportingText"
+                :icon="option.icon || leadingIcon"
+                :avatar-src="option.avatarSrc"
+                :avatar-alt="option.avatarAlt"
+                :dot-color="option.dotColor"
+                :selected="option.value === modelValue"
+                :disabled="option.disabled"
+                @click="selectOption(option)"
+              />
+            </div>
+          </Scrollbar>
         </div>
       </div>
     </div>
@@ -245,7 +248,7 @@ onUnmounted(() => {
 
 /* ── Label ─────────────────────────────────────────────────────────── */
 .ds-input-dropdown__label {
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -296,7 +299,7 @@ onUnmounted(() => {
 
 /* ── Value text ────────────────────────────────────────────────────── */
 .ds-input-dropdown__value {
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   font-size: 1rem;
   line-height: 1.5rem;
@@ -364,7 +367,7 @@ onUnmounted(() => {
   background: transparent;
   border: none;
   outline: none;
-  font-family: var(--ds-typography-font-family-inter);
+  font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   font-size: 1rem;
   line-height: 1.5rem;
@@ -393,34 +396,12 @@ onUnmounted(() => {
 }
 
 /* ── Panel items list ──────────────────────────────────────────────── */
+/* Scroll is delegated to <Scrollbar> (ADR-0001) — its thumb overlays the list
+ * instead of reserving a gutter, so the options keep the panel's full width. */
 .ds-input-dropdown__panel-items {
   display: flex;
   flex-direction: column;
   padding: 4px 0;
-  max-height: 320px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: var(--ds-semantic-bg-quaternary) transparent;
-}
-
-.ds-input-dropdown__panel-items::-webkit-scrollbar {
-  width: 16px;
-}
-
-.ds-input-dropdown__panel-items::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.ds-input-dropdown__panel-items::-webkit-scrollbar-thumb {
-  background-color: var(--ds-semantic-bg-quaternary);
-  border-radius: var(--ds-radius-full);
-  border: 4px solid transparent;
-  background-clip: padding-box;
-}
-
-.ds-input-dropdown__panel-items::-webkit-scrollbar-thumb:hover {
-  background-color: var(--ds-semantic-fg-senary);
 }
 
 /* ── Hint text ─────────────────────────────────────────────────────── */
