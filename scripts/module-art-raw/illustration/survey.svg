@@ -1,0 +1,19 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="48" height="48" fill="#8F8F8F"/>
+<g id="Module icons">
+<path d="M-645 -344C-645 -345.105 -644.105 -346 -643 -346H430C431.105 -346 432 -345.105 432 -344V168C432 169.105 431.105 170 430 170H-643C-644.105 170 -645 169.105 -645 168V-344Z" fill="#444444"/>
+<path d="M-643 -346V-345H430V-346V-347H-643V-346ZM432 -344H431V168H432H433V-344H432ZM430 170V169H-643V170V171H430V170ZM-645 168H-644V-344H-645H-646V168H-645ZM-643 170V169C-643.552 169 -644 168.552 -644 168H-645H-646C-646 169.657 -644.657 171 -643 171V170ZM432 168H431C431 168.552 430.552 169 430 169V170V171C431.657 171 433 169.657 433 168H432ZM430 -346V-345C430.552 -345 431 -344.552 431 -344H432H433C433 -345.657 431.657 -347 430 -347V-346ZM-643 -346V-347C-644.657 -347 -646 -345.657 -646 -344H-645H-644C-644 -344.552 -643.552 -345 -643 -345V-346Z" fill="white" fill-opacity="0.1"/>
+<g id="Module illustration">
+<g id="Module=Survey">
+<g id="surface1">
+<path id="Vector" d="M24.9805 14.5703L38.543 17.7344" stroke="#FAC720" stroke-width="2.36803" stroke-linecap="round"/>
+<path id="Vector_2" d="M22.7188 24.2539L36.2812 27.4219" stroke="#FAC720" stroke-width="2.36803" stroke-linecap="round"/>
+<path id="Vector_3" d="M20.4609 33.9414L29.4062 36.0313" stroke="#FAC720" stroke-width="2.36803" stroke-linecap="round"/>
+<path id="Vector_4" d="M13.9297 12.7461L15.5234 14.8906L19.7227 11.6875" stroke="#066938" stroke-width="1.89442" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_5" d="M11.7539 22.0625L13.3477 24.207L17.5469 21.0039" stroke="#066938" stroke-width="1.89442" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_6" d="M9.58984 31.3281L11.1914 33.4297L15.3711 30.3203" stroke="#066938" stroke-width="1.89442" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+</g>
+</svg>

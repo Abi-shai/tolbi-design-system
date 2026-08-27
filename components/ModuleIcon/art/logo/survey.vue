@@ -1,0 +1,20 @@
+<template>
+  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g id="Module=Survey" clip-path="url(#ds-mod-logo-survey-clip0_1083_118533)">
+    <g id="surface1">
+    <path id="Vector" d="M0 14.207C0 6.35938 6.35938 0 14.207 0H33.793C41.6406 0 48 6.35938 48 14.207V33.793C48 41.6406 41.6406 48 33.793 48H14.207C6.35938 48 0 41.6406 0 33.793V14.207Z" fill="#E6F0EB" fill-opacity="0.3"/>
+    <path id="Vector_2" d="M24.9805 14.5703L38.5429 17.7344" stroke="#FAC720" stroke-width="2.36803" stroke-linecap="round"/>
+    <path id="Vector_3" d="M22.7187 24.2539L36.2812 27.4219" stroke="#FAC720" stroke-width="2.36803" stroke-linecap="round"/>
+    <path id="Vector_4" d="M20.4609 33.9414L29.4062 36.0313" stroke="#FAC720" stroke-width="2.36803" stroke-linecap="round"/>
+    <path id="Vector_5" d="M13.9297 12.7461L15.5234 14.8906L19.7226 11.6875" stroke="#066938" stroke-width="1.89442" stroke-linecap="round" stroke-linejoin="round"/>
+    <path id="Vector_6" d="M11.7539 22.0625L13.3477 24.207L17.5469 21.0039" stroke="#066938" stroke-width="1.89442" stroke-linecap="round" stroke-linejoin="round"/>
+    <path id="Vector_7" d="M9.58984 31.3281L11.1914 33.4297L15.3711 30.3203" stroke="#066938" stroke-width="1.89442" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    </g>
+    <defs>
+    <clipPath id="ds-mod-logo-survey-clip0_1083_118533">
+    <rect width="48" height="48" fill="white"/>
+    </clipPath>
+    </defs>
+  </svg>
+</template>
