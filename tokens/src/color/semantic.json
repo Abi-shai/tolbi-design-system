@@ -114,6 +114,10 @@
       "value": "{color.gray-light.950}",
       "description": "ground — dark surface that carries text. Pairs with text-on-inverse"
     },
+    "overlay": {
+      "value": "color-mix(in srgb, {color.gray-light.950} 60%, transparent)",
+      "description": "contract — the scrim. bg-default separates from the dimmed page at 4.94:1; the floor is 48%, below which a dialog's own edge stops being perceivable. Alpha is baked in: a scrim that needs the caller to supply opacity ships the broken default"
+    },
     "neutral-subtle": {
       "value": "{color.gray-light.50}",
       "description": "ground — recessed surfaces, tracks, the neutral tone"

@@ -72,49 +72,49 @@ const emit = defineEmits<{
 <style scoped>
 /* ── Color tokens ─────────────────────────────────────────────────── */
 .ds-badge-group {
-  --bg-default:  var(--ds-bg-brand-subtle);
-  --bg-hover:    var(--ds-bg-brand-subtle-hover);
-  --border:      var(--ds-border-on-brand-subtle);
-  --text:        var(--ds-text-on-brand-subtle);
-  --pill-border: var(--ds-border-on-brand-subtle);
+  --badge-group-bg:  var(--ds-bg-brand-subtle);
+  --badge-group-bg-hover:    var(--ds-bg-brand-subtle-hover);
+  --badge-group-border:      var(--ds-border-on-brand-subtle);
+  --badge-group-text:        var(--ds-text-on-brand-subtle);
+  --badge-group-pill-border: var(--ds-border-on-brand-subtle);
 }
 .ds-badge-group--error   {
-  --bg-default:  var(--ds-bg-error-subtle);
-  --bg-hover:    var(--ds-bg-error-subtle-hover);
-  --border:      var(--ds-border-on-error-subtle);
-  --text:        var(--ds-text-on-error-subtle);
-  --pill-border: var(--ds-border-on-error-subtle);
+  --badge-group-bg:  var(--ds-bg-error-subtle);
+  --badge-group-bg-hover:    var(--ds-bg-error-subtle-hover);
+  --badge-group-border:      var(--ds-border-on-error-subtle);
+  --badge-group-text:        var(--ds-text-on-error-subtle);
+  --badge-group-pill-border: var(--ds-border-on-error-subtle);
 }
 .ds-badge-group--warning {
-  --bg-default:  var(--ds-bg-warning-subtle);
-  --bg-hover:    var(--ds-bg-warning-subtle-hover);
-  --border:      var(--ds-border-on-warning-subtle);
-  --text:        var(--ds-text-on-warning-subtle);
-  --pill-border: var(--ds-border-on-warning-subtle);
+  --badge-group-bg:  var(--ds-bg-warning-subtle);
+  --badge-group-bg-hover:    var(--ds-bg-warning-subtle-hover);
+  --badge-group-border:      var(--ds-border-on-warning-subtle);
+  --badge-group-text:        var(--ds-text-on-warning-subtle);
+  --badge-group-pill-border: var(--ds-border-on-warning-subtle);
 }
 .ds-badge-group--success {
-  --bg-default:  var(--ds-bg-success-subtle);
-  --bg-hover:    var(--ds-bg-success-subtle-hover);
-  --border:      var(--ds-border-on-success-subtle);
-  --text:        var(--ds-text-on-success-subtle);
-  --pill-border: var(--ds-border-on-success-subtle);
+  --badge-group-bg:  var(--ds-bg-success-subtle);
+  --badge-group-bg-hover:    var(--ds-bg-success-subtle-hover);
+  --badge-group-border:      var(--ds-border-on-success-subtle);
+  --badge-group-text:        var(--ds-text-on-success-subtle);
+  --badge-group-pill-border: var(--ds-border-on-success-subtle);
 }
 .ds-badge-group--gray {
-  --bg-default:  var(--ds-bg-neutral-subtle);
-  --bg-hover:    var(--ds-bg-neutral-subtle-hover);
-  --border:      var(--ds-border-subtle);
-  --text:        var(--ds-text-default);
-  --pill-border: var(--ds-border-subtle);
+  --badge-group-bg:  var(--ds-bg-neutral-subtle);
+  --badge-group-bg-hover:    var(--ds-bg-neutral-subtle-hover);
+  --badge-group-border:      var(--ds-border-subtle);
+  --badge-group-text:        var(--ds-text-default);
+  --badge-group-pill-border: var(--ds-border-subtle);
 }
 
 /* ── Base ─────────────────────────────────────────────────────────── */
 .ds-badge-group {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--border);
+  border: 1px solid var(--badge-group-border);
   border-radius: var(--ds-radius-pill);
-  background-color: var(--bg-default);
-  color: var(--text);
+  background-color: var(--badge-group-bg);
+  color: var(--badge-group-text);
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   white-space: nowrap;
@@ -123,7 +123,7 @@ const emit = defineEmits<{
 }
 
 .ds-badge-group:hover {
-  background-color: var(--bg-hover);
+  background-color: var(--badge-group-bg-hover);
 }
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
@@ -152,10 +152,10 @@ const emit = defineEmits<{
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  border: 1px solid var(--pill-border);
+  border: 1px solid var(--badge-group-pill-border);
   border-radius: var(--ds-radius-pill);
   background-color: var(--ds-bg-default);
-  color: var(--text);
+  color: var(--badge-group-text);
   padding: 2px 8px;
   white-space: nowrap;
 }

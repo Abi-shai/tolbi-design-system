@@ -209,7 +209,7 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
 }
 
 .ds-input-field__input:disabled {
-  color: var(--ds-text-placeholder);
+  color: var(--ds-text-disabled);
   cursor: not-allowed;
 }
 

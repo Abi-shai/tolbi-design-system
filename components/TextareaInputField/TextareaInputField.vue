@@ -206,7 +206,7 @@ function onKeydown(e: KeyboardEvent) {
 }
 
 .ds-textarea__input:disabled {
-  color: var(--ds-text-placeholder);
+  color: var(--ds-text-disabled);
   cursor: not-allowed;
 }
 

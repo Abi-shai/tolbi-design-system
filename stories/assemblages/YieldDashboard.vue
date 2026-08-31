@@ -150,7 +150,7 @@ const forecast = [
             <div class="gap datepicker" data-n="2">
               <Icon name="calendar" :size="20" />
               <span class="datepicker__value">Ven. 28 août 2026</span>
-              <Badge label="Prévu" color="gray" size="sm" />
+              <Badge label="Prévu" tone="neutral" size="sm" />
               <Icon name="chevron-down" :size="20" />
             </div>
             <Button label="Comparez les dates" variant="secondary-gray" />

@@ -110,7 +110,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
       <Badge
         v-if="tab.badge !== undefined"
         :label="String(tab.badge)"
-        color="gray"
+        tone="neutral"
         variant="pill-color"
         :size="badgeSize"
       />

@@ -29,6 +29,14 @@ Before working on any component, read:
   The tier marker leaves the name: `--ds-bg-brand-solid`, not `--ds-semantic-bg-brand-solid`. A token
   is admitted under exactly one of four clauses — contract, ground, state, decorative — named in its
   `description`.
+- **ADR-0010**: The component tier holds **values, not routing**. A local custom property that aliases
+  a semantic token is a *variant switch*, not a token — it gets a component-scoped name and nothing
+  else. Only own-values are component tokens (33 of them, 28 being `Badge`'s categorical palette).
+  There is **no `control.*` colour layer** — control chrome does not diverge; `control` is a geometry
+  context only (`radius-control`, `elevation-control`). Component tokens start **private**; the
+  `--ds-` prefix marks a public, semver-covered API and is applied on demand. A component token may
+  alias a **primitive** directly when the value is categorical ("this one is blue"), never when it
+  expresses a role. `Badge` splits `tone` (semantic) from `color` (categorical).
 
 ## Architecture
 

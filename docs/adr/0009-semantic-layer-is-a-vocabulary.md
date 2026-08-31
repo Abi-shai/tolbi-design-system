@@ -284,7 +284,7 @@ records that they are deliberately decorative rather than borders someone got wr
 
 ## What changes
 
-**92 semantic colour tokens → 64.** Deletions (the whole `fg` group, the `accent` family, the
+**92 semantic colour tokens → 64** (65 once ADR-0010 reinstates `bg-overlay`). Deletions (the whole `fg` group, the `accent` family, the
 `-on-brand` ramp, `utility`, `bg-active`, the brand sections, `bg-disabled-subtle`) outweigh
 additions (the `on-` family, `border-on-{tone}-subtle`, `bg-selected`).
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Badge, type BadgeColor } from '../Badge'
+import { Badge, type BadgeTone } from '../Badge'
 
 export interface ChartTooltipSeries {
   label: string
@@ -13,7 +13,7 @@ interface Props {
   title?: string
   /** Short qualifier on the reading: `Mesuré`, `Estimé`. */
   tag?: string
-  tagColor?: BadgeColor
+  tagTone?: BadgeTone
   /** The hero. A tooltip has one headline figure, not a table of them. */
   value?: string
   unit?: string
@@ -21,7 +21,7 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  tagColor: 'gray',
+  tagTone: 'neutral',
   series: () => [],
 })
 </script>
@@ -36,7 +36,7 @@ withDefaults(defineProps<Props>(), {
   <div class="ds-chart-tooltip" role="tooltip">
     <div v-if="title || tag" class="ds-chart-tooltip__head">
       <span v-if="title" class="ds-chart-tooltip__title">{{ title }}</span>
-      <Badge v-if="tag" :label="tag" :color="tagColor" size="sm" />
+      <Badge v-if="tag" :label="tag" :tone="tagTone" size="sm" />
     </div>
 
     <div v-if="value" class="ds-chart-tooltip__value">

@@ -21,7 +21,7 @@ const meta: Meta<typeof ChartTooltip> = {
   argTypes: {
     title: { control: 'text', description: 'Ce qui est pointé — en général une date formatée.', table: { category: 'Contenu', type: { summary: 'string' } } },
     tag:   { control: 'text', description: 'Qualificatif court sur le relevé — `Mesuré`, `Estimé`.', table: { category: 'Contenu', type: { summary: 'string' } } },
-    tagColor: { control: 'text', table: { category: 'Apparence', type: { summary: 'BadgeColor' }, defaultValue: { summary: "'gray'" } } },
+    tagTone: { control: 'text', table: { category: 'Apparence', type: { summary: 'BadgeTone' }, defaultValue: { summary: "'neutral'" } } },
     value: { control: 'text', table: { category: 'Contenu', type: { summary: 'string' } } },
     unit:  { control: 'text', table: { category: 'Contenu', type: { summary: 'string' } } },
     series: { control: 'object', table: { category: 'Contenu', type: { summary: 'ChartTooltipSeries[]' } } },

@@ -99,7 +99,7 @@ export const Default: Story = {
             <Badge
               v-if="row.tags.length > 3"
               :label="'+' + (row.tags.length - 3)"
-              color="gray"
+              tone="neutral"
               size="sm"
             />
           </div>
@@ -156,7 +156,7 @@ export const WithPagination: Story = {
         <template #cell-tags="{ row }">
           <div style="display:flex;flex-wrap:nowrap;align-items:center;gap:4px;overflow:hidden">
             <Badge v-for="(tag, i) in row.tags.slice(0, 3)" :key="tag" :label="tag" :color="TAG_COLORS[i % TAG_COLORS.length]" size="sm" />
-            <Badge v-if="row.tags.length > 3" :label="'+' + (row.tags.length - 3)" color="gray" size="sm" />
+            <Badge v-if="row.tags.length > 3" :label="'+' + (row.tags.length - 3)" tone="neutral" size="sm" />
           </div>
         </template>
         <template #cell-actions="{ row }">

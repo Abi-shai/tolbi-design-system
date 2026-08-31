@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Card } from '../Card'
 import { MetricValue, type MetricTrend } from '../MetricValue'
-import { Badge, type BadgeColor } from '../Badge'
+import { Badge, type BadgeTone } from '../Badge'
 import { Skeleton } from '../Skeleton'
 
 interface Props {
@@ -12,13 +12,13 @@ interface Props {
   trend?: MetricTrend
   /** Short qualifier shown beside the label — `Mesuré`, `Estimé`, `Standard`. */
   tag?: string
-  tagColor?: BadgeColor
+  tagTone?: BadgeTone
   loading?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
   trend: 'flat',
-  tagColor: 'gray',
+  tagTone: 'neutral',
   loading: false,
 })
 </script>
@@ -32,7 +32,7 @@ withDefaults(defineProps<Props>(), {
   <Card class="ds-stat-tile">
     <div class="ds-stat-tile__head">
       <span class="ds-stat-tile__label">{{ label }}</span>
-      <Badge v-if="tag" :label="tag" :color="tagColor" size="sm" />
+      <Badge v-if="tag" :label="tag" :tone="tagTone" size="sm" />
     </div>
 
     <div v-if="loading" class="ds-stat-tile__loading">

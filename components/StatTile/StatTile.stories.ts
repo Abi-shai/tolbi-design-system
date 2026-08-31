@@ -23,7 +23,7 @@ const meta: Meta<typeof StatTile> = {
     delta: { control: 'text', table: { category: 'Contenu', type: { summary: 'string' } } },
     trend: { control: 'inline-radio', options: ['up', 'down', 'flat'], table: { category: 'Contenu', defaultValue: { summary: "'flat'" } } },
     tag:   { control: 'text', description: 'Qualificatif court à côté de l\'étiquette — `Mesuré`, `Estimé`.', table: { category: 'Contenu', type: { summary: 'string' } } },
-    tagColor: { control: 'text', table: { category: 'Apparence', type: { summary: 'BadgeColor' }, defaultValue: { summary: "'gray'" } } },
+    tagTone: { control: 'text', table: { category: 'Apparence', type: { summary: 'BadgeTone' }, defaultValue: { summary: "'neutral'" } } },
     loading: { control: 'boolean', table: { category: 'État', type: { summary: 'boolean' }, defaultValue: { summary: 'false' } } },
   },
   args: { label: 'Rendement moyen', value: '4,82', unit: 't/ha', delta: '+12 %', trend: 'up', tag: 'Mesuré', loading: false },
