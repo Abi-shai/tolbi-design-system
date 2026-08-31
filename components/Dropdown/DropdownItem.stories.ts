@@ -5,15 +5,16 @@ import DropdownDivider from './DropdownDivider.vue'
 
 const PANEL = `
   padding: var(--ds-spacing-xs);
-  background: var(--ds-semantic-bg-primary);
-  border: 1px solid var(--ds-semantic-border-secondary);
+  background: var(--ds-bg-default);
+  border: 1px solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-lg);
+  box-shadow: var(--ds-elevation-overlay);
   width: 240px;
 `
 
 const meta: Meta<typeof DropdownItem> = {
-  title: 'Subcomponents/DropdownItem',
+  title: 'Superposition/Dropdown/Item',
+  tags: ['wip'],
   component: DropdownItem,
   parameters: {
     layout: 'centered',

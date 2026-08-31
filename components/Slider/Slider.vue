@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-export type SliderLabel = 'none' | 'bottom' | 'top-floating'
+export type SliderValueDisplay = 'none' | 'bottom' | 'top-floating'
 
 interface Props {
   modelValue?: [number, number]
   min?: number
   max?: number
   step?: number
-  label?: SliderLabel
+  /** Where the current value is shown. Not a caption — that is FormField's `label`. */
+  valueDisplay?: SliderValueDisplay
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -16,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
   min: 0,
   max: 100,
   step: 1,
-  label: 'none',
+  valueDisplay: 'none',
 })
 
 const emit = defineEmits<{
@@ -55,9 +56,9 @@ function display(v: number): string {
 </script>
 
 <template>
-  <div :class="['ds-slider', `ds-slider--label-${label}`]">
+  <div :class="['ds-slider', `ds-slider--value-${valueDisplay}`]">
     <div class="ds-slider__body">
-      <template v-if="label === 'top-floating'">
+      <template v-if="valueDisplay === 'top-floating'">
         <div class="ds-slider__tooltip-anchor" :style="{ left: `${leftPct}%` }">
           <div class="ds-slider__tooltip">{{ display(leftVal) }}</div>
         </div>
@@ -92,7 +93,7 @@ function display(v: number): string {
         @input="onRightInput"
       />
 
-      <template v-if="label === 'bottom'">
+      <template v-if="valueDisplay === 'bottom'">
         <div class="ds-slider__label-anchor" :style="{ left: `${leftPct}%` }">
           <span class="ds-slider__label">{{ display(leftVal) }}</span>
         </div>
@@ -117,7 +118,7 @@ function display(v: number): string {
   overflow: visible;
 }
 
-.ds-slider--label-bottom .ds-slider__body {
+.ds-slider--value-bottom .ds-slider__body {
   margin-bottom: 36px;
 }
 
@@ -134,16 +135,16 @@ function display(v: number): string {
 .ds-slider__bg {
   position: absolute;
   inset: 0;
-  background: var(--ds-semantic-bg-quaternary);
-  border-radius: var(--ds-radius-full, 9999px);
+  background: var(--ds-bg-neutral-strong);
+  border-radius: var(--ds-radius-pill, 9999px);
 }
 
 .ds-slider__fill {
   position: absolute;
   top: 0;
   height: 8px;
-  background: var(--ds-semantic-fg-brand-primary);
-  border-radius: var(--ds-radius-full, 9999px);
+  background: var(--ds-text-brand);
+  border-radius: var(--ds-radius-pill, 9999px);
 }
 
 /* ── Range inputs ──────────────────────────────────────────────────── */
@@ -172,11 +173,9 @@ function display(v: number): string {
   height: 24px;
   margin-top: -8px;
   border-radius: 50%;
-  background: var(--ds-semantic-bg-primary, #fff);
-  border: 2px solid var(--ds-semantic-bg-brand-solid);
-  box-shadow:
-    0 4px 8px -2px rgba(16, 24, 40, 0.1),
-    0 2px 4px -2px rgba(16, 24, 40, 0.06);
+  background: var(--ds-bg-default);
+  border: 2px solid var(--ds-bg-brand-solid);
+  box-shadow: var(--ds-elevation-raised);
   cursor: grab;
   transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
@@ -195,19 +194,14 @@ function display(v: number): string {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--ds-semantic-bg-primary, #fff);
-  border: 2px solid var(--ds-semantic-bg-brand-solid);
-  box-shadow:
-    0 4px 8px -2px rgba(16, 24, 40, 0.1),
-    0 2px 4px -2px rgba(16, 24, 40, 0.06);
+  background: var(--ds-bg-default);
+  border: 2px solid var(--ds-bg-brand-solid);
+  box-shadow: var(--ds-elevation-raised);
   cursor: grab;
 }
 
 .ds-slider__input:focus-visible::-webkit-slider-thumb {
-  box-shadow:
-    0 0 0 3px rgba(5, 96, 51, 0.2),
-    0 4px 8px -2px rgba(16, 24, 40, 0.1),
-    0 2px 4px -2px rgba(16, 24, 40, 0.06);
+  box-shadow: var(--ds-focus-ring-brand), var(--ds-elevation-raised);
 }
 
 /* ── Top-floating tooltip ──────────────────────────────────────────── */
@@ -224,19 +218,17 @@ function display(v: number): string {
   bottom: 32px; /* 24px thumb height + 8px gap */
   left: 50%;
   transform: translateX(-50%);
-  background: var(--ds-semantic-bg-primary, #fff);
-  border: 1px solid var(--ds-semantic-border-secondary);
+  background: var(--ds-bg-default);
+  border: 1px solid var(--ds-border-subtle);
   border-radius: 8px;
   padding: 8px 12px;
   font-family: var(--ds-typography-font-family-poppins);
   font-size: var(--ds-font-size-body-sm);
   font-weight: 600;
   line-height: var(--ds-line-height-body-sm);
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
   white-space: nowrap;
-  box-shadow:
-    0 4px 6px -2px rgba(16, 24, 40, 0.03),
-    0 12px 16px -4px rgba(16, 24, 40, 0.08);
+  box-shadow: var(--ds-elevation-overlay);
 }
 
 /* ── Bottom label ──────────────────────────────────────────────────── */
@@ -252,7 +244,7 @@ function display(v: number): string {
   font-size: var(--ds-font-size-body-lg);
   font-weight: 500;
   line-height: var(--ds-line-height-body-lg);
-  color: var(--ds-semantic-text-primary);
+  color: var(--ds-text-strong);
   white-space: nowrap;
 }
 </style>

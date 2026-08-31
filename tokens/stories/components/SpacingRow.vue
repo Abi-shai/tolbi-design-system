@@ -27,7 +27,7 @@ withDefaults(defineProps<Props>(), { accent: 'primitive' })
   align-items: center;
   gap: 1rem;
   padding: 0.5rem 0;
-  border-bottom: 1px solid var(--ds-semantic-border-tertiary, #f2f4f7);
+  border-bottom: 1px solid var(--ds-border-subtlest, #f2f4f7);
 }
 
 .row__label {
@@ -35,7 +35,7 @@ withDefaults(defineProps<Props>(), { accent: 'primitive' })
   font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--ds-semantic-text-primary, #101828);
+  color: var(--ds-text-strong, #101828);
   flex-shrink: 0;
   text-align: right;
 }
@@ -53,6 +53,6 @@ withDefaults(defineProps<Props>(), { accent: 'primitive' })
 .row__meta {
   font-family: monospace;
   font-size: 0.7rem;
-  color: var(--ds-semantic-text-quarterary, #667085);
+  color: var(--ds-text-subtlest, #667085);
 }
 </style>

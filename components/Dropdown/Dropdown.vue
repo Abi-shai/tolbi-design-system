@@ -148,26 +148,26 @@ onUnmounted(() => {
   gap: 4px;
   padding: 10px 14px;
   box-sizing: border-box;
-  background-color: var(--ds-semantic-bg-primary);
-  border: 1px solid var(--ds-semantic-border-primary);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-xs);
+  background-color: var(--ds-bg-default);
+  border: 1px solid var(--ds-border-default);
+  border-radius: var(--ds-radius-control);
+  box-shadow: var(--ds-elevation-control);
   cursor: pointer;
   font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.25rem;
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
   white-space: nowrap;
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-dropdown__trigger--button:hover {
-  background-color: var(--ds-semantic-bg-primary-hover);
+  background-color: var(--ds-bg-hover);
 }
 
 .ds-dropdown__trigger-chevron {
-  color: var(--ds-semantic-fg-secondary);
+  color: var(--ds-text-default);
 }
 
 /* ── Trigger: icon ────────────────────────────────────────────────── */
@@ -180,14 +180,14 @@ onUnmounted(() => {
   background: transparent;
   border: none;
   cursor: pointer;
-  color: var(--ds-semantic-fg-secondary);
-  border-radius: var(--ds-radius-sm);
+  color: var(--ds-text-default);
+  border-radius: var(--ds-radius-inner);
   padding: 0;
   transition: color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-dropdown__trigger--icon:hover {
-  color: var(--ds-semantic-fg-primary);
+  color: var(--ds-text-strong);
 }
 
 /* ── Trigger: avatar ──────────────────────────────────────────────── */
@@ -199,7 +199,7 @@ onUnmounted(() => {
   border: none;
   cursor: pointer;
   padding: 0;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
 }
 
 .ds-dropdown__trigger--avatar-open {
@@ -213,10 +213,10 @@ onUnmounted(() => {
   right: 0;
   z-index: 100;
   width: 240px;
-  background-color: var(--ds-semantic-bg-primary);
-  border: 1px solid var(--ds-semantic-border-secondary);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-lg);
+  background-color: var(--ds-bg-default);
+  border: 1px solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-control);
+  box-shadow: var(--ds-elevation-overlay);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -228,7 +228,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  border-bottom: 1px solid var(--ds-semantic-border-secondary);
+  border-bottom: 1px solid var(--ds-border-subtle);
   flex-shrink: 0;
 }
 
@@ -244,7 +244,7 @@ onUnmounted(() => {
   font-weight: 600;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -255,7 +255,7 @@ onUnmounted(() => {
   font-weight: 400;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  color: var(--ds-semantic-text-tertiary);
+  color: var(--ds-text-subtle);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -59,7 +59,7 @@ function handleClick(event: MouseEvent) {
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-control);
   background-color: transparent;
   cursor: pointer;
   outline: none;
@@ -75,21 +75,21 @@ function handleClick(event: MouseEvent) {
 
 /* ── Icon color — light background ───────────────────────────────── */
 .ds-close-button__icon {
-  color: var(--ds-semantic-fg-quarterary);
+  color: var(--ds-text-subtlest);
   transition: color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-close-button:hover:not(:disabled) .ds-close-button__icon {
-  color: var(--ds-semantic-fg-secondary);
+  color: var(--ds-text-default);
 }
 
 .ds-close-button:focus-visible:not(:disabled) {
-  background-color: var(--ds-semantic-bg-primary);
+  background-color: var(--ds-bg-default);
   box-shadow: var(--ds-focus-ring-gray);
 }
 
 .ds-close-button:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-primary-hover);
+  background-color: var(--ds-bg-hover);
 }
 
 /* ── Dark background ──────────────────────────────────────────────── */
@@ -99,7 +99,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .ds-close-button--dark:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: color-mix(in srgb, var(--ds-text-on-inverse) 20%, transparent);
 }
 
 .ds-close-button--dark:hover:not(:disabled) .ds-close-button__icon {
@@ -108,7 +108,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .ds-close-button--dark:focus-visible:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: color-mix(in srgb, var(--ds-text-on-inverse) 20%, transparent);
   box-shadow: var(--ds-focus-ring-gray);
 }
 

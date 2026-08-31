@@ -73,18 +73,18 @@ function play() {
   font-family: var(--ds-typography-font-family-poppins, 'Poppins', sans-serif);
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--ds-semantic-text-primary, #101828);
+  color: var(--ds-text-strong, #101828);
 }
 
 .subtitle {
   margin: 0;
   font-size: 0.8125rem;
-  color: var(--ds-semantic-text-tertiary, #475467);
+  color: var(--ds-text-subtle, #475467);
 }
 
 .play-btn {
   padding: 8px 16px;
-  background: var(--ds-semantic-bg-brand-solid, #056033);
+  background: var(--ds-bg-brand-solid, #056033);
   color: white;
   border: none;
   border-radius: 8px;
@@ -96,14 +96,14 @@ function play() {
   white-space: nowrap;
 }
 
-.play-btn:hover { background: var(--ds-semantic-bg-brand-solid-hover, #044B28); }
+.play-btn:hover { background: var(--ds-bg-brand-solid-hover, #044B28); }
 
 .row {
   display: flex;
   align-items: center;
   gap: 20px;
   padding: 12px 0;
-  border-bottom: 1px solid var(--ds-semantic-border-secondary, #EAECF0);
+  border-bottom: 1px solid var(--ds-border-subtle, #EAECF0);
 }
 
 .row__meta { width: 240px; flex-shrink: 0; }
@@ -112,8 +112,8 @@ function play() {
   display: block;
   font-family: monospace;
   font-size: 0.6875rem;
-  background: var(--ds-semantic-bg-brand-primary, #E6F0EB);
-  color: var(--ds-semantic-text-brand-primary, #032C18);
+  background: var(--ds-bg-brand-subtle, #E6F0EB);
+  color: var(--ds-text-brand, #032C18);
   padding: 2px 6px;
   border-radius: 4px;
   margin-bottom: 3px;
@@ -123,25 +123,25 @@ function play() {
 
 .row__label {
   font-weight: 600;
-  color: var(--ds-semantic-text-secondary, #344054);
+  color: var(--ds-text-default, #344054);
 }
 
 .row__value {
   font-family: monospace;
   font-size: 0.75rem;
-  color: var(--ds-semantic-text-tertiary, #475467);
+  color: var(--ds-text-subtle, #475467);
 }
 
 .row__desc {
   font-size: 0.75rem;
-  color: var(--ds-semantic-text-tertiary, #475467);
+  color: var(--ds-text-subtle, #475467);
 }
 
 .track {
   flex: 1;
   height: 20px;
-  background: var(--ds-semantic-bg-secondary, #F9FAFB);
-  border: 1px solid var(--ds-semantic-border-secondary, #EAECF0);
+  background: var(--ds-bg-neutral-subtle, #F9FAFB);
+  border: 1px solid var(--ds-border-subtle, #EAECF0);
   border-radius: 9999px;
   position: relative;
   overflow: hidden;
@@ -154,7 +154,7 @@ function play() {
   width: 16px;
   height: 16px;
   border-radius: 9999px;
-  background: var(--ds-semantic-fg-brand-primary, #056033);
+  background: var(--ds-text-brand, #056033);
 }
 
 .dot--moved { left: calc(100% - 18px); }

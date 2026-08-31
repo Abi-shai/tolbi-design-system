@@ -101,17 +101,17 @@ const emit = defineEmits<{
   flex: 1;
   min-width: 0;
   padding: 10px 10px 10px 8px;
-  border-radius: var(--ds-radius-sm);
+  border-radius: var(--ds-radius-inner);
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-dropdown-select-item--selected .ds-dropdown-select-item__content {
-  background-color: var(--ds-semantic-bg-active);
+  background-color: var(--ds-bg-selected);
 }
 
 .ds-dropdown-select-item:hover:not(.ds-dropdown-select-item--disabled) .ds-dropdown-select-item__content,
 .ds-dropdown-select-item:focus-visible .ds-dropdown-select-item__content {
-  background-color: var(--ds-semantic-bg-primary-hover);
+  background-color: var(--ds-bg-hover);
 }
 
 .ds-dropdown-select-item:focus-visible {
@@ -120,11 +120,11 @@ const emit = defineEmits<{
 
 .ds-dropdown-select-item__leading-icon {
   flex-shrink: 0;
-  color: var(--ds-semantic-fg-secondary);
+  color: var(--ds-text-default);
 }
 
 .ds-dropdown-select-item--disabled .ds-dropdown-select-item__leading-icon {
-  color: var(--ds-semantic-text-quarterary);
+  color: var(--ds-text-subtlest);
 }
 
 .ds-dropdown-select-item__leading-avatar {
@@ -136,12 +136,12 @@ const emit = defineEmits<{
   display: inline-block;
   width: 8px;
   height: 8px;
-  border-radius: var(--ds-radius-full);
-  background-color: var(--ds-semantic-fg-success-primary);
+  border-radius: var(--ds-radius-pill);
+  background-color: var(--ds-text-success);
 }
 
 .ds-dropdown-select-item--disabled .ds-dropdown-select-item__leading-dot {
-  background-color: var(--ds-semantic-text-quarterary);
+  background-color: var(--ds-text-subtlest);
 }
 
 .ds-dropdown-select-item__text {
@@ -158,7 +158,7 @@ const emit = defineEmits<{
   font-weight: 500;
   font-size: 1rem;
   line-height: 1.5rem;
-  color: var(--ds-semantic-text-primary);
+  color: var(--ds-text-strong);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -166,7 +166,7 @@ const emit = defineEmits<{
 }
 
 .ds-dropdown-select-item--disabled .ds-dropdown-select-item__label {
-  color: var(--ds-semantic-text-disabled);
+  color: var(--ds-text-disabled);
 }
 
 .ds-dropdown-select-item__supporting {
@@ -174,21 +174,21 @@ const emit = defineEmits<{
   font-weight: 400;
   font-size: 1rem;
   line-height: 1.5rem;
-  color: var(--ds-semantic-text-tertiary);
+  color: var(--ds-text-subtle);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .ds-dropdown-select-item--disabled .ds-dropdown-select-item__supporting {
-  color: var(--ds-semantic-text-disabled);
+  color: var(--ds-text-disabled);
 }
 
 .ds-dropdown-select-item__check {
   flex-shrink: 0;
-  color: var(--ds-semantic-fg-brand-primary);
+  color: var(--ds-text-brand);
 }
 
 .ds-dropdown-select-item--disabled .ds-dropdown-select-item__check {
-  color: var(--ds-semantic-text-quarterary);
+  color: var(--ds-text-subtlest);
 }
 </style>

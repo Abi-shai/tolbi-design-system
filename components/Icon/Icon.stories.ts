@@ -6,9 +6,9 @@ import { icons, type IconName } from './registry'
 const allNames = Object.keys(icons) as IconName[]
 
 const meta: Meta<typeof Icon> = {
-  title: 'Primitives/Icon',
+  title: 'Identité & média/Icon',
   component: Icon,
-  tags: ['wip'],
+  tags: ['wip', 'primitive'],
   parameters: {
     layout: 'centered',
     docs: {
@@ -95,8 +95,8 @@ export const Sizes: Story = {
     template: `
       <div style="display: flex; align-items: flex-end; gap: 2.5rem; flex-wrap: wrap; padding: 1.5rem; font-family: var(--ds-typography-font-family-poppins);">
         <div v-for="s in steps" :key="s.size" style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
-          <Icon name="land-plot" :size="s.size" style="color: var(--ds-semantic-text-primary);" />
-          <span style="font-family: monospace; font-size: 0.7rem; color: var(--ds-semantic-text-tertiary); white-space: nowrap;">
+          <Icon name="land-plot" :size="s.size" style="color: var(--ds-text-strong);" />
+          <span style="font-family: monospace; font-size: 0.7rem; color: var(--ds-text-subtle); white-space: nowrap;">
             {{ s.size }} px · {{ s.stroke }}
           </span>
         </div>
@@ -129,8 +129,8 @@ export const Ornaments: Story = {
     template: `
       <div style="display: flex; align-items: flex-end; gap: 2.5rem; flex-wrap: wrap; padding: 1.5rem; font-family: var(--ds-typography-font-family-poppins);">
         <div v-for="s in steps" :key="s.size" style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
-          <Icon name="check" :size="s.size" style="color: var(--ds-semantic-text-primary);" />
-          <span style="font-family: monospace; font-size: 0.7rem; color: var(--ds-semantic-text-tertiary); white-space: nowrap;">
+          <Icon name="check" :size="s.size" style="color: var(--ds-text-strong);" />
+          <span style="font-family: monospace; font-size: 0.7rem; color: var(--ds-text-subtle); white-space: nowrap;">
             {{ s.size }} px · {{ s.stroke }}
           </span>
         </div>
@@ -149,7 +149,7 @@ export const Colors: Story = {
         <Icon name="leaf" :size="32" style="color: var(--ds-color-error-500);" />
         <Icon name="leaf" :size="32" style="color: var(--ds-color-warning-500);" />
         <Icon name="leaf" :size="32" style="color: var(--ds-color-gray-light-400);" />
-        <Icon name="leaf" :size="32" style="color: var(--ds-semantic-text-primary);" />
+        <Icon name="leaf" :size="32" style="color: var(--ds-text-strong);" />
       </div>
     `,
   }),
@@ -170,17 +170,17 @@ export const Gallery: Story = {
     setup: () => ({ allNames }),
     template: `
       <div style="padding: 1.5rem;">
-        <p style="font-family: var(--ds-typography-font-family-poppins); font-size: 0.8rem; color: var(--ds-semantic-text-tertiary); margin: 0 0 1.25rem;">
+        <p style="font-family: var(--ds-typography-font-family-poppins); font-size: 0.8rem; color: var(--ds-text-subtle); margin: 0 0 1.25rem;">
           {{ allNames.length }} icônes Lucide.
         </p>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem;">
           <div
             v-for="name in allNames"
             :key="name"
-            style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--ds-semantic-border-secondary, #eaecf0);"
+            style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--ds-border-subtle);"
           >
-            <Icon :name="name" :size="24" style="color: var(--ds-semantic-text-primary, #101828);" />
-            <span style="font-family: var(--ds-typography-font-family-poppins); font-size: 0.6rem; color: var(--ds-semantic-text-tertiary, #475467); text-align: center; word-break: break-all;">{{ name }}</span>
+            <Icon :name="name" :size="24" style="color: var(--ds-text-strong);" />
+            <span style="font-family: var(--ds-typography-font-family-poppins); font-size: 0.6rem; color: var(--ds-text-subtle); text-align: center; word-break: break-all;">{{ name }}</span>
           </div>
         </div>
       </div>

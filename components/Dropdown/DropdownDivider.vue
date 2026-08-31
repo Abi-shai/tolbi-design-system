@@ -6,7 +6,7 @@
 .ds-dropdown-divider {
   height: 1px;
   margin: 4px 0;
-  background-color: var(--ds-semantic-border-secondary);
+  background-color: var(--ds-border-subtle);
   flex-shrink: 0;
 }
 </style>

@@ -97,40 +97,42 @@ const dotSize = computed(() => {
 <style scoped>
 /* ── Color tokens (set per color modifier) ────────────────────────── */
 .ds-badge {
-  --badge-bg:             var(--ds-color-brand-50);
-  --badge-border:         var(--ds-color-brand-200);
-  --badge-text:           var(--ds-color-brand-700);
-  --badge-dot:            var(--ds-color-brand-500);
-  --badge-outline-border: var(--ds-color-brand-600);
+  --badge-bg:             var(--ds-bg-brand-subtle);
+  --badge-border:         var(--ds-border-on-brand-subtle);
+  --badge-text:           var(--ds-text-on-brand-subtle);
+  --badge-dot:            var(--ds-bg-brand-solid);
+  --badge-outline-border: var(--ds-border-brand-solid);
 }
 .ds-badge--error   {
-  --badge-bg:             var(--ds-color-error-50);
-  --badge-border:         var(--ds-color-error-200);
-  --badge-text:           var(--ds-color-error-700);
-  --badge-dot:            var(--ds-color-error-500);
-  --badge-outline-border: var(--ds-color-error-600);
+  --badge-bg:             var(--ds-bg-error-subtle);
+  --badge-border:         var(--ds-border-on-error-subtle);
+  --badge-text:           var(--ds-text-on-error-subtle);
+  --badge-dot:            var(--ds-bg-error-solid);
+  --badge-outline-border: var(--ds-border-error-solid);
 }
 .ds-badge--warning {
-  --badge-bg:             var(--ds-color-warning-50);
-  --badge-border:         var(--ds-color-warning-200);
-  --badge-text:           var(--ds-color-warning-700);
-  --badge-dot:            var(--ds-color-warning-500);
-  --badge-outline-border: var(--ds-color-warning-600);
+  --badge-bg:             var(--ds-bg-warning-subtle);
+  --badge-border:         var(--ds-border-on-warning-subtle);
+  --badge-text:           var(--ds-text-on-warning-subtle);
+  --badge-dot:            var(--ds-bg-warning-solid);
+  --badge-outline-border: var(--ds-border-warning-solid);
 }
 .ds-badge--success {
-  --badge-bg:             var(--ds-color-success-50);
-  --badge-border:         var(--ds-color-success-200);
-  --badge-text:           var(--ds-color-success-700);
-  --badge-dot:            var(--ds-color-success-500);
-  --badge-outline-border: var(--ds-color-success-600);
+  --badge-bg:             var(--ds-bg-success-subtle);
+  --badge-border:         var(--ds-border-on-success-subtle);
+  --badge-text:           var(--ds-text-on-success-subtle);
+  --badge-dot:            var(--ds-bg-success-solid);
+  --badge-outline-border: var(--ds-border-success-solid);
 }
 .ds-badge--gray {
-  --badge-bg:             var(--ds-color-gray-light-100);
-  --badge-border:         var(--ds-color-gray-light-300);
-  --badge-text:           var(--ds-color-gray-light-700);
-  --badge-dot:            var(--ds-color-gray-light-500);
-  --badge-outline-border: var(--ds-color-gray-light-600);
+  --badge-bg:             var(--ds-bg-neutral);
+  --badge-border:         var(--ds-border-default);
+  --badge-text:           var(--ds-text-default);
+  --badge-dot:            var(--ds-bg-neutral-strong);
+  --badge-outline-border: var(--ds-border-default);
 }
+/* ADR-0009: categorical label palette — component tier, not semantic tones.
+   These eight hues have no primitive ramp. Pending a categorical-palette ADR. */
 .ds-badge--blue       { --badge-bg:#EFF8FF; --badge-border:#B2DDFF; --badge-text:#175CD3; --badge-dot:#2E90FA; --badge-outline-border:#1570EF; }
 .ds-badge--blue-light { --badge-bg:#F0F9FF; --badge-border:#B9E6FE; --badge-text:#026AA2; --badge-dot:#36BFFA; --badge-outline-border:#0BA5EC; }
 .ds-badge--blue-gray  { --badge-bg:#F8F9FC; --badge-border:#D5D9EB; --badge-text:#363F72; --badge-dot:#717BBC; --badge-outline-border:#4E5BA6; }
@@ -145,7 +147,7 @@ const dotSize = computed(() => {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
   white-space: nowrap;

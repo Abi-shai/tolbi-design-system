@@ -9,7 +9,7 @@ const ALL_COLORS = [
 ] as const
 
 const meta: Meta<typeof Badge> = {
-  title: 'Primitives/Badge',
+  title: 'Étiquettes/Badge',
   component: Badge,
   tags: ['wip'],
   parameters: {

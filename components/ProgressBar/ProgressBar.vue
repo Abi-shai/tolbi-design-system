@@ -62,7 +62,7 @@ const hasFloatingLabel = computed(() => props.label === 'top-floating' || props.
   position: relative;
   height: 8px;
   flex: 1 0 0;
-  border-radius: var(--ds-radius-full, 9999px);
+  border-radius: var(--ds-radius-pill, 9999px);
   overflow: visible;
 }
 
@@ -77,8 +77,8 @@ const hasFloatingLabel = computed(() => props.label === 'top-floating' || props.
 .ds-progress-bar__bg {
   position: absolute;
   inset: 0;
-  background-color: var(--ds-semantic-bg-tertiary);
-  border-radius: var(--ds-radius-full, 9999px);
+  background-color: var(--ds-bg-neutral);
+  border-radius: var(--ds-radius-pill, 9999px);
 }
 
 /* ── Fill ──────────────────────────────────────────────────────────── */
@@ -89,8 +89,8 @@ const hasFloatingLabel = computed(() => props.label === 'top-floating' || props.
   height: 8px;
   min-width: 0;
   max-width: 100%;
-  background-color: var(--ds-semantic-fg-brand-primary);
-  border-radius: var(--ds-radius-full, 9999px);
+  background-color: var(--ds-text-brand);
+  border-radius: var(--ds-radius-pill, 9999px);
   transition: width var(--ds-motion-duration-process) var(--ds-motion-easing-out);
 }
 
@@ -100,7 +100,7 @@ const hasFloatingLabel = computed(() => props.label === 'top-floating' || props.
   font-size: var(--ds-font-size-label-lg);
   font-weight: 500;
   line-height: var(--ds-line-height-label-lg);
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -110,19 +110,17 @@ const hasFloatingLabel = computed(() => props.label === 'top-floating' || props.
   position: absolute;
   right: 0;
   transform: translateX(50%);
-  background-color: var(--ds-semantic-bg-primary, #fff);
-  border: 1px solid var(--ds-semantic-border-secondary);
+  background-color: var(--ds-bg-default);
+  border: 1px solid var(--ds-border-subtle);
   border-radius: 8px;
   padding: 8px 12px;
   font-family: var(--ds-typography-font-family-poppins);
   font-size: var(--ds-font-size-body-sm);
   font-weight: 600;
   line-height: var(--ds-line-height-body-sm);
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
   white-space: nowrap;
-  box-shadow:
-    0px 4px 6px -2px rgba(16, 24, 40, 0.03),
-    0px 12px 16px -4px rgba(16, 24, 40, 0.08);
+  box-shadow: var(--ds-elevation-overlay);
   pointer-events: none;
   z-index: 1;
 }

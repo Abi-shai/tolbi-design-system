@@ -3,15 +3,15 @@ import { ref } from 'vue'
 import Slider from './Slider.vue'
 
 const meta: Meta<typeof Slider> = {
-  title: 'Components/Slider',
+  title: 'Saisie/Slider',
   component: Slider,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'wip'],
   parameters: {
     layout: 'padded',
     docs: {
       description: {
         component:
-          'Curseur à double poignée pour sélectionner une plage de valeurs. Supporte trois variantes de label : aucun, bas, et bulle flottante en haut.',
+          'Curseur à double poignée pour sélectionner une plage de valeurs. Trois façons d\'afficher la valeur : aucune, sous la poignée, ou en bulle flottante au-dessus. Pour une légende de champ, envelopper dans `FormField`.',
       },
     },
   },
@@ -32,7 +32,7 @@ const meta: Meta<typeof Slider> = {
       control: { type: 'number' },
       table: { category: 'Données', defaultValue: { summary: '1' } },
     },
-    label: {
+    valueDisplay: {
       control: 'select',
       options: ['none', 'bottom', 'top-floating'],
       table: {
@@ -45,7 +45,7 @@ const meta: Meta<typeof Slider> = {
     min: 0,
     max: 100,
     step: 1,
-    label: 'none',
+    valueDisplay: 'none',
   },
 }
 
@@ -71,7 +71,7 @@ export const LabelBottom: Story = {
       const value = ref<[number, number]>([25, 75])
       return { args, value }
     },
-    template: `<div style="width: 320px; padding-bottom: 48px"><Slider v-bind="args" v-model="value" label="bottom" /></div>`,
+    template: `<div style="width: 320px; padding-bottom: 48px"><Slider v-bind="args" v-model="value" value-display="bottom" /></div>`,
   }),
 }
 
@@ -83,12 +83,12 @@ export const LabelTopFloating: Story = {
       const value = ref<[number, number]>([25, 75])
       return { args, value }
     },
-    template: `<div style="width: 320px; padding-top: 60px"><Slider v-bind="args" v-model="value" label="top-floating" /></div>`,
+    template: `<div style="width: 320px; padding-top: 60px"><Slider v-bind="args" v-model="value" value-display="top-floating" /></div>`,
   }),
 }
 
 export const AllLabelTypes: Story = {
-  name: 'All label types',
+  name: 'Affichage de la valeur',
   parameters: { layout: 'padded' },
   render: () => ({
     components: { Slider },
@@ -106,11 +106,11 @@ export const AllLabelTypes: Story = {
         </div>
         <div style="display: flex; flex-direction: column; gap: 8px">
           <span style="font-size: 12px; color: #667085; font-family: Poppins, sans-serif">Bottom</span>
-          <Slider v-model="bottom" label="bottom" />
+          <Slider v-model="bottom" value-display="bottom" />
         </div>
         <div style="display: flex; flex-direction: column; gap: 8px">
           <span style="font-size: 12px; color: #667085; font-family: Poppins, sans-serif">Top floating</span>
-          <Slider v-model="floating" label="top-floating" />
+          <Slider v-model="floating" value-display="top-floating" />
         </div>
       </div>
     `,

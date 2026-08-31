@@ -18,9 +18,9 @@ withDefaults(defineProps<Props>(), {
 .ds-button-group {
   display: inline-flex;
   align-items: stretch;
-  border: 1px solid var(--ds-semantic-border-primary);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-xs);
+  border: 1px solid var(--ds-border-default);
+  border-radius: var(--ds-radius-control);
+  box-shadow: var(--ds-elevation-control);
   overflow: hidden;
   isolation: isolate;
 }

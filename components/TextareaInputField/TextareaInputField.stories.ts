@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { ref } from 'vue'
 import TextareaInputField from './TextareaInputField.vue'
+import FormField from '../FormField/FormField.vue'
 import TextareaInputFieldDocs from './TextareaInputField.mdx'
 
 const meta: Meta<typeof TextareaInputField> = {
-  title: 'Components/TextareaInputField',
+  title: 'Saisie/TextareaInputField',
   component: TextareaInputField,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
   parameters: {
     layout: 'centered',
     docs: { page: TextareaInputFieldDocs },
@@ -17,15 +18,7 @@ const meta: Meta<typeof TextareaInputField> = {
       options: ['default', 'tags'],
       table: { category: 'Apparence', defaultValue: { summary: "'default'" } },
     },
-    label: {
-      control: 'text',
-      table: { category: 'Contenu' },
-    },
     placeholder: {
-      control: 'text',
-      table: { category: 'Contenu' },
-    },
-    hint: {
       control: 'text',
       table: { category: 'Contenu' },
     },
@@ -39,9 +32,7 @@ const meta: Meta<typeof TextareaInputField> = {
     },
   },
   args: {
-    label:       'Description',
     placeholder: 'Enter a description...',
-    hint:        'This is a hint text to help user.',
     type:        'default',
     destructive: false,
     disabled:    false,
@@ -51,7 +42,17 @@ const meta: Meta<typeof TextareaInputField> = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
+export const Default: Story = {
+  render: (args) => ({
+    components: { TextareaInputField, FormField },
+    setup: () => ({ args }),
+    template: `
+      <FormField label="Description" hint="This is a hint text to help user." style="width:320px">
+        <TextareaInputField v-bind="args" />
+      </FormField>
+    `,
+  }),
+}
 
 export const WithValue: Story = {
   name: 'Avec valeur',
@@ -62,30 +63,51 @@ export const WithValue: Story = {
 
 export const Destructive: Story = {
   name: 'État destructif',
-  args: {
-    destructive: true,
-    hint:        'This is an error message.',
-  },
+  render: (args) => ({
+    components: { TextareaInputField, FormField },
+    setup: () => ({ args }),
+    template: `
+      <FormField label="Description" error="This is an error message." style="width:320px">
+        <TextareaInputField v-bind="args" />
+      </FormField>
+    `,
+  }),
 }
 
 export const Disabled: Story = {
   name: 'État désactivé',
-  args: { disabled: true },
+  render: (args) => ({
+    components: { TextareaInputField, FormField },
+    setup: () => ({ args }),
+    template: `
+      <FormField label="Description" hint="This is a hint text to help user." disabled style="width:320px">
+        <TextareaInputField v-bind="args" />
+      </FormField>
+    `,
+  }),
 }
 
 export const TagsEmpty: Story = {
   name: 'Mode tags — vide',
+  render: (args) => ({
+    components: { TextareaInputField, FormField },
+    setup: () => ({ args }),
+    template: `
+      <FormField label="Description" hint="This is a hint text to help user." style="width:320px">
+        <TextareaInputField v-bind="args" />
+      </FormField>
+    `,
+  }),
   args: {
     type:        'tags',
     placeholder: 'Add tags...',
-    hint:        'This is a hint text to help user.',
   },
 }
 
 export const TagsWithValues: Story = {
   name: 'Mode tags — avec tags',
   render: () => ({
-    components: { TextareaInputField },
+    components: { TextareaInputField, FormField },
     setup() {
       const tags = ref(['Design', 'Software'])
       const input = ref('Marketing')
@@ -94,17 +116,16 @@ export const TagsWithValues: Story = {
       return { tags, input, addTag, removeTag }
     },
     template: `
-      <TextareaInputField
-        v-model="input"
-        type="tags"
-        label="Description"
-        placeholder="Add tags..."
-        hint="This is a hint text to help user."
-        :tags="tags"
-        @add-tag="addTag"
-        @remove-tag="removeTag"
-        style="width:320px"
-      />
+      <FormField label="Description" hint="This is a hint text to help user." style="width:320px">
+        <TextareaInputField
+          v-model="input"
+          type="tags"
+          placeholder="Add tags..."
+          :tags="tags"
+          @add-tag="addTag"
+          @remove-tag="removeTag"
+        />
+      </FormField>
     `,
   }),
 }
@@ -113,13 +134,21 @@ export const AllStates: Story = {
   name: 'Tous les états',
   parameters: { layout: 'padded' },
   render: () => ({
-    components: { TextareaInputField },
+    components: { TextareaInputField, FormField },
     template: `
       <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;">
-        <TextareaInputField label="Default" placeholder="Enter a description..." hint="Hint text." style="width:280px" />
-        <TextareaInputField label="With value" model-value="A little about the company and the team." hint="Hint text." style="width:280px" />
-        <TextareaInputField label="Disabled" placeholder="Enter a description..." hint="Hint text." :disabled="true" style="width:280px" />
-        <TextareaInputField label="Destructive" placeholder="Enter a description..." hint="This is an error message." :destructive="true" style="width:280px" />
+        <FormField label="Default" hint="Hint text." style="width:280px">
+          <TextareaInputField placeholder="Enter a description..." />
+        </FormField>
+        <FormField label="With value" hint="Hint text." style="width:280px">
+          <TextareaInputField model-value="A little about the company and the team." />
+        </FormField>
+        <FormField label="Disabled" hint="Hint text." disabled style="width:280px">
+          <TextareaInputField placeholder="Enter a description..." />
+        </FormField>
+        <FormField label="Destructive" error="This is an error message." style="width:280px">
+          <TextareaInputField placeholder="Enter a description..." />
+        </FormField>
       </div>
     `,
   }),

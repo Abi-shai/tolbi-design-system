@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, useId } from 'vue'
+import { useFormField } from '../FormField/context'
 
 export type OtpSize   = 'sm' | 'md' | 'lg'
 export type OtpDigits = 4 | 6
@@ -8,8 +9,6 @@ interface Props {
   modelValue?: string
   digits?:     OtpDigits
   size?:       OtpSize
-  label?:      string
-  hint?:       string
   disabled?:   boolean
   id?:         string
 }
@@ -26,8 +25,13 @@ const emit = defineEmits<{
   'complete':         [value: string]
 }>()
 
-const uid     = useId()
-const fieldId = computed(() => props.id ?? `otp-${uid}`)
+const uid   = useId()
+const field = useFormField()
+
+// The first cell is the control the wrapper's `for` points at.
+const fieldId     = computed(() => field?.id.value ?? props.id ?? `otp-${uid}`)
+const isDisabled  = computed(() => (field?.disabled.value ?? false) || props.disabled)
+const describedBy = computed(() => field?.describedBy.value)
 
 // Tableau des refs sur chaque input
 const cellRefs = ref<HTMLInputElement[]>([])
@@ -100,23 +104,22 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
 <template>
   <div class="ds-otp" :class="`ds-otp--${size}`">
 
-    <!-- Label -->
-    <label v-if="label" :for="`${fieldId}-0`" class="ds-otp__label">{{ label }}</label>
-
     <!-- Cells -->
     <div class="ds-otp__row">
       <input
         v-for="i in firstGroup"
         :key="i"
         :ref="el => { if (el) cellRefs[i] = el as HTMLInputElement }"
-        :id="i === 0 ? `${fieldId}-0` : undefined"
+        :id="i === 0 ? fieldId : undefined"
+        :aria-describedby="i === 0 ? describedBy : undefined"
+        :aria-invalid="i === 0 && field?.invalid.value ? true : undefined"
         class="ds-otp__cell"
         type="text"
         inputmode="numeric"
         pattern="[0-9]*"
         maxlength="1"
         :value="cells[i]"
-        :disabled="disabled"
+        :disabled="isDisabled"
         :aria-label="`Chiffre ${i + 1} sur ${digits}`"
         @input="onInput($event, i)"
         @keydown="onKeydown($event, i)"
@@ -137,7 +140,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
         pattern="[0-9]*"
         maxlength="1"
         :value="cells[i]"
-        :disabled="disabled"
+        :disabled="isDisabled"
         :aria-label="`Chiffre ${i + 1} sur ${digits}`"
         @input="onInput($event, i)"
         @keydown="onKeydown($event, i)"
@@ -145,9 +148,6 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
         @focus="($event.target as HTMLInputElement).select()"
       />
     </div>
-
-    <!-- Hint -->
-    <p v-if="hint" class="ds-otp__hint">{{ hint }}</p>
   </div>
 </template>
 
@@ -161,17 +161,6 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
 }
 
 /* ── Label ────────────────────────────────────────────────────────── */
-.ds-otp__label {
-  margin: 0;
-  display: block;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-text-secondary);
-  white-space: nowrap;
-}
-
 /* ── Row ──────────────────────────────────────────────────────────── */
 .ds-otp__row {
   display: flex;
@@ -188,14 +177,14 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: var(--ds-semantic-bg-primary);
-  border: 1px solid var(--ds-semantic-border-primary);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-xs);
+  background: var(--ds-bg-default);
+  border: 1px solid var(--ds-border-default);
+  border-radius: var(--ds-radius-control);
+  box-shadow: var(--ds-elevation-control);
   box-sizing: border-box;
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
-  color: var(--ds-semantic-text-primary);
+  color: var(--ds-text-strong);
   transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
   outline: none;
   cursor: pointer;
@@ -208,20 +197,20 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
 /* Placeholder (vide) */
 .ds-otp__cell:placeholder-shown,
 .ds-otp__cell:not(:focus):not([value]):not([value="0"]) {
-  color: var(--ds-semantic-text-placeholder-subtle);
+  color: var(--ds-text-placeholder);
 }
 
 /* Focus */
 .ds-otp__cell:focus {
-  border-color: var(--ds-semantic-border-brand);
+  border-color: var(--ds-border-brand);
   box-shadow: var(--ds-focus-ring-brand-shadow-xs);
 }
 
 /* Disabled */
 .ds-otp__cell:disabled {
-  background: var(--ds-semantic-bg-primary);
+  background: var(--ds-bg-default);
   cursor: not-allowed;
-  color: var(--ds-semantic-text-placeholder);
+  color: var(--ds-text-placeholder);
 }
 
 /* ── Tailles ──────────────────────────────────────────────────────── */
@@ -229,7 +218,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
   width: 64px;
   min-height: 64px;
   padding: var(--ds-spacing-xxs) var(--ds-spacing-md);
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-control);
   font-size: 3rem;        /* 48px */
   line-height: 3.75rem;   /* 60px */
   letter-spacing: -0.96px;
@@ -249,7 +238,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
   width: 96px;
   min-height: 96px;
   padding: var(--ds-spacing-lg) var(--ds-spacing-md);
-  border-radius: var(--ds-radius-xl);
+  border-radius: var(--ds-radius-surface);
   font-size: 3.75rem;     /* 60px */
   line-height: 4.5rem;    /* 72px */
   letter-spacing: -1.2px;
@@ -259,7 +248,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
 .ds-otp__separator {
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
-  color: var(--ds-semantic-text-placeholder-subtle);
+  color: var(--ds-text-placeholder);
   flex-shrink: 0;
 }
 
@@ -268,12 +257,4 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
 .ds-otp--lg .ds-otp__separator { font-size: 3.75rem; line-height: 4.5rem;  }
 
 /* ── Hint ─────────────────────────────────────────────────────────── */
-.ds-otp__hint {
-  margin: 0;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-text-tertiary);
-}
 </style>

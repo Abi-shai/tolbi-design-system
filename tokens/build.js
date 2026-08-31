@@ -2,6 +2,8 @@ import StyleDictionary from 'style-dictionary'
 import { readFileSync, writeFileSync, appendFileSync } from 'fs'
 
 const TYPE_ROLE_ROOTS = ['font-size', 'line-height', 'letter-spacing', 'font-weight']
+const SEMANTIC_COLOR_ROOTS = ['text', 'bg', 'border']
+const isSemanticColor = (token) => SEMANTIC_COLOR_ROOTS.includes(token.path[0])
 const isTypeRole = (token) => TYPE_ROLE_ROOTS.includes(token.path[0])
 
 async function buildTokenFile(source, dest, opts = {}) {
@@ -45,10 +47,13 @@ await Promise.all([
     { filter: (token) => token.path[0] === 'spacing', outputReferences: true },
   ),
 
+  // ADR-0009: three groups, no tier marker in the name. `--ds-bg-brand-solid`,
+  // not `--ds-semantic-bg-brand-solid` — the namespace word already says the tier
+  // (`color`/`space`/`typography` are primitives; `text`/`bg`/`border` are semantic).
   buildTokenFile(
-    ['tokens/src/color/primitives.json', 'tokens/src/color/semantic.light.json'],
+    ['tokens/src/color/primitives.json', 'tokens/src/color/semantic.json'],
     'semantic.css',
-    { filter: (token) => token.path[0] === 'semantic', outputReferences: true },
+    { filter: isSemanticColor, outputReferences: true },
   ),
 
   // Typography roles. Web is the default scale; the mobile scale is opt-in via
@@ -78,8 +83,21 @@ await Promise.all([
     { filter: (token) => token.path[0] === 'container', outputReferences: true },
   ),
 
-  buildTokenFile('tokens/src/radius/primitives.json', 'radius.css'),
   buildTokenFile('tokens/src/motion/primitives.json', 'motion.css'),
+
+  buildTokenFile(
+    ['tokens/src/radius/primitives.json', 'tokens/src/radius/semantic.json'],
+    'radius.css',
+    { outputReferences: true },
+  ),
+
+  // ADR-0009: names the elevation rule that already had 100% adherence —
+  // controls xs, surfaces sm, floating lg.
+  buildTokenFile(
+    ['tokens/src/effect/shadows.json', 'tokens/src/effect/elevation.json'],
+    'elevation.css',
+    { filter: (token) => token.path[0] === 'elevation', outputReferences: true },
+  ),
 ])
 
 appendFileSync('tokens/dist/motion.css', `
@@ -95,7 +113,7 @@ appendFileSync('tokens/dist/motion.css', `
 const tokenFiles = [
   'colors', 'typography', 'type-roles', 'type-roles-mobile',
   'radius', 'space', 'spacing', 'widths', 'containers',
-  'shadows', 'focus-rings', 'blurs', 'semantic', 'motion',
+  'shadows', 'elevation', 'focus-rings', 'blurs', 'semantic', 'motion',
 ]
 const combined = tokenFiles
   .map(f => readFileSync(`tokens/dist/${f}.css`, 'utf8'))

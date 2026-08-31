@@ -81,7 +81,7 @@ function onSelect(item: ModulesListItem) {
 .ds-modules-list {
   height: 224px;
   box-sizing: border-box;
-  background: var(--ds-semantic-bg-secondary);
+  background: var(--ds-bg-neutral-subtle);
   border-radius: var(--ds-radius-2xl);
   padding: var(--ds-spacing-sm);
   display: inline-flex;
@@ -96,8 +96,8 @@ function onSelect(item: ModulesListItem) {
 .ds-modules-list__inner {
   width: 246px;
   box-sizing: border-box;
-  background: var(--ds-semantic-bg-primary);
-  border-radius: var(--ds-radius-xl);
+  background: var(--ds-bg-default);
+  border-radius: var(--ds-radius-surface);
   padding: var(--ds-spacing-md);
   display: flex;
   flex-wrap: wrap;
@@ -116,7 +116,7 @@ function onSelect(item: ModulesListItem) {
   padding: var(--ds-spacing-md);
   background: transparent;
   border: none;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-control);
   cursor: pointer;
   overflow: hidden;
   flex-shrink: 0;
@@ -124,11 +124,11 @@ function onSelect(item: ModulesListItem) {
 }
 
 .ds-modules-list__item:hover:not(:disabled) {
-  background: var(--ds-semantic-bg-primary-hover);
+  background: var(--ds-bg-hover);
 }
 
 .ds-modules-list__item--active {
-  background: var(--ds-semantic-bg-brand-primary);
+  background: var(--ds-bg-selected);
 }
 
 .ds-modules-list__item--disabled {
@@ -142,7 +142,7 @@ function onSelect(item: ModulesListItem) {
   font-weight: 500;
   line-height: 1.125rem;
   text-align: center;
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

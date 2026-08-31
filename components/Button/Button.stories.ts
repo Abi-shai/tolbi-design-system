@@ -4,9 +4,9 @@ import Button from './Button.vue'
 import StoryGrid from '../../stories/StoryGrid.vue'
 
 const meta: Meta<typeof Button> = {
-  title: 'Components/Button',
+  title: 'Actions/Button',
   component: Button,
-  tags: [],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {},

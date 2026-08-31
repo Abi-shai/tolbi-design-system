@@ -17,9 +17,9 @@ const ALL_MODULES = [
 ]
 
 const meta: Meta<typeof HorizontalNavigation> = {
-  title: 'Components/HorizontalNavigation',
+  title: 'Navigation/HorizontalNavigation',
   component: HorizontalNavigation,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
   parameters: {
     layout: 'fullscreen',
     docs: { page: HorizontalNavigationDocs },

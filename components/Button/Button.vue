@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Icon } from '../Icon'
+import { Spinner } from '../Spinner'
 import type { IconName } from '../Icon'
 
 export type ButtonVariant =
@@ -58,7 +59,9 @@ function handleClick(event: MouseEvent) {
     :aria-label="iconOnly ? label : undefined"
     @click="handleClick"
   >
-    <span v-if="loading" class="ds-button__spinner" aria-hidden="true" />
+    <!-- size="1em" so the spinner tracks the button's own font size, as the
+         hand-rolled version did across all five sizes (ADR-0001). -->
+    <Spinner v-if="loading" size="1em" class="ds-button__spinner" />
     <template v-else>
       <Icon v-if="iconLeading" :name="iconLeading" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
       <span v-if="!iconOnly" class="ds-button__label">{{ label }}</span>
@@ -76,14 +79,14 @@ function handleClick(event: MouseEvent) {
   gap: 4px;
   padding: 10px 14px;
   border: 1px solid transparent;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-control);
   font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.25rem;
   white-space: nowrap;
   cursor: pointer;
-  box-shadow: var(--ds-shadow-xs);
+  box-shadow: var(--ds-elevation-control);
   outline: none;
   transition:
     background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
@@ -120,13 +123,13 @@ function handleClick(event: MouseEvent) {
 
 /* ── Primary ──────────────────────────────────────────────────────── */
 .ds-button--primary {
-  background-color: var(--ds-semantic-bg-brand-solid);
-  border-color: var(--ds-semantic-border-brand-solid);
-  color: var(--ds-semantic-fg-white);
+  background-color: var(--ds-bg-brand-solid);
+  border-color: var(--ds-border-brand-solid);
+  color: var(--ds-text-on-brand-solid);
 }
 .ds-button--primary:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-brand-solid-hover);
-  border-color: var(--ds-color-brand-700);
+  background-color: var(--ds-bg-brand-solid-hover);
+  border-color: var(--ds-border-brand-solid-hover);
 }
 .ds-button--primary:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-brand-shadow-xs);
@@ -134,13 +137,13 @@ function handleClick(event: MouseEvent) {
 
 /* ── Secondary gray ───────────────────────────────────────────────── */
 .ds-button--secondary-gray {
-  background-color: var(--ds-semantic-bg-primary);
-  border-color: var(--ds-semantic-border-primary);
-  color: var(--ds-semantic-fg-secondary);
+  background-color: var(--ds-bg-default);
+  border-color: var(--ds-border-default);
+  color: var(--ds-text-default);
 }
 .ds-button--secondary-gray:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-primary-hover);
-  color: var(--ds-semantic-fg-secondary-hover);
+  background-color: var(--ds-bg-hover);
+  color: var(--ds-text-default-hover);
 }
 .ds-button--secondary-gray:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-gray-shadow-xs);
@@ -148,13 +151,13 @@ function handleClick(event: MouseEvent) {
 
 /* ── Secondary color ──────────────────────────────────────────────── */
 .ds-button--secondary-color {
-  background-color: var(--ds-semantic-bg-primary);
-  border-color: var(--ds-semantic-border-brand);
-  color: var(--ds-color-brand-700);
+  background-color: var(--ds-bg-default);
+  border-color: var(--ds-border-brand);
+  color: var(--ds-text-brand);
 }
 .ds-button--secondary-color:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-brand-primary);
-  color: var(--ds-color-brand-800);
+  background-color: var(--ds-bg-brand-subtle);
+  color: var(--ds-text-brand-hover);
 }
 .ds-button--secondary-color:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-brand-shadow-xs);
@@ -164,12 +167,12 @@ function handleClick(event: MouseEvent) {
 .ds-button--tertiary {
   background-color: transparent;
   border-color: transparent;
-  color: var(--ds-color-brand-700);
+  color: var(--ds-text-brand);
   box-shadow: none;
 }
 .ds-button--tertiary:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-brand-primary);
-  color: var(--ds-color-brand-800);
+  background-color: var(--ds-bg-brand-subtle);
+  color: var(--ds-text-brand-hover);
 }
 .ds-button--tertiary:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-brand-shadow-xs);
@@ -181,11 +184,11 @@ function handleClick(event: MouseEvent) {
   padding: 0;
   background-color: transparent;
   border-color: transparent;
-  color: var(--ds-color-brand-700);
+  color: var(--ds-text-brand);
   box-shadow: none;
 }
 .ds-button--link:hover:not(:disabled) {
-  color: var(--ds-color-brand-800);
+  color: var(--ds-text-brand-hover);
   text-decoration: underline;
 }
 .ds-button--link:focus-visible:not(:disabled) {
@@ -194,13 +197,13 @@ function handleClick(event: MouseEvent) {
 
 /* ── Danger ───────────────────────────────────────────────────────── */
 .ds-button--danger {
-  background-color: var(--ds-semantic-bg-error-solid);
-  border-color: var(--ds-semantic-border-error-solid);
-  color: var(--ds-semantic-fg-white);
+  background-color: var(--ds-bg-error-solid);
+  border-color: var(--ds-border-error-solid);
+  color: var(--ds-text-on-error-solid);
 }
 .ds-button--danger:hover:not(:disabled) {
-  background-color: var(--ds-color-error-700);
-  border-color: var(--ds-color-error-700);
+  background-color: var(--ds-bg-error-solid-hover);
+  border-color: var(--ds-border-error-solid-hover);
 }
 .ds-button--danger:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-error-shadow-xs);
@@ -208,13 +211,13 @@ function handleClick(event: MouseEvent) {
 
 /* ── Danger secondary ─────────────────────────────────────────────── */
 .ds-button--danger-secondary {
-  background-color: var(--ds-semantic-bg-primary);
-  border-color: var(--ds-semantic-border-error);
-  color: var(--ds-color-error-700);
+  background-color: var(--ds-bg-default);
+  border-color: var(--ds-border-error);
+  color: var(--ds-text-error);
 }
 .ds-button--danger-secondary:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-error-primary);
-  color: var(--ds-color-error-800);
+  background-color: var(--ds-bg-error-subtle);
+  color: var(--ds-text-on-error-subtle);
 }
 .ds-button--danger-secondary:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-error-shadow-xs);
@@ -224,12 +227,12 @@ function handleClick(event: MouseEvent) {
 .ds-button--ghost {
   background-color: transparent;
   border-color: transparent;
-  color: var(--ds-semantic-text-tertiary);
+  color: var(--ds-text-subtle);
   box-shadow: none;
 }
 .ds-button--ghost:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-primary-hover);
-  color: var(--ds-semantic-text-secondary);
+  background-color: var(--ds-bg-hover);
+  color: var(--ds-text-default);
 }
 .ds-button--ghost:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-gray-shadow-xs);
@@ -248,9 +251,9 @@ function handleClick(event: MouseEvent) {
 
 /* ── Disabled ─────────────────────────────────────────────────────── */
 .ds-button:disabled {
-  background-color: var(--ds-semantic-bg-disabled);
-  border-color: var(--ds-semantic-border-disabled-subtle);
-  color: var(--ds-semantic-fg-disabled);
+  background-color: var(--ds-bg-disabled);
+  border-color: var(--ds-border-subtle);
+  color: var(--ds-text-disabled);
   box-shadow: none;
   cursor: not-allowed;
 }
@@ -262,16 +265,7 @@ function handleClick(event: MouseEvent) {
 }
 
 /* ── Spinner ──────────────────────────────────────────────────────── */
-.ds-button__spinner {
-  width: 1em;
-  height: 1em;
-  border: 2px solid currentColor;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: ds-spin 0.6s linear infinite;
-}
+/* Geometry and animation now live in Spinner. */
+.ds-button__spinner { flex-shrink: 0; }
 
-@keyframes ds-spin {
-  to { transform: rotate(360deg); }
-}
 </style>

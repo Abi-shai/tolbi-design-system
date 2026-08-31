@@ -6,9 +6,18 @@ interface Props {
   maxHeight?: string
   /** Scroll on the x axis instead of the y axis. Thumb moves to the bottom edge. */
   horizontal?: boolean
+  /**
+   * Fades the leading and trailing edges while there is more content that way,
+   * so a cut-off list reads as scrollable before anyone touches it.
+   *
+   * This lives here rather than in a separate wrapper because Scrollbar already
+   * owns the scroll container and tracks the position — a second component
+   * would mean a second scroller nested inside this one.
+   */
+  shadows?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), { horizontal: false })
+const props = withDefaults(defineProps<Props>(), { horizontal: false, shadows: false })
 
 /**
  * The native scrollbar is hidden and replaced by an absolutely positioned thumb.
@@ -27,6 +36,8 @@ const thumbOffset = ref(0)
 const scrollable = ref(false)
 const visible = ref(false)
 const dragging = ref(false)
+const atStart = ref(true)
+const atEnd = ref(false)
 
 /** Below this the thumb becomes an untargetable sliver. */
 const MIN_THUMB = 24
@@ -47,6 +58,11 @@ function measure() {
   // Sub-pixel layout rounding leaves a fractional overflow on content that
   // actually fits; 1px of slack keeps the thumb from flickering into view.
   scrollable.value = scrollSize - clientSize > 1
+
+  // Same 1px slack at both ends, so a fade never lingers on a fully scrolled edge.
+  atStart.value = scrollPos <= 1
+  atEnd.value = scrollPos >= scrollSize - clientSize - 1
+
   if (!scrollable.value) return
 
   const size = Math.max((clientSize / scrollSize) * clientSize, MIN_THUMB)
@@ -126,7 +142,15 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="ds-scrollbar" :class="{ 'ds-scrollbar--horizontal': horizontal }">
+  <div
+    class="ds-scrollbar"
+    :class="{
+      'ds-scrollbar--horizontal': horizontal,
+      'ds-scrollbar--shadows': shadows && scrollable,
+      'ds-scrollbar--at-start': atStart,
+      'ds-scrollbar--at-end': atEnd,
+    }"
+  >
     <div
       ref="viewport"
       class="ds-scrollbar__viewport"
@@ -151,6 +175,12 @@ onBeforeUnmount(() => {
       @pointerup="onThumbUp"
       @pointercancel="onThumbUp"
     />
+
+    <!-- Purely decorative, and never intercepting a pointer. -->
+    <template v-if="shadows && scrollable">
+      <span class="ds-scrollbar__fade ds-scrollbar__fade--start" aria-hidden="true" />
+      <span class="ds-scrollbar__fade ds-scrollbar__fade--end" aria-hidden="true" />
+    </template>
   </div>
 </template>
 
@@ -196,8 +226,8 @@ onBeforeUnmount(() => {
 
 .ds-scrollbar__thumb {
   position: absolute;
-  border-radius: var(--ds-radius-full);
-  background-color: var(--ds-semantic-bg-quaternary);
+  border-radius: var(--ds-radius-pill);
+  background-color: var(--ds-bg-neutral-strong);
   opacity: 0;
   transition:
     opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-out),
@@ -225,6 +255,27 @@ onBeforeUnmount(() => {
 
 .ds-scrollbar__thumb:hover,
 .ds-scrollbar__thumb:active {
-  background-color: var(--ds-semantic-fg-senary);
+  background-color: var(--ds-bg-neutral-strong);
 }
+
+/* ── Edge fades ───────────────────────────────────────────────────── */
+.ds-scrollbar__fade {
+  position: absolute;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+  /* Fades to the surface behind, which the consumer can override. */
+  --fade-color: var(--ds-bg-default);
+  --fade-size: 24px;
+}
+
+.ds-scrollbar__fade--start { top: 0; left: 0; right: 0; height: var(--fade-size); background: linear-gradient(to bottom, var(--fade-color), transparent); }
+.ds-scrollbar__fade--end   { bottom: 0; left: 0; right: 0; height: var(--fade-size); background: linear-gradient(to top, var(--fade-color), transparent); }
+
+.ds-scrollbar--horizontal .ds-scrollbar__fade--start { top: 0; bottom: 0; left: 0; right: auto; height: auto; width: var(--fade-size); background: linear-gradient(to right, var(--fade-color), transparent); }
+.ds-scrollbar--horizontal .ds-scrollbar__fade--end   { top: 0; bottom: 0; right: 0; left: auto; height: auto; width: var(--fade-size); background: linear-gradient(to left, var(--fade-color), transparent); }
+
+/* Hide the fade on the edge that has nothing left to reveal. */
+.ds-scrollbar--at-start .ds-scrollbar__fade--start,
+.ds-scrollbar--at-end   .ds-scrollbar__fade--end { opacity: 0; }
 </style>

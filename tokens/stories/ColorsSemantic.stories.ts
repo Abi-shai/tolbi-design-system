@@ -1,17 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import semanticLight from '../src/color/semantic.light.json'
+import semantic from '../src/color/semantic.json'
 import SemanticTokenRow from './components/SemanticTokenRow.vue'
 
 function refToCssVar(ref: string): string {
   return '--ds-' + ref.replace(/[{}]/g, '').split('.').join('-')
 }
 
-function flattenTokens(obj: Record<string, any>, path: string[] = []): Map<string, string> {
-  const result = new Map<string, string>()
+interface Entry { value: string; description?: string }
+
+function flattenTokens(obj: Record<string, any>, path: string[] = []): Map<string, Entry> {
+  const result = new Map<string, Entry>()
   for (const [key, val] of Object.entries(obj)) {
     const currentPath = [...path, key]
     if (val && typeof val === 'object' && 'value' in val) {
-      result.set(currentPath.join('.'), val.value as string)
+      result.set(currentPath.join('.'), { value: val.value as string, description: val.description })
     } else if (val && typeof val === 'object') {
       for (const [k, v] of flattenTokens(val, currentPath)) result.set(k, v)
     }
@@ -19,23 +21,25 @@ function flattenTokens(obj: Record<string, any>, path: string[] = []): Map<strin
   return result
 }
 
-const lightTokens = flattenTokens(semanticLight)
+const tokens = flattenTokens(semantic)
 
 function getCategory(category: string) {
-  return [...lightTokens.entries()]
-    .filter(([path]) => path.startsWith(`semantic.${category}.`))
-    .map(([path, lightRef]) => ({
+  return [...tokens.entries()]
+    .filter(([path]) => path.startsWith(`${category}.`))
+    .map(([path, entry]) => ({
       cssVar: '--ds-' + path.split('.').join('-'),
-      primitiveCssVar: refToCssVar(lightRef),
+      primitiveCssVar: refToCssVar(entry.value),
+      description: entry.description,
     }))
 }
 
 const HEADER = `
   <thead>
-    <tr style="border-bottom: 2px solid var(--ds-semantic-border-secondary, #EAECF0);">
-      <th style="padding: 0.5rem 1.5rem 0.75rem 0; text-align: left; font-family: var(--ds-typography-font-family-poppins); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ds-semantic-text-tertiary, #667085);">Token</th>
-      <th style="padding: 0.5rem 0.75rem 0.75rem; font-family: var(--ds-typography-font-family-poppins); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ds-semantic-text-tertiary, #667085);">Value</th>
-      <th style="padding: 0.5rem 0 0.75rem 1rem; text-align: left; font-family: var(--ds-typography-font-family-poppins); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ds-semantic-text-tertiary, #667085);">Primitive</th>
+    <tr style="border-bottom: 2px solid var(--ds-border-subtle);">
+      <th style="padding: 0.5rem 1.5rem 0.75rem 0; text-align: left; font-family: var(--ds-typography-font-family-poppins); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ds-text-subtle);">Token</th>
+      <th style="padding: 0.5rem 0.75rem 0.75rem; font-family: var(--ds-typography-font-family-poppins); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ds-text-subtle);">Value</th>
+      <th style="padding: 0.5rem 0 0.75rem 1rem; text-align: left; font-family: var(--ds-typography-font-family-poppins); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ds-text-subtle);">Primitive</th>
+      <th style="padding: 0.5rem 0 0.75rem 1.25rem; text-align: left; font-family: var(--ds-typography-font-family-poppins); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ds-text-subtle);">Why it exists</th>
     </tr>
   </thead>
 `
@@ -55,6 +59,7 @@ function makeStory(category: string): StoryObj<typeof meta> {
                 :key="token.cssVar"
                 :css-var="token.cssVar"
                 :primitive-css-var="token.primitiveCssVar"
+                :description="token.description"
               />
             </tbody>
           </table>
@@ -73,6 +78,5 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Background: Story = makeStory('bg')
-export const Foreground:  Story = makeStory('fg')
 export const Text:        Story = makeStory('text')
 export const Border:      Story = makeStory('border')

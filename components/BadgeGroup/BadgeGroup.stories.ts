@@ -4,7 +4,7 @@ import BadgeGroup from './BadgeGroup.vue'
 const COLORS = ['brand', 'error', 'warning', 'success', 'gray'] as const
 
 const meta: Meta<typeof BadgeGroup> = {
-  title: 'Components/BadgeGroup',
+  title: 'Étiquettes/BadgeGroup',
   component: BadgeGroup,
   tags: ['wip'],
   parameters: {

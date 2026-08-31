@@ -4,7 +4,8 @@ import ButtonGroupItem from './ButtonGroupItem.vue'
 import ButtonGroup from './ButtonGroup.vue'
 
 const meta: Meta<typeof ButtonGroupItem> = {
-  title: 'Subcomponents/ButtonGroupItem',
+  title: 'Actions/ButtonGroup/Item',
+  tags: ['wip'],
   component: ButtonGroupItem,
   parameters: {
     layout: 'centered',

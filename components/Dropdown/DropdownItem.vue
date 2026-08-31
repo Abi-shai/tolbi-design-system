@@ -62,12 +62,12 @@ const emit = defineEmits<{
   flex: 1;
   min-width: 0;
   padding: 9px 10px;
-  border-radius: var(--ds-radius-sm);
+  border-radius: var(--ds-radius-inner);
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-dropdown-item:hover:not(.ds-dropdown-item--disabled) .ds-dropdown-item__content {
-  background-color: var(--ds-semantic-bg-primary-hover);
+  background-color: var(--ds-bg-hover);
 }
 
 .ds-dropdown-item:focus-visible {
@@ -75,7 +75,7 @@ const emit = defineEmits<{
 }
 
 .ds-dropdown-item:focus-visible .ds-dropdown-item__content {
-  background-color: var(--ds-semantic-bg-primary-hover);
+  background-color: var(--ds-bg-hover);
 }
 
 .ds-dropdown-item--disabled {
@@ -93,7 +93,7 @@ const emit = defineEmits<{
 
 .ds-dropdown-item__icon {
   flex-shrink: 0;
-  color: var(--ds-semantic-fg-secondary);
+  color: var(--ds-text-default);
 }
 
 .ds-dropdown-item__label {
@@ -101,7 +101,7 @@ const emit = defineEmits<{
   font-weight: 500;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -114,7 +114,7 @@ const emit = defineEmits<{
   font-weight: 400;
   font-size: 0.75rem;
   line-height: 1.125rem;
-  color: var(--ds-semantic-text-quarterary);
+  color: var(--ds-text-subtlest);
   white-space: nowrap;
   flex-shrink: 0;
 }

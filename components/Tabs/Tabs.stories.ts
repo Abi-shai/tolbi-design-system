@@ -12,9 +12,9 @@ const defaultTabs: TabsItem[] = [
 ]
 
 const meta: Meta<typeof Tabs> = {
-  title: 'Components/Tabs',
+  title: 'Navigation/Tabs',
   component: Tabs,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'wip'],
   parameters: {
     layout: 'padded',
     docs: {

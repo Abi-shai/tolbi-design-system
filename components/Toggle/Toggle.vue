@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useId } from 'vue'
+import { computed, useId } from 'vue'
+import { useFormField } from '../FormField/context'
 
 export type ToggleSize = 'sm' | 'md'
 
@@ -21,10 +22,26 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
 
-const labelId = useId()
+const uid = useId()
+
+const labelId   = `${uid}-label`
+const supportId = `${uid}-support`
+
+const field      = useFormField()
+const isDisabled = computed(() => (field?.disabled.value ?? false) || props.disabled)
+
+/*
+  aria-labelledby pointed at the container holding BOTH texts, so the supporting
+  text was read as part of the switch's name. It now names the label alone and
+  describes with the rest.
+*/
+const describedBy = computed(() => {
+  const ids = [props.supportingText ? supportId : null, field?.describedBy.value]
+  return ids.filter(Boolean).join(' ') || undefined
+})
 
 function toggle() {
-  if (!props.disabled) {
+  if (!isDisabled.value) {
     emit('update:modelValue', !props.modelValue)
   }
 }
@@ -40,17 +57,19 @@ function toggle() {
       role="switch"
       :aria-checked="modelValue"
       :aria-labelledby="label ? labelId : undefined"
-      :disabled="disabled"
+      :aria-describedby="describedBy"
+      :aria-invalid="field?.invalid.value || undefined"
+      :disabled="isDisabled"
       class="ds-toggle"
-      :class="[`ds-toggle--${size}`, { 'ds-toggle--on': modelValue, 'ds-toggle--disabled': disabled }]"
+      :class="[`ds-toggle--${size}`, { 'ds-toggle--on': modelValue, 'ds-toggle--disabled': isDisabled }]"
       @click="toggle"
     >
       <span class="ds-toggle__thumb" />
     </button>
 
-    <div v-if="label" :id="labelId" class="ds-toggle__text" :class="`ds-toggle__text--${size}`">
-      <span class="ds-toggle__label">{{ label }}</span>
-      <span v-if="supportingText" class="ds-toggle__supporting">{{ supportingText }}</span>
+    <div v-if="label" class="ds-toggle__text" :class="`ds-toggle__text--${size}`">
+      <span :id="labelId" class="ds-toggle__label">{{ label }}</span>
+      <span v-if="supportingText" :id="supportId" class="ds-toggle__supporting">{{ supportingText }}</span>
     </div>
   </div>
 </template>
@@ -76,8 +95,8 @@ function toggle() {
   align-items: center;
   padding: 2px;
   border: none;
-  border-radius: var(--ds-radius-full);
-  background-color: var(--ds-semantic-bg-tertiary);
+  border-radius: var(--ds-radius-pill);
+  background-color: var(--ds-bg-neutral);
   cursor: pointer;
   flex-shrink: 0;
   transition: background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
@@ -95,11 +114,11 @@ function toggle() {
 
 /* ── On state ──────────────────────────────────────────────────────── */
 .ds-toggle--on {
-  background-color: var(--ds-semantic-bg-brand-solid);
+  background-color: var(--ds-bg-brand-solid);
 }
 
 .ds-toggle--on:hover:not(:disabled):not(.ds-toggle--disabled) {
-  background-color: var(--ds-semantic-bg-brand-solid-hover);
+  background-color: var(--ds-bg-brand-solid-hover);
 }
 
 /* ── Focus states ──────────────────────────────────────────────────── */
@@ -115,16 +134,16 @@ function toggle() {
 /* ── Disabled ──────────────────────────────────────────────────────── */
 .ds-toggle--disabled,
 .ds-toggle:disabled {
-  background-color: var(--ds-semantic-bg-disabled);
+  background-color: var(--ds-bg-disabled);
   cursor: not-allowed;
 }
 
 /* ── Thumb ─────────────────────────────────────────────────────────── */
 .ds-toggle__thumb {
   display: block;
-  border-radius: var(--ds-radius-full);
-  background-color: var(--ds-color-base-white);
-  box-shadow: var(--ds-shadow-sm);
+  border-radius: var(--ds-radius-pill);
+  background-color: var(--ds-bg-default);
+  box-shadow: var(--ds-elevation-surface);
   flex-shrink: 0;
   transition: transform var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
@@ -151,7 +170,7 @@ function toggle() {
 /* Disabled thumb tint */
 .ds-toggle--disabled .ds-toggle__thumb,
 .ds-toggle:disabled .ds-toggle__thumb {
-  background-color: var(--ds-color-gray-light-50);
+  background-color: var(--ds-bg-neutral-subtle);
 }
 
 /* ── Text content ──────────────────────────────────────────────────── */
@@ -174,7 +193,7 @@ function toggle() {
 .ds-toggle__label {
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: 500;
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
 }
 
 .ds-toggle__text--sm .ds-toggle__label {
@@ -191,7 +210,7 @@ function toggle() {
 .ds-toggle__supporting {
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: 400;
-  color: var(--ds-semantic-text-tertiary);
+  color: var(--ds-text-subtle);
 }
 
 .ds-toggle__text--sm .ds-toggle__supporting {

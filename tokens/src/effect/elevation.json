@@ -1,0 +1,20 @@
+{
+  "elevation": {
+    "control": {
+      "value": "{shadow.xs}",
+      "description": "Buttons, inputs — the hairline lift of an interactive control"
+    },
+    "surface": {
+      "value": "{shadow.sm}",
+      "description": "Cards, tables — resting content surfaces"
+    },
+    "raised": {
+      "value": "{shadow.md}",
+      "description": "Draggable pucks that ride above their own track — slider thumb"
+    },
+    "overlay": {
+      "value": "{shadow.lg}",
+      "description": "Dropdowns, toasts, tooltips — anything floating above the page"
+    }
+  }
+}

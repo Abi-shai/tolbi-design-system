@@ -141,7 +141,7 @@ const labelFont = computed(() => LABEL_FONT[props.size])
           :cy="cy"
           :r="radius"
           fill="none"
-          stroke="var(--ds-semantic-bg-tertiary)"
+          stroke="var(--ds-bg-neutral)"
           :stroke-width="strokeWidth"
           :stroke-dasharray="`${arcLength} ${arcLength}`"
           stroke-linecap="butt"
@@ -153,7 +153,7 @@ const labelFont = computed(() => LABEL_FONT[props.size])
           :cy="cy"
           :r="radius"
           fill="none"
-          stroke="var(--ds-semantic-fg-brand-primary)"
+          stroke="var(--ds-text-brand)"
           :stroke-width="strokeWidth"
           :stroke-dasharray="`${arcLength} ${arcLength}`"
           :stroke-dashoffset="dashOffset"
@@ -187,7 +187,7 @@ const labelFont = computed(() => LABEL_FONT[props.size])
           fontSize:   labelFont.size,
           fontWeight: '500',
           lineHeight: labelFont.line,
-          color:      'var(--ds-semantic-text-tertiary)',
+          color:      'var(--ds-text-subtle)',
         }"
       >{{ label }}</span>
 
@@ -198,7 +198,7 @@ const labelFont = computed(() => LABEL_FONT[props.size])
           fontWeight:    '600',
           lineHeight:    valueFont.line,
           letterSpacing: valueFont.tracking ?? 'normal',
-          color:         'var(--ds-semantic-text-primary)',
+          color:         'var(--ds-text-strong)',
         }"
       >{{ pct }}</span>
     </div>
@@ -215,7 +215,7 @@ const labelFont = computed(() => LABEL_FONT[props.size])
         fontSize:   labelFont.size,
         fontWeight: '500',
         lineHeight: labelFont.line,
-        color:      'var(--ds-semantic-text-tertiary)',
+        color:      'var(--ds-text-subtle)',
         whiteSpace: 'nowrap',
       }"
     >{{ label }}</span>

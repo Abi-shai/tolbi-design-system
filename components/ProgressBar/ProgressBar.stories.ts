@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import ProgressBar from './ProgressBar.vue'
 
 const meta: Meta<typeof ProgressBar> = {
-  title: 'Components/ProgressBar',
+  title: 'Feedback & chargement/ProgressBar',
   component: ProgressBar,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'wip'],
   parameters: {
     layout: 'padded',
     docs: {

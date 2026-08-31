@@ -3,9 +3,9 @@ import { ref } from 'vue'
 import Checkbox from './Checkbox.vue'
 
 const meta: Meta<typeof Checkbox> = {
-  title: 'Components/Checkbox',
+  title: 'Saisie/Checkbox',
   component: Checkbox,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'wip'],
   parameters: {
     layout: 'centered',
     docs: {

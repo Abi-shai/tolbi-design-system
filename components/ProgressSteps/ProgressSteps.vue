@@ -138,12 +138,12 @@ const checkSize = computed(() => {
   justify-content: center;
   width: 48px;
   height: 48px;
-  border: 1px solid var(--ds-semantic-border-secondary);
+  border: 1px solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-lg);
-  box-shadow: var(--ds-shadow-xs);
-  background-color: var(--ds-semantic-bg-primary);
+  box-shadow: var(--ds-elevation-control);
+  background-color: var(--ds-bg-default);
   flex-shrink: 0;
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
 }
 
 /* ── Icon circle ───────────────────────────────────────────────────── */
@@ -151,7 +151,7 @@ const checkSize = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -161,18 +161,18 @@ const checkSize = computed(() => {
 .ds-steps__icon--lg { width: 40px; height: 40px; }
 
 .ds-steps__icon--complete {
-  background-color: var(--ds-semantic-bg-brand-solid);
+  background-color: var(--ds-bg-brand-solid);
 }
 
 .ds-steps__icon--current {
-  background-color: var(--ds-semantic-bg-brand-solid);
+  background-color: var(--ds-bg-brand-solid);
   box-shadow: var(--ds-focus-ring-brand);
   overflow: visible;
 }
 
 .ds-steps__icon--incomplete {
-  background-color: var(--ds-semantic-bg-disabled-subtle);
-  border: 2px solid var(--ds-semantic-border-disabled-subtle);
+  background-color: var(--ds-bg-disabled);
+  border: 2px solid var(--ds-border-subtle);
 }
 
 /* ── Check icon (complete) ─────────────────────────────────────────── */
@@ -184,27 +184,27 @@ const checkSize = computed(() => {
 .ds-steps__dot {
   display: block;
   flex-shrink: 0;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
 }
 
 .ds-steps__icon--sm .ds-steps__dot  { width: 8px;  height: 8px; }
 .ds-steps__icon--md .ds-steps__dot  { width: 10px; height: 10px; }
 .ds-steps__icon--lg .ds-steps__dot  { width: 12px; height: 12px; }
 
-.ds-steps__icon--current    .ds-steps__dot { background-color: white; }
-.ds-steps__icon--incomplete .ds-steps__dot { background-color: var(--ds-semantic-border-disabled-subtle); }
+.ds-steps__icon--current    .ds-steps__dot { background-color: var(--ds-text-on-brand-solid); }
+.ds-steps__icon--incomplete .ds-steps__dot { background-color: var(--ds-bg-neutral-strong); }
 
 /* ── Connector line ────────────────────────────────────────────────── */
 .ds-steps__line {
   flex: 1 0 0;
   width: 2px;
   min-height: 1px;
-  background-color: var(--ds-semantic-border-secondary);
+  background-color: var(--ds-border-subtle);
   border-radius: 2px;
 }
 
 .ds-steps__line--complete {
-  background-color: var(--ds-semantic-border-brand-solid);
+  background-color: var(--ds-border-brand-solid);
 }
 
 /* ── Text block ────────────────────────────────────────────────────── */
@@ -239,22 +239,22 @@ const checkSize = computed(() => {
 .ds-steps__title {
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: 600;
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
 }
 
 /* ── Description ───────────────────────────────────────────────────── */
 .ds-steps__description {
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: 400;
-  color: var(--ds-semantic-text-tertiary);
+  color: var(--ds-text-subtle);
 }
 
 /* ── Current step text (icon type) ────────────────────────────────── */
 .ds-steps--icon .ds-steps__text--current .ds-steps__title {
-  color: var(--ds-semantic-text-brand-secondary);
+  color: var(--ds-text-on-brand-subtle);
 }
 
 .ds-steps--icon .ds-steps__text--current .ds-steps__description {
-  color: var(--ds-semantic-text-brand-tertiary);
+  color: var(--ds-text-brand);
 }
 </style>

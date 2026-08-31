@@ -3,10 +3,9 @@ import { ref } from 'vue'
 import Dropdown from './Dropdown.vue'
 import DropdownItem from './DropdownItem.vue'
 import DropdownDivider from './DropdownDivider.vue'
-import DropdownSelectItem from './DropdownSelectItem.vue'
 
 const meta: Meta<typeof Dropdown> = {
-  title: 'Components/Dropdown',
+  title: 'Superposition/Dropdown',
   component: Dropdown,
   tags: ['wip'],
   parameters: {
@@ -101,50 +100,6 @@ export const IconTrigger: Story = {
 export const AvatarTrigger: Story = {
   name: 'Avatar trigger',
   render: () => withMenu('avatar'),
-}
-
-export const SelectItemTypes: Story = {
-  name: 'DropdownSelectItem — types',
-  parameters: { layout: 'padded' },
-  render: () => ({
-    components: { DropdownSelectItem },
-    setup() {
-      const selected = ref('olivia')
-      return { selected }
-    },
-    template: `
-      <div style="display: flex; gap: 48px; align-items: flex-start; padding: 16px;">
-        <div style="width: 240px; display: flex; flex-direction: column;">
-          <p style="font: 600 12px/20px sans-serif; color: #667085; margin: 0 0 4px 6px;">Default</p>
-          <DropdownSelectItem label="Olivia Rhye" supporting-text="@olivia" :selected="selected === 'olivia'" @click="selected = 'olivia'" />
-          <DropdownSelectItem label="Phoenix Baker" supporting-text="@phoenix" :selected="selected === 'phoenix'" @click="selected = 'phoenix'" />
-          <DropdownSelectItem label="Lana Steiner" supporting-text="@lana" :selected="selected === 'lana'" @click="selected = 'lana'" />
-          <DropdownSelectItem label="Disabled" supporting-text="@disabled" :disabled="true" />
-        </div>
-        <div style="width: 240px; display: flex; flex-direction: column;">
-          <p style="font: 600 12px/20px sans-serif; color: #667085; margin: 0 0 4px 6px;">Icon leading</p>
-          <DropdownSelectItem type="icon" icon="user" label="Olivia Rhye" supporting-text="@olivia" :selected="selected === 'olivia'" @click="selected = 'olivia'" />
-          <DropdownSelectItem type="icon" icon="user" label="Phoenix Baker" supporting-text="@phoenix" :selected="selected === 'phoenix'" @click="selected = 'phoenix'" />
-          <DropdownSelectItem type="icon" icon="user" label="Lana Steiner" supporting-text="@lana" :selected="selected === 'lana'" @click="selected = 'lana'" />
-          <DropdownSelectItem type="icon" icon="user" label="Disabled" supporting-text="@disabled" :disabled="true" />
-        </div>
-        <div style="width: 240px; display: flex; flex-direction: column;">
-          <p style="font: 600 12px/20px sans-serif; color: #667085; margin: 0 0 4px 6px;">Avatar leading</p>
-          <DropdownSelectItem type="avatar" label="Olivia Rhye" supporting-text="@olivia" :selected="selected === 'olivia'" @click="selected = 'olivia'" />
-          <DropdownSelectItem type="avatar" label="Phoenix Baker" supporting-text="@phoenix" :selected="selected === 'phoenix'" @click="selected = 'phoenix'" />
-          <DropdownSelectItem type="avatar" label="Lana Steiner" supporting-text="@lana" :selected="selected === 'lana'" @click="selected = 'lana'" />
-          <DropdownSelectItem type="avatar" label="Disabled" supporting-text="@disabled" :disabled="true" />
-        </div>
-        <div style="width: 240px; display: flex; flex-direction: column;">
-          <p style="font: 600 12px/20px sans-serif; color: #667085; margin: 0 0 4px 6px;">Dot leading</p>
-          <DropdownSelectItem type="dot" label="Olivia Rhye" supporting-text="@olivia" :selected="selected === 'olivia'" @click="selected = 'olivia'" />
-          <DropdownSelectItem type="dot" label="Phoenix Baker" supporting-text="@phoenix" :selected="selected === 'phoenix'" @click="selected = 'phoenix'" />
-          <DropdownSelectItem type="dot" label="Lana Steiner" supporting-text="@lana" :selected="selected === 'lana'" @click="selected = 'lana'" />
-          <DropdownSelectItem type="dot" label="Disabled" supporting-text="@disabled" :disabled="true" />
-        </div>
-      </div>
-    `,
-  }),
 }
 
 export const AllTriggers: Story = {

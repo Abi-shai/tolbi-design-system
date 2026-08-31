@@ -65,13 +65,13 @@ function handleClick(event: MouseEvent) {
   min-height: 40px;
   padding: 8px 16px;
   border: none;
-  border-right: 1px solid var(--ds-semantic-border-primary);
-  background-color: var(--ds-semantic-bg-primary);
+  border-right: 1px solid var(--ds-border-default);
+  background-color: var(--ds-bg-default);
   font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.25rem;
-  color: var(--ds-semantic-fg-secondary);
+  color: var(--ds-text-default);
   white-space: nowrap;
   cursor: pointer;
   outline: none;
@@ -98,8 +98,8 @@ function handleClick(event: MouseEvent) {
 
 /* ── States ───────────────────────────────────────────────────────── */
 .ds-button-group-item:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-primary-hover);
-  color: var(--ds-semantic-fg-secondary-hover);
+  background-color: var(--ds-bg-hover);
+  color: var(--ds-text-default-hover);
   z-index: 1;
 }
 
@@ -108,19 +108,25 @@ function handleClick(event: MouseEvent) {
   z-index: 1;
 }
 
+/* Component token (ADR-0009): segmented selection is a neutral raised
+   surface. It must not use bg-selected — that one is brand-tinted, and a
+   segmented control is a neutral affordance. */
 .ds-button-group-item--active {
-  background-color: var(--ds-semantic-bg-secondary);
-  color: var(--ds-semantic-fg-secondary-hover);
+  --segment-selected-bg:       var(--ds-bg-neutral-subtle);
+  --segment-selected-bg-hover: var(--ds-bg-neutral-subtle-hover);
+
+  background-color: var(--segment-selected-bg);
+  color: var(--ds-text-default-hover);
 }
 
 .ds-button-group-item--active:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-secondary-hover);
+  background-color: var(--segment-selected-bg-hover);
 }
 
 /* ── Disabled ─────────────────────────────────────────────────────── */
 .ds-button-group-item:disabled {
-  background-color: var(--ds-semantic-bg-disabled);
-  color: var(--ds-semantic-fg-disabled);
+  background-color: var(--ds-bg-disabled);
+  color: var(--ds-text-disabled);
   cursor: not-allowed;
 }
 </style>

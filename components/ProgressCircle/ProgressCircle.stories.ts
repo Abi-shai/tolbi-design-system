@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import ProgressCircle from './ProgressCircle.vue'
 
 const meta: Meta<typeof ProgressCircle> = {
-  title: 'Components/ProgressCircle',
+  title: 'Feedback & chargement/ProgressCircle',
   component: ProgressCircle,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'wip'],
   parameters: {
     layout: 'centered',
     docs: {

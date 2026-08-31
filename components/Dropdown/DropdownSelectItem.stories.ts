@@ -4,17 +4,18 @@ import DropdownSelectItem from './DropdownSelectItem.vue'
 
 const PANEL = `
   padding: var(--ds-spacing-xs);
-  background: var(--ds-semantic-bg-primary);
-  border: 1px solid var(--ds-semantic-border-secondary);
+  background: var(--ds-bg-default);
+  border: 1px solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-lg);
+  box-shadow: var(--ds-elevation-overlay);
   width: 280px;
 `
 
 const AVATAR = 'https://i.pravatar.cc/80?img=12'
 
 const meta: Meta<typeof DropdownSelectItem> = {
-  title: 'Subcomponents/DropdownSelectItem',
+  title: 'Saisie/InputDropdown/SelectItem',
+  tags: ['wip'],
   component: DropdownSelectItem,
   parameters: {
     layout: 'centered',
@@ -110,7 +111,7 @@ export const WithAvatar: Story = {
 
 export const WithDot: Story = {
   name: 'Type — puce',
-  args: { type: 'dot', dotColor: 'var(--ds-semantic-fg-success-primary)' },
+  args: { type: 'dot', dotColor: 'var(--ds-text-success)' },
 }
 
 export const AllTypes: Story = {
@@ -123,7 +124,7 @@ export const AllTypes: Story = {
         <DropdownSelectItem label="Défaut" supportingText="@default" />
         <DropdownSelectItem label="Icône" supportingText="@icon" type="icon" icon="user" />
         <DropdownSelectItem label="Avatar" supportingText="@avatar" type="avatar" :avatar-src="AVATAR" avatar-alt="Avatar" selected />
-        <DropdownSelectItem label="En ligne" supportingText="@dot" type="dot" dot-color="var(--ds-semantic-fg-success-primary)" />
+        <DropdownSelectItem label="En ligne" supportingText="@dot" type="dot" dot-color="var(--ds-text-success)" />
         <DropdownSelectItem label="Désactivée" supportingText="@disabled" disabled />
       </div>
     `,

@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import Logo from './Logo.vue'
 
 const meta: Meta<typeof Logo> = {
-  title: 'Primitives/Logo',
+  title: 'Identité & média/Logo',
   component: Logo,
-  tags: ['wip'],
+  tags: ['wip', 'primitive'],
   parameters: {
     layout: 'centered',
   },

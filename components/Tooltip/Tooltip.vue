@@ -56,8 +56,10 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
   flex-direction: column;
   align-items: center;
   /* shadow-lg */
-  filter: drop-shadow(0px 4px 6px rgba(16, 24, 40, 0.03))
-          drop-shadow(0px 12px 16px rgba(16, 24, 40, 0.08));
+  /* drop-shadow() cannot consume a box-shadow token, so --ds-elevation-overlay
+     is restated here geometrically; the colour still comes from a token. */
+  filter: drop-shadow(0px 4px 6px color-mix(in srgb, var(--ds-bg-inverse) 3%, transparent))
+          drop-shadow(0px 12px 16px color-mix(in srgb, var(--ds-bg-inverse) 8%, transparent));
 }
 
 /* Largeur fixe sur le wrapper (box-sizing: border-box côté Figma) */
@@ -72,8 +74,8 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
 
 /* ── Contenu ──────────────────────────────────────────────────────── */
 .ds-tooltip__content {
-  background: #0c111d;
-  border-radius: var(--ds-radius-md);
+  background: var(--ds-bg-inverse);
+  border-radius: var(--ds-radius-control);
   width: 100%;
   box-sizing: border-box;
 }
@@ -101,7 +103,7 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
   font-size: 0.75rem;
   font-weight: 600;
   line-height: 1.125rem;
-  color: #ffffff;
+  color: var(--ds-text-on-inverse);
 }
 
 .ds-tooltip__title--single {
@@ -115,7 +117,7 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
   font-size: 0.75rem;
   font-weight: 500;
   line-height: 1.125rem;
-  color: #d0d5dd;
+  color: var(--ds-text-on-inverse-subtle);
 }
 
 /* ── Flèches CSS ──────────────────────────────────────────────────── */
@@ -127,7 +129,7 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
   height: 0;
   border-left:  8px solid transparent;
   border-right: 8px solid transparent;
-  border-top:   6px solid #0c111d;
+  border-top:   6px solid var(--ds-bg-inverse);
 }
 
 .ds-tooltip__arrow--bottom-left  { align-self: flex-start; margin-left: 12px; }
@@ -139,7 +141,7 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
   height: 0;
   border-left:   8px solid transparent;
   border-right:  8px solid transparent;
-  border-bottom: 6px solid #0c111d;
+  border-bottom: 6px solid var(--ds-bg-inverse);
 }
 
 /* ◀ Left — 6px large × 16px haut */
@@ -148,7 +150,7 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
   height: 0;
   border-top:    8px solid transparent;
   border-bottom: 8px solid transparent;
-  border-right:  6px solid #0c111d;
+  border-right:  6px solid var(--ds-bg-inverse);
 }
 
 /* ▶ Right — 6px large × 16px haut */
@@ -157,6 +159,6 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
   height: 0;
   border-top:    8px solid transparent;
   border-bottom: 8px solid transparent;
-  border-left:   6px solid #0c111d;
+  border-left:   6px solid var(--ds-bg-inverse);
 }
 </style>

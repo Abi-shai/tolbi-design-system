@@ -214,7 +214,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   justify-content: space-between;
   width: 100%;
   box-sizing: border-box;
-  background: rgba(6, 105, 56, 0.95);
+  background: color-mix(in srgb, var(--ds-bg-brand-solid) 95%, transparent);
   padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
   overflow: visible;
 }
@@ -237,7 +237,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 }
 
 .ds-hnav__chevron {
-  color: rgba(255, 255, 255, 0.4);
+  color: color-mix(in srgb, var(--ds-text-on-brand-solid) 40%, transparent);
   flex-shrink: 0;
 }
 
@@ -246,11 +246,11 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   align-items: center;
   justify-content: center;
   padding: var(--ds-spacing-xs) var(--ds-spacing-md);
-  border-radius: var(--ds-radius-sm);
+  border-radius: var(--ds-radius-inner);
   background: transparent;
   border: none;
   cursor: pointer;
-  color: var(--ds-color-gray-light-300);
+  color: color-mix(in srgb, var(--ds-text-on-brand-solid) 70%, transparent);
   font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 500;
@@ -260,12 +260,12 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 }
 
 .ds-hnav__crumb-btn:hover {
-  background: var(--ds-semantic-bg-brand-solid-hover);
+  background: var(--ds-bg-brand-solid-hover);
 }
 
 .ds-hnav__crumb-btn--active {
-  background: rgba(5, 96, 51, 0.9);
-  color: var(--ds-color-gray-light-200, #eaecf0);
+  background: color-mix(in srgb, var(--ds-bg-brand-solid) 90%, transparent);
+  color: var(--ds-text-on-brand-solid);
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: 600;
 }
@@ -308,11 +308,11 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   align-items: center;
   gap: var(--ds-spacing-xs);
   padding: var(--ds-spacing-md) var(--ds-spacing-lg);
-  background: rgba(5, 96, 51, 0.9);
-  border: 1px solid var(--ds-color-brand-600, #056033);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-xs);
-  color: var(--ds-color-gray-light-200, #eaecf0);
+  background: color-mix(in srgb, var(--ds-bg-brand-solid) 90%, transparent);
+  border: 1px solid var(--ds-border-brand-solid);
+  border-radius: var(--ds-radius-control);
+  box-shadow: var(--ds-elevation-control);
+  color: var(--ds-text-on-brand-solid);
   font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 600;
@@ -323,7 +323,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 }
 
 .ds-hnav__learn-btn:hover {
-  background: var(--ds-semantic-bg-brand-solid-hover);
+  background: var(--ds-bg-brand-solid-hover);
 }
 
 /* ── Boutons icônes ───────────────────────────────────────────────── */
@@ -336,13 +336,13 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   background: transparent;
   border: none;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.85);
+  color: color-mix(in srgb, var(--ds-text-on-brand-solid) 85%, transparent);
   transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-hnav__icon-btn:hover,
 .ds-hnav__icon-btn--open {
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--ds-text-on-brand-solid) 10%, transparent);
 }
 
 /* ── Notifications ────────────────────────────────────────────────── */
@@ -356,9 +356,9 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   left: 22px;
   width: 6px;
   height: 6px;
-  border-radius: var(--ds-radius-full);
-  background: var(--ds-semantic-fg-error-primary, #d92d20);
-  border: 1.5px solid var(--ds-color-gray-light-200, #eaecf0);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-bg-error-solid);
+  border: 1.5px solid var(--ds-border-subtle);
 }
 
 /* ── Avatar utilisateur ───────────────────────────────────────────── */
@@ -367,7 +367,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   border: none;
   cursor: pointer;
   padding: 0;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   flex-shrink: 0;
 }
 

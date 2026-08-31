@@ -125,14 +125,14 @@ function onKeydown(e: KeyboardEvent, i: number) {
   display: flex;
   align-items: center;
   width: 100%;
-  background-color: var(--ds-semantic-bg-secondary);
-  border: 1px solid var(--ds-semantic-border-secondary);
+  background-color: var(--ds-bg-neutral-subtle);
+  border: 1px solid var(--ds-border-subtle);
   gap: 4px;
 }
 
 .ds-tabs--md {
   padding: 6px;
-  border-radius: var(--ds-radius-xl);
+  border-radius: var(--ds-radius-surface);
 }
 
 .ds-tabs--sm {
@@ -145,9 +145,9 @@ function onKeydown(e: KeyboardEvent, i: number) {
   position: absolute;
   left: 0;
   top: 0;
-  border-radius: var(--ds-radius-sm);
-  background-color: var(--ds-semantic-bg-primary);
-  box-shadow: var(--ds-shadow-sm);
+  border-radius: var(--ds-radius-inner);
+  background-color: var(--ds-bg-default);
+  box-shadow: var(--ds-elevation-surface);
   pointer-events: none;
   z-index: 0;
   /* No transition until after first paint to prevent mount jump */
@@ -173,8 +173,8 @@ function onKeydown(e: KeyboardEvent, i: number) {
   padding: 8px 12px;
   background: transparent;
   border: none;
-  border-radius: var(--ds-radius-sm);
-  color: var(--ds-semantic-text-quarterary);
+  border-radius: var(--ds-radius-inner);
+  color: var(--ds-text-subtlest);
   cursor: pointer;
   outline: none;
   transition: color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
@@ -190,13 +190,13 @@ function onKeydown(e: KeyboardEvent, i: number) {
 
 /* ── Hover — subtle tint, text promotes, clearly lighter than active ── */
 .ds-tabs__tab:not(.ds-tabs__tab--active):hover {
-  background-color: rgba(255, 255, 255, 0.5);
-  color: var(--ds-semantic-text-secondary);
+  background-color: color-mix(in srgb, var(--ds-bg-default) 50%, transparent);
+  color: var(--ds-text-default);
 }
 
 /* ── Active — indicator provides the card; button carries text color ── */
 .ds-tabs__tab--active {
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
 }
 
 /* ── Focus (inactive) — ring only, no extra bg needed ─────────────── */

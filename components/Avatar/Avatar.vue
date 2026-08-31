@@ -126,13 +126,13 @@ const showInitials = computed(() => !props.src && !!props.initials)
 /* ── Shell ────────────────────────────────────────────────────────── */
 .ds-avatar {
   position: relative;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   overflow: visible;
-  background-color: var(--ds-color-gray-light-100);
+  background-color: var(--ds-bg-neutral);
 }
 
 /* ── Image ────────────────────────────────────────────────────────── */
@@ -142,7 +142,7 @@ const showInitials = computed(() => !props.src && !!props.initials)
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   pointer-events: none;
 }
 
@@ -151,7 +151,7 @@ const showInitials = computed(() => !props.src && !!props.initials)
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: 600;
   line-height: 1.5;
-  color: var(--ds-color-gray-light-500);
+  color: var(--ds-text-subtlest);
   user-select: none;
   position: relative;
   z-index: 1;
@@ -161,14 +161,14 @@ const showInitials = computed(() => !props.src && !!props.initials)
 .ds-avatar__placeholder {
   width: 55%;
   height: 55%;
-  color: var(--ds-color-gray-light-400);
+  color: var(--ds-text-subtlest);
 }
 
 /* ── Contrast border ──────────────────────────────────────────────── */
 .ds-avatar__border {
   position: absolute;
   inset: 0;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   border: 0.75px solid rgba(0, 0, 0, 0.08);
   pointer-events: none;
   z-index: 2;
@@ -179,8 +179,8 @@ const showInitials = computed(() => !props.src && !!props.initials)
   position: absolute;
   bottom: 0;
   right: 0;
-  border-radius: var(--ds-radius-full);
-  border: 1.5px solid var(--ds-semantic-bg-primary);
+  border-radius: var(--ds-radius-pill);
+  border: 1.5px solid var(--ds-bg-default);
   z-index: 3;
   display: flex;
   align-items: center;
@@ -189,7 +189,7 @@ const showInitials = computed(() => !props.src && !!props.initials)
 }
 
 .ds-avatar__status--online {
-  background-color: var(--ds-semantic-fg-success-secondary, #17b26a);
+  background-color: var(--ds-bg-success-solid);
   transform: translate(15%, 15%);
 }
 
@@ -199,7 +199,7 @@ const showInitials = computed(() => !props.src && !!props.initials)
 }
 
 .ds-avatar__status--verified {
-  background-color: var(--ds-color-brand-600);
+  background-color: var(--ds-bg-brand-solid);
   transform: translate(15%, 15%);
 }
 

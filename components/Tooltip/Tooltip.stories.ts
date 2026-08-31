@@ -3,9 +3,9 @@ import Tooltip from './Tooltip.vue'
 import TooltipDocs from './Tooltip.mdx'
 
 const meta: Meta<typeof Tooltip> = {
-  title: 'Components/Tooltip',
+  title: 'Superposition/Tooltip',
   component: Tooltip,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
   parameters: {
     layout: 'centered',
     docs: { page: TooltipDocs },

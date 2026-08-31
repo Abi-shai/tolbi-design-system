@@ -15,7 +15,7 @@ const meta: Meta = {
     components: { EffectCard },
     setup: () => ({ tokens }),
     template: `
-      <div style="padding: 3rem 2rem; display: flex; flex-wrap: wrap; gap: 3rem; align-items: flex-end; background: var(--ds-semantic-bg-secondary, #f9fafb);">
+      <div style="padding: 3rem 2rem; display: flex; flex-wrap: wrap; gap: 3rem; align-items: flex-end; background: var(--ds-bg-neutral-subtle, #f9fafb);">
         <EffectCard
           v-for="token in tokens"
           :key="token.name"

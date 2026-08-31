@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import Scrollbar from './Scrollbar.vue'
 
 const meta: Meta<typeof Scrollbar> = {
-  title: 'Primitives/Scrollbar',
+  title: 'Structure/Scrollbar',
   component: Scrollbar,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'wip'],
   parameters: {
     layout: 'centered',
     docs: {

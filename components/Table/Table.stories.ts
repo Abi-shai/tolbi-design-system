@@ -7,9 +7,9 @@ import { Badge } from '../Badge'
 import { Button } from '../Button'
 
 const meta: Meta<typeof Table> = {
-  title: 'Components/Table',
+  title: 'Données/Table',
   component: Table,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'wip'],
   parameters: {
     layout: 'padded',
     docs: {
@@ -77,8 +77,8 @@ export const Default: Story = {
           <div style="display:flex;align-items:center;gap:12px;min-width:0">
             <Avatar size="sm" :initials="initials(row.name)" />
             <div style="min-width:0">
-              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.875rem;font-weight:500;color:var(--ds-semantic-text-primary);line-height:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div>
-              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.75rem;color:var(--ds-semantic-text-tertiary);line-height:1.125rem">{{ row.handle }}</div>
+              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.875rem;font-weight:500;color:var(--ds-text-strong);line-height:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div>
+              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.75rem;color:var(--ds-text-subtle);line-height:1.125rem">{{ row.handle }}</div>
             </div>
           </div>
         </template>
@@ -145,8 +145,8 @@ export const WithPagination: Story = {
           <div style="display:flex;align-items:center;gap:12px;min-width:0">
             <Avatar size="sm" :initials="initials(row.name)" />
             <div style="min-width:0">
-              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.875rem;font-weight:500;color:var(--ds-semantic-text-primary);line-height:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div>
-              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.75rem;color:var(--ds-semantic-text-tertiary);line-height:1.125rem">{{ row.handle }}</div>
+              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.875rem;font-weight:500;color:var(--ds-text-strong);line-height:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div>
+              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.75rem;color:var(--ds-text-subtle);line-height:1.125rem">{{ row.handle }}</div>
             </div>
           </div>
         </template>

@@ -107,19 +107,19 @@ const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
   border: none;
   background: transparent;
   cursor: pointer;
-  color: var(--ds-semantic-fg-quinary);
+  color: var(--ds-text-subtlest);
   transition: color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
 }
 
 .ds-help-icon__btn:hover,
 .ds-help-icon__btn--open {
-  color: var(--ds-semantic-fg-quinary-hover);
+  color: var(--ds-text-subtle);
 }
 
 .ds-help-icon__btn:focus-visible {
-  outline: 2px solid var(--ds-semantic-border-brand);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--ds-focus-ring-brand);
 }
 
 .ds-help-icon__tooltip {

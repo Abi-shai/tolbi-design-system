@@ -20,6 +20,15 @@ Before working on any component, read:
   returns `null` outside one, so they still work standalone). Invalidity is derived from the presence
   of `error`, never declared. Two words exist for helper copy and they are not interchangeable:
   `FormField.hint` sits outside the control, `<control>.supportingText` inside or beside it.
+- **ADR-0009**: The semantic layer is a **vocabulary**, not a swap seam — code owns semantic names,
+  Figma owns primitives. Three groups only (`text`, `bg`, `border`; `fg` is deleted). Prominence is
+  emphasis (`strong/default/subtle/subtlest`), never an ordinal. `-solid` marks a fill on which
+  `text-*` is illegible, so every fill *and every tint* has an exact on-colour partner
+  (`--ds-text-on-{exact bg suffix}`). States are a closed set of three (`-hover`, `-selected`,
+  `-disabled`), always last. Tones are `error/warning/success/neutral`; `brand` is interactive-only.
+  The tier marker leaves the name: `--ds-bg-brand-solid`, not `--ds-semantic-bg-brand-solid`. A token
+  is admitted under exactly one of four clauses — contract, ground, state, decorative — named in its
+  `description`.
 
 ## Architecture
 

@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { Checkbox } from '../Checkbox'
 import { HelpIcon } from '../HelpIcon'
 import { Scrollbar } from '../Scrollbar'
+import { Skeleton } from '../Skeleton'
 import { Pagination } from '../Pagination'
 
 export interface TableColumn {
@@ -74,6 +75,19 @@ function colStyle(col: TableColumn) {
   return styles
 }
 
+/*
+ * Reproduces the widths the old nth-child rules produced, including their
+ * precedence: later selectors won, so 5n beats 4n beats 3n beats 2n.
+ * Varying the width is what stops the skeleton reading as a striped block.
+ */
+function skeletonWidth(i: number): string {
+  if (i % 5 === 0) return '55%'
+  if (i % 4 === 0) return '80%'
+  if (i % 3 === 0) return '45%'
+  if (i % 2 === 0) return '75%'
+  return '60%'
+}
+
 const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 </script>
 
@@ -110,10 +124,10 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
           <template v-if="loading">
             <tr v-for="i in loadingRows" :key="`skeleton-${i}`" class="ds-table__row">
               <td v-if="selectable" class="ds-table__td ds-table__td--select">
-                <div class="ds-table__skeleton ds-table__skeleton--check" />
+                <Skeleton variant="rect" width="16px" height="16px" />
               </td>
               <td v-for="col in columns" :key="col.key" class="ds-table__td">
-                <div class="ds-table__skeleton" />
+                <Skeleton variant="text" :width="skeletonWidth(i)" height="14px" />
               </td>
             </tr>
           </template>
@@ -167,10 +181,10 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 /* ── Container ─────────────────────────────────────────────────────── */
 .ds-table-container {
   width: 100%;
-  border: 1px solid var(--ds-semantic-border-secondary);
-  border-radius: var(--ds-radius-xl);
-  box-shadow: var(--ds-shadow-sm);
-  background-color: var(--ds-semantic-bg-primary);
+  border: 1px solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-surface);
+  box-shadow: var(--ds-elevation-surface);
+  background-color: var(--ds-bg-default);
   overflow: hidden;
 }
 
@@ -183,13 +197,13 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 
 /* ── Header row ────────────────────────────────────────────────────── */
 .ds-table__header-row {
-  background-color: var(--ds-semantic-bg-secondary);
+  background-color: var(--ds-bg-neutral-subtle);
 }
 
 /* ── Header cell ───────────────────────────────────────────────────── */
 .ds-table__th {
   padding: 12px 24px;
-  border-bottom: 1px solid var(--ds-semantic-border-secondary);
+  border-bottom: 1px solid var(--ds-border-subtle);
   text-align: left;
   white-space: nowrap;
   vertical-align: middle;
@@ -214,13 +228,13 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
   font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--ds-semantic-text-tertiary);
+  color: var(--ds-text-subtle);
   line-height: 1.125rem;
 }
 
 /* ── Data row ──────────────────────────────────────────────────────── */
 .ds-table__row {
-  border-bottom: 1px solid var(--ds-semantic-border-secondary);
+  border-bottom: 1px solid var(--ds-border-subtle);
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
@@ -229,15 +243,15 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 }
 
 .ds-table__row:hover {
-  background-color: var(--ds-semantic-bg-primary-hover);
+  background-color: var(--ds-bg-hover);
 }
 
 .ds-table__row--selected {
-  background-color: var(--ds-semantic-bg-brand-primary);
+  background-color: var(--ds-bg-selected);
 }
 
 .ds-table__row--selected:hover {
-  background-color: var(--ds-semantic-bg-brand-secondary);
+  background-color: var(--ds-bg-selected-hover);
 }
 
 /* ── Data cell ─────────────────────────────────────────────────────── */
@@ -260,7 +274,7 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
   padding: 48px 24px;
   font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
-  color: var(--ds-semantic-text-tertiary);
+  color: var(--ds-text-subtle);
 }
 
 /* ── Default cell text ─────────────────────────────────────────────── */
@@ -268,7 +282,7 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
   font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 400;
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
   line-height: 1.25rem;
   display: block;
   overflow: hidden;
@@ -277,34 +291,5 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 }
 
 
-/* ── Skeleton ──────────────────────────────────────────────────────── */
-@keyframes ds-skeleton-shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.ds-table__skeleton {
-  height: 14px;
-  width: 60%;
-  border-radius: var(--ds-radius-sm);
-  background: linear-gradient(
-    90deg,
-    var(--ds-semantic-bg-secondary) 25%,
-    var(--ds-semantic-bg-primary-hover) 50%,
-    var(--ds-semantic-bg-secondary) 75%
-  );
-  background-size: 400% 100%;
-  animation: ds-skeleton-shimmer 1.6s ease-in-out infinite;
-}
-
-.ds-table__skeleton--check {
-  width: 16px;
-  height: 16px;
-  border-radius: var(--ds-radius-xs);
-}
-
-.ds-table__row:nth-child(2n) .ds-table__skeleton { width: 75%; }
-.ds-table__row:nth-child(3n) .ds-table__skeleton { width: 45%; }
-.ds-table__row:nth-child(4n) .ds-table__skeleton { width: 80%; }
-.ds-table__row:nth-child(5n) .ds-table__skeleton { width: 55%; }
+/* Skeleton geometry and shimmer now live in the Skeleton component. */
 </style>

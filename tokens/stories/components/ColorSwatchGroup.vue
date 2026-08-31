@@ -42,7 +42,7 @@ defineProps<Props>()
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--ds-semantic-text-tertiary, #475467);
+  color: var(--ds-text-subtle, #475467);
 }
 
 .group__swatches { display: flex; flex-wrap: wrap; gap: 0.75rem; }
@@ -60,20 +60,20 @@ defineProps<Props>()
   font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--ds-semantic-text-primary, #101828);
+  color: var(--ds-text-strong, #101828);
 }
 
 .swatch__value {
   margin: 0;
   font-family: monospace;
   font-size: 0.7rem;
-  color: var(--ds-semantic-text-tertiary, #475467);
+  color: var(--ds-text-subtle, #475467);
 }
 
 .swatch__var {
   margin: 0;
   font-family: monospace;
   font-size: 0.6rem;
-  color: var(--ds-semantic-text-quarterary, #667085);
+  color: var(--ds-text-subtlest, #667085);
 }
 </style>

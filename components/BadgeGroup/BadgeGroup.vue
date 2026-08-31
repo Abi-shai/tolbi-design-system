@@ -72,39 +72,39 @@ const emit = defineEmits<{
 <style scoped>
 /* ── Color tokens ─────────────────────────────────────────────────── */
 .ds-badge-group {
-  --bg-default:  var(--ds-color-brand-50);
-  --bg-hover:    var(--ds-color-brand-100);
-  --border:      var(--ds-color-brand-200);
-  --text:        var(--ds-color-brand-700);
-  --pill-border: var(--ds-color-brand-200);
+  --bg-default:  var(--ds-bg-brand-subtle);
+  --bg-hover:    var(--ds-bg-brand-subtle-hover);
+  --border:      var(--ds-border-on-brand-subtle);
+  --text:        var(--ds-text-on-brand-subtle);
+  --pill-border: var(--ds-border-on-brand-subtle);
 }
 .ds-badge-group--error   {
-  --bg-default:  var(--ds-color-error-50);
-  --bg-hover:    var(--ds-color-error-100);
-  --border:      var(--ds-color-error-200);
-  --text:        var(--ds-color-error-700);
-  --pill-border: var(--ds-color-error-200);
+  --bg-default:  var(--ds-bg-error-subtle);
+  --bg-hover:    var(--ds-bg-error-subtle-hover);
+  --border:      var(--ds-border-on-error-subtle);
+  --text:        var(--ds-text-on-error-subtle);
+  --pill-border: var(--ds-border-on-error-subtle);
 }
 .ds-badge-group--warning {
-  --bg-default:  var(--ds-color-warning-50);
-  --bg-hover:    var(--ds-color-warning-100);
-  --border:      var(--ds-color-warning-200);
-  --text:        var(--ds-color-warning-700);
-  --pill-border: var(--ds-color-warning-200);
+  --bg-default:  var(--ds-bg-warning-subtle);
+  --bg-hover:    var(--ds-bg-warning-subtle-hover);
+  --border:      var(--ds-border-on-warning-subtle);
+  --text:        var(--ds-text-on-warning-subtle);
+  --pill-border: var(--ds-border-on-warning-subtle);
 }
 .ds-badge-group--success {
-  --bg-default:  var(--ds-color-success-50);
-  --bg-hover:    var(--ds-color-success-100);
-  --border:      var(--ds-color-success-200);
-  --text:        var(--ds-color-success-700);
-  --pill-border: var(--ds-color-success-200);
+  --bg-default:  var(--ds-bg-success-subtle);
+  --bg-hover:    var(--ds-bg-success-subtle-hover);
+  --border:      var(--ds-border-on-success-subtle);
+  --text:        var(--ds-text-on-success-subtle);
+  --pill-border: var(--ds-border-on-success-subtle);
 }
 .ds-badge-group--gray {
-  --bg-default:  var(--ds-color-gray-light-50);
-  --bg-hover:    var(--ds-color-gray-light-100);
-  --border:      var(--ds-color-gray-light-200);
-  --text:        var(--ds-semantic-fg-secondary);
-  --pill-border: var(--ds-color-gray-light-200);
+  --bg-default:  var(--ds-bg-neutral-subtle);
+  --bg-hover:    var(--ds-bg-neutral-subtle-hover);
+  --border:      var(--ds-border-subtle);
+  --text:        var(--ds-text-default);
+  --pill-border: var(--ds-border-subtle);
 }
 
 /* ── Base ─────────────────────────────────────────────────────────── */
@@ -112,7 +112,7 @@ const emit = defineEmits<{
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--border);
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   background-color: var(--bg-default);
   color: var(--text);
   font-family: var(--ds-typography-font-family-poppins);
@@ -153,8 +153,8 @@ const emit = defineEmits<{
   align-items: center;
   gap: 4px;
   border: 1px solid var(--pill-border);
-  border-radius: var(--ds-radius-full);
-  background-color: var(--ds-semantic-bg-primary);
+  border-radius: var(--ds-radius-pill);
+  background-color: var(--ds-bg-default);
   color: var(--text);
   padding: 2px 8px;
   white-space: nowrap;
