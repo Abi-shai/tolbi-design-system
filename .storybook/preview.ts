@@ -9,10 +9,15 @@ const preview: Preview = {
       // Must be inline — Storybook statically analyses this to build the index,
       // so it cannot resolve a variable reference.
       //
-      // The design system reads bottom-up: the decisions first (Foundations),
-      // then the atoms carrying them (Primitives), then the parts that only
-      // exist inside a parent (Subcomponents), then assembled Components.
-      // Anything unlisted sorts alphabetically after its listed siblings.
+      // Two tiers, then nine functional categories. The categories are
+      // alphabetical on purpose: any "importance" ordering is a judgment that
+      // gets argued, and predictability is the point. Atlassian orders its own
+      // categories the same way.
+      //
+      // There is deliberately no atomic-level tier for components. "How
+      // composed is it?" is a maintainer's question; "where is the thing that
+      // does X?" is the question someone browsing actually has. The primitive
+      // rule survives as the `primitive` tag, not as an address (ADR-0007).
       storySort: {
         order: [
           'Introduction',
@@ -26,9 +31,15 @@ const preview: Preview = {
             'Effects', ['Shadows', 'Focus Rings', 'Backdrop Blurs'],
             'Motion',
           ],
-          'Primitives',
-          'Subcomponents',
-          'Components',
+          'Actions',
+          'Données',
+          'Étiquettes',
+          'Feedback & chargement',
+          'Identité & média',
+          'Navigation',
+          'Saisie',
+          'Structure',
+          'Superposition',
         ],
       },
     },

@@ -36,6 +36,9 @@ export type { TooltipArrow } from './Tooltip'
 export { HelpIcon } from './HelpIcon'
 export type { HelpPlacement } from './HelpIcon'
 
+export { FormField, useFormField, FORM_FIELD_KEY } from './FormField'
+export type { FormFieldContext } from './FormField'
+
 export { InputField } from './InputField'
 export type { InputFieldSize } from './InputField'
 
@@ -69,7 +72,7 @@ export { ProgressCircle } from './ProgressCircle'
 export type { ProgressCircleSize, ProgressCircleShape } from './ProgressCircle'
 
 export { Slider } from './Slider'
-export type { SliderLabel } from './Slider'
+export type { SliderValueDisplay } from './Slider'
 
 export { Tabs } from './Tabs'
 export type { TabsSize, TabsItem } from './Tabs'
@@ -84,3 +87,52 @@ export type { TableColumn, TableRow } from './Table'
 
 export { Breadcrumbs } from './Breadcrumbs'
 export type { BreadcrumbsItem } from './Breadcrumbs'
+
+/* ── Primitives issues de l'inventaire produit (ADR-0006) ──────────── */
+
+export { Card } from './Card'
+export type { CardVariant, CardPadding } from './Card'
+
+export { Spinner } from './Spinner'
+
+export { Skeleton } from './Skeleton'
+export type { SkeletonVariant } from './Skeleton'
+
+export { MetricValue } from './MetricValue'
+export type { MetricTrend, MetricSize } from './MetricValue'
+
+export { DetailRow } from './DetailRow'
+export type { DetailRowLayout } from './DetailRow'
+
+export { Callout } from './Callout'
+export type { CalloutTone } from './Callout'
+
+export { EmptyState } from './EmptyState'
+export type { EmptyStateSize } from './EmptyState'
+
+export { Toast } from './Toast'
+export type { ToastTone } from './Toast'
+
+export { StatTile } from './StatTile'
+
+export { AvatarGroup } from './AvatarGroup'
+export type { AvatarGroupItem } from './AvatarGroup'
+
+export { PasswordField } from './PasswordField'
+export type { PasswordRule } from './PasswordField'
+
+export { PhoneField, dialCodes, dialCodeFor, dialCodesFor } from './PhoneField'
+export type { DialCode } from './PhoneField'
+
+export { FileDropzone } from './FileDropzone'
+export type { DropzoneFile } from './FileDropzone'
+
+export { ResizableSplit } from './ResizableSplit'
+
+export { ChartTooltip } from './ChartTooltip'
+export type { ChartTooltipSeries } from './ChartTooltip'
+
+export { ChartLegend } from './ChartLegend'
+export type { ChartLegendItem, ChartLegendShape } from './ChartLegend'
+
+export { ChartFrame } from './ChartFrame'
