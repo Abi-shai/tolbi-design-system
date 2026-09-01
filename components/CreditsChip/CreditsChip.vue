@@ -32,9 +32,9 @@ const goodLabel = computed(() =>
   <div v-if="isCritical" class="ds-credits-chip ds-credits-chip--critical">
     <!-- Badge rouge -->
     <div class="ds-credits-chip__badge ds-credits-chip__badge--error">
-      <span class="ds-credits-chip__avatar-wrap">
-        <img :src="creditsIconSrc" alt="" class="ds-credits-chip__avatar-img" />
-        <span class="ds-credits-chip__avatar-border" aria-hidden="true" />
+      <span class="ds-credits-chip__coin">
+        <img :src="creditsIconSrc" alt="" class="ds-credits-chip__coin-img" />
+        <span class="ds-credits-chip__coin-ring" aria-hidden="true" />
       </span>
       <!-- Texte inline : "Plus que [N] crédits disponibles" -->
       <p class="ds-credits-chip__text ds-credits-chip__text--inline">
@@ -55,9 +55,9 @@ const goodLabel = computed(() =>
 
   <!-- État normal (good) : badge jaune seul -->
   <div v-else class="ds-credits-chip__badge ds-credits-chip__badge--good">
-    <span class="ds-credits-chip__avatar-wrap">
-      <img :src="creditsIconSrc" alt="" class="ds-credits-chip__avatar-img" />
-      <span class="ds-credits-chip__avatar-border" aria-hidden="true" />
+    <span class="ds-credits-chip__coin">
+      <img :src="creditsIconSrc" alt="" class="ds-credits-chip__coin-img" />
+      <span class="ds-credits-chip__coin-ring" aria-hidden="true" />
     </span>
     <!-- Content : flex gap-4px entre le count et le label -->
     <span class="ds-credits-chip__content">
@@ -103,8 +103,8 @@ const goodLabel = computed(() =>
   background: var(--ds-bg-default);
 }
 
-/* ── Mini avatar ──────────────────────────────────────────────────── */
-.ds-credits-chip__avatar-wrap {
+/* ── Credits coin — a currency glyph, not an Avatar (ADR-0016) ────── */
+.ds-credits-chip__coin {
   position: relative;
   width: 17.331px;
   height: 17.331px;
@@ -113,7 +113,7 @@ const goodLabel = computed(() =>
   flex-shrink: 0;
 }
 
-.ds-credits-chip__avatar-img {
+.ds-credits-chip__coin-img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -123,7 +123,7 @@ const goodLabel = computed(() =>
   pointer-events: none;
 }
 
-.ds-credits-chip__avatar-border {
+.ds-credits-chip__coin-ring {
   position: absolute;
   inset: 0;
   border-radius: var(--ds-radius-pill);

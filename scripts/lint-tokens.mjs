@@ -25,12 +25,9 @@ const SEMANTIC_NAMES = new Set(
   Object.entries(semantic).flatMap(([g, ts]) => Object.keys(ts).map((t) => `${g}-${t}`)),
 )
 
-/** ADR-0015 tokenised the avatar hairlines as --ds-border-inset. What remains is
- *  the nav's drop shadow, whose geometry matches no step on the shadow ramp. */
-const COLOUR_LITERAL_ALLOW = [
-  ['HorizontalNavigation/HorizontalNavigation.vue', 'rgba(0, 0, 0, 0.12)'],
-  ['HorizontalNavigation/HorizontalNavigation.vue', 'rgba(0, 0, 0, 0.06)'],
-]
+/** Empty, and that is the point: every colour literal in the catalogue now has
+ *  a token. ADR-0015 took the avatar hairlines, ADR-0016 the nav's drop shadow. */
+const COLOUR_LITERAL_ALLOW = []
 
 function walk(dir, out = []) {
   for (const n of readdirSync(dir)) {

@@ -85,11 +85,8 @@ offset became `calc(-1 * var(--ds-spacing-md))`.
 
 ## Still open
 
-- **`CreditsChip` hand-rolls a mini avatar** — `__avatar-wrap`, `__avatar-img`, `__avatar-border`,
-  duplicating `Avatar`'s exact structure. That is an ADR-0001 violation and the reason the hairline
-  appeared twice. It is **blocked**: the mini avatar is `17.331px` and `Avatar`'s smallest size is
-  24px, so fixing it needs an `Avatar` size below `xs` — and `17.331px` with a `0.361px` border is a
-  raw Figma export that wants a decision of its own before it becomes a token.
+- ~~**`CreditsChip` hand-rolls a mini avatar**~~ — **withdrawn** by ADR-0016. The image is a currency glyph, not a person; ADR-0001 does not reach it. The claim rested on misleading class names, now renamed.
+
 - **The mobile type scale has never been exercised** — deliberately deferred.
-- **`HorizontalNavigation`'s drop shadow** stays literal: its geometry matches no step on the shadow
-  ramp.
+- ~~**`HorizontalNavigation`'s drop shadow**~~ — closed by ADR-0016: it was drift, not an exception. Now `elevation-overlay`.
+

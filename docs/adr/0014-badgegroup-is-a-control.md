@@ -62,6 +62,5 @@ own files. Shipping two breaks where one would do is the cost that argument was 
 
 ## Still open
 
-- **BadgeGroup is always interactive.** A purely decorative announcement now has no non-interactive
-  form. Nothing needs one today; if something does, the answer is a prop, not a `<div>` that emits
-  `click`.
+- ~~**BadgeGroup is always interactive.**~~ — examined in ADR-0016 and deliberately left until something asks.
+

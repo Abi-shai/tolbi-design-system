@@ -242,5 +242,6 @@ uses is already semantic. That is the divergence rule working, not a gap.
 - ~~**The four `blur-*` tokens**~~ — closed by ADR-0015: deleted. The scrim does not blur.
 - ~~**`BadgeGroup.color` still accepts `brand`**~~ — closed by ADR-0014, which also reverses the
   "leave BadgeGroup alone" decision above: `color` became `tone` and `gray` became `neutral`.
-- **The numbered categorical set**, deferred above until something renders a data series.
+- ~~**The numbered categorical set**~~ — closed by ADR-0016. Deferring on "no consumer" was the wrong test: the design system ships no renderer, so the condition could never be met.
+
 - ~~**Radius has no agreed role for four of its steps**~~ — closed by ADR-0013.

@@ -67,6 +67,10 @@ Before working on any component, read:
   (zero consumers): the scrim does not blur. `--ds-border-inset` is the avatar hairline (8% of
   gray-950 — 8% black differs by 2/255). An ADR's *Still open* section is a claim about the present
   and decays: two entries were already closed by later work.
+- **ADR-0016**: `--ds-chart-categorical-{1..7}` is the data-series palette, ordered by **measured
+  ΔE** (greedy max-min), so the first N series are always the most distinguishable. **Five is the
+  comfortable ceiling** — past that, aggregate rather than reach down the ramp. Charts never use
+  `brand`, which is interactive-only. The linter's colour-literal allowlist is now **empty**.
 
 ## Architecture
 

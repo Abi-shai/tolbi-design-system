@@ -37,6 +37,14 @@ await Promise.all([
   buildTokenFile('tokens/src/color/primitives.json',    'colors.css'),
   buildTokenFile('tokens/src/typography/primitives.json', 'typography.css'),
   buildTokenFile('tokens/src/effect/shadows.json',      'shadows.css'),
+
+  // ADR-0016: an ordered categorical series palette over the display hues.
+  // Ordered max-min by ΔE, so the first N series are always the most distinct.
+  buildTokenFile(
+    ['tokens/src/color/primitives.json', 'tokens/src/color/chart.json'],
+    'chart.css',
+    { filter: (token) => token.path[0] === 'chart', outputReferences: true },
+  ),
   buildTokenFile('tokens/src/effect/focus-rings.json',  'focus-rings.css'),
   buildTokenFile('tokens/src/effect/blurs.json',        'blurs.css'),
   buildTokenFile('tokens/src/spacing/primitives.json',  'space.css'),
@@ -148,7 +156,7 @@ const tokenFiles = [
   'colors', 'typography', 'type-roles', 'type-roles-mobile',
   'radius', 'space', 'spacing', 'widths', 'containers',
   'font-roles', 'font-roles-mobile', 'control',
-  'shadows', 'elevation', 'focus-rings', 'semantic', 'motion',
+  'shadows', 'elevation', 'focus-rings', 'semantic', 'chart', 'motion',
 ]
 const combined = tokenFiles
   .map(f => readFileSync(`tokens/dist/${f}.css`, 'utf8'))

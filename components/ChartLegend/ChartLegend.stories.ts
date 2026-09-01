@@ -4,9 +4,9 @@ import { ref } from 'vue'
 import ChartLegend from './ChartLegend.vue'
 
 const SERIES = [
-  { key: 'observed', label: 'Rendement observé', color: 'var(--ds-color-brand-500)', value: '4,82' },
-  { key: 'modelled', label: 'Modélisé', color: 'var(--ds-color-accent-400)', value: '4,41' },
-  { key: 'baseline', label: 'Référence', color: 'var(--ds-color-gray-light-400)', value: '4,10' },
+  { key: 'observed', label: 'Rendement observé', color: 'var(--ds-chart-categorical-1)', value: '4,82' },
+  { key: 'modelled', label: 'Modélisé', color: 'var(--ds-chart-categorical-2)', value: '4,41' },
+  { key: 'baseline', label: 'Référence', color: 'var(--ds-chart-categorical-5)', value: '4,10' },
 ]
 
 const meta: Meta<typeof ChartLegend> = {

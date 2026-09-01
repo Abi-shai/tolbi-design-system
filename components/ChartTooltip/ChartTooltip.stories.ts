@@ -31,7 +31,7 @@ const meta: Meta<typeof ChartTooltip> = {
     tag: 'Mesuré',
     value: '4,82',
     unit: 't/ha',
-    series: [{ label: 'Rendement observé', color: 'var(--ds-color-brand-500)' }],
+    series: [{ label: 'Rendement observé', color: 'var(--ds-chart-categorical-1)' }],
   },
 }
 
@@ -44,9 +44,9 @@ export const MultipleSeries: Story = {
   name: 'Plusieurs séries',
   args: {
     series: [
-      { label: 'Observé', value: '4,82', color: 'var(--ds-color-brand-500)' },
-      { label: 'Modélisé', value: '4,41', color: 'var(--ds-color-accent-400)' },
-      { label: 'Référence', value: '4,10', color: 'var(--ds-color-gray-light-400)' },
+      { label: 'Observé', value: '4,82', color: 'var(--ds-chart-categorical-1)' },
+      { label: 'Modélisé', value: '4,41', color: 'var(--ds-chart-categorical-2)' },
+      { label: 'Référence', value: '4,10', color: 'var(--ds-chart-categorical-5)' },
     ],
   },
 }

@@ -9,7 +9,7 @@ const FAKE_PLOT = `
     <polyline
       points="0,80 40,62 80,68 120,40 160,46 200,24 240,30 300,12"
       fill="none"
-      stroke="var(--ds-color-brand-500)"
+      stroke="var(--ds-chart-categorical-1)"
       stroke-width="2"
       vector-effect="non-scaling-stroke"
     />
@@ -72,8 +72,8 @@ export const WithLegend: Story = {
       args,
       FAKE_PLOT,
       series: [
-        { key: 'observed', label: 'Observé', color: 'var(--ds-color-brand-500)' },
-        { key: 'modelled', label: 'Modélisé', color: 'var(--ds-color-accent-400)' },
+        { key: 'observed', label: 'Observé', color: 'var(--ds-chart-categorical-1)' },
+        { key: 'modelled', label: 'Modélisé', color: 'var(--ds-chart-categorical-2)' },
       ],
     }),
     template: `

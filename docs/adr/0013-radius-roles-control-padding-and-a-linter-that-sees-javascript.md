@@ -109,5 +109,5 @@ verified against a deliberately broken file.
 ## Still open
 
 - ~~**Nine bespoke spacing literals**~~ — reviewed and recorded in ADR-0015; one had a token after all.
-- **The suppression list is three components long.** That is the right size today; if it grows, the
-  `no-literal-dimension-js` rule is mis-scoped rather than the components being wrong.
+- ~~**The suppression list is three components long.**~~ — examined in ADR-0016 and deliberately left: a tripwire, not a task.
+

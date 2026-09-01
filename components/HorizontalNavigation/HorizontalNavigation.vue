@@ -371,6 +371,6 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   top: calc(100% + 8px);
   right: 0;
   z-index: 200;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--ds-elevation-overlay);
 }
 </style>
