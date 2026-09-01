@@ -171,7 +171,7 @@ function display(v: number): string {
   pointer-events: all;
   width: 24px;
   height: 24px;
-  margin-top: -8px;
+  margin-top: calc(-1 * var(--ds-spacing-md));
   border-radius: 50%;
   background: var(--ds-bg-default);
   border: 2px solid var(--ds-bg-brand-solid);

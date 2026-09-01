@@ -127,7 +127,7 @@ const goodLabel = computed(() =>
   position: absolute;
   inset: 0;
   border-radius: var(--ds-radius-pill);
-  border: 0.361px solid rgba(0, 0, 0, 0.08);
+  border: 0.361px solid var(--ds-border-inset);
   pointer-events: none;
 }
 

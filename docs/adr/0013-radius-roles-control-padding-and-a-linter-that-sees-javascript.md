@@ -108,8 +108,6 @@ verified against a deliberately broken file.
 
 ## Still open
 
-- **Nine bespoke spacing literals** survive — chip micro-padding (`3px`), a menu row's `9px 10px`,
-  and negative offsets. They are neither layout rhythm nor control padding, and a third scale for
-  nine values is not worth naming.
+- ~~**Nine bespoke spacing literals**~~ — reviewed and recorded in ADR-0015; one had a token after all.
 - **The suppression list is three components long.** That is the right size today; if it grows, the
   `no-literal-dimension-js` rule is mis-scoped rather than the components being wrong.

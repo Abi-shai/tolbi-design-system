@@ -25,10 +25,9 @@ const SEMANTIC_NAMES = new Set(
   Object.entries(semantic).flatMap(([g, ts]) => Object.keys(ts).map((t) => `${g}-${t}`)),
 )
 
-/** Hairline rings at 8% pure black. No token: the darkest colour is gray-950, not black. */
+/** ADR-0015 tokenised the avatar hairlines as --ds-border-inset. What remains is
+ *  the nav's drop shadow, whose geometry matches no step on the shadow ramp. */
 const COLOUR_LITERAL_ALLOW = [
-  ['Avatar/Avatar.vue', 'rgba(0, 0, 0, 0.08)'],
-  ['CreditsChip/CreditsChip.vue', 'rgba(0, 0, 0, 0.08)'],
   ['HorizontalNavigation/HorizontalNavigation.vue', 'rgba(0, 0, 0, 0.12)'],
   ['HorizontalNavigation/HorizontalNavigation.vue', 'rgba(0, 0, 0, 0.06)'],
 ]

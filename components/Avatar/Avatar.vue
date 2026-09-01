@@ -172,7 +172,7 @@ const showInitials = computed(() => !props.src && !!props.initials)
   position: absolute;
   inset: 0;
   border-radius: var(--ds-radius-pill);
-  border: 0.75px solid rgba(0, 0, 0, 0.08);
+  border: 0.75px solid var(--ds-border-inset);
   pointer-events: none;
   z-index: 2;
 }

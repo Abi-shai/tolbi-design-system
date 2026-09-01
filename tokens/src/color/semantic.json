@@ -204,6 +204,10 @@
       "value": "{color.gray-light.100}",
       "description": "decorative — deliberately non-load-bearing"
     },
+    "inset": {
+      "value": "color-mix(in srgb, {color.gray-light.950} 8%, transparent)",
+      "description": "decorative — the hairline that keeps a filled circular shape (an avatar) legible against any background. 8% of gray-950; 8% pure black differs by 2/255, so no black primitive is needed"
+    },
     "disabled": {
       "value": "{color.gray-light.300}",
       "description": "state"

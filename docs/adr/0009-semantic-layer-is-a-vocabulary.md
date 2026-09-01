@@ -326,12 +326,10 @@ Known fallout to be handled in the same change:
 - ~~**`Badge`'s categorical palette.**~~ — closed by ADR-0010's implementation (35 display-palette
   references, zero hex) and recorded in ADR-0014.
 
-- **Two hairline rings** (`Avatar`, `CreditsChip`) remain `rgba(0, 0, 0, 0.08)`. There is no honest
-  token: they are 8% pure black, and the darkest thing in the system is `gray.950`, not black.
+- ~~**Two hairline rings**~~ — closed by ADR-0015: `--ds-border-inset`, since 8% gray-950 and 8% black differ by 2/255.
 - ~~**Enforcement.**~~ Closed by ADR-0012: `npm run lint` carries these rules, and spacing —
   the standing proof that an unenforced layer gets ignored — went from 47% to 87% adoption.
-- **The component tier.** One member so far: segmented-control selection. Its naming and file
-  location are decided in the component-layer pass that follows this one.
-- **Motion's layer violation**, recorded above.
+- ~~**The component tier.**~~ — answered by ADR-0010 itself; the entry was stale.
+- ~~**Motion's layer violation**~~ — closed by ADR-0015: the filename was wrong, not the design.
 - ~~**The typography follow-up from ADR-0003**~~ — closed by ADR-0011: 0 literal type values remain.
 

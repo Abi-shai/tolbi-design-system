@@ -239,9 +239,7 @@ uses is already semantic. That is the divergence rule working, not a gap.
 - ~~**Naming enforcement.**~~ Closed by ADR-0012: the `no-shadowing-var` rule checks that a variant
   switch never carries a semantic token's name with the prefix filed off, which is how
   `BadgeGroup`'s `--bg-default` was found.
-- **The four `blur-*` tokens have zero usage** and were almost certainly built for a scrim's
-  `backdrop-filter`. Now that `bg-overlay` carries real alpha, whether the scrim also blurs is a live
-  question rather than a stranded token set.
+- ~~**The four `blur-*` tokens**~~ — closed by ADR-0015: deleted. The scrim does not blur.
 - ~~**`BadgeGroup.color` still accepts `brand`**~~ — closed by ADR-0014, which also reverses the
   "leave BadgeGroup alone" decision above: `color` became `tone` and `gray` became `neutral`.
 - **The numbered categorical set**, deferred above until something renders a data series.

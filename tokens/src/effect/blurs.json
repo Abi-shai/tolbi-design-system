@@ -1,8 +1,0 @@
-{
-  "blur": {
-    "sm": { "value": "blur(4px)",  "description": "Figma radius 8" },
-    "md": { "value": "blur(8px)",  "description": "Figma radius 16" },
-    "lg": { "value": "blur(12px)", "description": "Figma radius 24" },
-    "xl": { "value": "blur(20px)", "description": "Figma radius 40" }
-  }
-}

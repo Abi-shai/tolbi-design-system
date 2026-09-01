@@ -91,7 +91,10 @@ await Promise.all([
     { filter: (token) => token.path[0] === 'container', outputReferences: true },
   ),
 
-  buildTokenFile('tokens/src/motion/primitives.json', 'motion.css'),
+  // ADR-0015: motion has no primitive tier. ADR-0002 named these by intent, and
+  // a numeric ramp beneath them would alias six names 1:1 onto six values,
+  // adding no decision — the `fg` failure mode ADR-0009 deleted.
+  buildTokenFile('tokens/src/motion/semantic.json', 'motion.css'),
 
   buildTokenFile(
     ['tokens/src/radius/primitives.json', 'tokens/src/radius/semantic.json'],
@@ -145,7 +148,7 @@ const tokenFiles = [
   'colors', 'typography', 'type-roles', 'type-roles-mobile',
   'radius', 'space', 'spacing', 'widths', 'containers',
   'font-roles', 'font-roles-mobile', 'control',
-  'shadows', 'elevation', 'focus-rings', 'blurs', 'semantic', 'motion',
+  'shadows', 'elevation', 'focus-rings', 'semantic', 'motion',
 ]
 const combined = tokenFiles
   .map(f => readFileSync(`tokens/dist/${f}.css`, 'utf8'))

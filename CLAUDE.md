@@ -62,6 +62,11 @@ Before working on any component, read:
   — because a `<div>` that emits `click` is unreachable by keyboard. Its prop is `tone` (matching
   `Badge`), `gray` became `neutral`, and `brand` survives because a BadgeGroup is always interactive
   and brand is interactive affordance (ADR-0009).
+- **ADR-0015**: Motion is the one foundation that is **semantic-only** — six durations named by
+  intent are the decisions; a numeric ramp beneath them would add none. The `blur-*` ramp is deleted
+  (zero consumers): the scrim does not blur. `--ds-border-inset` is the avatar hairline (8% of
+  gray-950 — 8% black differs by 2/255). An ADR's *Still open* section is a claim about the present
+  and decays: two entries were already closed by later work.
 
 ## Architecture
 
