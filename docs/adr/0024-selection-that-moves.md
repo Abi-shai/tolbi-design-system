@@ -92,7 +92,7 @@ Restored, all five steps pass.
 
 ## Still open
 
-- **Expansion.** Nothing in the catalogue expands, so there is nothing to animate. It arrives with
-  the first accordion or disclosure.
+- ~~**Expansion.**~~ — closed by ADR-0025, which found the one thing that actually toggles in the
+  flow: `FormField`'s message. An accordion would still be the first consumer worth extracting for.
 - **`Pagination`'s highlight** still cross-fades, correctly. If its page list is ever made stable
   rather than recomputed, it becomes a third consumer.

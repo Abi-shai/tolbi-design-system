@@ -114,6 +114,11 @@ Before working on any component, read:
   nothing knew where the selection sat. Selection that moves between aligned siblings uses
   `useSlidingIndicator` — shared by `Tabs` and `ButtonGroup`, and it carries the two details that
   are easy to re-learn: no transition until after the first paint, and a `ResizeObserver` re-measure.
+- **ADR-0025**: `FormField`'s message **opens the space it needs** rather than shoving the layout —
+  a one-row grid going `0fr → 1fr`, because `height: auto` is not animatable. The grid must sit on
+  the **transitioning element**: on leave, `v-if` has already removed what gave a static wrapper its
+  height. `quick`, not `enter` — an error must not be late. The text does **not** cross-fade; only
+  its colour turns.
 
 ## Architecture
 

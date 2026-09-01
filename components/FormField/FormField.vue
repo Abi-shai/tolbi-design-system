@@ -60,26 +60,63 @@ provide(FORM_FIELD_KEY, {
       one thing at a time — and because a stable id keeps aria-describedby valid
       across the switch from hint to error.
     -->
-    <p
-      v-if="message"
-      :id="messageId"
-      class="ds-form-field__message"
-      :class="{ 'ds-form-field__message--error': invalid }"
-    >
-      <!-- Tone never carries meaning alone (ADR-0006): an error is also a glyph. -->
-      <Icon
-        v-if="invalid"
-        name="circle-alert"
-        :size="16"
-        class="ds-form-field__message-icon"
-        aria-hidden="true"
-      />
-      {{ message }}
-    </p>
+    <Transition name="ds-field-message">
+      <div v-if="message" class="ds-form-field__message-wrap">
+        <p
+          :id="messageId"
+          class="ds-form-field__message"
+          :class="{ 'ds-form-field__message--error': invalid }"
+        >
+          <!-- Tone never carries meaning alone (ADR-0006): an error is also a glyph. -->
+          <Icon
+            v-if="invalid"
+            name="circle-alert"
+            :size="16"
+            class="ds-form-field__message-icon"
+            aria-hidden="true"
+          />
+          {{ message }}
+        </p>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <style scoped>
+/*
+  ADR-0025 — the message opens the space it needs instead of shoving the layout.
+
+  `height: auto` is not animatable, so the wrapper is a one-row grid and the row
+  goes 0fr → 1fr, which IS. The child needs `overflow: hidden` or it spills out
+  of the collapsed row.
+
+  The grid lives on the TRANSITIONING element rather than a static parent: Vue
+  puts enter-from / leave-to on the element it mounts, and on leave the content
+  has to still be there for the space to have anything to close over. A static
+  wrapper with a toggled class collapses instantly, because `v-if` has already
+  removed what gave the row its height.
+
+  `quick` (100ms), not `enter`: an error must not be late. The duration is there
+  to stop the layout jumping, not to make an entrance.
+*/
+.ds-form-field__message-wrap {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.ds-field-message-enter-active,
+.ds-field-message-leave-active {
+  transition:
+    grid-template-rows var(--ds-motion-duration-quick) var(--ds-motion-easing-out),
+    opacity            var(--ds-motion-duration-quick) var(--ds-motion-easing-out);
+}
+
+.ds-field-message-enter-from,
+.ds-field-message-leave-to {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
 .ds-form-field {
   /*
     The message glyph is 16px — below the 320px floor of the widths ramp and not
@@ -109,6 +146,11 @@ provide(FORM_FIELD_KEY, {
 
 /* ── Message ──────────────────────────────────────────────────────── */
 .ds-form-field__message {
+  overflow: hidden;
+  /* hint → error is the common case (the stories carry 30 hints to 9 errors):
+     same slot, so nothing moves and only the colour turns. The text itself does
+     not cross-fade — an error has to be readable the instant it replaces a hint. */
+  transition: color var(--ds-motion-duration-quick) var(--ds-motion-easing-out);
   margin: 0;
   display: flex;
   align-items: flex-start;
@@ -130,6 +172,11 @@ provide(FORM_FIELD_KEY, {
 /* ── Disabled ─────────────────────────────────────────────────────── */
 .ds-form-field--disabled .ds-form-field__label,
 .ds-form-field--disabled .ds-form-field__message {
+  overflow: hidden;
+  /* hint → error is the common case (the stories carry 30 hints to 9 errors):
+     same slot, so nothing moves and only the colour turns. The text itself does
+     not cross-fade — an error has to be readable the instant it replaces a hint. */
+  transition: color var(--ds-motion-duration-quick) var(--ds-motion-easing-out);
   color: var(--ds-text-disabled);
 }
 </style>

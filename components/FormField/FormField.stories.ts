@@ -228,3 +228,35 @@ export const Accessibility: Story = {
     `,
   }),
 }
+
+/**
+ * ADR-0025: a message that appears opens the space it needs instead of shoving
+ * the layout. Toggle it and watch what sits below — it should slide, not jump.
+ */
+export const MessageAppears: Story = {
+  name: 'Message appearing and leaving',
+  render: () => ({
+    setup: () => ({ error: ref('') }),
+    components: { FormField, InputField },
+    template: `
+      <div style="display: flex; flex-direction: column; gap: var(--ds-spacing-xl); align-items: flex-start;">
+        <FormField label="Adresse e-mail" :error="error">
+          <InputField placeholder="nom@exemple.fr" />
+        </FormField>
+
+        <p id="below" style="margin: 0; font: var(--ds-font-body-sm); color: var(--ds-text-subtle);">
+          Ce paragraphe est poussé vers le bas quand le message apparaît.
+        </p>
+
+        <button
+          id="toggle-error"
+          type="button"
+          @click="error = error ? '' : 'Cette adresse n’est pas valide.'"
+          style="font: var(--ds-font-label-lg); padding: var(--ds-control-padding-sm);
+                 border: var(--ds-border-width-default) solid var(--ds-border-default);
+                 border-radius: var(--ds-radius-control); background: var(--ds-bg-default); cursor: pointer;"
+        >{{ error ? 'Retirer' : 'Déclencher' }} l’erreur</button>
+      </div>
+    `,
+  }),
+}
