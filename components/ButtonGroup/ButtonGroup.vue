@@ -34,10 +34,17 @@ const { containerRef, itemRefs, style, ready, measure } = useSlidingIndicator(ac
 
 const context: ButtonGroupContext = {
   register(value, el) {
-    const i = values.value.length
-    values.value.push(value)
+    const existing = values.value.indexOf(value)
+    const i = existing === -1 ? values.value.length : existing
+    if (existing === -1) values.value.push(value)
     itemRefs.value[i] = el
     return i
+  },
+  unregister(value) {
+    const i = values.value.indexOf(value)
+    if (i === -1) return
+    values.value.splice(i, 1)
+    itemRefs.value.splice(i, 1)
   },
   select(value) { emit('update:modelValue', value) },
   isSelected: (value) => value === props.modelValue,

@@ -79,7 +79,7 @@ one that runs correctly, in every artefact except a running page.
 
 ## Still open
 
-- **13% is still low.** The remaining candidates are heavier: a selection background that slides
-  between rows rather than cross-fading, and expansion — which nothing in the catalogue does yet
-  because no component expands.
+- ~~**13% is still low.**~~ — the sliding selection is closed by ADR-0024, which found the blocker
+  was an API defect rather than a missing animation. Expansion remains, and stays there until a
+  component expands.
 - **`moderate` now carries 48%.** Falling as predicted, and it will keep falling as movement grows.

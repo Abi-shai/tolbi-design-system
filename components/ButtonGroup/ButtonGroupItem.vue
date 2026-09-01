@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, ref } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
 import { Icon } from '../Icon'
 import type { IconName } from '../Icon'
 import { BUTTON_GROUP_KEY } from './context'
@@ -38,6 +38,7 @@ const el = ref<HTMLButtonElement>()
 const key = computed(() => props.value ?? props.label ?? '')
 
 onMounted(() => { if (group && el.value) group.register(key.value, el.value) })
+onBeforeUnmount(() => group?.unregister(key.value))
 
 const selected = computed(() => group?.isSelected(key.value) ?? false)
 const iconOnly = computed(() => !!props.icon && !props.label)
