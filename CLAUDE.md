@@ -58,6 +58,10 @@ Before working on any component, read:
   derived from control heights minus the line box — the spacing ramp has no 10/14/18/22px because
   those are not layout rhythm. The linter reads `<script>` blocks too (`no-literal-dimension-js`);
   a suppression must name the rule and give a reason (`token-lint-disable <rule> — <why>`).
+- **ADR-0014**: `BadgeGroup` renders a real control — `<button type="button">`, or `<a>` with `href`
+  — because a `<div>` that emits `click` is unreachable by keyboard. Its prop is `tone` (matching
+  `Badge`), `gray` became `neutral`, and `brand` survives because a BadgeGroup is always interactive
+  and brand is interactive affordance (ADR-0009).
 
 ## Architecture
 

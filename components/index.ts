@@ -16,7 +16,7 @@ export { Badge } from './Badge'
 export type { BadgeTone, BadgeColor, BadgeVariant, BadgeSize } from './Badge'
 
 export { BadgeGroup } from './BadgeGroup'
-export type { BadgeGroupColor, BadgeGroupSize, BadgeGroupBadge } from './BadgeGroup'
+export type { BadgeGroupTone, BadgeGroupSize, BadgeGroupBadge } from './BadgeGroup'
 
 export { ModuleIcon, moduleNames } from './ModuleIcon'
 export type { ModuleName, ModuleVariant } from './ModuleIcon'

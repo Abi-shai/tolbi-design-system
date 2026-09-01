@@ -323,11 +323,9 @@ Known fallout to be handled in the same change:
   `Tag`, `ChartLegend`), `2xl` (`ModulesList`) and `4xl` (`HorizontalNavigation`) still consume the
   primitive ramp. Deciding what those roles are is the remaining half of ADR-0006's "six tiles,
   four radii".
-- **`Badge`'s categorical palette.** Eight hues — blue, blue-light, blue-gray, gray-blue, indigo,
-  orange, pink, purple — are hard-coded hex with no primitive ramp behind them. They are a
-  *categorical* label palette, not status tones, so ADR-0009's "brand is interactive only" does not
-  reach `Badge.color`; its API is unchanged. They are flagged in the file and need a
-  categorical-palette decision of their own, alongside the chart series colours.
+- ~~**`Badge`'s categorical palette.**~~ — closed by ADR-0010's implementation (35 display-palette
+  references, zero hex) and recorded in ADR-0014.
+
 - **Two hairline rings** (`Avatar`, `CreditsChip`) remain `rgba(0, 0, 0, 0.08)`. There is no honest
   token: they are 8% pure black, and the darkest thing in the system is `gray.950`, not black.
 - ~~**Enforcement.**~~ Closed by ADR-0012: `npm run lint` carries these rules, and spacing —

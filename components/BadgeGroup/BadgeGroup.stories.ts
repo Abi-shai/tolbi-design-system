@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import BadgeGroup from './BadgeGroup.vue'
 
-const COLORS = ['brand', 'error', 'warning', 'success', 'gray'] as const
+const TONES = ['brand', 'error', 'warning', 'success', 'neutral'] as const
 
 const meta: Meta<typeof BadgeGroup> = {
   title: 'Étiquettes/BadgeGroup',
@@ -24,10 +24,14 @@ const meta: Meta<typeof BadgeGroup> = {
       control: 'text',
       table: { category: 'Contenu' },
     },
-    color: {
+    tone: {
       control: 'select',
-      options: COLORS,
-      table: { category: 'Apparence', defaultValue: { summary: "'brand'" } },
+      options: TONES,
+      table: { category: 'Apparence', type: { summary: 'BadgeGroupTone' }, defaultValue: { summary: "'brand'" } },
+    },
+    href: {
+      control: 'text',
+      table: { category: 'Comportement', type: { summary: 'string' }, defaultValue: { summary: 'undefined' } },
     },
     size: {
       control: 'inline-radio',
@@ -47,7 +51,7 @@ const meta: Meta<typeof BadgeGroup> = {
   args: {
     label:   'New feature',
     message: "We've just released a new feature",
-    color:   'brand',
+    tone:    'brand',
     size:    'md',
     badge:   'leading',
     icon:    'square-pen',
@@ -85,11 +89,11 @@ export const AllColors: Story = {
     components: { BadgeGroup },
     setup: () => ({
       items: [
-        { color: 'brand',   label: 'New feature', message: "We've just released a new feature" },
-        { color: 'error',   label: 'Error',        message: 'There was a problem with that action' },
-        { color: 'warning', label: 'Warning',      message: 'Just to let you know this might be a problem' },
-        { color: 'success', label: 'Success',      message: "You've updated your profile and details" },
-        { color: 'gray',    label: 'Version 4.0',  message: "We've just released a new feature" },
+        { tone: 'brand',   label: 'New feature', message: "We've just released a new feature" },
+        { tone: 'error',   label: 'Error',        message: 'There was a problem with that action' },
+        { tone: 'warning', label: 'Warning',      message: 'Just to let you know this might be a problem' },
+        { tone: 'success', label: 'Success',      message: "You've updated your profile and details" },
+        { tone: 'neutral',    label: 'Version 4.0',  message: "We've just released a new feature" },
       ],
     }),
     template: `
@@ -115,11 +119,11 @@ export const AllColorsTrailing: Story = {
     components: { BadgeGroup },
     setup: () => ({
       items: [
-        { color: 'brand',   label: 'New feature', message: "We've just released a new feature" },
-        { color: 'error',   label: 'Fix now',      message: 'There was a problem with that action' },
-        { color: 'warning', label: 'Warning',      message: 'Just to let you know this might be a problem' },
-        { color: 'success', label: 'Success',      message: "You've updated your profile and details" },
-        { color: 'gray',    label: 'Version 4.0',  message: "We've just released a new feature" },
+        { tone: 'brand',   label: 'New feature', message: "We've just released a new feature" },
+        { tone: 'error',   label: 'Fix now',      message: 'There was a problem with that action' },
+        { tone: 'warning', label: 'Warning',      message: 'Just to let you know this might be a problem' },
+        { tone: 'success', label: 'Success',      message: "You've updated your profile and details" },
+        { tone: 'neutral',    label: 'Version 4.0',  message: "We've just released a new feature" },
       ],
     }),
     template: `

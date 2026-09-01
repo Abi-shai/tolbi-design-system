@@ -1,22 +1,32 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Icon } from '../Icon'
 import type { IconName } from '../Icon'
 
-export type BadgeGroupColor  = 'brand' | 'error' | 'warning' | 'success' | 'gray'
+/**
+ * ADR-0014: aligned with `Badge.tone`. `brand` survives where ADR-0009 removed
+ * it from Badge's status tones, because a BadgeGroup is *always* interactive —
+ * and brand is interactive affordance. `gray` became `neutral` to match the
+ * tone vocabulary.
+ */
+export type BadgeGroupTone   = 'brand' | 'neutral' | 'error' | 'warning' | 'success'
 export type BadgeGroupSize   = 'md' | 'lg'
 export type BadgeGroupBadge  = 'leading' | 'trailing'
 
 interface Props {
   label:         string
   message:       string
-  color?:        BadgeGroupColor
+  tone?:         BadgeGroupTone
+  /** Renders an anchor instead of a button. */
+  href?:         string
   size?:         BadgeGroupSize
   badge?:        BadgeGroupBadge
   icon?:         IconName
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  color:  'brand',
+  tone:   'brand',
+  href:   undefined,
   size:   'md',
   badge:  'leading',
   icon:   undefined,
@@ -25,16 +35,23 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   click: [event: MouseEvent]
 }>()
+
+/* A div that emits click is unreachable by keyboard. The DS convention is a
+   real control — Button, Tag and CloseButton all render <button type="button">. */
+const tag = computed(() => (props.href ? 'a' : 'button'))
 </script>
 
 <template>
-  <div
+  <component
+    :is="tag"
     :class="[
       'ds-badge-group',
-      `ds-badge-group--${color}`,
+      `ds-badge-group--${tone}`,
       `ds-badge-group--${size}`,
       `ds-badge-group--${badge}`,
     ]"
+    :type="href ? undefined : 'button'"
+    :href="href"
     @click="emit('click', $event)"
   >
     <!-- Leading: pill | message [→] -->
@@ -66,7 +83,7 @@ const emit = defineEmits<{
         />
       </span>
     </template>
-  </div>
+  </component>
 </template>
 
 <style scoped>
@@ -99,7 +116,7 @@ const emit = defineEmits<{
   --badge-group-text:        var(--ds-text-on-success-subtle);
   --badge-group-pill-border: var(--ds-border-on-success-subtle);
 }
-.ds-badge-group--gray {
+.ds-badge-group--neutral {
   --badge-group-bg:  var(--ds-bg-neutral-subtle);
   --badge-group-bg-hover:    var(--ds-bg-neutral-subtle-hover);
   --badge-group-border:      var(--ds-border-subtle);
@@ -118,12 +135,22 @@ const emit = defineEmits<{
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: var(--ds-font-weight-label-lg);
   white-space: nowrap;
-  cursor: default;
+  cursor: pointer;
+  text-decoration: none;
+  /* Reset the UA button styles the element now brings with it. */
+  margin: 0;
+  text-align: left;
   transition: background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-badge-group:hover {
   background-color: var(--badge-group-bg-hover);
+}
+
+/* ADR-0006: one focus treatment, and no component defines its own. */
+.ds-badge-group:focus-visible {
+  outline: none;
+  box-shadow: var(--ds-focus-ring-brand);
 }
 
 /* ── Sizes ────────────────────────────────────────────────────────── */

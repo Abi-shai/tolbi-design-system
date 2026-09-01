@@ -242,7 +242,7 @@ uses is already semantic. That is the divergence rule working, not a gap.
 - **The four `blur-*` tokens have zero usage** and were almost certainly built for a scrim's
   `backdrop-filter`. Now that `bg-overlay` carries real alpha, whether the scrim also blurs is a live
   question rather than a stranded token set.
-- **`BadgeGroup.color` still accepts `brand`**, which ADR-0009 removed from the status tones. Left
-  alone above; needs resolving when the component-layer pass reaches it.
+- ~~**`BadgeGroup.color` still accepts `brand`**~~ — closed by ADR-0014, which also reverses the
+  "leave BadgeGroup alone" decision above: `color` became `tone` and `gray` became `neutral`.
 - **The numbered categorical set**, deferred above until something renders a data series.
 - ~~**Radius has no agreed role for four of its steps**~~ — closed by ADR-0013.
