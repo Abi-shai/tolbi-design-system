@@ -127,16 +127,16 @@ function onKeydown(e: KeyboardEvent, i: number) {
   width: 100%;
   background-color: var(--ds-bg-neutral-subtle);
   border: 1px solid var(--ds-border-subtle);
-  gap: 4px;
+  gap: var(--ds-spacing-xs);
 }
 
 .ds-tabs--md {
-  padding: 6px;
+  padding: var(--ds-spacing-sm);
   border-radius: var(--ds-radius-surface);
 }
 
 .ds-tabs--sm {
-  padding: 4px;
+  padding: var(--ds-spacing-xs);
   border-radius: var(--ds-radius-lg);
 }
 
@@ -167,10 +167,10 @@ function onKeydown(e: KeyboardEvent, i: number) {
   flex: 1 0 0;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   min-width: 1px;
   overflow: hidden;
-  padding: 8px 12px;
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
   background: transparent;
   border: none;
   border-radius: var(--ds-radius-inner);

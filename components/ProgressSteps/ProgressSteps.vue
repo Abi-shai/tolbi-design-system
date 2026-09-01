@@ -228,10 +228,10 @@ const checkSize = computed(() => {
 }
 
 /* Top padding per type × size */
-.ds-steps--icon.ds-steps--sm  .ds-steps__text { padding-top: 2px; }
-.ds-steps--icon.ds-steps--md  .ds-steps__text { padding-top: 4px; }
-.ds-steps--icon.ds-steps--lg  .ds-steps__text { padding-top: 6px; }
-.ds-steps--featured-icon.ds-steps--sm .ds-steps__text { padding-top: 4px; }
+.ds-steps--icon.ds-steps--sm  .ds-steps__text { padding-top: var(--ds-spacing-xxs); }
+.ds-steps--icon.ds-steps--md  .ds-steps__text { padding-top: var(--ds-spacing-xs); }
+.ds-steps--icon.ds-steps--lg  .ds-steps__text { padding-top: var(--ds-spacing-sm); }
+.ds-steps--featured-icon.ds-steps--sm .ds-steps__text { padding-top: var(--ds-spacing-xs); }
 
 /* ── Title ─────────────────────────────────────────────────────────── */
 .ds-steps__title {

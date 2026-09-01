@@ -111,7 +111,7 @@ function goToPage(page: number) {
 .ds-pagination__numbers {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--ds-spacing-xxs);
   flex-shrink: 0;
 }
 

@@ -1,7 +1,7 @@
 {
   "name": "@abi-shai/tolbi-design-system",
   "version": "0.4.0",
-  "description": "Tolbi multi-product Design System — Vue 3 components",
+  "description": "Tolbi multi-product Design System \u2014 Vue 3 components",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -20,12 +20,13 @@
   "scripts": {
     "tokens": "node tokens/build.js",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "npm run tokens && storybook build",
-    "build": "npm run tokens && vue-tsc --noEmit && vite build",
+    "build-storybook": "npm run tokens && npm run lint && storybook build",
+    "build": "npm run tokens && npm run lint && vue-tsc --noEmit && vite build",
     "typecheck": "vue-tsc --noEmit",
     "icons": "node scripts/generate-icons.mjs",
     "module-art": "node scripts/generate-module-art.mjs",
-    "dial-codes": "node scripts/generate-dial-codes.mjs"
+    "dial-codes": "node scripts/generate-dial-codes.mjs",
+    "lint": "node scripts/lint-tokens.mjs"
   },
   "keywords": [
     "design-system",

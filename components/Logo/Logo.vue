@@ -45,7 +45,7 @@ withDefaults(defineProps<Props>(), { alt: 'Tolbi', variant: 'default' })
 .ds-logo {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
 }
 
 .ds-logo__icon {

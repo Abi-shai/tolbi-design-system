@@ -128,54 +128,54 @@ const emit = defineEmits<{
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
 .ds-badge-group--md {
-  gap: 8px;
-  padding: 4px 10px 4px 4px;
+  gap: var(--ds-spacing-md);
+  padding: var(--ds-spacing-xs) 10px var(--ds-spacing-xs) var(--ds-spacing-xs);
   font: var(--ds-font-label-md);
 }
 .ds-badge-group--md.ds-badge-group--trailing {
-  padding: 4px 4px 4px 12px;
+  padding: var(--ds-spacing-xs) var(--ds-spacing-xs) var(--ds-spacing-xs) var(--ds-spacing-lg);
 }
 
 .ds-badge-group--lg {
-  gap: 12px;
-  padding: 4px 10px 4px 4px;
+  gap: var(--ds-spacing-lg);
+  padding: var(--ds-spacing-xs) 10px var(--ds-spacing-xs) var(--ds-spacing-xs);
   font: var(--ds-font-label-lg);
 }
 .ds-badge-group--lg.ds-badge-group--trailing {
-  padding: 4px 4px 4px 14px;
+  padding: var(--ds-spacing-xs) var(--ds-spacing-xs) var(--ds-spacing-xs) 14px;
 }
 
 /* ── Inner pill ───────────────────────────────────────────────────── */
 .ds-badge-group__pill {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ds-spacing-xs);
   border: 1px solid var(--badge-group-pill-border);
   border-radius: var(--ds-radius-pill);
   background-color: var(--ds-bg-default);
   color: var(--badge-group-text);
-  padding: 2px 8px;
+  padding: var(--ds-spacing-xxs) var(--ds-spacing-md);
   white-space: nowrap;
 }
 
 .ds-badge-group--lg .ds-badge-group__pill {
-  padding: 2px 10px;
+  padding: var(--ds-spacing-xxs) 10px;
 }
 
 /* Trailing pill has tighter right padding to accommodate the icon */
 .ds-badge-group__pill--trailing {
-  padding-right: 6px;
+  padding-right: var(--ds-spacing-sm);
 }
 .ds-badge-group--lg .ds-badge-group__pill--trailing {
   padding-left: 10px;
-  padding-right: 8px;
+  padding-right: var(--ds-spacing-md);
 }
 
 /* ── Content (leading mode) ───────────────────────────────────────── */
 .ds-badge-group__content {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ds-spacing-xs);
 }
 
 /* ── Icon ─────────────────────────────────────────────────────────── */

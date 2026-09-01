@@ -202,7 +202,7 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 
 /* ── Header cell ───────────────────────────────────────────────────── */
 .ds-table__th {
-  padding: 12px 24px;
+  padding: var(--ds-spacing-lg) var(--ds-spacing-3xl);
   border-bottom: 1px solid var(--ds-border-subtle);
   text-align: left;
   white-space: nowrap;
@@ -212,7 +212,7 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 
 .ds-table__th--select {
   width: 44px;
-  padding: 12px 12px 12px 24px;
+  padding: var(--ds-spacing-lg) var(--ds-spacing-lg) var(--ds-spacing-lg) var(--ds-spacing-3xl);
 }
 
 .ds-table__th--center { text-align: center; }
@@ -221,7 +221,7 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 .ds-table__th-content {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ds-spacing-xs);
 }
 
 .ds-table__th-label {  font: var(--ds-font-label-md);
@@ -252,14 +252,14 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 
 /* ── Data cell ─────────────────────────────────────────────────────── */
 .ds-table__td {
-  padding: 16px 24px;
+  padding: var(--ds-spacing-xl) var(--ds-spacing-3xl);
   vertical-align: middle;
   overflow: hidden;
 }
 
 .ds-table__td--select {
   width: 44px;
-  padding: 16px 12px 16px 24px;
+  padding: var(--ds-spacing-xl) var(--ds-spacing-lg) var(--ds-spacing-xl) var(--ds-spacing-3xl);
 }
 
 .ds-table__td--center { text-align: center; }
@@ -267,7 +267,7 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 
 .ds-table__td--empty {
   text-align: center;
-  padding: 48px 24px;
+  padding: var(--ds-spacing-6xl) var(--ds-spacing-3xl);
   font: var(--ds-font-body-md);
   color: var(--ds-text-subtle);
 }

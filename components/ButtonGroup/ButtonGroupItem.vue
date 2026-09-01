@@ -63,7 +63,7 @@ function handleClick(event: MouseEvent) {
   justify-content: center;
   gap: 0;
   min-height: 40px;
-  padding: 8px 16px;
+  padding: var(--ds-spacing-md) var(--ds-spacing-xl);
   border: none;
   border-right: 1px solid var(--ds-border-default);
   background-color: var(--ds-bg-default);
@@ -85,12 +85,12 @@ function handleClick(event: MouseEvent) {
 
 /* ── Icon modes ───────────────────────────────────────────────────── */
 .ds-button-group-item--icon-only {
-  padding: 8px 12px;
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
 }
 
 .ds-button-group-item--leading-icon {
-  gap: 8px;
-  padding: 8px 16px 8px 14px;
+  gap: var(--ds-spacing-md);
+  padding: var(--ds-spacing-md) var(--ds-spacing-xl) var(--ds-spacing-md) 14px;
 }
 
 /* ── States ───────────────────────────────────────────────────────── */

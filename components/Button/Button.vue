@@ -76,7 +76,7 @@ function handleClick(event: MouseEvent) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: var(--ds-spacing-xs);
   padding: 10px 14px;
   border: 1px solid transparent;
   border-radius: var(--ds-radius-control);
@@ -94,24 +94,24 @@ function handleClick(event: MouseEvent) {
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
 .ds-button--sm {
-  padding: 8px 12px;
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
 }
 
 .ds-button--lg {
-  gap: 6px;
-  padding: 10px 16px;
+  gap: var(--ds-spacing-sm);
+  padding: 10px var(--ds-spacing-xl);
   font: var(--ds-font-label-xl-strong);
 }
 
 .ds-button--xl {
-  gap: 6px;
-  padding: 12px 18px;
+  gap: var(--ds-spacing-sm);
+  padding: var(--ds-spacing-lg) 18px;
   font: var(--ds-font-label-xl-strong);
 }
 
 .ds-button--2xl {
   gap: 10px;
-  padding: 16px 22px;
+  padding: var(--ds-spacing-xl) 22px;
   /* Component token (ADR-0010): 18px/28px is off the type ramp and has exactly
      one consumer. A role would be minted for a single call site. */
   --button-2xl-font: var(--ds-font-weight-label-xl-strong) 1.125rem/1.75rem var(--ds-typography-font-family-poppins);
@@ -177,7 +177,7 @@ function handleClick(event: MouseEvent) {
 
 /* ── Link ─────────────────────────────────────────────────────────── */
 .ds-button--link {
-  gap: 6px;
+  gap: var(--ds-spacing-sm);
   padding: 0;
   background-color: transparent;
   border-color: transparent;

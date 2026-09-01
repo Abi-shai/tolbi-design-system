@@ -221,7 +221,7 @@ function display(v: number): string {
   background: var(--ds-bg-default);
   border: 1px solid var(--ds-border-subtle);
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
   font: var(--ds-font-label-md);
   color: var(--ds-text-default);
   white-space: nowrap;

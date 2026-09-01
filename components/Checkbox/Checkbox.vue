@@ -170,11 +170,11 @@ function handleChange(event: Event) {
 }
 
 .ds-checkbox-wrapper--has-text.ds-checkbox-wrapper--sm {
-  gap: 8px;
+  gap: var(--ds-spacing-md);
 }
 
 .ds-checkbox-wrapper--has-text.ds-checkbox-wrapper--md {
-  gap: 12px;
+  gap: var(--ds-spacing-lg);
 }
 
 .ds-checkbox-wrapper--disabled {
@@ -188,7 +188,7 @@ function handleChange(event: Event) {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  padding-top: 2px;
+  padding-top: var(--ds-spacing-xxs);
 }
 
 /* ── Visually-hidden native input ──────────────────────────────────── */
@@ -345,7 +345,7 @@ function handleChange(event: Event) {
 }
 
 .ds-checkbox__text--md {
-  gap: 2px;
+  gap: var(--ds-spacing-xxs);
 }
 
 /* ── Label ─────────────────────────────────────────────────────────── */

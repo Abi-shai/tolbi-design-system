@@ -82,18 +82,18 @@ function toggle() {
 }
 
 .ds-toggle-wrapper--has-text.ds-toggle-wrapper--sm {
-  gap: 8px;
+  gap: var(--ds-spacing-md);
 }
 
 .ds-toggle-wrapper--has-text.ds-toggle-wrapper--md {
-  gap: 12px;
+  gap: var(--ds-spacing-lg);
 }
 
 /* ── Track (button) ────────────────────────────────────────────────── */
 .ds-toggle {
   display: flex;
   align-items: center;
-  padding: 2px;
+  padding: var(--ds-spacing-xxs);
   border: none;
   border-radius: var(--ds-radius-pill);
   background-color: var(--ds-bg-neutral);
@@ -186,7 +186,7 @@ function toggle() {
 }
 
 .ds-toggle__text--md {
-  gap: 2px;
+  gap: var(--ds-spacing-xxs);
 }
 
 /* ── Label ─────────────────────────────────────────────────────────── */

@@ -214,9 +214,8 @@ therefore checked against computed styles rather than reasoned about:
 
 ## Still open
 
-- **The lint does not exist yet**, and it is now load-bearing for two layers — ADR-0009 left the
-  colour rules unenforced and this ADR adds four more. Spacing at 46% adoption is the standing proof
-  that an unenforced layer gets ignored.
+- ~~**The lint does not exist yet.**~~ Closed by ADR-0012: eight rules, including the three from
+  this ADR, run on every build. Spacing went 47% → 87% in the same pass.
 - **The mobile scale has never been exercised.** `[data-typography="mobile"]` has no consumer, so the
   shorthand's mobile variant ships untested.
 - **Radius has no agreed role for four of its steps** — carried from ADR-0009, still untouched.

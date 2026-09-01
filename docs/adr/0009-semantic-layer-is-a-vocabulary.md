@@ -330,9 +330,8 @@ Known fallout to be handled in the same change:
   categorical-palette decision of their own, alongside the chart series colours.
 - **Two hairline rings** (`Avatar`, `CreditsChip`) remain `rgba(0, 0, 0, 0.08)`. There is no honest
   token: they are 8% pure black, and the darkest thing in the system is `gray.950`, not black.
-- **Enforcement.** The rules here are all lintable — no raw primitive in a component, no `text-*` on
-  a `-solid` background, no length repeated across three or more components — but no lint exists yet.
-  Spacing at 46% adoption is the standing proof that an unenforced layer gets ignored.
+- ~~**Enforcement.**~~ Closed by ADR-0012: `npm run lint` carries these rules, and spacing —
+  the standing proof that an unenforced layer gets ignored — went from 47% to 87% adoption.
 - **The component tier.** One member so far: segmented-control selection. Its naming and file
   location are decided in the component-layer pass that follows this one.
 - **Motion's layer violation**, recorded above.

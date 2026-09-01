@@ -41,14 +41,14 @@ const hasFloatingLabel = computed(() => props.label === 'top-floating' || props.
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 12px;
+  gap: var(--ds-spacing-lg);
   width: 100%;
 }
 
 .ds-progress-bar--label-bottom {
   flex-direction: column;
   align-items: flex-end;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
 }
 
 .ds-progress-bar--label-top-floating,
@@ -110,7 +110,7 @@ const hasFloatingLabel = computed(() => props.label === 'top-floating' || props.
   background-color: var(--ds-bg-default);
   border: 1px solid var(--ds-border-subtle);
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
   font: var(--ds-font-label-md);
   color: var(--ds-text-default);
   white-space: nowrap;

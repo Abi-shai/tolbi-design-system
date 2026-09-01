@@ -244,7 +244,7 @@ onUnmounted(() => {
 .ds-input-dropdown {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   width: 100%;
 }
 
@@ -252,7 +252,7 @@ onUnmounted(() => {
 .ds-input-dropdown__field-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--ds-spacing-sm);
 }
 
 /* ── Label ─────────────────────────────────────────────────────────── */
@@ -266,7 +266,7 @@ onUnmounted(() => {
 .ds-input-dropdown__trigger {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   width: 100%;
   padding: 10px 14px;
   box-sizing: border-box;
@@ -292,7 +292,7 @@ onUnmounted(() => {
 .ds-input-dropdown__content {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -391,7 +391,7 @@ onUnmounted(() => {
 .ds-input-dropdown__panel-items {
   display: flex;
   flex-direction: column;
-  padding: 4px 0;
+  padding: var(--ds-spacing-xs) 0;
 }
 
 /* ── Hint text ─────────────────────────────────────────────────────── */

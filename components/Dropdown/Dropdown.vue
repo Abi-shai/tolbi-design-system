@@ -145,7 +145,7 @@ onUnmounted(() => {
 .ds-dropdown__trigger--button {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ds-spacing-xs);
   padding: 10px 14px;
   box-sizing: border-box;
   background-color: var(--ds-bg-default);
@@ -223,8 +223,8 @@ onUnmounted(() => {
 .ds-dropdown__header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: var(--ds-spacing-lg);
+  padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
   border-bottom: 1px solid var(--ds-border-subtle);
   flex-shrink: 0;
 }
@@ -256,7 +256,7 @@ onUnmounted(() => {
 .ds-dropdown__items {
   display: flex;
   flex-direction: column;
-  padding: 4px 0;
+  padding: var(--ds-spacing-xs) 0;
 }
 
 /* ── Panel transition ──────────────────────────────────────────────── */

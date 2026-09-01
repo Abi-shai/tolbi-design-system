@@ -48,7 +48,7 @@ const emit = defineEmits<{
 .ds-dropdown-item {
   display: flex;
   align-items: center;
-  padding: 1px 6px;
+  padding: 1px var(--ds-spacing-sm);
   cursor: pointer;
   flex-shrink: 0;
   width: 100%;
@@ -58,7 +58,7 @@ const emit = defineEmits<{
 .ds-dropdown-item__content {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--ds-spacing-lg);
   flex: 1;
   min-width: 0;
   padding: 9px 10px;
@@ -86,7 +86,7 @@ const emit = defineEmits<{
 .ds-dropdown-item__icon-text {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   flex: 1;
   min-width: 0;
 }

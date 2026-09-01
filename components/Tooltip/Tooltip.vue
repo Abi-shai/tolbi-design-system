@@ -126,8 +126,8 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
   border-top:   6px solid var(--ds-bg-inverse);
 }
 
-.ds-tooltip__arrow--bottom-left  { align-self: flex-start; margin-left: 12px; }
-.ds-tooltip__arrow--bottom-right { align-self: flex-end;   margin-right: 12px; }
+.ds-tooltip__arrow--bottom-left  { align-self: flex-start; margin-left: var(--ds-spacing-lg); }
+.ds-tooltip__arrow--bottom-right { align-self: flex-end;   margin-right: var(--ds-spacing-lg); }
 
 /* ▲ Top center — 16px large × 6px haut */
 .ds-tooltip__arrow--top {

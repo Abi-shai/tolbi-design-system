@@ -72,9 +72,9 @@ const goodLabel = computed(() =>
 .ds-credits-chip__badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   border-radius: var(--ds-radius-pill);
-  padding: 4px 12px 4px 10px;
+  padding: var(--ds-spacing-xs) var(--ds-spacing-lg) var(--ds-spacing-xs) 10px;
   flex-shrink: 0;
 }
 
@@ -98,8 +98,8 @@ const goodLabel = computed(() =>
 .ds-credits-chip--critical {
   border: 1.083px solid var(--ds-border-error-solid);
   border-radius: var(--ds-radius-pill);
-  padding: 6px 12px 6px 6px;
-  gap: 8px;
+  padding: var(--ds-spacing-sm) var(--ds-spacing-lg) var(--ds-spacing-sm) var(--ds-spacing-sm);
+  gap: var(--ds-spacing-md);
   background: var(--ds-bg-default);
 }
 
@@ -135,7 +135,7 @@ const goodLabel = computed(() =>
 .ds-credits-chip__content {
   display: inline-flex;
   align-items: baseline;
-  gap: 4px;
+  gap: var(--ds-spacing-xs);
   white-space: nowrap;
 }
 
@@ -173,7 +173,7 @@ const goodLabel = computed(() =>
 .ds-credits-chip__cta {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ds-spacing-xs);
   background: transparent;
   border: none;
   cursor: pointer;

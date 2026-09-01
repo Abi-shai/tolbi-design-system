@@ -84,7 +84,7 @@ const emit = defineEmits<{
 .ds-dropdown-select-item {
   display: flex;
   align-items: center;
-  padding: 1px 6px;
+  padding: 1px var(--ds-spacing-sm);
   cursor: pointer;
   width: 100%;
   box-sizing: border-box;
@@ -97,10 +97,10 @@ const emit = defineEmits<{
 .ds-dropdown-select-item__content {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   flex: 1;
   min-width: 0;
-  padding: 10px 10px 10px 8px;
+  padding: 10px 10px 10px var(--ds-spacing-md);
   border-radius: var(--ds-radius-inner);
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
@@ -147,7 +147,7 @@ const emit = defineEmits<{
 .ds-dropdown-select-item__text {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   flex: 1;
   min-width: 0;
   overflow: hidden;

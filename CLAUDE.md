@@ -45,6 +45,12 @@ Before working on any component, read:
   `-strong` = semibold), minted on demand. `tabular-nums` is a rule, not a token. 20 roles:
   `heading-2xl` deleted (0 uses); `metric-xl`, `label-xl`, three `-emphasis` and three `-strong`
   added.
+- **ADR-0012**: Token discipline is **enforced**, not documented — `npm run lint`
+  (`scripts/lint-tokens.mjs`, zero deps, part of both builds) carries eight rules drawn from
+  ADR-0009/0010/0011. A linter reporting zero is indistinguishable from a broken one, so every rule
+  is verified against a deliberately broken file. Spacing is 87% tokenised; the `spacing-on-ramp`
+  rule fires only on literals that exactly match a token, because the 31 survivors are **control
+  padding** (10px, 14px, 18px, 22px) — a different scale, derived from control heights, not yet named.
 
 ## Architecture
 
@@ -52,7 +58,7 @@ Before working on any component, read:
 - Storybook nav is `Foundations/` (tokens only) then nine functional categories: `Actions`, `Données`, `Étiquettes`, `Feedback & chargement`, `Identité & média`, `Navigation`, `Saisie`, `Structure`, `Superposition`. A new story's `title` picks the category by what the component *does*. There is no atomic-level tier and no `Subcomponents/` tier — a piece that only exists inside a parent is titled under it (`Superposition/Dropdown/Item`). See ADR-0007
 - Every component story carries exactly one status tag, `stable` or `wip`, plus `primitive` when it satisfies the rule (one element, no composition of DS components, no internal state). These tags are the only source of truth for status — never re-add a hand-maintained table
 - Sidebar order is pinned inline in `.storybook/preview.ts` under `options.storySort`, which Storybook statically analyses — it cannot be a variable reference. Categories are alphabetical on purpose
-- Design tokens live in `tokens/` — run `npm run tokens` after any token change
+- Design tokens live in `tokens/` — run `npm run tokens` after any token change, and `npm run lint` to check token discipline (both builds run it)
 - Icons are generated — run `npm run icons` after editing `scripts/icons.manifest.txt`; `components/Icon/registry.ts` and `components/Icon/icons/` are build output, not source
 - Module artwork is generated — run `npm run module-art`; `components/ModuleIcon/registry.ts` and `components/ModuleIcon/art/` are build output, not source
 - All components are exported from `components/index.ts`

@@ -211,24 +211,24 @@ const dotSize = computed(() => {
 .ds-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ds-spacing-xs);
   border-radius: var(--ds-radius-pill);
   white-space: nowrap;
 }
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
 .ds-badge--sm {
-  padding: 2px 8px;
+  padding: var(--ds-spacing-xxs) var(--ds-spacing-md);
   font: var(--ds-font-label-md);
   line-height: 1;
 }
 .ds-badge--md {
-  padding: 2px 10px;
+  padding: var(--ds-spacing-xxs) 10px;
   font: var(--ds-font-label-lg);
   line-height: 1;
 }
 .ds-badge--lg {
-  padding: 4px 12px;
+  padding: var(--ds-spacing-xs) var(--ds-spacing-lg);
   font: var(--ds-font-label-lg);
   line-height: 1;
 }
@@ -252,7 +252,7 @@ const dotSize = computed(() => {
 
 /* ── Dot ──────────────────────────────────────────────────────────── */
 .ds-badge--has-dot {
-  padding-left: 6px;
+  padding-left: var(--ds-spacing-sm);
 }
 
 .ds-badge__dot {
@@ -264,8 +264,8 @@ const dotSize = computed(() => {
 
 /* ── Icon leading ─────────────────────────────────────────────────── */
 .ds-badge--has-icon {
-  gap: 2px;
-  padding-left: 6px;
+  gap: var(--ds-spacing-xxs);
+  padding-left: var(--ds-spacing-sm);
 }
 
 .ds-badge__icon {
@@ -274,13 +274,13 @@ const dotSize = computed(() => {
 
 /* ── Icon only ────────────────────────────────────────────────────── */
 .ds-badge--icon-only {
-  padding-left: 8px;
-  padding-right: 8px;
+  padding-left: var(--ds-spacing-md);
+  padding-right: var(--ds-spacing-md);
 }
 
 /* ── Dismissible ──────────────────────────────────────────────────── */
 .ds-badge--dismissible {
-  gap: 2px;
+  gap: var(--ds-spacing-xxs);
   padding-right: 3px;
 }
 
@@ -288,7 +288,7 @@ const dotSize = computed(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px;
+  padding: var(--ds-spacing-xxs);
   border: none;
   background: transparent;
   border-radius: 50%;
