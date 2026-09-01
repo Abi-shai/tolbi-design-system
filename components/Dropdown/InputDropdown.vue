@@ -271,7 +271,7 @@ onUnmounted(() => {
   padding: var(--ds-control-padding-md);
   box-sizing: border-box;
   background-color: var(--ds-bg-default);
-  border: 1px solid var(--ds-border-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
   border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-control);
   cursor: pointer;
@@ -377,9 +377,9 @@ onUnmounted(() => {
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: var(--ds-z-popover);
   background-color: var(--ds-bg-default);
-  border: 1px solid var(--ds-border-subtle);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-overlay);
   overflow: hidden;

@@ -102,6 +102,24 @@ test('no-token-js-import', () => {
   silent('no-token-js-import', style('.a { color: var(--ds-text-on-brand-solid); }'))
 })
 
+test('no-literal-border-width', () => {
+  fires('no-literal-border-width', style('.a { border: 1px solid var(--ds-border-default); }'))
+  fires('no-literal-border-width', style('.a { border-left: 2px solid var(--ds-border-brand); }'))
+  silent('no-literal-border-width', style('.a { border: var(--ds-border-width-default) solid var(--ds-border-default); }'))
+  // the tooltip's arrow is a CSS triangle, and Toast's 3px is an accent rule
+  silent('no-literal-border-width', style('.a { border-left: 8px solid transparent; }'))
+  silent('no-literal-border-width', style('.a { border-left: 3px solid var(--ds-text-error); }'))
+})
+
+test('no-literal-z-index', () => {
+  fires('no-literal-z-index', style('.a { z-index: 100; }'))
+  fires('no-literal-z-index', style('.a { z-index: 200; }'))
+  silent('no-literal-z-index', style('.a { z-index: var(--ds-z-popover); }'))
+  // stacking inside one component is its own business
+  silent('no-literal-z-index', style('.a { z-index: 2; }'))
+  silent('no-literal-z-index', style('.a { z-index: 0; }'))
+})
+
 test('every exported rule has a test that fires it', () => {
   const covered = new Set()
   for (const [rule, src] of [
@@ -116,6 +134,8 @@ test('every exported rule has a test that fires it', () => {
     ['no-raw-radius', style('.a { border-radius: var(--ds-radius-md); }')],
     ['no-literal-dimension-js', script("const t = { size: '2.5rem' }")],
     ['no-token-js-import', script("import { DsTextOnBrandSolid } from '../../tokens/dist/index.js'")],
+    ['no-literal-border-width', style('.a { border: 1px solid var(--ds-border-default); }')],
+    ['no-literal-z-index', style('.a { z-index: 100; }')],
   ]) if (rules(src).has(rule)) covered.add(rule)
   assert.deepEqual([...covered].sort(), [...RULES].sort())
 })

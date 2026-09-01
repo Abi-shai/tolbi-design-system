@@ -295,7 +295,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   top: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 100;
+  z-index: var(--ds-z-popover);
   white-space: nowrap;
 }
 
@@ -306,7 +306,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   gap: var(--ds-spacing-xs);
   padding: var(--ds-spacing-md) var(--ds-spacing-lg);
   background: color-mix(in srgb, var(--ds-bg-brand-solid) 90%, transparent);
-  border: 1px solid var(--ds-border-brand-solid);
+  border: var(--ds-border-width-default) solid var(--ds-border-brand-solid);
   border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-control);
   color: var(--ds-text-on-brand-solid);
@@ -352,7 +352,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   height: 6px;
   border-radius: var(--ds-radius-pill);
   background: var(--ds-bg-error-solid);
-  border: 1.5px solid var(--ds-border-subtle);
+  border: var(--ds-border-width-strong) solid var(--ds-border-subtle);
 }
 
 /* ── Avatar utilisateur ───────────────────────────────────────────── */
@@ -370,7 +370,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  z-index: 200;
+  z-index: var(--ds-z-overlay);
   box-shadow: var(--ds-elevation-overlay);
 }
 </style>

@@ -184,7 +184,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
   justify-content: center;
   text-align: center;
   background: var(--ds-bg-default);
-  border: 1px solid var(--ds-border-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
   border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-control);
   box-sizing: border-box;

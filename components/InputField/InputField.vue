@@ -137,7 +137,7 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
   gap: var(--ds-spacing-md);   /* 8px entre content et trailing */
   width: 100%;
   background: var(--ds-bg-default);
-  border: 1px solid var(--ds-border-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
   border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-control);
   box-sizing: border-box;

@@ -128,7 +128,7 @@ const tag = computed(() => (props.href ? 'a' : 'button'))
 .ds-badge-group {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--badge-group-border);
+  border: var(--ds-border-width-default) solid var(--badge-group-border);
   border-radius: var(--ds-radius-pill);
   background-color: var(--badge-group-bg);
   color: var(--badge-group-text);
@@ -177,7 +177,7 @@ const tag = computed(() => (props.href ? 'a' : 'button'))
   display: inline-flex;
   align-items: center;
   gap: var(--ds-spacing-xs);
-  border: 1px solid var(--badge-group-pill-border);
+  border: var(--ds-border-width-default) solid var(--badge-group-pill-border);
   border-radius: var(--ds-radius-pill);
   background-color: var(--ds-bg-default);
   color: var(--badge-group-text);

@@ -174,7 +174,7 @@ function display(v: number): string {
   margin-top: calc(-1 * var(--ds-spacing-md));
   border-radius: 50%;
   background: var(--ds-bg-default);
-  border: 2px solid var(--ds-bg-brand-solid);
+  border: var(--ds-border-width-strong) solid var(--ds-bg-brand-solid);
   box-shadow: var(--ds-elevation-raised);
   cursor: grab;
   transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
@@ -195,7 +195,7 @@ function display(v: number): string {
   height: 24px;
   border-radius: 50%;
   background: var(--ds-bg-default);
-  border: 2px solid var(--ds-bg-brand-solid);
+  border: var(--ds-border-width-strong) solid var(--ds-bg-brand-solid);
   box-shadow: var(--ds-elevation-raised);
   cursor: grab;
 }
@@ -219,7 +219,7 @@ function display(v: number): string {
   left: 50%;
   transform: translateX(-50%);
   background: var(--ds-bg-default);
-  border: 1px solid var(--ds-border-subtle);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: 8px;
   padding: var(--ds-spacing-md) var(--ds-spacing-lg);
   font: var(--ds-font-label-md);

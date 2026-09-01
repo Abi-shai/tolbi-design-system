@@ -89,7 +89,7 @@ const overflow = computed(() => Math.max(0, props.items.length - props.max))
 .ds-avatar-group__item:nth-child(2) { z-index: 4; }
 .ds-avatar-group__item:nth-child(3) { z-index: 3; }
 .ds-avatar-group__item:nth-child(4) { z-index: 2; }
-.ds-avatar-group__item:nth-child(n+5) { z-index: 1; }
+.ds-avatar-group__item:nth-child(n+5) { z-index: var(--ds-z-raised); }
 
 .ds-avatar-group__more {
   display: inline-flex;
@@ -132,7 +132,7 @@ const overflow = computed(() => Math.max(0, props.items.length - props.max))
   width: 32px;
   height: 32px;
   border-radius: var(--ds-radius-pill);
-  border: 1px dashed var(--ds-border-default);
+  border: var(--ds-border-width-default) dashed var(--ds-border-default);
   color: var(--ds-text-subtlest);
 }
 </style>

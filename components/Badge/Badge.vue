@@ -239,14 +239,14 @@ const dotSize = computed(() => {
 /* ── Pill color ───────────────────────────────────────────────────── */
 .ds-badge--pill-color {
   background-color: var(--badge-bg);
-  border: 1px solid var(--badge-border);
+  border: var(--ds-border-width-default) solid var(--badge-border);
   color: var(--badge-text);
 }
 
 /* ── Pill outline ─────────────────────────────────────────────────── */
 .ds-badge--pill-outline {
   background-color: transparent;
-  border: 1.5px solid var(--badge-outline-border);
+  border: var(--ds-border-width-strong) solid var(--badge-outline-border);
   color: var(--badge-text);
 }
 

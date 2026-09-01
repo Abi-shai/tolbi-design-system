@@ -18,7 +18,7 @@ withDefaults(defineProps<Props>(), {
 .ds-button-group {
   display: inline-flex;
   align-items: stretch;
-  border: 1px solid var(--ds-border-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
   border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-control);
   overflow: hidden;

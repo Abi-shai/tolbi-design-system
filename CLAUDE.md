@@ -87,6 +87,12 @@ Before working on any component, read:
   rule forbids it. `chartCategorical` + `chartCategoricalCeiling` carry ADR-0016's ceiling into code.
   **No native platform**: there is no native app, and an export nobody consumes is the `blur-*` ramp
   again.
+- **ADR-0020**: `--ds-border-width-{default,strong}` (1px / 2px — 1.5px snaps up, sub-pixel Figma
+  artifacts go) and `--ds-z-{raised,popover,overlay}` (1 / 100 / 200). Both were scales several
+  components had agreed on without naming — 38 sites chose `1px`, four chose `z-index: 100`.
+  A z-index **below 10 is stacking inside one component** and stays literal; the lint fires at 10+.
+  Deliberately absent: breakpoints (no responsive behaviour yet) and icon sizes (a typed component
+  API, ADR-0004).
 
 ## Architecture
 

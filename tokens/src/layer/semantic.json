@@ -1,0 +1,19 @@
+{
+  "z": {
+    "raised": {
+      "$value": "1",
+      "$type": "number",
+      "$description": "Lifted above a sibling in the same component — a hovered segment, a checkbox input over its box"
+    },
+    "popover": {
+      "$value": "100",
+      "$type": "number",
+      "$description": "Anchored floating chrome: dropdown panels, tooltips. Four components chose 100 independently, which is what makes this a layer rather than a number"
+    },
+    "overlay": {
+      "$value": "200",
+      "$type": "number",
+      "$description": "Anything that must cover a popover — the nav's module panel today, a modal scrim when one exists. Pairs with bg-overlay"
+    }
+  }
+}

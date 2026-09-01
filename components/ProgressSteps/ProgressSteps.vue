@@ -138,7 +138,7 @@ const checkSize = computed(() => {
   justify-content: center;
   width: 48px;
   height: 48px;
-  border: 1px solid var(--ds-border-subtle);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface-sm);
   box-shadow: var(--ds-elevation-control);
   background-color: var(--ds-bg-default);
@@ -172,7 +172,7 @@ const checkSize = computed(() => {
 
 .ds-steps__icon--incomplete {
   background-color: var(--ds-bg-disabled);
-  border: 2px solid var(--ds-border-subtle);
+  border: var(--ds-border-width-strong) solid var(--ds-border-subtle);
 }
 
 /* ── Check icon (complete) ─────────────────────────────────────────── */

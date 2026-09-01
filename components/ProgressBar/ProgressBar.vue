@@ -108,7 +108,7 @@ const hasFloatingLabel = computed(() => props.label === 'top-floating' || props.
   right: 0;
   transform: translateX(50%);
   background-color: var(--ds-bg-default);
-  border: 1px solid var(--ds-border-subtle);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: 8px;
   padding: var(--ds-spacing-md) var(--ds-spacing-lg);
   font: var(--ds-font-label-md);
@@ -116,7 +116,7 @@ const hasFloatingLabel = computed(() => props.label === 'top-floating' || props.
   white-space: nowrap;
   box-shadow: var(--ds-elevation-overlay);
   pointer-events: none;
-  z-index: 1;
+  z-index: var(--ds-z-raised);
 }
 
 .ds-progress-bar__tooltip--top {

@@ -96,7 +96,7 @@ const goodLabel = computed(() =>
 }
 
 .ds-credits-chip--critical {
-  border: 1.083px solid var(--ds-border-error-solid);
+  border: var(--ds-border-width-default) solid var(--ds-border-error-solid);
   border-radius: var(--ds-radius-pill);
   padding: var(--ds-spacing-sm) var(--ds-spacing-lg) var(--ds-spacing-sm) var(--ds-spacing-sm);
   gap: var(--ds-spacing-md);
@@ -127,7 +127,7 @@ const goodLabel = computed(() =>
   position: absolute;
   inset: 0;
   border-radius: var(--ds-radius-pill);
-  border: 0.361px solid var(--ds-border-inset);
+  border: var(--ds-border-width-default) solid var(--ds-border-inset);
   pointer-events: none;
 }
 

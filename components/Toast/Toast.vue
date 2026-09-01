@@ -74,7 +74,7 @@ const liveRole = computed(() => (props.tone === 'error' ? 'alert' : 'status'))
   padding: var(--ds-spacing-xl);
   width: 100%;
   max-width: var(--ds-width-xs);
-  border: 1px solid var(--ds-border-subtle);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-left: 3px solid var(--tone-fg);
   border-radius: var(--ds-radius-surface);
   background-color: var(--ds-bg-default);

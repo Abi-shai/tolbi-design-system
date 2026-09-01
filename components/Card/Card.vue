@@ -52,15 +52,15 @@ const slots = defineSlots<{
   background-color: var(--ds-bg-default);
 }
 
-.ds-card--outlined { border: 1px solid var(--ds-border-subtle); }
+.ds-card--outlined { border: var(--ds-border-width-default) solid var(--ds-border-subtle); }
 
 .ds-card--elevated {
-  border: 1px solid var(--ds-border-subtle);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   box-shadow: var(--ds-elevation-surface);
 }
 
 .ds-card--sunk {
-  border: 1px solid transparent;
+  border: var(--ds-border-width-default) solid transparent;
   background-color: var(--ds-bg-neutral-subtle);
 }
 
@@ -77,8 +77,8 @@ const slots = defineSlots<{
 }
 
 /* Dividers only appear when there is something to divide. */
-.ds-card__header { border-bottom: 1px solid var(--ds-border-subtle); }
-.ds-card__footer { border-top: 1px solid var(--ds-border-subtle); }
+.ds-card__header { border-bottom: var(--ds-border-width-default) solid var(--ds-border-subtle); }
+.ds-card__footer { border-top: var(--ds-border-width-default) solid var(--ds-border-subtle); }
 
 .ds-card__body { flex: 1 1 auto; }
 </style>

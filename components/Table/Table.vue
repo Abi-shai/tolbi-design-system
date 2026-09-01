@@ -181,7 +181,7 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 /* ── Container ─────────────────────────────────────────────────────── */
 .ds-table-container {
   width: 100%;
-  border: 1px solid var(--ds-border-subtle);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
   box-shadow: var(--ds-elevation-surface);
   background-color: var(--ds-bg-default);
@@ -203,7 +203,7 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 /* ── Header cell ───────────────────────────────────────────────────── */
 .ds-table__th {
   padding: var(--ds-spacing-lg) var(--ds-spacing-3xl);
-  border-bottom: 1px solid var(--ds-border-subtle);
+  border-bottom: var(--ds-border-width-default) solid var(--ds-border-subtle);
   text-align: left;
   white-space: nowrap;
   vertical-align: middle;
@@ -230,7 +230,7 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 
 /* ── Data row ──────────────────────────────────────────────────────── */
 .ds-table__row {
-  border-bottom: 1px solid var(--ds-border-subtle);
+  border-bottom: var(--ds-border-width-default) solid var(--ds-border-subtle);
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 

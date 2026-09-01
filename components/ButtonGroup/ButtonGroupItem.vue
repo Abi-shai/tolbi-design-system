@@ -65,7 +65,7 @@ function handleClick(event: MouseEvent) {
   min-height: 40px;
   padding: var(--ds-spacing-md) var(--ds-spacing-xl);
   border: none;
-  border-right: 1px solid var(--ds-border-default);
+  border-right: var(--ds-border-width-default) solid var(--ds-border-default);
   background-color: var(--ds-bg-default);
   font: var(--ds-font-label-lg-strong);
   color: var(--ds-text-default);
@@ -97,12 +97,12 @@ function handleClick(event: MouseEvent) {
 .ds-button-group-item:hover:not(:disabled) {
   background-color: var(--ds-bg-hover);
   color: var(--ds-text-default-hover);
-  z-index: 1;
+  z-index: var(--ds-z-raised);
 }
 
 .ds-button-group-item:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-gray);
-  z-index: 1;
+  z-index: var(--ds-z-raised);
 }
 
 /* Component token (ADR-0009): segmented selection is a neutral raised

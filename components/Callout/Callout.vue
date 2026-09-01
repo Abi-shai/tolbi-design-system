@@ -69,7 +69,7 @@ const resolvedIcon = computed(() => props.icon ?? TONE_ICON[props.tone])
   align-items: flex-start;
   gap: var(--ds-spacing-lg);
   padding: var(--ds-spacing-xl);
-  border: 1px solid var(--tone-border);
+  border: var(--ds-border-width-default) solid var(--tone-border);
   border-radius: var(--ds-radius-surface);
   background-color: var(--tone-bg);
   font-family: var(--ds-typography-font-family-poppins);

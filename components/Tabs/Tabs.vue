@@ -126,7 +126,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
   align-items: center;
   width: 100%;
   background-color: var(--ds-bg-neutral-subtle);
-  border: 1px solid var(--ds-border-subtle);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   gap: var(--ds-spacing-xs);
 }
 
@@ -162,7 +162,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
 /* ── Tab button (base) ─────────────────────────────────────────────── */
 .ds-tabs__tab {
   position: relative;
-  z-index: 1;
+  z-index: var(--ds-z-raised);
   display: flex;
   flex: 1 0 0;
   align-items: center;

@@ -91,7 +91,7 @@ function goToPage(page: number) {
   align-items: center;
   gap: var(--ds-spacing-lg);
   padding: 12px var(--ds-spacing-3xl) 16px;
-  border-top: 1px solid var(--ds-border-subtle);
+  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
 }
 
 /* ── Side slots (Previous / Next) ──────────────────────────────────── */

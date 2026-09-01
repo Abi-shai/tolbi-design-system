@@ -57,7 +57,7 @@ function suppressions(src) {
 export const RULES = ['no-raw-primitive', 'no-colour-literal', 'no-shadowing-var',
                       'no-literal-type', 'role-completeness', 'font-order', 'solid-pairing',
                       'spacing-on-ramp', 'no-raw-radius', 'no-literal-dimension-js',
-                      'no-token-js-import']
+                      'no-token-js-import', 'no-literal-border-width', 'no-literal-z-index']
 
 /**
  * The rules, over one file's source. Pure: no filesystem, so the suite can
@@ -149,6 +149,19 @@ export function lintSource(rel, src) {
      stale the day the token moves. Components use the CSS. */
   for (const m of src.matchAll(/from\s+['"][^'"]*tokens\/dist(?:\/index)?(?:\.js)?['"]/g))
     report('no-token-js-import', rel, lineOf(m.index), 'components use the CSS custom properties, not the resolved JS export')
+
+  /* ADR-0020 — a border width that maps to a token must use it. Scoped to the
+     two values that ARE tokens: the tooltip's 6/8px triangles are geometry and
+     Toast's 3px rule is an accent, neither is a border width. */
+  for (const m of src.matchAll(/\b(border(?:-(?:top|right|bottom|left))?)\s*:\s*(1|2)px\s+(?:solid|dashed)/g))
+    report('no-literal-border-width', rel, lineOf(m.index), `${m[1]}: ${m[2]}px is --ds-border-width-${m[2] === '1' ? 'default' : 'strong'}`)
+
+  /* ADR-0020 — a z-index of 10 or more is a SHARED layer and needs a name.
+     Below that it is stacking inside one component, which is its own business. */
+  for (const m of src.matchAll(/z-index:\s*(\d+)/g)) {
+    if (Number(m[1]) < 10) continue
+    report('no-literal-z-index', rel, lineOf(m.index), `z-index: ${m[1]} — use --ds-z-popover or --ds-z-overlay`)
+  }
 
   /* Rule-block rules. */
   for (const m of src.matchAll(/\{([^{}]*)\}/g)) {

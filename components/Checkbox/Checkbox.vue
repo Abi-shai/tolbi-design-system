@@ -199,7 +199,7 @@ function handleChange(event: Event) {
   height: 100%;
   margin: 0;
   cursor: inherit;
-  z-index: 1;
+  z-index: var(--ds-z-raised);
 }
 
 /* ── Custom control ────────────────────────────────────────────────── */
@@ -208,7 +208,7 @@ function handleChange(event: Event) {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid var(--ds-border-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
   background-color: var(--ds-bg-default);
   color: var(--ds-text-on-brand-solid);
   overflow: hidden;

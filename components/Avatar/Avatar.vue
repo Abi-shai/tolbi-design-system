@@ -157,7 +157,7 @@ const showInitials = computed(() => !props.src && !!props.initials)
   color: var(--ds-text-subtlest);
   user-select: none;
   position: relative;
-  z-index: 1;
+  z-index: var(--ds-z-raised);
 }
 
 /* ── Placeholder ──────────────────────────────────────────────────── */
@@ -172,7 +172,7 @@ const showInitials = computed(() => !props.src && !!props.initials)
   position: absolute;
   inset: 0;
   border-radius: var(--ds-radius-pill);
-  border: 0.75px solid var(--ds-border-inset);
+  border: var(--ds-border-width-default) solid var(--ds-border-inset);
   pointer-events: none;
   z-index: 2;
 }
@@ -183,7 +183,7 @@ const showInitials = computed(() => !props.src && !!props.initials)
   bottom: 0;
   right: 0;
   border-radius: var(--ds-radius-pill);
-  border: 1.5px solid var(--ds-bg-default);
+  border: var(--ds-border-width-strong) solid var(--ds-bg-default);
   z-index: 3;
   display: flex;
   align-items: center;

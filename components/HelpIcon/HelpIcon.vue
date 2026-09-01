@@ -127,7 +127,7 @@ const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
 
 .ds-help-icon__tooltip {
   position: absolute;
-  z-index: 100;
+  z-index: var(--ds-z-popover);
   white-space: normal;
 }
 

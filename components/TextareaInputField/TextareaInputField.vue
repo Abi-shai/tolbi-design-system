@@ -141,7 +141,7 @@ function onKeydown(e: KeyboardEvent) {
   width: 100%;
   box-sizing: border-box;
   background: var(--ds-bg-default);
-  border: 1px solid var(--ds-border-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
   border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-control);
   overflow: hidden;
@@ -237,7 +237,7 @@ function onKeydown(e: KeyboardEvent) {
   gap: 3px;
   padding: var(--ds-spacing-xxs) var(--ds-spacing-xs) var(--ds-spacing-xxs) 9px;
   background: var(--ds-bg-default);
-  border: 1px solid var(--ds-border-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
   border-radius: var(--ds-radius-inner);
   flex-shrink: 0;
 }

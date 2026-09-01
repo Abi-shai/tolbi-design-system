@@ -133,7 +133,7 @@ function onTagClick() {
   gap: var(--ds-spacing-xs);
   padding: 3px var(--ds-spacing-md);
   background-color: var(--ds-bg-default);
-  border: 1px solid var(--ds-border-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
   border-radius: var(--ds-radius-inner);
   color: var(--ds-text-default);
   font: var(--ds-font-label-md);

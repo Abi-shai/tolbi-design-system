@@ -78,7 +78,7 @@ function handleClick(event: MouseEvent) {
   justify-content: center;
   gap: var(--ds-spacing-xs);
   padding: var(--ds-control-padding-md);
-  border: 1px solid transparent;
+  border: var(--ds-border-width-default) solid transparent;
   border-radius: var(--ds-radius-control);
   font: var(--ds-font-label-lg-strong);
   white-space: nowrap;

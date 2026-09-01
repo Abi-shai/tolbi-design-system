@@ -9,6 +9,7 @@ const ALL_SOURCES = [
   'tokens/src/widths/semantic.json', 'tokens/src/containers/semantic.json',
   'tokens/src/effect/shadows.json', 'tokens/src/effect/elevation.json', 'tokens/src/effect/focus-rings.json',
   'tokens/src/motion/semantic.json',
+  'tokens/src/border/semantic.json', 'tokens/src/layer/semantic.json',
 ]
 
 const TYPE_ROLE_ROOTS = ['font-size', 'line-height', 'letter-spacing', 'font-weight']
@@ -84,7 +85,10 @@ await Promise.all([
     { filter: (token) => token.path[0] === 'chart', outputReferences: true },
   ),
   buildTokenFile('tokens/src/effect/focus-rings.json',  'focus-rings.css'),
-  buildTokenFile('tokens/src/effect/blurs.json',        'blurs.css'),
+
+  // ADR-0020: two scales several components had agreed on without naming.
+  buildTokenFile('tokens/src/border/semantic.json',      'border.css'),
+  buildTokenFile('tokens/src/layer/semantic.json',       'layer.css'),
   buildTokenFile('tokens/src/spacing/primitives.json',  'space.css'),
 
   buildTokenFile(
@@ -227,6 +231,7 @@ const tokenFiles = [
   'radius', 'space', 'spacing', 'widths', 'containers',
   'font-roles', 'font-roles-mobile', 'control',
   'shadows', 'elevation', 'focus-rings', 'semantic', 'chart', 'motion',
+  'border', 'layer',
 ]
 const combined = tokenFiles
   .map(f => readFileSync(`tokens/dist/${f}.css`, 'utf8'))

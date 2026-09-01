@@ -45,7 +45,7 @@ const slots = defineSlots<{ default?: () => unknown }>()
   display: flex;
   gap: var(--ds-spacing-lg);
   padding: var(--ds-spacing-lg) 0;
-  border-bottom: 1px solid var(--ds-border-subtlest);
+  border-bottom: var(--ds-border-width-default) solid var(--ds-border-subtlest);
   font-family: var(--ds-typography-font-family-poppins);
   min-width: 0;
 }
