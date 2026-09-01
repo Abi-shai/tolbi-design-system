@@ -194,3 +194,29 @@ export const Empty: Story = {
     template: `<Table :columns="columns" :rows="rows" empty-text="Aucun membre trouvé." />`,
   }),
 }
+
+/**
+ * ADR-0026: skeleton → content is the most-watched transition in a data product,
+ * because it fires on every page load. Toggle it and watch the shimmer hand over
+ * rather than snap.
+ */
+export const LoadingHandover: Story = {
+  name: 'Loading handover',
+  render: () => ({
+    setup: () => ({ loading: ref(true), columns: COLUMNS, rows: ROWS }),
+    components: { Table },
+    template: `
+      <div style="display: flex; flex-direction: column; gap: var(--ds-spacing-xl); align-items: flex-start;">
+        <button
+          id="toggle-loading"
+          type="button"
+          @click="loading = !loading"
+          style="font: var(--ds-font-label-lg); padding: var(--ds-control-padding-sm);
+                 border: var(--ds-border-width-default) solid var(--ds-border-default);
+                 border-radius: var(--ds-radius-control); background: var(--ds-bg-default); cursor: pointer;"
+        >{{ loading ? 'Charger' : 'Recharger' }}</button>
+        <Table :columns="columns" :rows="rows" :loading="loading" />
+      </div>
+    `,
+  }),
+}

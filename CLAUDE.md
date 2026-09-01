@@ -119,6 +119,11 @@ Before working on any component, read:
   the **transitioning element**: on leave, `v-if` has already removed what gave a static wrapper its
   height. `quick`, not `enter` — an error must not be late. The text does **not** cross-fade; only
   its colour turns.
+- **ADR-0026**: Skeleton → content uses `SwapTransition` — a cross-fade at `quick` with
+  `mode="out-in"`, because the two states have different heights and overlapping them makes the
+  container jump. `Table` carries **two `<tbody>` elements** so the transition has a single element
+  child. `Button` is deliberately excluded: swapping a spinner for a label changes its width, and
+  fading through a resize reads as a wobble — fix the resize first.
 
 ## Architecture
 

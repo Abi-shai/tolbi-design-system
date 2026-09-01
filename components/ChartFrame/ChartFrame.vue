@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SwapTransition } from '../SwapTransition'
 import { computed } from 'vue'
 import { Spinner } from '../Spinner'
 import { EmptyState } from '../EmptyState'
@@ -62,23 +63,25 @@ const gridLines = computed(() => (props.yTicks.length ? props.yTicks.length : 5)
             <span v-for="n in gridLines" :key="n" class="ds-chart-frame__grid-line" />
           </div>
 
-          <div v-if="loading" class="ds-chart-frame__overlay">
-            <Spinner :size="24" label="Chargement du graphique" />
-          </div>
+          <SwapTransition>
+            <div v-if="loading" class="ds-chart-frame__overlay">
+              <Spinner :size="24" label="Chargement du graphique" />
+            </div>
 
-          <EmptyState
-            v-else-if="empty"
-            size="sm"
-            icon="chart-line"
-            :title="emptyTitle"
-            :description="emptyDescription"
-            class="ds-chart-frame__empty"
-          />
+            <EmptyState
+              v-else-if="empty"
+              size="sm"
+              icon="chart-line"
+              :title="emptyTitle"
+              :description="emptyDescription"
+              class="ds-chart-frame__empty"
+            />
 
-          <!-- The plot itself. The design system supplies no renderer. -->
-          <div v-else class="ds-chart-frame__slot">
-            <slot />
-          </div>
+            <!-- The plot itself. The design system supplies no renderer. -->
+            <div v-else class="ds-chart-frame__slot">
+              <slot />
+            </div>
+          </SwapTransition>
         </div>
 
         <div v-if="xTicks.length && !empty" class="ds-chart-frame__x-axis" aria-hidden="true">

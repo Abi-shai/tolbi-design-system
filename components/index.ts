@@ -38,6 +38,7 @@ export type { HelpPlacement } from './HelpIcon'
 
 export { SurfaceTransition } from './SurfaceTransition'
 export { MarkTransition } from './MarkTransition'
+export { SwapTransition } from './SwapTransition'
 
 export { FormField, useFormField, FORM_FIELD_KEY } from './FormField'
 export type { FormFieldContext } from './FormField'

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SwapTransition } from '../SwapTransition'
 import { computed } from 'vue'
 import { Checkbox } from '../Checkbox'
 import { HelpIcon } from '../HelpIcon'
@@ -120,8 +121,8 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
             </th>
           </tr>
         </thead>
-        <tbody>
-          <template v-if="loading">
+        <SwapTransition>
+          <tbody v-if="loading">
             <tr v-for="i in loadingRows" :key="`skeleton-${i}`" class="ds-table__row">
               <td v-if="selectable" class="ds-table__td ds-table__td--select">
                 <Skeleton variant="rect" width="16px" height="16px" />
@@ -130,8 +131,8 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
                 <Skeleton variant="text" :width="skeletonWidth(i)" height="14px" />
               </td>
             </tr>
-          </template>
-          <template v-else>
+          </tbody>
+          <tbody v-else>
             <tr
               v-for="row in rows"
               :key="row.id"
@@ -163,8 +164,8 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
                 <slot name="empty">{{ emptyText }}</slot>
               </td>
             </tr>
-          </template>
-        </tbody>
+          </tbody>
+        </SwapTransition>
       </table>
     </Scrollbar>
 

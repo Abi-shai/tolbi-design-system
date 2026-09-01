@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SwapTransition } from '../SwapTransition'
 import { Card } from '../Card'
 import { MetricValue, type MetricTrend } from '../MetricValue'
 import { Badge, type BadgeTone } from '../Badge'
@@ -35,19 +36,21 @@ withDefaults(defineProps<Props>(), {
       <Badge v-if="tag" :label="tag" :tone="tagTone" size="sm" />
     </div>
 
-    <div v-if="loading" class="ds-stat-tile__loading">
-      <Skeleton variant="text" width="55%" height="32px" />
-    </div>
+    <SwapTransition>
+      <div v-if="loading" class="ds-stat-tile__loading">
+        <Skeleton variant="text" width="55%" height="32px" />
+      </div>
 
-    <MetricValue
-      v-else
-      label=""
-      :value="value ?? '—'"
-      :unit="unit"
-      :delta="delta"
-      :trend="trend"
-      class="ds-stat-tile__metric"
-    />
+      <MetricValue
+        v-else
+        label=""
+        :value="value ?? '—'"
+        :unit="unit"
+        :delta="delta"
+        :trend="trend"
+        class="ds-stat-tile__metric"
+      />
+    </SwapTransition>
 
     <div v-if="$slots.default" class="ds-stat-tile__footer">
       <slot />

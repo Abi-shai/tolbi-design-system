@@ -123,7 +123,7 @@ function formatSize(bytes?: number) {
       </label>
     </div>
 
-    <ul v-if="files.length" class="ds-dropzone__files">
+    <TransitionGroup v-if="files.length" tag="ul" name="ds-mark" class="ds-dropzone__files">
       <li
         v-for="file in files"
         :key="file.id"
@@ -154,7 +154,7 @@ function formatSize(bytes?: number) {
           @click="emit('remove', file.id)"
         />
       </li>
-    </ul>
+    </TransitionGroup>
   </div>
 </template>
 
@@ -255,7 +255,11 @@ function formatSize(bytes?: number) {
   list-style: none;
 }
 
+/* ADR-0026: a file arriving during an upload is a mark that confirms — the user
+   is watching this exact spot. TransitionGroup needs the leaving row taken out
+   of flow, or the survivors jump while it fades. */
 .ds-dropzone__file {
+  transition: transform var(--ds-motion-duration-quick) var(--ds-motion-easing-out);
   display: flex;
   align-items: flex-start;
   gap: var(--ds-spacing-lg);
@@ -295,4 +299,8 @@ function formatSize(bytes?: number) {
 .ds-dropzone__file-error { color: var(--ds-text-error); }
 
 .ds-dropzone__file-progress { margin-top: var(--ds-spacing-xs); }
+
+.ds-mark-leave-active {
+  position: absolute;
+}
 </style>
