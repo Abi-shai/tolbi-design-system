@@ -87,6 +87,5 @@ offset became `calc(-1 * var(--ds-spacing-md))`.
 
 - ~~**`CreditsChip` hand-rolls a mini avatar**~~ — **withdrawn** by ADR-0016. The image is a currency glyph, not a person; ADR-0001 does not reach it. The claim rested on misleading class names, now renamed.
 
-- **The mobile type scale has never been exercised** — deliberately deferred.
 - ~~**`HorizontalNavigation`'s drop shadow**~~ — closed by ADR-0016: it was drift, not an exception. Now `elevation-overlay`.
 

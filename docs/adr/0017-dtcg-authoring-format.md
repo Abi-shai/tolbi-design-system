@@ -88,8 +88,5 @@ until the key names moved.
 ## Still open
 
 - ~~**No platform beyond CSS is configured.**~~ — closed by ADR-0019 for JS and JSON. Native is deferred: there is no native app, so an export would be consumed by nobody.
-- **Original text:** Style Dictionary can emit iOS, Android and JS today; the
-  work is a platform block, not a format change. This matters most for the mobile type scale, which
-  ADR-0003 defined as a *native* context and which therefore still cannot be consumed as specified.
 - **No deprecation mechanism.** Correct at zero consumers, a cliff at one. `$extensions` is where it
   would go.

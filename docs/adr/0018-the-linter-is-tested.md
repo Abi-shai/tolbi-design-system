@@ -83,5 +83,5 @@ catalogue; the suite guards the linter.
 
 - **Mutation testing is manual.** Three mutations were run by hand for this ADR, not by a tool. At
   ten rules that is proportionate; if the rule set doubles it is worth automating.
-- The remaining maturity gaps are unchanged and structural: one colour mode, and no platform beyond
-  CSS configured.
+- ~~The remaining maturity gaps~~ — the platform gap is closed by ADR-0019. **One colour mode is a
+  settled constraint (ADR-0003), not a gap**, and is not to be re-raised as one.

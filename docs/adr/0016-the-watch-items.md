@@ -96,4 +96,3 @@ silently or leaving them to look like neglected work.
 
 ## Still open
 
-- **The mobile type scale has never been exercised** — deliberately deferred; the only item left.

@@ -67,6 +67,5 @@ discovered late.
 ## Still open
 
 - **Native platforms**, deferred above with an explicit trigger.
-- **The mobile type scale**, whose blocker is a consumer rather than a format.
-- **One colour mode** — the last structural item, and the only one where the semantic layer's central
-  claim is untested.
+- ~~**One colour mode**~~ — settled by ADR-0003. The product has one mode; the semantic layer serves
+  it. Not a gap.
