@@ -1,20 +1,30 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject, onMounted, ref } from 'vue'
 import { Icon } from '../Icon'
 import type { IconName } from '../Icon'
+import { BUTTON_GROUP_KEY } from './context'
 
+/**
+ * ADR-0024: selection comes from the group, not from a prop. `active` is gone —
+ * it allowed a segmented control with zero or two selected segments, and it
+ * meant nothing knew where the selection sat, so it could only cross-fade.
+ *
+ * The item still works outside a group (`useSlidingIndicator` is the group's
+ * business); it simply never reports as selected.
+ */
 interface Props {
+  /** Identifies this segment to the group's `v-model`. */
+  value?: string
   label?: string
   icon?: IconName
-  active?: boolean
   disabled?: boolean
   type?: 'button' | 'submit' | 'reset'
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  value: undefined,
   label: undefined,
   icon: undefined,
-  active: false,
   disabled: false,
   type: 'button',
 })
@@ -23,23 +33,33 @@ const emit = defineEmits<{
   click: [event: MouseEvent]
 }>()
 
+const group = inject(BUTTON_GROUP_KEY, null)
+const el = ref<HTMLButtonElement>()
+const key = computed(() => props.value ?? props.label ?? '')
+
+onMounted(() => { if (group && el.value) group.register(key.value, el.value) })
+
+const selected = computed(() => group?.isSelected(key.value) ?? false)
 const iconOnly = computed(() => !!props.icon && !props.label)
 
 function handleClick(event: MouseEvent) {
-  if (!props.disabled) emit('click', event)
+  if (props.disabled) return
+  group?.select(key.value)
+  emit('click', event)
 }
 </script>
 
 <template>
   <button
+    ref="el"
     :type="type"
     :disabled="disabled"
-    :aria-pressed="active || undefined"
+    :aria-pressed="selected || undefined"
     :class="[
       'ds-button-group-item',
       iconOnly && 'ds-button-group-item--icon-only',
       icon && label && 'ds-button-group-item--leading-icon',
-      active && 'ds-button-group-item--active',
+      selected && 'ds-button-group-item--active',
     ]"
     @click="handleClick"
   >
@@ -105,19 +125,10 @@ function handleClick(event: MouseEvent) {
   z-index: var(--ds-z-raised);
 }
 
-/* Component token (ADR-0009): segmented selection is a neutral raised
-   surface. It must not use bg-selected — that one is brand-tinted, and a
-   segmented control is a neutral affordance. */
+/* The selection is painted by the group's sliding indicator (ADR-0024); the
+   item only promotes its own text. */
 .ds-button-group-item--active {
-  --segment-selected-bg:       var(--ds-bg-neutral-subtle);
-  --segment-selected-bg-hover: var(--ds-bg-neutral-subtle-hover);
-
-  background-color: var(--segment-selected-bg);
   color: var(--ds-text-default-hover);
-}
-
-.ds-button-group-item--active:hover:not(:disabled) {
-  background-color: var(--segment-selected-bg-hover);
 }
 
 /* ── Disabled ─────────────────────────────────────────────────────── */

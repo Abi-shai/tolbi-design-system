@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, watch, nextTick } from 'vue'
+import { useSlidingIndicator } from '../../composables/useSlidingIndicator'
 import { Badge } from '../Badge'
 
 export type TabsSize = 'sm' | 'md'
@@ -28,42 +29,15 @@ const badgeSize = computed(() => (props.size === 'md' ? 'md' : 'sm') as 'sm' | '
 const activeIndex = computed(() => props.tabs.findIndex(t => t.value === props.modelValue))
 
 // ── Sliding indicator ──────────────────────────────────────────────────
-const containerRef = ref<HTMLDivElement>()
-const tabRefs = ref<HTMLButtonElement[]>([])
-const indicatorStyle = ref({ transform: 'translateX(0px)', width: '0px', top: '0px', height: '0px' })
-const indicatorReady = ref(false)
+const {
+  containerRef,
+  itemRefs: tabRefs,
+  style: indicatorStyle,
+  ready: indicatorReady,
+  measure,
+} = useSlidingIndicator(activeIndex)
 
-function updateIndicator(index: number) {
-  const btn = tabRefs.value[index]
-  if (!btn) return
-  indicatorStyle.value = {
-    transform: `translateX(${btn.offsetLeft}px)`,
-    width:     `${btn.offsetWidth}px`,
-    top:       `${btn.offsetTop}px`,
-    height:    `${btn.offsetHeight}px`,
-  }
-}
-
-let ro: ResizeObserver | null = null
-
-onMounted(async () => {
-  await nextTick()
-  updateIndicator(activeIndex.value)
-  // Enable transition only after the first paint so there's no jump on mount
-  requestAnimationFrame(() => { indicatorReady.value = true })
-
-  ro = new ResizeObserver(() => updateIndicator(activeIndex.value))
-  if (containerRef.value) ro.observe(containerRef.value)
-})
-
-onUnmounted(() => ro?.disconnect())
-
-watch(activeIndex, (idx) => { if (idx !== -1) updateIndicator(idx) })
-
-watch(() => props.tabs, async () => {
-  await nextTick()
-  updateIndicator(activeIndex.value)
-}, { deep: true })
+watch(() => props.tabs, async () => { await nextTick(); measure() }, { deep: true })
 
 // ── Keyboard navigation ────────────────────────────────────────────────
 function activate(index: number) {

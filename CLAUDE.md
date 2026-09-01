@@ -109,6 +109,11 @@ Before working on any component, read:
   surface arrives**. Movement must *explain*: a static indicator (Badge dot, Tooltip arrow) is not
   animated. Two mechanisms share the motion — `v-if` marks wrap the component, `Checkbox`'s radio
   `::after` takes the same values in CSS.
+- **ADR-0024**: `ButtonGroup` owns its selection (`v-model`); `ButtonGroupItem.active` is gone,
+  because a per-item prop let a segmented control have zero or two selected segments *and* meant
+  nothing knew where the selection sat. Selection that moves between aligned siblings uses
+  `useSlidingIndicator` — shared by `Tabs` and `ButtonGroup`, and it carries the two details that
+  are easy to re-learn: no transition until after the first paint, and a `ResizeObserver` re-measure.
 
 ## Architecture
 
