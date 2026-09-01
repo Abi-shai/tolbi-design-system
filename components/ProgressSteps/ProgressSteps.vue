@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { MarkTransition } from '../MarkTransition'
 import { computed } from 'vue'
 import { Icon } from '../Icon'
 import type { IconName } from '../Icon'
@@ -63,13 +64,16 @@ const checkSize = computed(() => {
           class="ds-steps__icon"
           :class="[`ds-steps__icon--${size}`, `ds-steps__icon--${stepStatus(i)}`]"
         >
-          <Icon
-            v-if="stepStatus(i) === 'complete'"
-            name="check"
-            :size="checkSize"
-            class="ds-steps__check"
-          />
-          <span v-else class="ds-steps__dot" />
+          <MarkTransition>
+            <Icon
+              v-if="stepStatus(i) === 'complete'"
+              key="check"
+              name="check"
+              :size="checkSize"
+              class="ds-steps__check"
+            />
+            <span v-else key="dot" class="ds-steps__dot" />
+          </MarkTransition>
         </div>
 
         <!-- Connector line (omitted on last step) -->

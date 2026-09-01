@@ -104,6 +104,11 @@ Before working on any component, read:
   catalogue is a focus ring, and the `focus-ring-instant` rule keeps it that way. `considered`
   (400ms) has no consumer on purpose: it is the third of `bg-overlay` / `z-overlay` /
   `duration-considered`, all waiting on the modal that does not exist yet.
+- **ADR-0023**: A mark that confirms an action uses `MarkTransition` — `scale(0.6)` + fade over
+  `duration-quick`, smaller and faster than a surface entrance because **a mark confirms where a
+  surface arrives**. Movement must *explain*: a static indicator (Badge dot, Tooltip arrow) is not
+  animated. Two mechanisms share the motion — `v-if` marks wrap the component, `Checkbox`'s radio
+  `::after` takes the same values in CSS.
 
 ## Architecture
 

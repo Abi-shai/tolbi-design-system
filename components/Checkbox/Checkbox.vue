@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useId, watch, useTemplateRef } from 'vue'
 import { Icon } from '../Icon'
+import { MarkTransition } from '../MarkTransition'
 import { useFormField } from '../FormField/context'
 
 export type CheckboxSize = 'sm' | 'md'
@@ -87,18 +88,22 @@ function handleChange(event: Event) {
     ]"
     aria-hidden="true"
   >
-    <Icon
-      v-if="type === 'checkbox' && modelValue && !indeterminate"
-      name="check"
-      :size="iconSize"
-      class="ds-checkbox__icon"
-    />
-    <Icon
-      v-else-if="type === 'checkbox' && indeterminate"
-      name="minus"
-      :size="iconSize"
-      class="ds-checkbox__icon"
-    />
+    <MarkTransition>
+      <Icon
+        v-if="type === 'checkbox' && modelValue && !indeterminate"
+        key="check"
+        name="check"
+        :size="iconSize"
+        class="ds-checkbox__icon"
+      />
+      <Icon
+        v-else-if="type === 'checkbox' && indeterminate"
+        key="minus"
+        name="minus"
+        :size="iconSize"
+        class="ds-checkbox__icon"
+      />
+    </MarkTransition>
   </span>
 
   <!-- Full interactive mode -->
@@ -138,18 +143,22 @@ function handleChange(event: Event) {
         ]"
         aria-hidden="true"
       >
-        <Icon
-          v-if="type === 'checkbox' && modelValue && !indeterminate"
-          name="check"
-          :size="iconSize"
-          class="ds-checkbox__icon"
-        />
-        <Icon
-          v-else-if="type === 'checkbox' && indeterminate"
-          name="minus"
-          :size="iconSize"
-          class="ds-checkbox__icon"
-        />
+        <MarkTransition>
+          <Icon
+            v-if="type === 'checkbox' && modelValue && !indeterminate"
+            key="check"
+            name="check"
+            :size="iconSize"
+            class="ds-checkbox__icon"
+          />
+          <Icon
+            v-else-if="type === 'checkbox' && indeterminate"
+            key="minus"
+            name="minus"
+            :size="iconSize"
+            class="ds-checkbox__icon"
+          />
+        </MarkTransition>
       </span>
     </span>
 
@@ -251,7 +260,10 @@ function handleChange(event: Event) {
   border-radius: var(--ds-radius-pill);
   background-color: var(--ds-text-on-brand-solid);
   opacity: 0;
-  transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+  transform: scale(var(--ds-motion-scale-mark));
+  transition:
+    opacity   var(--ds-motion-duration-quick) var(--ds-motion-easing-out),
+    transform var(--ds-motion-duration-quick) var(--ds-motion-easing-out);
 }
 
 .ds-checkbox__control--radio.ds-checkbox__control--sm::after {
@@ -272,6 +284,7 @@ function handleChange(event: Event) {
 
 .ds-checkbox__control--radio.ds-checkbox__control--checked::after {
   opacity: 1;
+  transform: scale(1);
 }
 
 /* Indeterminate state (checkbox only) */

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { MarkTransition } from '../MarkTransition'
 import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
 import type { IconName } from '../Icon'
@@ -69,13 +70,15 @@ const emit = defineEmits<{
         <span v-if="supportingText" class="ds-dropdown-select-item__supporting">{{ supportingText }}</span>
       </div>
 
-      <Icon
-        v-if="selected"
-        name="check"
-        :size="20"
-        class="ds-dropdown-select-item__check"
-        aria-hidden="true"
-      />
+      <MarkTransition>
+        <Icon
+          v-if="selected"
+          name="check"
+          :size="20"
+          class="ds-dropdown-select-item__check"
+          aria-hidden="true"
+        />
+      </MarkTransition>
     </div>
   </div>
 </template>
