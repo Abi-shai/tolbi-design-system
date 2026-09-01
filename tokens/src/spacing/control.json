@@ -1,24 +1,24 @@
 {
   "control-padding": {
     "sm": {
-      "value": "{space.2} {space.3}",
-      "description": "8px 12px — 36px control"
+      "$value": "{space.2} {space.3}",
+      "$description": "8px 12px — 36px control"
     },
     "md": {
-      "value": "{space.2-5} {space.3-5}",
-      "description": "10px 14px — 40px control. Button, InputField, Dropdown and InputDropdown all landed here independently"
+      "$value": "{space.2-5} {space.3-5}",
+      "$description": "10px 14px — 40px control. Button, InputField, Dropdown and InputDropdown all landed here independently"
     },
     "lg": {
-      "value": "{space.2-5} {space.4}",
-      "description": "10px 16px — 44px control"
+      "$value": "{space.2-5} {space.4}",
+      "$description": "10px 16px — 44px control"
     },
     "xl": {
-      "value": "{space.3} {space.4-5}",
-      "description": "12px 18px — 48px control"
+      "$value": "{space.3} {space.4-5}",
+      "$description": "12px 18px — 48px control"
     },
     "2xl": {
-      "value": "{space.4} {space.5-5}",
-      "description": "16px 22px — 56px control"
+      "$value": "{space.4} {space.5-5}",
+      "$description": "16px 22px — 56px control"
     }
   }
 }

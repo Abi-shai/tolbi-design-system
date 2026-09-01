@@ -5,7 +5,7 @@ import EffectCard from './components/EffectCard.vue'
 const tokens = Object.entries(shadows.shadow).map(([name, token]) => ({
   name: `shadow-${name}`,
   cssVar: `--ds-shadow-${name}`,
-  description: token.value,
+  description: token.$value,
 }))
 
 const meta: Meta = {
@@ -21,7 +21,7 @@ const meta: Meta = {
           :key="token.name"
           :name="token.name"
           :css-var="token.cssVar"
-          :description="token.description"
+          :description="token.$description"
         />
       </div>
     `,

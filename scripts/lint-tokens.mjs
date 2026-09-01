@@ -17,9 +17,9 @@ const WARN_ONLY = process.argv.includes('--warn')
 
 const web = JSON.parse(readFileSync('tokens/src/typography/semantic.web.json', 'utf8'))
 const ROLES = Object.keys(web['font-size'])
-const TRACKED = ROLES.filter((r) => !web['letter-spacing'][r].value.includes('none'))
+const TRACKED = ROLES.filter((r) => !web['letter-spacing'][r].$value.includes('none'))
 const spacing = JSON.parse(readFileSync('tokens/src/spacing/semantic.json', 'utf8')).spacing
-const PX_ON_RAMP = new Map(Object.entries(spacing).map(([n, t]) => [parseInt(t.description, 10), n]))
+const PX_ON_RAMP = new Map(Object.entries(spacing).map(([n, t]) => [parseInt(t.$description, 10), n]))
 const semantic = JSON.parse(readFileSync('tokens/src/color/semantic.json', 'utf8'))
 const SEMANTIC_NAMES = new Set(
   Object.entries(semantic).flatMap(([g, ts]) => Object.keys(ts).map((t) => `${g}-${t}`)),

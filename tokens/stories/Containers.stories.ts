@@ -3,7 +3,7 @@ import containers from '../src/containers/semantic.json'
 
 const rows = Object.entries(containers.container).map(([name, token]) => ({
   cssVar: `--ds-container-${name}`,
-  px: token.description ?? '',
+  px: token.$description ?? '',
 }))
 
 const meta: Meta = {

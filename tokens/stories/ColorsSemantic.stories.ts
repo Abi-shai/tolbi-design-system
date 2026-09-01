@@ -12,8 +12,8 @@ function flattenTokens(obj: Record<string, any>, path: string[] = []): Map<strin
   const result = new Map<string, Entry>()
   for (const [key, val] of Object.entries(obj)) {
     const currentPath = [...path, key]
-    if (val && typeof val === 'object' && 'value' in val) {
-      result.set(currentPath.join('.'), { value: val.value as string, description: val.description })
+    if (val && typeof val === 'object' && '$value' in val) {
+      result.set(currentPath.join('.'), { value: val.$value as string, description: val.$description })
     } else if (val && typeof val === 'object') {
       for (const [k, v] of flattenTokens(val, currentPath)) result.set(k, v)
     }
@@ -59,7 +59,7 @@ function makeStory(category: string): StoryObj<typeof meta> {
                 :key="token.cssVar"
                 :css-var="token.cssVar"
                 :primitive-css-var="token.primitiveCssVar"
-                :description="token.description"
+                :description="token.$description"
               />
             </tbody>
           </table>

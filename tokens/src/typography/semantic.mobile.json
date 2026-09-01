@@ -1,128 +1,168 @@
 {
   "font-size": {
     "heading-xl": {
-      "value": "{typography.font-size.22}"
+      "$value": "{typography.font-size.22}",
+      "$type": "dimension"
     },
     "heading-lg": {
-      "value": "{typography.font-size.20}"
+      "$value": "{typography.font-size.20}",
+      "$type": "dimension"
     },
     "heading-md": {
-      "value": "{typography.font-size.17}"
+      "$value": "{typography.font-size.17}",
+      "$type": "dimension"
     },
     "heading-sm": {
-      "value": "{typography.font-size.15}"
+      "$value": "{typography.font-size.15}",
+      "$type": "dimension"
     },
     "body-lg": {
-      "value": "{typography.font-size.17}",
-      "description": "Default body on mobile"
+      "$value": "{typography.font-size.17}",
+      "$type": "dimension",
+      "$description": "Default body on mobile"
     },
     "body-md": {
-      "value": "{typography.font-size.15}"
+      "$value": "{typography.font-size.15}",
+      "$type": "dimension"
     },
     "body-sm": {
-      "value": "{typography.font-size.13}"
+      "$value": "{typography.font-size.13}",
+      "$type": "dimension"
     },
     "label-lg": {
-      "value": "{typography.font-size.16}"
+      "$value": "{typography.font-size.16}",
+      "$type": "dimension"
     },
     "label-md": {
-      "value": "{typography.font-size.13}"
+      "$value": "{typography.font-size.13}",
+      "$type": "dimension"
     },
     "label-xs": {
-      "value": "{typography.font-size.11}",
-      "description": "Chrome only — below the 13px mobile floor"
+      "$value": "{typography.font-size.11}",
+      "$type": "dimension",
+      "$description": "Chrome only — below the 13px mobile floor"
     },
     "metric-lg": {
-      "value": "{typography.font-size.28}"
+      "$value": "{typography.font-size.28}",
+      "$type": "dimension"
     },
     "code-md": {
-      "value": "{typography.font-size.13}"
+      "$value": "{typography.font-size.13}",
+      "$type": "dimension"
     },
     "metric-xl": {
-      "value": "{typography.font-size.32}"
+      "$value": "{typography.font-size.32}",
+      "$type": "dimension"
     },
     "body-lg-emphasis": {
-      "value": "{typography.font-size.17}"
+      "$value": "{typography.font-size.17}",
+      "$type": "dimension"
     },
     "body-md-emphasis": {
-      "value": "{typography.font-size.15}"
+      "$value": "{typography.font-size.15}",
+      "$type": "dimension"
     },
     "body-sm-emphasis": {
-      "value": "{typography.font-size.13}"
+      "$value": "{typography.font-size.13}",
+      "$type": "dimension"
     },
     "label-xl": {
-      "value": "{typography.font-size.17}"
+      "$value": "{typography.font-size.17}",
+      "$type": "dimension"
     },
     "label-md-strong": {
-      "value": "{typography.font-size.13}"
+      "$value": "{typography.font-size.13}",
+      "$type": "dimension"
     },
     "label-lg-strong": {
-      "value": "{typography.font-size.16}"
+      "$value": "{typography.font-size.16}",
+      "$type": "dimension"
     },
     "label-xl-strong": {
-      "value": "{typography.font-size.17}"
+      "$value": "{typography.font-size.17}",
+      "$type": "dimension"
     }
   },
   "line-height": {
     "heading-xl": {
-      "value": "{typography.line-height.28}"
+      "$value": "{typography.line-height.28}",
+      "$type": "dimension"
     },
     "heading-lg": {
-      "value": "{typography.line-height.28}"
+      "$value": "{typography.line-height.28}",
+      "$type": "dimension"
     },
     "heading-md": {
-      "value": "{typography.line-height.24}"
+      "$value": "{typography.line-height.24}",
+      "$type": "dimension"
     },
     "heading-sm": {
-      "value": "{typography.line-height.20}"
+      "$value": "{typography.line-height.20}",
+      "$type": "dimension"
     },
     "body-lg": {
-      "value": "{typography.line-height.24}"
+      "$value": "{typography.line-height.24}",
+      "$type": "dimension"
     },
     "body-md": {
-      "value": "{typography.line-height.24}"
+      "$value": "{typography.line-height.24}",
+      "$type": "dimension"
     },
     "body-sm": {
-      "value": "{typography.line-height.20}"
+      "$value": "{typography.line-height.20}",
+      "$type": "dimension"
     },
     "label-lg": {
-      "value": "{typography.line-height.24}"
+      "$value": "{typography.line-height.24}",
+      "$type": "dimension"
     },
     "label-md": {
-      "value": "{typography.line-height.20}"
+      "$value": "{typography.line-height.20}",
+      "$type": "dimension"
     },
     "label-xs": {
-      "value": "{typography.line-height.16}"
+      "$value": "{typography.line-height.16}",
+      "$type": "dimension"
     },
     "metric-lg": {
-      "value": "{typography.line-height.32}"
+      "$value": "{typography.line-height.32}",
+      "$type": "dimension"
     },
     "code-md": {
-      "value": "{typography.line-height.20}"
+      "$value": "{typography.line-height.20}",
+      "$type": "dimension"
     },
     "metric-xl": {
-      "value": "{typography.line-height.40}"
+      "$value": "{typography.line-height.40}",
+      "$type": "dimension"
     },
     "body-lg-emphasis": {
-      "value": "{typography.line-height.24}"
+      "$value": "{typography.line-height.24}",
+      "$type": "dimension"
     },
     "body-md-emphasis": {
-      "value": "{typography.line-height.24}"
+      "$value": "{typography.line-height.24}",
+      "$type": "dimension"
     },
     "body-sm-emphasis": {
-      "value": "{typography.line-height.20}"
+      "$value": "{typography.line-height.20}",
+      "$type": "dimension"
     },
     "label-xl": {
-      "value": "{typography.line-height.24}"
+      "$value": "{typography.line-height.24}",
+      "$type": "dimension"
     },
     "label-md-strong": {
-      "value": "{typography.line-height.20}"
+      "$value": "{typography.line-height.20}",
+      "$type": "dimension"
     },
     "label-lg-strong": {
-      "value": "{typography.line-height.24}"
+      "$value": "{typography.line-height.24}",
+      "$type": "dimension"
     },
     "label-xl-strong": {
-      "value": "{typography.line-height.24}"
+      "$value": "{typography.line-height.24}",
+      "$type": "dimension"
     }
   }
 }

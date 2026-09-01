@@ -5,8 +5,8 @@ import RadiusCard from './components/RadiusCard.vue'
 const scale = Object.entries(primitives.radius).map(([key, token]) => ({
   label: `radius-${key}`,
   cssVar: `--ds-radius-${key}`,
-  rem: token.value,
-  px: token.description,
+  rem: token.$value,
+  px: token.$description,
 }))
 
 const meta: Meta = {

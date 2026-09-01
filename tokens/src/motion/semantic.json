@@ -2,46 +2,56 @@
   "motion": {
     "duration": {
       "instant": {
-        "value": "50ms",
-        "description": "Imperceptible confirm — press states, focus rings"
+        "$value": "50ms",
+        "$type": "duration",
+        "$description": "Imperceptible confirm — press states, focus rings"
       },
       "quick": {
-        "value": "100ms",
-        "description": "Immediate feedback — responds before you finish the gesture"
+        "$value": "100ms",
+        "$type": "duration",
+        "$description": "Immediate feedback — responds before you finish the gesture"
       },
       "moderate": {
-        "value": "150ms",
-        "description": "State changes that communicate meaning — buttons, toggles, inputs"
+        "$value": "150ms",
+        "$type": "duration",
+        "$description": "State changes that communicate meaning — buttons, toggles, inputs"
       },
       "enter": {
-        "value": "200ms",
-        "description": "Entering elements — the interface makes room"
+        "$value": "200ms",
+        "$type": "duration",
+        "$description": "Entering elements — the interface makes room"
       },
       "process": {
-        "value": "300ms",
-        "description": "Data in motion — progress bars, calculations"
+        "$value": "300ms",
+        "$type": "duration",
+        "$description": "Data in motion — progress bars, calculations"
       },
       "considered": {
-        "value": "400ms",
-        "description": "Heavy surfaces — modals, drawers, destructive confirmations"
+        "$value": "400ms",
+        "$type": "duration",
+        "$description": "Heavy surfaces — modals, drawers, destructive confirmations"
       }
     },
     "easing": {
       "default": {
-        "value": "cubic-bezier(0.25, 0, 0, 1)",
-        "description": "Grounded — responds instantly, settles with weight. Default for state changes."
+        "$value": "cubic-bezier(0.25, 0, 0, 1)",
+        "$type": "cubicBezier",
+        "$description": "Grounded — responds instantly, settles with weight. Default for state changes."
       },
       "in": {
-        "value": "cubic-bezier(0.4, 0, 1, 1)",
-        "description": "Exit — accelerates away. The interface steps aside without lingering."
+        "$value": "cubic-bezier(0.4, 0, 1, 1)",
+        "$type": "cubicBezier",
+        "$description": "Exit — accelerates away. The interface steps aside without lingering."
       },
       "out": {
-        "value": "cubic-bezier(0, 0, 0.2, 1)",
-        "description": "Enter — decelerates into position. The interface makes room for you."
+        "$value": "cubic-bezier(0, 0, 0.2, 1)",
+        "$type": "cubicBezier",
+        "$description": "Enter — decelerates into position. The interface makes room for you."
       },
       "in-out": {
-        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
-        "description": "Spatial — lateral movement. Tab indicator, drawer slides."
+        "$value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "$type": "cubicBezier",
+        "$description": "Spatial — lateral movement. Tab indicator, drawer slides."
       }
     }
   }

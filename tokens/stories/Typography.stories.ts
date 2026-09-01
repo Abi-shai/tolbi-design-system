@@ -14,10 +14,10 @@ const step = (ref: string) => ref.split('.').pop()!.replace('}', '')
 const WEIGHT: Record<string, string> = { regular: 'Regular', medium: 'Medium', semibold: 'Semibold' }
 const roles = Object.keys(web['font-size']).map((role) => ({
   role,
-  web:    `${step(web['font-size'][role as keyof typeof web['font-size']].value)} / ${step(web['line-height'][role as keyof typeof web['line-height']].value)}`,
-  mobile: `${step(mobile['font-size'][role as keyof typeof mobile['font-size']].value)} / ${step(mobile['line-height'][role as keyof typeof mobile['line-height']].value)}`,
-  weight: WEIGHT[step(web['font-weight'][role as keyof typeof web['font-weight']].value)],
-  use:    (web['font-size'][role as keyof typeof web['font-size']] as { description?: string }).description ?? '',
+  web:    `${step(web['font-size'][role as keyof typeof web['font-size']].$value)} / ${step(web['line-height'][role as keyof typeof web['line-height']].$value)}`,
+  mobile: `${step(mobile['font-size'][role as keyof typeof mobile['font-size']].$value)} / ${step(mobile['line-height'][role as keyof typeof mobile['line-height']].$value)}`,
+  weight: WEIGHT[step(web['font-weight'][role as keyof typeof web['font-weight']].$value)],
+  use:    (web['font-size'][role as keyof typeof web['font-size']] as { $description?: string }).$description ?? '',
 }))
 
 const weights = [

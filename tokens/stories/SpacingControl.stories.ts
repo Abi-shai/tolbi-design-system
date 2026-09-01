@@ -9,7 +9,7 @@ import control from '../src/spacing/control.json'
 const steps = Object.entries(control['control-padding']).map(([key, token]) => ({
   name: key,
   cssVar: `--ds-control-padding-${key}`,
-  use: token.description,
+  use: token.$description,
 }))
 
 const meta: Meta = {

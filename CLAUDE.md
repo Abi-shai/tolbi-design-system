@@ -71,6 +71,11 @@ Before working on any component, read:
   ΔE** (greedy max-min), so the first N series are always the most distinguishable. **Five is the
   comfortable ceiling** — past that, aggregate rather than reach down the ramp. Charts never use
   `brand`, which is interactive-only. The linter's colour-literal allowlist is now **empty**.
+- **ADR-0017**: Tokens are authored in **DTCG** shape — `$value` / `$type` / `$description`.
+  Nominally, not strictly: `color-mix()`, composite shadows and the `font:` shorthand have no DTCG
+  representation, and Primer ships nominal DTCG too. `$type` is set only where truthful; composites
+  carry none. Descriptions emit as comments in `tokens/dist/` and are stripped from the published
+  bundle. DTCG does **not** gate multi-platform output or deprecation — both are separate work.
 
 ## Architecture
 

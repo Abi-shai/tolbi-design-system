@@ -9,7 +9,7 @@ import primitives from '../src/color/primitives.json'
 const hues = Object.entries(primitives.color.display).map(([hue, steps]) => ({
   hue,
   steps: Object.entries(steps).map(([n, t]) => ({
-    n, value: (t as { value: string }).value, use: (t as { description: string }).description,
+    n, value: (t as { $value: string }).$value, use: (t as { $description: string }).$description,
     cssVar: `--ds-color-display-${hue}-${n}`,
   })),
 }))
@@ -31,7 +31,7 @@ const meta: Meta = {
           <div v-for="s in h.steps" :key="s.n" style="flex: none; text-align: center;">
             <div :style="{ background: 'var(' + s.cssVar + ')', width: '92px', height: '48px',
                            borderRadius: 'var(--ds-radius-inner)', border: '1px solid var(--ds-border-inset)' }" />
-            <span style="font-family: monospace; font-size: 0.65rem; color: var(--ds-text-subtlest);">{{ s.n }} · {{ s.value }}</span>
+            <span style="font-family: monospace; font-size: 0.65rem; color: var(--ds-text-subtlest);">{{ s.n }} · {{ s.$value }}</span>
           </div>
         </div>
       </div>

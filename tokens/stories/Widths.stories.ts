@@ -5,8 +5,8 @@ import WidthRow from './components/WidthRow.vue'
 const entries = Object.entries(widths.width).map(([name, token]) => ({
   name,
   cssVar: `--ds-width-${name}`,
-  px: token.description ?? '',
-  value: parseInt(token.description ?? '0', 10),
+  px: token.$description ?? '',
+  value: parseInt(token.$description ?? '0', 10),
 }))
 
 const max = Math.max(...entries.map(e => e.value))

@@ -8,8 +8,8 @@ import chart from '../src/color/chart.json'
 const series = Object.entries(chart.chart.categorical).map(([n, t]) => ({
   n,
   cssVar: `--ds-chart-categorical-${n}`,
-  hue: t.value.replace(/[{}]/g, '').replace('color.display.', '').replace('.500', ''),
-  note: t.description,
+  hue: t.$value.replace(/[{}]/g, '').replace('color.display.', '').replace('.500', ''),
+  note: t.$description,
 }))
 
 const meta: Meta = {

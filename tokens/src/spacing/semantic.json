@@ -1,21 +1,89 @@
 {
   "spacing": {
-    "none": { "value": "{space.0}",   "description": "0px" },
-    "xxs":  { "value": "{space.0-5}", "description": "2px" },
-    "xs":   { "value": "{space.1}",   "description": "4px" },
-    "sm":   { "value": "{space.1-5}", "description": "6px" },
-    "md":   { "value": "{space.2}",   "description": "8px" },
-    "lg":   { "value": "{space.3}",   "description": "12px" },
-    "xl":   { "value": "{space.4}",   "description": "16px" },
-    "2xl":  { "value": "{space.5}",   "description": "20px" },
-    "3xl":  { "value": "{space.6}",   "description": "24px" },
-    "4xl":  { "value": "{space.8}",   "description": "32px" },
-    "5xl":  { "value": "{space.10}",  "description": "40px" },
-    "6xl":  { "value": "{space.12}",  "description": "48px" },
-    "7xl":  { "value": "{space.16}",  "description": "64px" },
-    "8xl":  { "value": "{space.20}",  "description": "80px" },
-    "9xl":  { "value": "{space.24}",  "description": "96px" },
-    "10xl": { "value": "{space.32}",  "description": "128px" },
-    "11xl": { "value": "{space.40}",  "description": "160px" }
+    "none": {
+      "$value": "{space.0}",
+      "$type": "dimension",
+      "$description": "0px"
+    },
+    "xxs": {
+      "$value": "{space.0-5}",
+      "$type": "dimension",
+      "$description": "2px"
+    },
+    "xs": {
+      "$value": "{space.1}",
+      "$type": "dimension",
+      "$description": "4px"
+    },
+    "sm": {
+      "$value": "{space.1-5}",
+      "$type": "dimension",
+      "$description": "6px"
+    },
+    "md": {
+      "$value": "{space.2}",
+      "$type": "dimension",
+      "$description": "8px"
+    },
+    "lg": {
+      "$value": "{space.3}",
+      "$type": "dimension",
+      "$description": "12px"
+    },
+    "xl": {
+      "$value": "{space.4}",
+      "$type": "dimension",
+      "$description": "16px"
+    },
+    "2xl": {
+      "$value": "{space.5}",
+      "$type": "dimension",
+      "$description": "20px"
+    },
+    "3xl": {
+      "$value": "{space.6}",
+      "$type": "dimension",
+      "$description": "24px"
+    },
+    "4xl": {
+      "$value": "{space.8}",
+      "$type": "dimension",
+      "$description": "32px"
+    },
+    "5xl": {
+      "$value": "{space.10}",
+      "$type": "dimension",
+      "$description": "40px"
+    },
+    "6xl": {
+      "$value": "{space.12}",
+      "$type": "dimension",
+      "$description": "48px"
+    },
+    "7xl": {
+      "$value": "{space.16}",
+      "$type": "dimension",
+      "$description": "64px"
+    },
+    "8xl": {
+      "$value": "{space.20}",
+      "$type": "dimension",
+      "$description": "80px"
+    },
+    "9xl": {
+      "$value": "{space.24}",
+      "$type": "dimension",
+      "$description": "96px"
+    },
+    "10xl": {
+      "$value": "{space.32}",
+      "$type": "dimension",
+      "$description": "128px"
+    },
+    "11xl": {
+      "$value": "{space.40}",
+      "$type": "dimension",
+      "$description": "160px"
+    }
   }
 }

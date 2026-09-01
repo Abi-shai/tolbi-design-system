@@ -2,15 +2,15 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import colors from '../src/color/primitives.json'
 import ColorSwatchGroup from './components/ColorSwatchGroup.vue'
 
-type ColorGroup = Record<string, { value: string; description?: string }>
+type ColorGroup = Record<string, { $value: string; $description?: string }>
 
 const groups = Object.entries(colors.color).map(([name, group]) => ({
   name,
   swatches: Object.entries(group as ColorGroup).map(([shade, token]) => ({
     shade,
-    value: token.value,
+    value: token.$value,
     cssVar: `--ds-color-${name}-${shade}`,
-    description: token.description,
+    description: token.$description,
   })),
 }))
 

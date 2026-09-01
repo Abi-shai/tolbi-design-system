@@ -5,7 +5,7 @@ import SpacingRow from './components/SpacingRow.vue'
 const named = Object.entries(semantic.spacing).map(([name, token]) => ({
   label: name,
   cssVar: `--ds-spacing-${name}`,
-  px: token.description,
+  px: token.$description,
 }))
 
 const meta: Meta = {

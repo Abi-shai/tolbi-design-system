@@ -6,8 +6,8 @@ import RadiusCard from './components/RadiusCard.vue'
 const roles = Object.entries(semantic.radius).map(([key, token]) => ({
   label: `radius-${key}`,
   cssVar: `--ds-radius-${key}`,
-  rem: token.value.replace(/[{}]/g, '').replace('radius.', 'radius-'),
-  px: token.description,
+  rem: token.$value.replace(/[{}]/g, '').replace('radius.', 'radius-'),
+  px: token.$description,
 }))
 
 const meta: Meta = {

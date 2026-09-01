@@ -5,8 +5,8 @@ import elevation from '../src/effect/elevation.json'
 const roles = Object.entries(elevation.elevation).map(([key, token]) => ({
   name: key,
   cssVar: `--ds-elevation-${key}`,
-  ref: token.value.replace(/[{}]/g, ''),
-  use: token.description,
+  ref: token.$value.replace(/[{}]/g, ''),
+  use: token.$description,
 }))
 
 const meta: Meta = {
