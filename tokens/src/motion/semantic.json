@@ -21,6 +21,11 @@
         "$type": "duration",
         "$description": "Entering elements — the interface makes room"
       },
+      "exit": {
+        "$value": "100ms",
+        "$type": "duration",
+        "$description": "Leaving elements. Deliberately faster than `enter` — a surface should get out of the way quicker than it arrives. Same value as `quick`, a different decision (ADR-0021)"
+      },
       "process": {
         "$value": "300ms",
         "$type": "duration",
@@ -52,6 +57,13 @@
         "$value": "cubic-bezier(0.4, 0, 0.2, 1)",
         "$type": "cubicBezier",
         "$description": "Spatial — lateral movement. Tab indicator, drawer slides."
+      }
+    },
+    "scale": {
+      "enter": {
+        "$value": "0.96",
+        "$type": "number",
+        "$description": "A floating surface enters at 96% and settles at 100%, scaled from its anchor. Dropdown had 0.98 and HelpIcon 0.96 — one decision, one value (ADR-0021)"
       }
     }
   }

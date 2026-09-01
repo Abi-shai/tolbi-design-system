@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SurfaceTransition } from '../SurfaceTransition'
 /* token-lint-disable no-literal-dimension-js — tooltip positioning offsets,
    not spacing: they align the bubble's tail to the trigger, and no token can
    express that relationship. */
@@ -79,7 +80,7 @@ const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
       <Icon name="circle-question-mark" :size="16" />
     </button>
 
-    <Transition name="ds-help-icon__tooltip">
+    <SurfaceTransition>
       <Tooltip
         v-if="isOpen"
         class="ds-help-icon__tooltip"
@@ -88,7 +89,7 @@ const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
         :supporting-text="supportingText"
         :arrow="arrow"
       />
-    </Transition>
+    </SurfaceTransition>
   </div>
 </template>
 
@@ -126,23 +127,10 @@ const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
 }
 
 .ds-help-icon__tooltip {
+  transform-origin: bottom center;
   position: absolute;
   z-index: var(--ds-z-popover);
   white-space: normal;
 }
 
-/* Transition */
-.ds-help-icon__tooltip-enter-active {
-  transition: opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-out),
-              transform var(--ds-motion-duration-enter) var(--ds-motion-easing-out);
-}
-.ds-help-icon__tooltip-leave-active {
-  transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-in),
-              transform var(--ds-motion-duration-moderate) var(--ds-motion-easing-in);
-}
-.ds-help-icon__tooltip-enter-from,
-.ds-help-icon__tooltip-leave-to {
-  opacity: 0;
-  transform: scale(0.96);
-}
 </style>

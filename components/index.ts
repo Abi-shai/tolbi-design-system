@@ -36,6 +36,8 @@ export type { TooltipArrow } from './Tooltip'
 export { HelpIcon } from './HelpIcon'
 export type { HelpPlacement } from './HelpIcon'
 
+export { SurfaceTransition } from './SurfaceTransition'
+
 export { FormField, useFormField, FORM_FIELD_KEY } from './FormField'
 export type { FormFieldContext } from './FormField'
 

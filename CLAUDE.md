@@ -93,6 +93,12 @@ Before working on any component, read:
   A z-index **below 10 is stacking inside one component** and stays literal; the lint fires at 10+.
   Deliberately absent: breakpoints (no responsive behaviour yet) and icon sizes (a typed component
   API, ADR-0004).
+- **ADR-0021**: The objective is what a **product** needs — feel, layering, motion — not what a
+  published system needs. Anything that floats uses `SurfaceTransition`: scale from
+  `--ds-motion-scale-enter` (0.96) + fade, `duration-enter`/`easing-out` in, `duration-exit`/
+  `easing-in` out. **The exit is faster than the entrance.** Its `<style>` is unscoped on purpose —
+  Vue applies transition classes to the *slotted* element, so a scoped rule fails silently. The
+  consuming surface sets its own `transform-origin`.
 
 ## Architecture
 

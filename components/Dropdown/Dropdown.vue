@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SurfaceTransition } from '../SurfaceTransition'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
@@ -106,7 +107,7 @@ onUnmounted(() => {
     </button>
 
     <!-- ── Panel ──────────────────────────────────────────────────── -->
-    <Transition name="ds-dropdown__panel">
+    <SurfaceTransition>
     <div
       v-if="open"
       class="ds-dropdown__panel"
@@ -128,7 +129,7 @@ onUnmounted(() => {
         </div>
       </Scrollbar>
     </div>
-    </Transition>
+    </SurfaceTransition>
   </div>
 </template>
 
@@ -205,6 +206,7 @@ onUnmounted(() => {
 
 /* ── Panel ────────────────────────────────────────────────────────── */
 .ds-dropdown__panel {
+  transform-origin: top left;
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
@@ -259,18 +261,4 @@ onUnmounted(() => {
   padding: var(--ds-spacing-xs) 0;
 }
 
-/* ── Panel transition ──────────────────────────────────────────────── */
-.ds-dropdown__panel-enter-active {
-  transition: opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-out),
-              transform var(--ds-motion-duration-enter) var(--ds-motion-easing-out);
-}
-.ds-dropdown__panel-leave-active {
-  transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-in),
-              transform var(--ds-motion-duration-moderate) var(--ds-motion-easing-in);
-}
-.ds-dropdown__panel-enter-from,
-.ds-dropdown__panel-leave-to {
-  opacity: 0;
-  transform: translateY(-6px) scale(0.98);
-}
 </style>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SurfaceTransition } from '../SurfaceTransition'
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useFormField } from '../FormField/context'
 import { Icon } from '../Icon'
@@ -212,26 +213,28 @@ onUnmounted(() => {
         </button>
 
         <!-- ── Dropdown panel ──────────────────────────────────────── -->
-        <div v-if="open" class="ds-input-dropdown__panel" role="listbox">
-          <Scrollbar max-height="320px">
-            <div class="ds-input-dropdown__panel-items">
-              <DropdownSelectItem
-                v-for="option in filteredOptions"
-                :key="option.value"
-                :type="itemType"
-                :label="option.label"
-                :supporting-text="option.supportingText"
-                :icon="option.icon || leadingIcon"
-                :avatar-src="option.avatarSrc"
-                :avatar-alt="option.avatarAlt"
-                :dot-color="option.dotColor"
-                :selected="option.value === modelValue"
-                :disabled="option.disabled"
-                @click="selectOption(option)"
-              />
-            </div>
-          </Scrollbar>
-        </div>
+        <SurfaceTransition>
+          <div v-if="open" class="ds-input-dropdown__panel" role="listbox">
+            <Scrollbar max-height="320px">
+              <div class="ds-input-dropdown__panel-items">
+                <DropdownSelectItem
+                  v-for="option in filteredOptions"
+                  :key="option.value"
+                  :type="itemType"
+                  :label="option.label"
+                  :supporting-text="option.supportingText"
+                  :icon="option.icon || leadingIcon"
+                  :avatar-src="option.avatarSrc"
+                  :avatar-alt="option.avatarAlt"
+                  :dot-color="option.dotColor"
+                  :selected="option.value === modelValue"
+                  :disabled="option.disabled"
+                  @click="selectOption(option)"
+                />
+              </div>
+            </Scrollbar>
+          </div>
+        </SurfaceTransition>
       </div>
     </div>
 
@@ -373,6 +376,7 @@ onUnmounted(() => {
 
 /* ── Dropdown panel ────────────────────────────────────────────────── */
 .ds-input-dropdown__panel {
+  transform-origin: top left;
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
