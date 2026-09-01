@@ -143,8 +143,7 @@ const grouped = computed(() => {
 .ds-phone-field__select:disabled { cursor: not-allowed; }
 
 .ds-phone-field__dial-text {
-  font-size: var(--ds-font-size-body-md);
-  line-height: var(--ds-line-height-body-md);
+  font: var(--ds-font-body-md);
   color: var(--ds-text-subtle);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;

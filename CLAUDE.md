@@ -37,6 +37,14 @@ Before working on any component, read:
   `--ds-` prefix marks a public, semver-covered API and is applied on demand. A component token may
   alias a **primitive** directly when the value is categorical ("this one is blue"), never when it
   expresses a role. `Badge` splits `tone` (semantic) from `color` (categorical).
+- **ADR-0011**: A typography role is applied in **one declaration** — `font: var(--ds-font-{role})`,
+  a CSS `font:` shorthand carrying family, size, line-height and weight. It resets
+  `font-variant-numeric`, so it must precede any `tabular-nums` line. The four axis tokens survive
+  for single-axis overrides and non-text uses, and the **lint enforces completeness**: using any axis
+  token of a role obliges the whole role. Emphasis variants are roles (`-emphasis` = medium,
+  `-strong` = semibold), minted on demand. `tabular-nums` is a rule, not a token. 20 roles:
+  `heading-2xl` deleted (0 uses); `metric-xl`, `label-xl`, three `-emphasis` and three `-strong`
+  added.
 
 ## Architecture
 

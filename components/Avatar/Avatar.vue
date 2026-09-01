@@ -149,7 +149,7 @@ const showInitials = computed(() => !props.src && !!props.initials)
 /* ── Initiales ────────────────────────────────────────────────────── */
 .ds-avatar__initials {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 600;
+  font-weight: var(--ds-font-weight-label-lg-strong);
   line-height: 1.5;
   color: var(--ds-text-subtlest);
   user-select: none;

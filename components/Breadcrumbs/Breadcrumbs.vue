@@ -90,10 +90,7 @@ defineProps<Props>()
   align-items: center;
   padding: var(--ds-spacing-xs, 4px) var(--ds-spacing-md, 8px);
   border-radius: var(--ds-radius-inner);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: var(--ds-font-size-label-lg);
-  line-height: var(--ds-line-height-label-lg);
-  font-weight: 500;
+  font: var(--ds-font-label-lg);
   color: var(--ds-text-subtle);
   text-decoration: none;
   white-space: nowrap;
@@ -114,6 +111,6 @@ a.ds-breadcrumbs__crumb:focus-visible {
   background-color: var(--ds-bg-selected);
   color: var(--ds-text-on-brand-subtle);
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 600;
+  font-weight: var(--ds-font-weight-label-lg-strong);
 }
 </style>

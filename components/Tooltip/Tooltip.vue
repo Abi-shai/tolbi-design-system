@@ -99,10 +99,7 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
 
 .ds-tooltip__title {
   margin: 0;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.125rem;
+  font: var(--ds-font-label-md-strong);
   color: var(--ds-text-on-inverse);
 }
 
@@ -113,10 +110,7 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
 
 .ds-tooltip__supporting {
   margin: 0;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.125rem;
+  font: var(--ds-font-body-sm);
   color: var(--ds-text-on-inverse-subtle);
 }
 

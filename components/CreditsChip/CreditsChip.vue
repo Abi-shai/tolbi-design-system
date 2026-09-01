@@ -139,29 +139,22 @@ const goodLabel = computed(() =>
   white-space: nowrap;
 }
 
-.ds-credits-chip__label {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.5rem;
+.ds-credits-chip__label {  font: var(--ds-font-label-xl);
   color: var(--ds-text-default);
 }
 
 /* ── Texte inline (critical) ──────────────────────────────────────── */
 .ds-credits-chip__text--inline {
   margin: 0;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.5rem;
+  font: var(--ds-font-body-lg-emphasis);
   color: var(--ds-text-default);
   white-space: nowrap;
 }
 
 /* ── Count (nombre de crédits) ────────────────────────────────────── */
 .ds-credits-chip__count {
-  font-size: 1rem;
-  line-height: 1.5rem;
+  font: var(--ds-font-label-xl);
+  font-variant-numeric: tabular-nums;
 }
 
 .ds-credits-chip__count--good {
@@ -172,7 +165,7 @@ const goodLabel = computed(() =>
 
 .ds-credits-chip__count--error {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 700;
+  font-weight: var(--ds-font-weight-label-xl-strong);
   color: var(--ds-text-error);
 }
 
@@ -185,10 +178,7 @@ const goodLabel = computed(() =>
   border: none;
   cursor: pointer;
   padding: 0;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.5rem;
+  font: var(--ds-font-label-xl);
   color: var(--ds-text-error);
   white-space: nowrap;
   transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);

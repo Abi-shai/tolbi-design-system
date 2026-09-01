@@ -116,7 +116,7 @@ const emit = defineEmits<{
   background-color: var(--badge-group-bg);
   color: var(--badge-group-text);
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
+  font-weight: var(--ds-font-weight-label-lg);
   white-space: nowrap;
   cursor: default;
   transition: background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
@@ -130,8 +130,7 @@ const emit = defineEmits<{
 .ds-badge-group--md {
   gap: 8px;
   padding: 4px 10px 4px 4px;
-  font-size: 0.75rem;
-  line-height: 1.125rem;
+  font: var(--ds-font-label-md);
 }
 .ds-badge-group--md.ds-badge-group--trailing {
   padding: 4px 4px 4px 12px;
@@ -140,8 +139,7 @@ const emit = defineEmits<{
 .ds-badge-group--lg {
   gap: 12px;
   padding: 4px 10px 4px 4px;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  font: var(--ds-font-label-lg);
 }
 .ds-badge-group--lg.ds-badge-group--trailing {
   padding: 4px 4px 4px 14px;

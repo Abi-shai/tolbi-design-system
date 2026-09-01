@@ -212,17 +212,15 @@ function onKeydown(e: KeyboardEvent, i: number) {
 /* ── Label ─────────────────────────────────────────────────────────── */
 .ds-tabs__label {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 600;
+  font-weight: var(--ds-font-weight-label-lg-strong);
   white-space: nowrap;
 }
 
 .ds-tabs--md .ds-tabs__label {
-  font-size: var(--ds-font-size-heading-md);
-  line-height: var(--ds-line-height-heading-md);
+  font: var(--ds-font-heading-md);
 }
 
 .ds-tabs--sm .ds-tabs__label {
-  font-size: var(--ds-font-size-heading-sm);
-  line-height: var(--ds-line-height-heading-sm);
+  font: var(--ds-font-heading-sm);
 }
 </style>

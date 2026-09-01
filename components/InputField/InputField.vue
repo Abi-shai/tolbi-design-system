@@ -194,10 +194,7 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
   appearance: none;
   -webkit-appearance: none;
   background: transparent;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 1rem;      /* 16px — identique en sm et md, seul le padding du wrapper change */
-  font-weight: 400;
-  line-height: 1.5rem;  /* 24px */
+  font: var(--ds-font-body-lg);
   color: var(--ds-text-strong);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -227,11 +224,7 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
 }
 
 /* ── Leading text (ex: "$", "https://") ───────────────────────────── */
-.ds-input-field__leading-text {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5rem;
+.ds-input-field__leading-text {  font: var(--ds-font-body-lg);
   color: var(--ds-text-placeholder);
   white-space: nowrap;
   flex-shrink: 0;

@@ -69,9 +69,7 @@ withDefaults(defineProps<Props>(), {
 }
 
 .ds-stat-tile__label {
-  font-size: var(--ds-font-size-label-md);
-  line-height: var(--ds-line-height-label-md);
-  font-weight: var(--ds-font-weight-label-md);
+  font: var(--ds-font-label-md);
   color: var(--ds-text-subtle);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -86,8 +84,7 @@ withDefaults(defineProps<Props>(), {
 
 .ds-stat-tile__footer {
   margin-top: var(--ds-spacing-lg);
-  font-size: var(--ds-font-size-body-sm);
-  line-height: var(--ds-line-height-body-sm);
+  font: var(--ds-font-body-sm);
   color: var(--ds-text-subtle);
 }
 </style>

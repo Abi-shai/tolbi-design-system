@@ -136,11 +136,7 @@ function onSelect(item: ModulesListItem) {
   cursor: not-allowed;
 }
 
-.ds-modules-list__label {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.125rem;
+.ds-modules-list__label {  font: var(--ds-font-label-md);
   text-align: center;
   color: var(--ds-text-default);
   overflow: hidden;

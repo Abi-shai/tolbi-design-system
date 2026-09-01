@@ -67,10 +67,7 @@ function handleClick(event: MouseEvent) {
   border: none;
   border-right: 1px solid var(--ds-border-default);
   background-color: var(--ds-bg-default);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25rem;
+  font: var(--ds-font-label-lg-strong);
   color: var(--ds-text-default);
   white-space: nowrap;
   cursor: pointer;

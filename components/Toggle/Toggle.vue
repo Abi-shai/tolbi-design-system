@@ -192,34 +192,28 @@ function toggle() {
 /* ── Label ─────────────────────────────────────────────────────────── */
 .ds-toggle__label {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
   color: var(--ds-text-default);
 }
 
 .ds-toggle__text--sm .ds-toggle__label {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  font: var(--ds-font-label-lg);
 }
 
 .ds-toggle__text--md .ds-toggle__label {
-  font-size: 1rem;
-  line-height: 1.5rem;
+  font: var(--ds-font-label-xl);
 }
 
 /* ── Supporting text ───────────────────────────────────────────────── */
 .ds-toggle__supporting {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
   color: var(--ds-text-subtle);
 }
 
 .ds-toggle__text--sm .ds-toggle__supporting {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  font: var(--ds-font-body-md);
 }
 
 .ds-toggle__text--md .ds-toggle__supporting {
-  font-size: 1rem;
-  line-height: 1.5rem;
+  font: var(--ds-font-body-lg);
 }
 </style>

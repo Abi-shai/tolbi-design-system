@@ -58,9 +58,7 @@ const slots = defineSlots<{ default?: () => unknown }>()
 .ds-detail-row__label {
   margin: 0;
   flex-shrink: 0;
-  font-size: var(--ds-font-size-body-md);
-  line-height: var(--ds-line-height-body-md);
-  font-weight: var(--ds-font-weight-label-md);
+  font: var(--ds-font-body-md-emphasis);
   color: var(--ds-text-subtle);
 }
 
@@ -68,9 +66,7 @@ const slots = defineSlots<{ default?: () => unknown }>()
   margin: 0;
   flex: 1 1 auto;
   min-width: 0;
-  font-size: var(--ds-font-size-body-md);
-  line-height: var(--ds-line-height-body-md);
-  font-weight: var(--ds-font-weight-body-md);
+  font: var(--ds-font-body-md);
   color: var(--ds-text-strong);
   overflow-wrap: anywhere;
 }
@@ -78,8 +74,6 @@ const slots = defineSlots<{ default?: () => unknown }>()
 .ds-detail-row--row .ds-detail-row__value { text-align: right; }
 
 .ds-detail-row__value--mono {
-  font-family: var(--ds-typography-font-family-mono);
-  font-size: var(--ds-font-size-code-md);
-  line-height: var(--ds-line-height-code-md);
+  font: var(--ds-font-code-md);
 }
 </style>

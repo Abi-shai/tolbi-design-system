@@ -100,6 +100,29 @@ await Promise.all([
   ),
 ])
 
+// ── ADR-0011: the `font:` shorthand, one declaration per role ─────────────
+// CSS custom properties cannot bundle declarations, so a role is applied as a
+// `font:` shorthand carrying family, size, line-height and weight. This is also
+// what carries the font-family, which is why no component references
+// --ds-typography-font-family-* any more.
+//
+// Note for consumers: `font:` RESETS font-variant-numeric to normal, so it must
+// be declared BEFORE any tabular-nums line.
+function writeFontShorthands(roles, selector, dest) {
+  const body = roles.map((role) => {
+    const family = role === 'code-md' ? 'mono' : 'poppins'
+    return `  --ds-font-${role}: var(--ds-font-weight-${role}) var(--ds-font-size-${role})`
+         + `/var(--ds-line-height-${role}) var(--ds-typography-font-family-${family});`
+  }).join('\n')
+  writeFileSync(`tokens/dist/${dest}`, `${selector} {\n${body}\n}\n`)
+}
+
+const ROLES = Object.keys(
+  JSON.parse(readFileSync('tokens/src/typography/semantic.web.json', 'utf8'))['font-size'],
+)
+writeFontShorthands(ROLES, ':root', 'font-roles.css')
+writeFontShorthands(ROLES, '[data-typography="mobile"]', 'font-roles-mobile.css')
+
 appendFileSync('tokens/dist/motion.css', `
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -113,6 +136,7 @@ appendFileSync('tokens/dist/motion.css', `
 const tokenFiles = [
   'colors', 'typography', 'type-roles', 'type-roles-mobile',
   'radius', 'space', 'spacing', 'widths', 'containers',
+  'font-roles', 'font-roles-mobile',
   'shadows', 'elevation', 'focus-rings', 'blurs', 'semantic', 'motion',
 ]
 const combined = tokenFiles

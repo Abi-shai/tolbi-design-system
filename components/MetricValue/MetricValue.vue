@@ -61,9 +61,7 @@ const arrow = computed(() =>
 }
 
 .ds-metric__label {
-  font-size: var(--ds-font-size-label-md);
-  line-height: var(--ds-line-height-label-md);
-  font-weight: var(--ds-font-weight-label-md);
+  font: var(--ds-font-label-md);
   color: var(--ds-text-subtle);
 }
 
@@ -75,10 +73,8 @@ const arrow = computed(() =>
 }
 
 .ds-metric__value {
-  font-size: var(--ds-font-size-metric-lg);
-  line-height: var(--ds-line-height-metric-lg);
+  font: var(--ds-font-metric-lg);
   letter-spacing: var(--ds-letter-spacing-metric-lg);
-  font-weight: var(--ds-font-weight-metric-lg);
   color: var(--ds-text-strong);
   /* Digits must not jitter as a value updates. */
   font-variant-numeric: tabular-nums;
@@ -86,9 +82,8 @@ const arrow = computed(() =>
 
 .ds-metric__unit {
   margin-left: 0.25em;
-  font-size: var(--ds-font-size-body-md);
+  font: var(--ds-font-body-md);
   line-height: 1;
-  font-weight: var(--ds-font-weight-body-md);
   color: var(--ds-text-subtle);
 }
 
@@ -96,9 +91,7 @@ const arrow = computed(() =>
   display: inline-flex;
   align-items: center;
   gap: var(--ds-spacing-xxs);
-  font-size: var(--ds-font-size-label-md);
-  line-height: var(--ds-line-height-label-md);
-  font-weight: var(--ds-font-weight-label-md);
+  font: var(--ds-font-label-md);
   font-variant-numeric: tabular-nums;
 }
 
@@ -108,11 +101,9 @@ const arrow = computed(() =>
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
 .ds-metric--sm .ds-metric__value {
-  font-size: var(--ds-font-size-heading-lg);
-  line-height: var(--ds-line-height-heading-lg);
-  letter-spacing: var(--ds-letter-spacing-heading-lg);
+  font: var(--ds-font-heading-lg);
 }
-.ds-metric--lg .ds-metric__value { font-size: 2.5rem; line-height: 3rem; }
+.ds-metric--lg .ds-metric__value { font: var(--ds-font-metric-xl); letter-spacing: var(--ds-letter-spacing-metric-xl); }
 
 /*
  * Deliberately no brand-surface variant. The metric is only supported on the

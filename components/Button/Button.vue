@@ -80,10 +80,7 @@ function handleClick(event: MouseEvent) {
   padding: 10px 14px;
   border: 1px solid transparent;
   border-radius: var(--ds-radius-control);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25rem;
+  font: var(--ds-font-label-lg-strong);
   white-space: nowrap;
   cursor: pointer;
   box-shadow: var(--ds-elevation-control);
@@ -103,22 +100,22 @@ function handleClick(event: MouseEvent) {
 .ds-button--lg {
   gap: 6px;
   padding: 10px 16px;
-  font-size: 1rem;
-  line-height: 1.5rem;
+  font: var(--ds-font-label-xl-strong);
 }
 
 .ds-button--xl {
   gap: 6px;
   padding: 12px 18px;
-  font-size: 1rem;
-  line-height: 1.5rem;
+  font: var(--ds-font-label-xl-strong);
 }
 
 .ds-button--2xl {
   gap: 10px;
   padding: 16px 22px;
-  font-size: 1.125rem;
-  line-height: 1.75rem;
+  /* Component token (ADR-0010): 18px/28px is off the type ramp and has exactly
+     one consumer. A role would be minted for a single call site. */
+  --button-2xl-font: var(--ds-font-weight-label-xl-strong) 1.125rem/1.75rem var(--ds-typography-font-family-poppins);
+  font: var(--button-2xl-font);
 }
 
 /* ── Primary ──────────────────────────────────────────────────────── */

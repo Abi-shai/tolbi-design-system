@@ -231,9 +231,7 @@ function formatSize(bytes?: number) {
 .ds-dropzone__text { display: flex; flex-direction: column; gap: var(--ds-spacing-xxs); }
 
 .ds-dropzone__cta {
-  font-size: var(--ds-font-size-label-lg);
-  line-height: var(--ds-line-height-label-lg);
-  font-weight: var(--ds-font-weight-label-lg);
+  font: var(--ds-font-label-lg);
   color: var(--ds-text-brand);
 }
 
@@ -243,8 +241,7 @@ function formatSize(bytes?: number) {
 }
 
 .ds-dropzone__supporting {
-  font-size: var(--ds-font-size-body-sm);
-  line-height: var(--ds-line-height-body-sm);
+  font: var(--ds-font-body-sm);
   color: var(--ds-text-subtle);
 }
 
@@ -282,9 +279,7 @@ function formatSize(bytes?: number) {
 }
 
 .ds-dropzone__file-name {
-  font-size: var(--ds-font-size-body-md);
-  line-height: var(--ds-line-height-body-md);
-  font-weight: var(--ds-font-weight-label-md);
+  font: var(--ds-font-body-md-emphasis);
   color: var(--ds-text-strong);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -293,8 +288,7 @@ function formatSize(bytes?: number) {
 
 .ds-dropzone__file-meta,
 .ds-dropzone__file-error {
-  font-size: var(--ds-font-size-body-sm);
-  line-height: var(--ds-line-height-body-sm);
+  font: var(--ds-font-body-sm);
 }
 
 .ds-dropzone__file-meta  { color: var(--ds-text-subtle); }

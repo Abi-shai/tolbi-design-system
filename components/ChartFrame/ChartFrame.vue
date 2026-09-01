@@ -108,9 +108,7 @@ const gridLines = computed(() => (props.yTicks.length ? props.yTicks.length : 5)
 }
 
 .ds-chart-frame__title {
-  font-size: var(--ds-font-size-heading-md);
-  line-height: var(--ds-line-height-heading-md);
-  font-weight: var(--ds-font-weight-heading-md);
+  font: var(--ds-font-heading-md);
   color: var(--ds-text-strong);
 }
 
@@ -152,9 +150,7 @@ const gridLines = computed(() => (props.yTicks.length ? props.yTicks.length : 5)
 }
 
 .ds-chart-frame__tick {
-  font-size: var(--ds-font-size-label-xs);
-  line-height: var(--ds-line-height-label-xs);
-  font-weight: var(--ds-font-weight-label-xs);
+  font: var(--ds-font-label-xs);
   color: var(--ds-text-subtlest);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;

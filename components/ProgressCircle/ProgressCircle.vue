@@ -31,7 +31,10 @@ const SIZE_MAP: Record<ProgressCircleSize, { diameter: number; strokeWidth: numb
 const HALF_OFFSET_NO_LABEL:   Record<ProgressCircleSize, number> = { xxs: 5, xs: 22, sm: 28, md: 36, lg: 35 }
 const HALF_OFFSET_WITH_LABEL: Record<ProgressCircleSize, number> = { xxs: 5, xs: 16, sm: 21, md: 26, lg: 27 }
 
-/* ── Value text styles ───────────────────────────────────────────── */
+/* ── Value text styles ───────────────────────────────────────────────
+   Component tokens (ADR-0010): the value scales with the ring diameter, so
+   these are geometry, not typographic roles — 30px, 36px and 48px are off the
+   type ramp entirely. Kept as a table rather than dissolved into roles. */
 const VALUE_FONT: Record<ProgressCircleSize, { size: string; line: string; tracking?: string }> = {
   xxs: { size: '0.875rem', line: '1.25rem'  },
   xs:  { size: '1.5rem',   line: '2rem'     },
@@ -198,6 +201,7 @@ const labelFont = computed(() => LABEL_FONT[props.size])
           fontWeight:    '600',
           lineHeight:    valueFont.line,
           letterSpacing: valueFont.tracking ?? 'normal',
+          fontVariantNumeric: 'tabular-nums',
           color:         'var(--ds-text-strong)',
         }"
       >{{ pct }}</span>

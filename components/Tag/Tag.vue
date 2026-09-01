@@ -136,10 +136,7 @@ function onTagClick() {
   border: 1px solid var(--ds-border-default);
   border-radius: var(--ds-radius-inner);
   color: var(--ds-text-default);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
-  font-size: 0.75rem;
-  line-height: 1.125rem;
+  font: var(--ds-font-label-md);
   white-space: nowrap;
   cursor: default;
   user-select: none;
@@ -151,8 +148,7 @@ function onTagClick() {
 }
 .ds-tag--lg {
   padding: 4px 10px;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  font: var(--ds-font-label-lg);
 }
 
 /* ── Leading icon — avatar / icon / slot: tighter left padding ───── */
@@ -222,8 +218,7 @@ function onTagClick() {
   padding: 0 4px;
   background-color: var(--ds-bg-neutral);
   border-radius: var(--ds-radius-xs);
-  font-size: 0.75rem;
-  font-weight: 500;
+  font: var(--ds-font-label-md);
   line-height: 1;
   flex-shrink: 0;
 }

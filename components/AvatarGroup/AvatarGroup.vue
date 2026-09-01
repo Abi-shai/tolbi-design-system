@@ -100,9 +100,7 @@ const overflow = computed(() => Math.max(0, props.items.length - props.max))
   padding: 0 var(--ds-spacing-xs);
   background-color: var(--ds-bg-neutral-subtle);
   color: var(--ds-text-subtle);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: var(--ds-font-size-label-md);
-  font-weight: var(--ds-font-weight-label-md);
+  font: var(--ds-font-label-md);
   font-variant-numeric: tabular-nums;
 }
 
@@ -119,9 +117,7 @@ const overflow = computed(() => Math.max(0, props.items.length - props.max))
   border: 0;
   background: none;
   cursor: pointer;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: var(--ds-font-size-label-lg);
-  font-weight: var(--ds-font-weight-label-lg);
+  font: var(--ds-font-label-lg);
   color: var(--ds-text-subtle);
   border-radius: var(--ds-radius-inner);
 }

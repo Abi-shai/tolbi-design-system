@@ -217,15 +217,13 @@ const checkSize = computed(() => {
 
 /* Size: bottom padding and font size */
 .ds-steps__text--sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  font: var(--ds-font-label-lg);
   padding-bottom: var(--ds-spacing-3xl);
 }
 
 .ds-steps__text--md,
 .ds-steps__text--lg {
-  font-size: 1rem;
-  line-height: 1.5rem;
+  font: var(--ds-font-label-xl);
   padding-bottom: var(--ds-spacing-4xl);
 }
 
@@ -238,14 +236,14 @@ const checkSize = computed(() => {
 /* ── Title ─────────────────────────────────────────────────────────── */
 .ds-steps__title {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 600;
+  font-weight: var(--ds-font-weight-label-lg-strong);
   color: var(--ds-text-default);
 }
 
 /* ── Description ───────────────────────────────────────────────────── */
 .ds-steps__description {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
+  font-weight: var(--ds-font-weight-body-md);
   color: var(--ds-text-subtle);
 }
 

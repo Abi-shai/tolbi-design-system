@@ -75,17 +75,14 @@ withDefaults(defineProps<Props>(), {
 
 .ds-empty-state__title {
   margin: 0;
-  font-size: var(--ds-font-size-heading-sm);
-  line-height: var(--ds-line-height-heading-sm);
-  font-weight: var(--ds-font-weight-heading-sm);
+  font: var(--ds-font-heading-sm);
   color: var(--ds-text-strong);
   text-wrap: balance;
 }
 
 .ds-empty-state__description {
   margin: 0;
-  font-size: var(--ds-font-size-body-md);
-  line-height: var(--ds-line-height-body-md);
+  font: var(--ds-font-body-md);
   color: var(--ds-text-subtle);
 }
 

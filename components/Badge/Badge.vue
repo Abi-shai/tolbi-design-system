@@ -213,28 +213,28 @@ const dotSize = computed(() => {
   align-items: center;
   gap: 4px;
   border-radius: var(--ds-radius-pill);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
   white-space: nowrap;
-  line-height: 1;
 }
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
 .ds-badge--sm {
   padding: 2px 8px;
-  font-size: 0.75rem;
-  line-height: 1.125rem;
+  font: var(--ds-font-label-md);
+  line-height: 1;
 }
 .ds-badge--md {
   padding: 2px 10px;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  font: var(--ds-font-label-lg);
+  line-height: 1;
 }
 .ds-badge--lg {
   padding: 4px 12px;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  font: var(--ds-font-label-lg);
+  line-height: 1;
 }
+
+/* Tabs renders counts through Badge, so digits must not jitter (ADR-0011). */
+.ds-badge__label { font-variant-numeric: tabular-nums; }
 
 /* ── Pill color ───────────────────────────────────────────────────── */
 .ds-badge--pill-color {

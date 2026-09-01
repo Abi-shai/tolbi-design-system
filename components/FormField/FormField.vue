@@ -98,11 +98,7 @@ provide(FORM_FIELD_KEY, {
 .ds-form-field__label {
   margin: 0;
   display: block;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: var(--ds-font-size-label-lg);
-  font-weight: var(--ds-font-weight-label-lg);
-  line-height: var(--ds-line-height-label-lg);
-  letter-spacing: var(--ds-letter-spacing-label-lg);
+  font: var(--ds-font-label-lg);
   color: var(--ds-text-default);
 }
 
@@ -117,11 +113,7 @@ provide(FORM_FIELD_KEY, {
   display: flex;
   align-items: flex-start;
   gap: var(--ds-spacing-xs);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: var(--ds-font-size-body-md);
-  font-weight: var(--ds-font-weight-body-md);
-  line-height: var(--ds-line-height-body-md);
-  letter-spacing: var(--ds-letter-spacing-body-md);
+  font: var(--ds-font-body-md);
   color: var(--ds-text-subtle);
 }
 

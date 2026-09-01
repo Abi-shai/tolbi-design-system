@@ -96,11 +96,7 @@ const emit = defineEmits<{
   color: var(--ds-text-default);
 }
 
-.ds-dropdown-item__label {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+.ds-dropdown-item__label {  font: var(--ds-font-label-lg);
   color: var(--ds-text-default);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -109,11 +105,7 @@ const emit = defineEmits<{
   min-width: 0;
 }
 
-.ds-dropdown-item__shortcut {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
-  font-size: 0.75rem;
-  line-height: 1.125rem;
+.ds-dropdown-item__shortcut {  font: var(--ds-font-body-sm);
   color: var(--ds-text-subtlest);
   white-space: nowrap;
   flex-shrink: 0;

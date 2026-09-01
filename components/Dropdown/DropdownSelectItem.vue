@@ -153,11 +153,7 @@ const emit = defineEmits<{
   overflow: hidden;
 }
 
-.ds-dropdown-select-item__label {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
-  font-size: 1rem;
-  line-height: 1.5rem;
+.ds-dropdown-select-item__label {  font: var(--ds-font-label-xl);
   color: var(--ds-text-strong);
   white-space: nowrap;
   overflow: hidden;
@@ -169,11 +165,7 @@ const emit = defineEmits<{
   color: var(--ds-text-disabled);
 }
 
-.ds-dropdown-select-item__supporting {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
-  font-size: 1rem;
-  line-height: 1.5rem;
+.ds-dropdown-select-item__supporting {  font: var(--ds-font-body-lg);
   color: var(--ds-text-subtle);
   white-space: nowrap;
   flex-shrink: 0;

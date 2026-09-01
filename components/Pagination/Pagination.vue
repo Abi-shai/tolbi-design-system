@@ -125,15 +125,13 @@ function goToPage(page: number) {
   border: none;
   border-radius: var(--ds-radius-pill);
   background-color: transparent;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.25rem;
+  font: var(--ds-font-label-lg);
   color: var(--ds-text-subtle);
   cursor: pointer;
   transition:
     background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),
     color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+  font-variant-numeric: tabular-nums;
 }
 
 .ds-pagination__num:hover:not(:disabled):not(.ds-pagination__num--active) {
@@ -143,7 +141,7 @@ function goToPage(page: number) {
 .ds-pagination__num--active {
   background-color: var(--ds-bg-selected);
   color: var(--ds-text-strong);
-  font-weight: 600;
+  font-weight: var(--ds-font-weight-label-lg-strong);
 }
 
 .ds-pagination__num--ellipsis {

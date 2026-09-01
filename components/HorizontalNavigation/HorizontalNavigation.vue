@@ -251,10 +251,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   border: none;
   cursor: pointer;
   color: color-mix(in srgb, var(--ds-text-on-brand-solid) 70%, transparent);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.25rem;
+  font: var(--ds-font-label-lg);
   white-space: nowrap;
   transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
@@ -267,7 +264,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   background: color-mix(in srgb, var(--ds-bg-brand-solid) 90%, transparent);
   color: var(--ds-text-on-brand-solid);
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 600;
+  font-weight: var(--ds-font-weight-label-lg-strong);
 }
 
 /* ── Droite ───────────────────────────────────────────────────────── */
@@ -313,10 +310,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-control);
   color: var(--ds-text-on-brand-solid);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25rem;
+  font: var(--ds-font-label-lg-strong);
   white-space: nowrap;
   cursor: pointer;
   transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);

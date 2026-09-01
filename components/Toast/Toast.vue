@@ -99,16 +99,13 @@ const liveRole = computed(() => (props.tone === 'error' ? 'alert' : 'status'))
 
 .ds-toast__title {
   margin: 0;
-  font-size: var(--ds-font-size-heading-sm);
-  line-height: var(--ds-line-height-heading-sm);
-  font-weight: var(--ds-font-weight-heading-sm);
+  font: var(--ds-font-heading-sm);
   color: var(--ds-text-strong);
 }
 
 .ds-toast__text {
   margin: 0;
-  font-size: var(--ds-font-size-body-sm);
-  line-height: var(--ds-line-height-body-sm);
+  font: var(--ds-font-body-sm);
   color: var(--ds-text-subtle);
 }
 

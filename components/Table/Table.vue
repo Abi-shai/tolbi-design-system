@@ -224,12 +224,8 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
   gap: 4px;
 }
 
-.ds-table__th-label {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.75rem;
-  font-weight: 500;
+.ds-table__th-label {  font: var(--ds-font-label-md);
   color: var(--ds-text-subtle);
-  line-height: 1.125rem;
 }
 
 /* ── Data row ──────────────────────────────────────────────────────── */
@@ -272,18 +268,13 @@ const showPagination = computed(() => (props.totalPages ?? 1) > 1)
 .ds-table__td--empty {
   text-align: center;
   padding: 48px 24px;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
+  font: var(--ds-font-body-md);
   color: var(--ds-text-subtle);
 }
 
 /* ── Default cell text ─────────────────────────────────────────────── */
-.ds-table__cell-text {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 400;
+.ds-table__cell-text {  font: var(--ds-font-body-md);
   color: var(--ds-text-default);
-  line-height: 1.25rem;
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;

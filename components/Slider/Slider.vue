@@ -222,13 +222,11 @@ function display(v: number): string {
   border: 1px solid var(--ds-border-subtle);
   border-radius: 8px;
   padding: 8px 12px;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: var(--ds-font-size-body-sm);
-  font-weight: 600;
-  line-height: var(--ds-line-height-body-sm);
+  font: var(--ds-font-label-md);
   color: var(--ds-text-default);
   white-space: nowrap;
   box-shadow: var(--ds-elevation-overlay);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Bottom label ──────────────────────────────────────────────────── */
@@ -240,11 +238,9 @@ function display(v: number): string {
 }
 
 .ds-slider__label {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: var(--ds-font-size-body-lg);
-  font-weight: 500;
-  line-height: var(--ds-line-height-body-lg);
+  font: var(--ds-font-body-lg-emphasis);
   color: var(--ds-text-strong);
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 </style>

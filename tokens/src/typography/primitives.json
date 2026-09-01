@@ -1,42 +1,134 @@
 {
   "typography": {
     "font-family": {
-      "poppins": { "value": "Poppins, sans-serif", "description": "Brand typeface — everything except code" },
-      "mono":    { "value": "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace", "description": "IDs, API keys, snippets — Poppins has no monospace" }
+      "poppins": {
+        "value": "Poppins, sans-serif",
+        "description": "Brand typeface — everything except code"
+      },
+      "mono": {
+        "value": "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
+        "description": "IDs, API keys, snippets — Poppins has no monospace"
+      }
     },
     "font-size": {
-      "11": { "value": "0.6875rem", "description": "11px — chrome only, never content" },
-      "12": { "value": "0.75rem",   "description": "12px — web floor for comprehension" },
-      "13": { "value": "0.8125rem", "description": "13px — mobile floor for comprehension" },
-      "14": { "value": "0.875rem",  "description": "14px" },
-      "15": { "value": "0.9375rem", "description": "15px" },
-      "16": { "value": "1rem",      "description": "16px" },
-      "17": { "value": "1.0625rem", "description": "17px" },
-      "20": { "value": "1.25rem",   "description": "20px" },
-      "22": { "value": "1.375rem",  "description": "22px" },
-      "24": { "value": "1.5rem",    "description": "24px" },
-      "28": { "value": "1.75rem",   "description": "28px" },
-      "32": { "value": "2rem",      "description": "32px" }
+      "11": {
+        "value": "0.6875rem",
+        "description": "11px — chrome only, never content"
+      },
+      "12": {
+        "value": "0.75rem",
+        "description": "12px — web floor for comprehension"
+      },
+      "13": {
+        "value": "0.8125rem",
+        "description": "13px — mobile floor for comprehension"
+      },
+      "14": {
+        "value": "0.875rem",
+        "description": "14px"
+      },
+      "15": {
+        "value": "0.9375rem",
+        "description": "15px"
+      },
+      "16": {
+        "value": "1rem",
+        "description": "16px"
+      },
+      "17": {
+        "value": "1.0625rem",
+        "description": "17px"
+      },
+      "20": {
+        "value": "1.25rem",
+        "description": "20px"
+      },
+      "22": {
+        "value": "1.375rem",
+        "description": "22px"
+      },
+      "24": {
+        "value": "1.5rem",
+        "description": "24px"
+      },
+      "28": {
+        "value": "1.75rem",
+        "description": "28px"
+      },
+      "32": {
+        "value": "2rem",
+        "description": "32px"
+      },
+      "40": {
+        "value": "2.5rem",
+        "description": "40px — MetricValue lg. Added by ADR-0011"
+      }
     },
     "line-height": {
-      "16": { "value": "1rem",     "description": "16px" },
-      "20": { "value": "1.25rem",  "description": "20px" },
-      "24": { "value": "1.5rem",   "description": "24px" },
-      "28": { "value": "1.75rem",  "description": "28px" },
-      "32": { "value": "2rem",     "description": "32px" },
-      "36": { "value": "2.25rem",  "description": "36px" },
-      "40": { "value": "2.5rem",   "description": "40px" }
+      "16": {
+        "value": "1rem",
+        "description": "16px"
+      },
+      "20": {
+        "value": "1.25rem",
+        "description": "20px"
+      },
+      "24": {
+        "value": "1.5rem",
+        "description": "24px"
+      },
+      "28": {
+        "value": "1.75rem",
+        "description": "28px"
+      },
+      "32": {
+        "value": "2rem",
+        "description": "32px"
+      },
+      "36": {
+        "value": "2.25rem",
+        "description": "36px"
+      },
+      "40": {
+        "value": "2.5rem",
+        "description": "40px"
+      },
+      "48": {
+        "value": "3rem",
+        "description": "48px — pairs with font-size 40"
+      }
     },
     "font-weight": {
-      "regular":  { "value": "400", "description": "Body copy" },
-      "medium":   { "value": "500", "description": "Labels, buttons, emphasis" },
-      "semibold": { "value": "600", "description": "Headings, metrics" }
+      "regular": {
+        "value": "400",
+        "description": "Body copy"
+      },
+      "medium": {
+        "value": "500",
+        "description": "Labels, buttons, emphasis"
+      },
+      "semibold": {
+        "value": "600",
+        "description": "Headings, metrics"
+      }
     },
     "letter-spacing": {
-      "none":    { "value": "0em",      "description": "0 — sizes up to 20px" },
-      "tight":   { "value": "-0.005em", "description": "-0.5% — 22–24px" },
-      "tighter": { "value": "-0.01em",  "description": "-1% — 28–32px" },
-      "wide":    { "value": "0.04em",   "description": "+4% — all-caps overlines only" }
+      "none": {
+        "value": "0em",
+        "description": "0 — sizes up to 20px"
+      },
+      "tight": {
+        "value": "-0.005em",
+        "description": "-0.5% — 22–24px"
+      },
+      "tighter": {
+        "value": "-0.01em",
+        "description": "-1% — 28–32px"
+      },
+      "wide": {
+        "value": "0.04em",
+        "description": "+4% — all-caps overlines only"
+      }
     }
   }
 }

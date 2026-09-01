@@ -153,10 +153,7 @@ onUnmounted(() => {
   border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-control);
   cursor: pointer;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25rem;
+  font: var(--ds-font-label-lg-strong);
   color: var(--ds-text-default);
   white-space: nowrap;
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
@@ -239,22 +236,14 @@ onUnmounted(() => {
   flex: 1;
 }
 
-.ds-dropdown__header-name {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 600;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+.ds-dropdown__header-name {  font: var(--ds-font-heading-sm);
   color: var(--ds-text-default);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.ds-dropdown__header-email {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+.ds-dropdown__header-email {  font: var(--ds-font-body-md);
   color: var(--ds-text-subtle);
   overflow: hidden;
   text-overflow: ellipsis;

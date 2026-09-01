@@ -122,8 +122,7 @@ const toggleLabel = computed(() =>
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-md);
-  font-size: var(--ds-font-size-body-sm);
-  line-height: var(--ds-line-height-body-sm);
+  font: var(--ds-font-body-sm);
   color: var(--ds-text-subtle);
 }
 

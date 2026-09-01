@@ -152,6 +152,12 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
 </template>
 
 <style scoped>
+/* Component tokens (ADR-0010): an OTP cell's digit size is geometry, not a
+   typographic role — 48px and 60px are off the type ramp entirely. */
+.ds-otp {
+  --otp-digit-font:    var(--ds-font-weight-metric-lg) 3rem/3.75rem var(--ds-typography-font-family-poppins);
+  --otp-digit-font-lg: var(--ds-font-weight-metric-lg) 3.75rem/4.5rem var(--ds-typography-font-family-poppins);
+}
 /* ── Shell ────────────────────────────────────────────────────────── */
 .ds-otp {
   display: inline-flex;
@@ -183,7 +189,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
   box-shadow: var(--ds-elevation-control);
   box-sizing: border-box;
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
+  font-weight: var(--ds-font-weight-label-lg);
   color: var(--ds-text-strong);
   transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
   outline: none;
@@ -219,8 +225,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
   min-height: 64px;
   padding: var(--ds-spacing-xxs) var(--ds-spacing-md);
   border-radius: var(--ds-radius-control);
-  font-size: 3rem;        /* 48px */
-  line-height: 3.75rem;   /* 60px */
+  font: var(--otp-digit-font);
   letter-spacing: -0.96px;
 }
 
@@ -229,8 +234,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
   min-height: 80px;
   padding: var(--ds-spacing-md);
   border-radius: var(--ds-radius-lg);
-  font-size: 3rem;
-  line-height: 3.75rem;
+  font: var(--otp-digit-font);
   letter-spacing: -0.96px;
 }
 
@@ -239,22 +243,21 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
   min-height: 96px;
   padding: var(--ds-spacing-lg) var(--ds-spacing-md);
   border-radius: var(--ds-radius-surface);
-  font-size: 3.75rem;     /* 60px */
-  line-height: 4.5rem;    /* 72px */
+  font: var(--otp-digit-font-lg);
   letter-spacing: -1.2px;
 }
 
 /* ── Séparateur ───────────────────────────────────────────────────── */
 .ds-otp__separator {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
+  font-weight: var(--ds-font-weight-label-lg);
   color: var(--ds-text-placeholder);
   flex-shrink: 0;
 }
 
-.ds-otp--sm .ds-otp__separator { font-size: 3rem;    line-height: 3.75rem; }
-.ds-otp--md .ds-otp__separator { font-size: 3rem;    line-height: 3.75rem; }
-.ds-otp--lg .ds-otp__separator { font-size: 3.75rem; line-height: 4.5rem;  }
+.ds-otp--sm .ds-otp__separator { font: var(--otp-digit-font); }
+.ds-otp--md .ds-otp__separator { font: var(--otp-digit-font); }
+.ds-otp--lg .ds-otp__separator { font: var(--otp-digit-font-lg); }
 
 /* ── Hint ─────────────────────────────────────────────────────────── */
 </style>

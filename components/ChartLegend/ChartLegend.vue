@@ -97,16 +97,13 @@ button.ds-chart-legend__entry:focus-visible {
 .ds-chart-legend__mark--line { width: 14px; height: 3px; border-radius: var(--ds-radius-pill); }
 
 .ds-chart-legend__label {
-  font-size: var(--ds-font-size-body-sm);
-  line-height: var(--ds-line-height-body-sm);
+  font: var(--ds-font-body-sm);
   color: var(--ds-text-default);
   white-space: nowrap;
 }
 
 .ds-chart-legend__value {
-  font-size: var(--ds-font-size-body-sm);
-  line-height: var(--ds-line-height-body-sm);
-  font-weight: var(--ds-font-weight-label-md);
+  font: var(--ds-font-body-sm-emphasis);
   color: var(--ds-text-strong);
   font-variant-numeric: tabular-nums;
 }

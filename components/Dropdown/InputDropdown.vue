@@ -299,11 +299,7 @@ onUnmounted(() => {
 }
 
 /* ── Value text ────────────────────────────────────────────────────── */
-.ds-input-dropdown__value {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
-  font-size: 1rem;
-  line-height: 1.5rem;
+.ds-input-dropdown__value {  font: var(--ds-font-body-lg-emphasis);
   color: var(--ds-text-strong);
   white-space: nowrap;
   overflow: hidden;
@@ -313,16 +309,12 @@ onUnmounted(() => {
 
 .ds-input-dropdown__value--placeholder {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
+  font-weight: var(--ds-font-weight-body-lg);
   color: var(--ds-text-placeholder);
 }
 
 /* ── Supporting text ───────────────────────────────────────────────── */
-.ds-input-dropdown__supporting {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
-  font-size: 1rem;
-  line-height: 1.5rem;
+.ds-input-dropdown__supporting {  font: var(--ds-font-body-lg-emphasis);
   color: var(--ds-text-subtle);
   white-space: nowrap;
   flex-shrink: 0;
@@ -368,17 +360,14 @@ onUnmounted(() => {
   background: transparent;
   border: none;
   outline: none;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
-  font-size: 1rem;
-  line-height: 1.5rem;
+  font: var(--ds-font-body-lg-emphasis);
   color: var(--ds-text-strong);
   padding: 0;
 }
 
 .ds-input-dropdown__search-input::placeholder {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
+  font-weight: var(--ds-font-weight-body-lg);
   color: var(--ds-text-placeholder);
 }
 

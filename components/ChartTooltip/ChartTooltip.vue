@@ -90,25 +90,21 @@ withDefaults(defineProps<Props>(), {
 }
 
 .ds-chart-tooltip__title {
-  font-size: var(--ds-font-size-body-sm);
-  line-height: var(--ds-line-height-body-sm);
+  font: var(--ds-font-body-sm);
   color: var(--ds-text-subtle);
   white-space: nowrap;
 }
 
 .ds-chart-tooltip__value {
-  font-size: var(--ds-font-size-heading-xl);
-  line-height: var(--ds-line-height-heading-xl);
+  font: var(--ds-font-heading-xl);
   letter-spacing: var(--ds-letter-spacing-heading-xl);
-  font-weight: var(--ds-font-weight-heading-xl);
   color: var(--ds-text-strong);
   font-variant-numeric: tabular-nums;
 }
 
 .ds-chart-tooltip__unit {
   margin-left: 0.25em;
-  font-size: var(--ds-font-size-body-sm);
-  font-weight: var(--ds-font-weight-body-sm);
+  font: var(--ds-font-body-sm);
   color: var(--ds-text-subtle);
 }
 
@@ -125,8 +121,7 @@ withDefaults(defineProps<Props>(), {
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-md);
-  font-size: var(--ds-font-size-body-sm);
-  line-height: var(--ds-line-height-body-sm);
+  font: var(--ds-font-body-sm);
 }
 
 .ds-chart-tooltip__swatch {

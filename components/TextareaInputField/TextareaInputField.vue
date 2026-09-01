@@ -193,10 +193,7 @@ function onKeydown(e: KeyboardEvent) {
   resize: none;
   appearance: none;
   background: transparent;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5rem;
+  font: var(--ds-font-body-lg);
   color: var(--ds-text-strong);
   box-sizing: border-box;
 }
@@ -245,11 +242,7 @@ function onKeydown(e: KeyboardEvent) {
   flex-shrink: 0;
 }
 
-.ds-textarea__tag-label {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.25rem;
+.ds-textarea__tag-label {  font: var(--ds-font-label-lg);
   color: var(--ds-text-default);
   white-space: nowrap;
 }
