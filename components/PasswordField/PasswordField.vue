@@ -100,6 +100,9 @@ const toggleLabel = computed(() =>
   cursor: pointer;
   color: var(--ds-text-subtlest);
   border-radius: var(--ds-radius-inner-sm);
+  transition:
+    color      var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    box-shadow var(--ds-motion-duration-instant)  var(--ds-motion-easing-default);
 }
 
 .ds-password-field__toggle:hover:not(:disabled) { color: var(--ds-text-default); }

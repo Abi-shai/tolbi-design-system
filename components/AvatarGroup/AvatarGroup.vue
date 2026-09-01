@@ -120,6 +120,9 @@ const overflow = computed(() => Math.max(0, props.items.length - props.max))
   font: var(--ds-font-label-lg);
   color: var(--ds-text-subtle);
   border-radius: var(--ds-radius-inner);
+  transition:
+    color      var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    box-shadow var(--ds-motion-duration-instant)  var(--ds-motion-easing-default);
 }
 
 .ds-avatar-group__empty:hover { color: var(--ds-text-default); }
