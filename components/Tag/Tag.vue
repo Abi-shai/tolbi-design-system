@@ -217,7 +217,7 @@ function onTagClick() {
   min-width: 16px;
   padding: 0 var(--ds-spacing-xs);
   background-color: var(--ds-bg-neutral);
-  border-radius: var(--ds-radius-xs);
+  border-radius: var(--ds-radius-inner-sm);
   font: var(--ds-font-label-md);
   line-height: 1;
   flex-shrink: 0;

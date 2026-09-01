@@ -78,7 +78,7 @@ defineEmits<{ toggle: [key: string] }>()
   background: none;
   font: inherit;
   color: inherit;
-  border-radius: var(--ds-radius-xs);
+  border-radius: var(--ds-radius-inner-sm);
   transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 

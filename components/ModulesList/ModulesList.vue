@@ -82,7 +82,7 @@ function onSelect(item: ModulesListItem) {
   height: 224px;
   box-sizing: border-box;
   background: var(--ds-bg-neutral-subtle);
-  border-radius: var(--ds-radius-2xl);
+  border-radius: var(--ds-radius-surface);
   padding: var(--ds-spacing-sm);
   display: inline-flex;
   align-items: flex-start;

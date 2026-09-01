@@ -268,7 +268,7 @@ onUnmounted(() => {
   align-items: center;
   gap: var(--ds-spacing-md);
   width: 100%;
-  padding: 10px 14px;
+  padding: var(--ds-control-padding-md);
   box-sizing: border-box;
   background-color: var(--ds-bg-default);
   border: 1px solid var(--ds-border-default);

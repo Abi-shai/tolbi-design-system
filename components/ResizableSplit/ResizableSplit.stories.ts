@@ -45,7 +45,7 @@ export const Default: Story = {
     components: { ResizableSplit },
     setup: () => ({ args, ratio: ref(args.modelValue ?? 50), PANE }),
     template: `
-      <div style="height:260px; border:1px solid var(--ds-border-subtle); border-radius:var(--ds-radius-xl); overflow:hidden">
+      <div style="height:260px; border:1px solid var(--ds-border-subtle); border-radius:var(--ds-radius-surface); overflow:hidden">
         <ResizableSplit v-bind="args" v-model="ratio" style="height:100%">
           <template #start><div :style="PANE">Carte · {{ Math.round(ratio) }} %</div></template>
           <template #end><div :style="PANE">Liste des parcelles</div></template>
@@ -62,7 +62,7 @@ export const Vertical: Story = {
     components: { ResizableSplit },
     setup: () => ({ args, ratio: ref(40), PANE }),
     template: `
-      <div style="height:320px; border:1px solid var(--ds-border-subtle); border-radius:var(--ds-radius-xl); overflow:hidden">
+      <div style="height:320px; border:1px solid var(--ds-border-subtle); border-radius:var(--ds-radius-surface); overflow:hidden">
         <ResizableSplit v-bind="args" v-model="ratio" style="height:100%">
           <template #start><div :style="PANE">Graphique · {{ Math.round(ratio) }} %</div></template>
           <template #end><div :style="PANE">Tableau de relevés</div></template>
@@ -80,7 +80,7 @@ export const Constrained: Story = {
     components: { ResizableSplit },
     setup: () => ({ args, ratio: ref(50), PANE }),
     template: `
-      <div style="height:220px; border:1px solid var(--ds-border-subtle); border-radius:var(--ds-radius-xl); overflow:hidden">
+      <div style="height:220px; border:1px solid var(--ds-border-subtle); border-radius:var(--ds-radius-surface); overflow:hidden">
         <ResizableSplit v-bind="args" v-model="ratio" style="height:100%">
           <template #start><div :style="PANE">min 35 %</div></template>
           <template #end><div :style="PANE">max 65 %</div></template>

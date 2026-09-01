@@ -75,7 +75,7 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
 /* ── Contenu ──────────────────────────────────────────────────────── */
 .ds-tooltip__content {
   background: var(--ds-bg-inverse);
-  border-radius: var(--ds-radius-control);
+  border-radius: var(--ds-radius-surface-sm);
   width: 100%;
   box-sizing: border-box;
 }

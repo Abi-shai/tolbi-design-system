@@ -245,4 +245,4 @@ uses is already semantic. That is the divergence rule working, not a gap.
 - **`BadgeGroup.color` still accepts `brand`**, which ADR-0009 removed from the status tones. Left
   alone above; needs resolving when the component-layer pass reaches it.
 - **The numbered categorical set**, deferred above until something renders a data series.
-- **Radius has no agreed role for four of its steps** — carried over from ADR-0009 and untouched here.
+- ~~**Radius has no agreed role for four of its steps**~~ — closed by ADR-0013.

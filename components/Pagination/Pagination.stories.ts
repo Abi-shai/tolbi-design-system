@@ -29,7 +29,7 @@ export const Default: Story = {
       return { currentPage, totalPages: 10 }
     },
     template: `
-      <div style="background: var(--ds-bg-default); border: 1px solid var(--ds-border-subtle); border-radius: var(--ds-radius-xl);">
+      <div style="background: var(--ds-bg-default); border: 1px solid var(--ds-border-subtle); border-radius: var(--ds-radius-surface);">
         <Pagination
           :current-page="currentPage"
           :total-pages="totalPages"
@@ -49,7 +49,7 @@ export const MiddlePage: Story = {
       return { currentPage, totalPages: 10 }
     },
     template: `
-      <div style="background: var(--ds-bg-default); border: 1px solid var(--ds-border-subtle); border-radius: var(--ds-radius-xl);">
+      <div style="background: var(--ds-bg-default); border: 1px solid var(--ds-border-subtle); border-radius: var(--ds-radius-surface);">
         <Pagination
           :current-page="currentPage"
           :total-pages="totalPages"
@@ -69,7 +69,7 @@ export const FewPages: Story = {
       return { currentPage, totalPages: 4 }
     },
     template: `
-      <div style="background: var(--ds-bg-default); border: 1px solid var(--ds-border-subtle); border-radius: var(--ds-radius-xl);">
+      <div style="background: var(--ds-bg-default); border: 1px solid var(--ds-border-subtle); border-radius: var(--ds-radius-surface);">
         <Pagination
           :current-page="currentPage"
           :total-pages="totalPages"
@@ -89,7 +89,7 @@ export const LastPage: Story = {
       return { currentPage, totalPages: 10 }
     },
     template: `
-      <div style="background: var(--ds-bg-default); border: 1px solid var(--ds-border-subtle); border-radius: var(--ds-radius-xl);">
+      <div style="background: var(--ds-bg-default); border: 1px solid var(--ds-border-subtle); border-radius: var(--ds-radius-surface);">
         <Pagination
           :current-page="currentPage"
           :total-pages="totalPages"

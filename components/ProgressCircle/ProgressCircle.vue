@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/* token-lint-disable no-literal-dimension-js — the value scales with the ring
+   diameter; 30px, 36px and 48px are off the type ramp. Component tokens per
+   ADR-0010, recorded in ADR-0011. */
 import { computed } from 'vue'
 
 export type ProgressCircleSize  = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'

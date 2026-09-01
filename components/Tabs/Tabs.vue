@@ -137,7 +137,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
 
 .ds-tabs--sm {
   padding: var(--ds-spacing-xs);
-  border-radius: var(--ds-radius-lg);
+  border-radius: var(--ds-radius-surface-sm);
 }
 
 /* ── Sliding indicator ─────────────────────────────────────────────── */

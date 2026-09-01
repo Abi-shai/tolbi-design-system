@@ -78,10 +78,10 @@ by a pixel or two each and call it consistency.
 
 ## Still open
 
-- **The control-padding scale**, described above. It wants an ADR of its own, and probably a
+- ~~**The control-padding scale**~~, described above. Closed by ADR-0013. It wants an ADR of its own, and probably a
   `control-padding-{sm,md,lg,xl,2xl}` set derived from the control heights.
-- **The linter only reads `.vue` files.** `ProgressCircle` proved typography can hide in a
+- ~~**The linter only reads `.vue` files.**~~ Closed by ADR-0013 — and it immediately found a
+  second parallel type ramp, in `Avatar`. `ProgressCircle` proved typography can hide in a
   JavaScript style object, and the linter would not see it. Extending it to `<script>` blocks is
   the obvious next hardening.
-- **Radius still has no agreed role for four of its steps** — carried since ADR-0009, and now the
-  oldest thing on the list.
+- ~~**Radius still has no agreed role for four of its steps**~~ — closed by ADR-0013.

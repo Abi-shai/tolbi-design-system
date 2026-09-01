@@ -318,7 +318,7 @@ Known fallout to be handled in the same change:
 
 ## Still open
 
-- **Radius has no agreed role for four of its steps.** `lg` (`ProgressSteps`, `Tabs`,
+- ~~**Radius has no agreed role for four of its steps.**~~ Closed by ADR-0013. `lg` (`ProgressSteps`, `Tabs`,
   `VerificationCodeInputField`, `FileDropzone`, `ChartTooltip`), `xs` (`Checkbox`, `PasswordField`,
   `Tag`, `ChartLegend`), `2xl` (`ModulesList`) and `4xl` (`HorizontalNavigation`) still consume the
   primitive ramp. Deciding what those roles are is the remaining half of ADR-0006's "six tiles,
@@ -335,5 +335,5 @@ Known fallout to be handled in the same change:
 - **The component tier.** One member so far: segmented-control selection. Its naming and file
   location are decided in the component-layer pass that follows this one.
 - **Motion's layer violation**, recorded above.
-- **The typography follow-up from ADR-0003** is still ~58% outstanding: 57 hardcoded `font-size:`
-  declarations against 41 role-based ones.
+- ~~**The typography follow-up from ADR-0003**~~ — closed by ADR-0011: 0 literal type values remain.
+

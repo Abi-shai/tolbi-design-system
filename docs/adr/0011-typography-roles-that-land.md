@@ -218,4 +218,4 @@ therefore checked against computed styles rather than reasoned about:
   this ADR, run on every build. Spacing went 47% → 87% in the same pass.
 - **The mobile scale has never been exercised.** `[data-typography="mobile"]` has no consumer, so the
   shorthand's mobile variant ships untested.
-- **Radius has no agreed role for four of its steps** — carried from ADR-0009, still untouched.
+- ~~**Radius has no agreed role for four of its steps**~~ — closed by ADR-0013.

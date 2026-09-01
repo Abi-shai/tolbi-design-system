@@ -69,7 +69,7 @@ export const CardPlaceholder: Story = {
   render: () => ({
     components: { Skeleton },
     template: `
-      <div style="display:flex; gap:1rem; align-items:flex-start; max-width:24rem; padding:1.25rem; border:1px solid var(--ds-border-subtle); border-radius:var(--ds-radius-xl)">
+      <div style="display:flex; gap:1rem; align-items:flex-start; max-width:24rem; padding:1.25rem; border:1px solid var(--ds-border-subtle); border-radius:var(--ds-radius-surface)">
         <Skeleton variant="circle" width="40px" height="40px" />
         <div style="flex:1; display:flex; flex-direction:column; gap:0.5rem">
           <Skeleton variant="text" width="50%" />

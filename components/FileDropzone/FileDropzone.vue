@@ -261,7 +261,7 @@ function formatSize(bytes?: number) {
   gap: var(--ds-spacing-lg);
   padding: var(--ds-spacing-lg);
   border: 1px solid var(--ds-border-subtle);
-  border-radius: var(--ds-radius-lg);
+  border-radius: var(--ds-radius-surface-sm);
   background-color: var(--ds-bg-default);
 }
 

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/* token-lint-disable no-literal-dimension-js — the initials scale with the
+   avatar's diameter, so this is geometry, not a typographic role (ADR-0010).
+   10px and 18px are off the type ramp by construction. */
 import { computed } from 'vue'
 
 export type AvatarSize   = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'

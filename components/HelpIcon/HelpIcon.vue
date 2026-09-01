@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/* token-lint-disable no-literal-dimension-js — tooltip positioning offsets,
+   not spacing: they align the bubble's tail to the trigger, and no token can
+   express that relationship. */
 import { ref, computed } from 'vue'
 import { Icon } from '../Icon'
 import { Tooltip } from '../Tooltip'

@@ -233,7 +233,7 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
   width: 80px;
   min-height: 80px;
   padding: var(--ds-spacing-md);
-  border-radius: var(--ds-radius-lg);
+  border-radius: var(--ds-radius-surface-sm);
   font: var(--otp-digit-font);
   letter-spacing: -0.96px;
 }

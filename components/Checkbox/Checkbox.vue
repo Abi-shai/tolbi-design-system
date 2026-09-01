@@ -231,7 +231,7 @@ function handleChange(event: Event) {
 
 /* ── Shape: checkbox (square) ──────────────────────────────────────── */
 .ds-checkbox__control--checkbox.ds-checkbox__control--sm {
-  border-radius: var(--ds-radius-xs);
+  border-radius: var(--ds-radius-inner-sm);
 }
 
 .ds-checkbox__control--checkbox.ds-checkbox__control--md {

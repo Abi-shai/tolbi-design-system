@@ -326,7 +326,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   align-items: center;
   justify-content: center;
   padding: var(--ds-spacing-md);
-  border-radius: var(--ds-radius-4xl);
+  border-radius: var(--ds-radius-pill);
   background: transparent;
   border: none;
   cursor: pointer;

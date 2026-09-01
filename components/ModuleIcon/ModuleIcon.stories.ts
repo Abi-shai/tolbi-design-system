@@ -131,7 +131,7 @@ export const Pairing: Story = {
           <div
             v-for="mod in modules"
             :key="mod"
-            style="display:flex; flex-direction:column; align-items:center; gap:0.75rem; padding:0.875rem; border:1px solid var(--ds-border-subtle); border-radius:var(--ds-radius-xl);"
+            style="display:flex; flex-direction:column; align-items:center; gap:0.75rem; padding:0.875rem; border:1px solid var(--ds-border-subtle); border-radius:var(--ds-radius-surface);"
           >
             <div style="display:flex; align-items:center; gap:0.75rem;">
               <ModuleIcon :module="mod" variant="illustration" :size="48" />

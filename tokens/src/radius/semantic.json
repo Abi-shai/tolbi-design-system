@@ -1,8 +1,28 @@
 {
   "radius": {
-    "control": { "value": "{radius.md}",   "description": "Buttons, inputs, selects — anything you click or type into" },
-    "surface": { "value": "{radius.xl}",   "description": "Cards, toasts, callouts, tables, popovers — anything that holds content" },
-    "pill":    { "value": "{radius.full}", "description": "Badges, avatars, dots, toggles — anything fully rounded" },
-    "inner":   { "value": "{radius.sm}",   "description": "Marks nested inside a control: checkbox box, tag close target" }
+    "inner-sm": {
+      "value": "{radius.xs}",
+      "description": "The mark inside a small control — Checkbox sm, Tag count, ChartLegend swatch. Radius tracks the control's size: sm marks take 4px, md take 6px"
+    },
+    "inner": {
+      "value": "{radius.sm}",
+      "description": "Marks nested inside a control: checkbox box, tag close target"
+    },
+    "control": {
+      "value": "{radius.md}",
+      "description": "Buttons, inputs, selects — anything you click or type into"
+    },
+    "surface-sm": {
+      "value": "{radius.lg}",
+      "description": "The step between a control and a surface — compact floating panels, small tracks, nested rows, mid-size cells. Five consumers, and OTP proves the ramp: sm cell 8px, md 10px, lg 12px"
+    },
+    "surface": {
+      "value": "{radius.xl}",
+      "description": "Cards, toasts, callouts, tables, popovers — anything that holds content"
+    },
+    "pill": {
+      "value": "{radius.full}",
+      "description": "Badges, avatars, dots, toggles — anything fully rounded"
+    }
   }
 }

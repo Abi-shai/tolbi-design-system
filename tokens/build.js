@@ -71,6 +71,14 @@ await Promise.all([
     { filter: isTypeRole, selector: '[data-typography="mobile"]', outputReferences: true },
   ),
 
+  // ADR-0013: control padding is a scale of its own — derived from control
+  // heights minus the line box, so it lands between the layout ramp's steps.
+  buildTokenFile(
+    ['tokens/src/spacing/primitives.json', 'tokens/src/spacing/control.json'],
+    'control.css',
+    { filter: (token) => token.path[0] === 'control-padding', outputReferences: true },
+  ),
+
   buildTokenFile(
     ['tokens/src/spacing/primitives.json', 'tokens/src/widths/semantic.json'],
     'widths.css',
@@ -136,7 +144,7 @@ appendFileSync('tokens/dist/motion.css', `
 const tokenFiles = [
   'colors', 'typography', 'type-roles', 'type-roles-mobile',
   'radius', 'space', 'spacing', 'widths', 'containers',
-  'font-roles', 'font-roles-mobile',
+  'font-roles', 'font-roles-mobile', 'control',
   'shadows', 'elevation', 'focus-rings', 'blurs', 'semantic', 'motion',
 ]
 const combined = tokenFiles

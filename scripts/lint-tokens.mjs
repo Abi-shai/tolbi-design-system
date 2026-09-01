@@ -43,9 +43,27 @@ function walk(dir, out = []) {
   return out
 }
 
+/** `// token-lint-disable-next-line <rule> — reason` and a file-level
+ *  `/* token-lint-disable <rule> — reason *\/`. A deliberate exception must
+ *  say which rule and why; a bare disable is not accepted. */
+function suppressions(src) {
+  const file = new Set()
+  const line = new Map()
+  const lines = src.split('\n')
+  for (const [i, l] of lines.entries()) {
+    let m = l.match(/token-lint-disable-next-line\s+([a-z-]+)\s+—/)
+    if (m) line.set(i + 2 + '|' + m[1], true)
+    m = l.match(/token-lint-disable\s+([a-z-]+)\s+—/)
+    if (m && !l.includes('next-line')) file.add(m[1])
+  }
+  return { file, line }
+}
+
 const findings = []
 const seenFinding = new Set()
+let sup = { file: new Set(), line: new Map() }
 const report = (rule, file, line, msg) => {
+  if (sup.file.has(rule) || sup.line.has(line + '|' + rule)) return
   const k = `${rule}|${file}|${line}|${msg}`
   if (seenFinding.has(k)) return
   seenFinding.add(k)
@@ -55,6 +73,7 @@ const report = (rule, file, line, msg) => {
 for (const file of walk('components')) {
   const src = readFileSync(file, 'utf8')
   const rel = file.replace('components/', '')
+  sup = suppressions(src)
   const lines = src.split('\n')
   const lineOf = (idx) => src.slice(0, idx).split('\n').length
 
@@ -88,6 +107,11 @@ for (const file of walk('components')) {
   for (const m of src.matchAll(/(?:^|[{;])\s*line-height:\s*([0-9.]+(?:rem|px))\s*;/gm))
     report('no-literal-type', rel, lineOf(m.index), `line-height: ${m[1]}`)
 
+  /* ADR-0013 — radius is consumed through its roles. Every primitive step now
+     has a role, so a raw step in a component is drift by definition. */
+  for (const m of src.matchAll(/--ds-radius-(none|xxs|xs|sm|md|lg|xl|2xl|3xl|4xl|full)\)/g))
+    report('no-raw-radius', rel, lineOf(m.index), `--ds-radius-${m[1]} — use a role (inner-sm, inner, control, surface-sm, surface, pill)`)
+
   /* ADR-0009 recorded spacing's defect as adoption, not naming. The rule is
      scoped to values that ARE on the ramp: a literal 8px must be spacing-md.
      Off-ramp control padding (10px, 14px, 18px) is a separate open question —
@@ -99,6 +123,24 @@ for (const file of walk('components')) {
       const px = part.match(/^(\d+)px$/)
       if (px && PX_ON_RAMP.has(Number(px[1])))
         report('spacing-on-ramp', rel, lineOf(m.index), `${m[1]}: ${part} is --ds-spacing-${PX_ON_RAMP.get(Number(px[1]))}`)
+    }
+  }
+
+  /* ADR-0013 — the same rules inside JavaScript style objects. `ProgressCircle`
+     carried a whole parallel type ramp in one, and a CSS-only linter is blind
+     to it: the property is `fontSize`, not `font-size`. */
+  const scriptBlock = src.match(/<script[^>]*>([\s\S]*?)<\/script>/)
+  if (scriptBlock) {
+    const js = scriptBlock[1]
+    const base = src.slice(0, src.indexOf(scriptBlock[1])).split('\n').length - 1
+    const jsLine = (i) => base + js.slice(0, i).split('\n').length
+    // Not keyed on the property name: ProgressCircle's ramp lives in tables
+    // keyed `size:`/`line:`, which a property-name rule sails straight past.
+    // Any bare dimensional literal is surfaced; the component declares intent
+    // with a `token-lint-disable` comment naming the rule and the reason.
+    for (const m of js.matchAll(/'(-?[0-9.]+(?:rem|px))'/g)) {
+      if (/^-?0(?:\.0+)?(?:rem|px)$/.test(m[1])) continue   // zero is not a decision
+      report('no-literal-dimension-js', rel, jsLine(m.index), m[1])
     }
   }
 
@@ -136,7 +178,7 @@ for (const file of walk('components')) {
 const byRule = findings.reduce((a, f) => ((a[f.rule] ??= []).push(f), a), {})
 const RULES = ['no-raw-primitive', 'no-colour-literal', 'no-shadowing-var',
                'no-literal-type', 'role-completeness', 'font-order', 'solid-pairing',
-               'spacing-on-ramp']
+               'spacing-on-ramp', 'no-raw-radius', 'no-literal-dimension-js']
 
 console.log('token discipline\n')
 for (const rule of RULES) {

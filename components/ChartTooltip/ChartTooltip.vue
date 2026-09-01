@@ -76,7 +76,7 @@ withDefaults(defineProps<Props>(), {
   max-width: var(--tooltip-max-width);
   padding: var(--ds-spacing-lg);
   border: 1px solid var(--ds-border-subtle);
-  border-radius: var(--ds-radius-lg);
+  border-radius: var(--ds-radius-surface-sm);
   background-color: var(--ds-bg-default);
   box-shadow: var(--ds-elevation-overlay);
   font-family: var(--ds-typography-font-family-poppins);

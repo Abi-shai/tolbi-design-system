@@ -51,6 +51,13 @@ Before working on any component, read:
   is verified against a deliberately broken file. Spacing is 87% tokenised; the `spacing-on-ramp`
   rule fires only on literals that exactly match a token, because the 31 survivors are **control
   padding** (10px, 14px, 18px, 22px) — a different scale, derived from control heights, not yet named.
+- **ADR-0013**: Radius has six roles — `inner-sm`, `inner`, `control`, `surface-sm`, `surface`,
+  `pill`; every primitive step has one, so a raw step is drift (`no-raw-radius`). Radius **scales
+  with the element**: `Checkbox` takes 4px at sm and 6px at md, OTP cells 8/10/12. Control padding is
+  **its own scale** (`--ds-control-padding-{sm,md,lg,xl,2xl}`, paired values in one declaration),
+  derived from control heights minus the line box — the spacing ramp has no 10/14/18/22px because
+  those are not layout rhythm. The linter reads `<script>` blocks too (`no-literal-dimension-js`);
+  a suppression must name the rule and give a reason (`token-lint-disable <rule> — <why>`).
 
 ## Architecture
 

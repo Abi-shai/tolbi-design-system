@@ -272,7 +272,7 @@ const forecast = [
   position: relative;
   outline: 1px dashed var(--ds-border-brand-solid);
   outline-offset: -1px;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-control);
 }
 
 /*
@@ -291,7 +291,7 @@ const forecast = [
   justify-content: center;
   width: 18px;
   height: 18px;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   background-color: var(--ds-bg-brand-solid);
   color: var(--ds-text-on-brand-solid);
   font-family: var(--ds-typography-font-family-mono);
@@ -322,7 +322,7 @@ const forecast = [
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   background-color: var(--ds-bg-brand-solid);
   color: var(--ds-text-on-brand-solid);
   font-family: var(--ds-typography-font-family-mono);
@@ -362,7 +362,7 @@ const forecast = [
   width: 40px;
   height: 40px;
   border: 0;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-control);
   background: none;
   cursor: pointer;
   color: var(--ds-text-subtlest);
@@ -402,7 +402,7 @@ const forecast = [
   align-self: flex-start;
   padding: var(--ds-spacing-xs) var(--ds-spacing-lg);
   border: 1px solid var(--ds-border-subtle);
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   background-color: var(--ds-bg-default);
   font-size: var(--ds-font-size-label-md);
   line-height: var(--ds-line-height-label-md);
@@ -424,7 +424,7 @@ const forecast = [
   gap: var(--ds-spacing-md);
   padding: var(--ds-spacing-md) var(--ds-spacing-lg);
   border: 1px solid var(--ds-border-default);
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-control);
   background-color: var(--ds-bg-default);
   color: var(--ds-text-subtlest);
 }
@@ -466,7 +466,7 @@ const forecast = [
   gap: var(--ds-spacing-md);
   padding: var(--ds-spacing-lg);
   border: 1px solid var(--ds-border-subtle);
-  border-radius: var(--ds-radius-lg);
+  border-radius: var(--ds-radius-surface-sm);
   background-color: var(--ds-bg-default);
 }
 
@@ -532,14 +532,14 @@ const forecast = [
 .map__surface {
   position: relative;
   height: 38rem;
-  border-radius: var(--ds-radius-xl);
+  border-radius: var(--ds-radius-surface);
   background-color: var(--ds-bg-inverse);
   overflow: hidden;
 }
 
 .map__tl { position: absolute; top: var(--ds-spacing-lg); left: var(--ds-spacing-lg); display: flex; gap: var(--ds-spacing-md); }
 .map__tr { position: absolute; top: var(--ds-spacing-lg); right: var(--ds-spacing-lg); display: flex; flex-direction: column; gap: var(--ds-spacing-md); }
-.map__zoom { display: flex; flex-direction: column; border-radius: var(--ds-radius-md); overflow: hidden; }
+.map__zoom { display: flex; flex-direction: column; border-radius: var(--ds-radius-control); overflow: hidden; }
 
 .map__ctl {
   display: flex;
@@ -551,7 +551,7 @@ const forecast = [
   background-color: var(--ds-bg-default);
   color: var(--ds-text-default);
   cursor: pointer;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-shadow-sm);
 }
 
@@ -567,7 +567,7 @@ const forecast = [
   height: 40px;
   padding: 0 var(--ds-spacing-lg);
   border: 0;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-control);
   background-color: var(--ds-bg-default);
   box-shadow: var(--ds-shadow-sm);
   cursor: pointer;
@@ -594,7 +594,7 @@ const forecast = [
 .map__pin-dot {
   width: 10px;
   height: 10px;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   background-color: var(--ds-bg-default);
   box-shadow: 0 0 0 2px var(--ds-text-success);
 }
@@ -608,7 +608,7 @@ const forecast = [
   flex-direction: column;
   gap: var(--ds-spacing-xs);
   padding: var(--ds-spacing-lg);
-  border-radius: var(--ds-radius-lg);
+  border-radius: var(--ds-radius-surface-sm);
   background-color: var(--ds-bg-default);
   box-shadow: var(--ds-shadow-lg);
 }
@@ -631,7 +631,7 @@ const forecast = [
 
 .map__legend-scale {
   height: 8px;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   background: linear-gradient(to right, var(--ds-bg-neutral-subtle), var(--ds-bg-brand-solid));
 }
 
@@ -645,7 +645,7 @@ const forecast = [
   width: 56px;
   height: 56px;
   border: 1px solid var(--ds-border-brand);
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   background-color: var(--ds-bg-default);
   color: var(--ds-text-brand);
   box-shadow: var(--ds-shadow-lg);

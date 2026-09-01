@@ -142,7 +142,7 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
   box-shadow: var(--ds-elevation-control);
   box-sizing: border-box;
   transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
-  padding: 10px 14px; /* md */
+  padding: var(--ds-control-padding-md); /* md */
 }
 
 .ds-input-field--sm .ds-input-field__wrapper {

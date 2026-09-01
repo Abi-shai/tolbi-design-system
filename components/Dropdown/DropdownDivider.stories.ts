@@ -6,7 +6,7 @@ const PANEL = `
   padding: var(--ds-spacing-xs);
   background: var(--ds-bg-default);
   border: 1px solid var(--ds-border-subtle);
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-overlay);
   width: 240px;
 `

@@ -139,7 +139,7 @@ const checkSize = computed(() => {
   width: 48px;
   height: 48px;
   border: 1px solid var(--ds-border-subtle);
-  border-radius: var(--ds-radius-lg);
+  border-radius: var(--ds-radius-surface-sm);
   box-shadow: var(--ds-elevation-control);
   background-color: var(--ds-bg-default);
   flex-shrink: 0;
