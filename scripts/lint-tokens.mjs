@@ -56,7 +56,8 @@ function suppressions(src) {
 
 export const RULES = ['no-raw-primitive', 'no-colour-literal', 'no-shadowing-var',
                       'no-literal-type', 'role-completeness', 'font-order', 'solid-pairing',
-                      'spacing-on-ramp', 'no-raw-radius', 'no-literal-dimension-js']
+                      'spacing-on-ramp', 'no-raw-radius', 'no-literal-dimension-js',
+                      'no-token-js-import']
 
 /**
  * The rules, over one file's source. Pure: no filesystem, so the suite can
@@ -141,6 +142,13 @@ export function lintSource(rel, src) {
       report('no-literal-dimension-js', rel, jsLine(m.index), m[1])
     }
   }
+
+  /* ADR-0019 — the JS token export is for CONSUMERS, for the cases a custom
+     property cannot serve (canvas, computation). Inside the library it would be
+     a second source of truth: a resolved value bypasses the cascade and goes
+     stale the day the token moves. Components use the CSS. */
+  for (const m of src.matchAll(/from\s+['"][^'"]*tokens\/dist(?:\/index)?(?:\.js)?['"]/g))
+    report('no-token-js-import', rel, lineOf(m.index), 'components use the CSS custom properties, not the resolved JS export')
 
   /* Rule-block rules. */
   for (const m of src.matchAll(/\{([^{}]*)\}/g)) {

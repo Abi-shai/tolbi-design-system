@@ -12,7 +12,12 @@
       "types": "./dist/index.d.ts"
     },
     "./tokens": "./dist/tokens/index.css",
-    "./tokens/*": "./dist/tokens/*.css"
+    "./tokens/*": "./dist/tokens/*.css",
+    "./tokens/js": {
+      "import": "./dist/tokens/index.js",
+      "types": "./dist/tokens/index.d.ts"
+    },
+    "./tokens/json": "./dist/tokens/tokens.json"
   },
   "files": [
     "dist"

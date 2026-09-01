@@ -81,6 +81,12 @@ Before working on any component, read:
   silent on the valid form — and the four bugs found by probing have named regression tests. The
   suite itself is **mutation-checked**: a new rule ships with a firing test, a silent test, and a
   mutation proving the tests bite.
+- **ADR-0019**: Tokens ship as CSS, **JS/TS** (`./tokens/js`) and **JSON** (`./tokens/json`). The JS
+  values are **resolved**, not `var()` — it exists for what a custom property cannot serve (canvas,
+  computation), so a component importing it is a second source of truth and the `no-token-js-import`
+  rule forbids it. `chartCategorical` + `chartCategoricalCeiling` carry ADR-0016's ceiling into code.
+  **No native platform**: there is no native app, and an export nobody consumes is the `blur-*` ramp
+  again.
 
 ## Architecture
 

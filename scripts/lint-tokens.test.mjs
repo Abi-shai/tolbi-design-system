@@ -95,6 +95,13 @@ test('no-literal-dimension-js', () => {
   silent('no-literal-dimension-js', script("const t = { top: '0px', left: '0rem' }"))
 })
 
+test('no-token-js-import', () => {
+  // the JS export is for consumers; inside the library it is a second source of
+  // truth that bypasses the cascade (ADR-0019)
+  fires('no-token-js-import', script("import { DsTextOnBrandSolid } from '../../tokens/dist/index.js'"))
+  silent('no-token-js-import', style('.a { color: var(--ds-text-on-brand-solid); }'))
+})
+
 test('every exported rule has a test that fires it', () => {
   const covered = new Set()
   for (const [rule, src] of [
@@ -108,6 +115,7 @@ test('every exported rule has a test that fires it', () => {
     ['spacing-on-ramp', style('.a { padding: 8px; }')],
     ['no-raw-radius', style('.a { border-radius: var(--ds-radius-md); }')],
     ['no-literal-dimension-js', script("const t = { size: '2.5rem' }")],
+    ['no-token-js-import', script("import { DsTextOnBrandSolid } from '../../tokens/dist/index.js'")],
   ]) if (rules(src).has(rule)) covered.add(rule)
   assert.deepEqual([...covered].sort(), [...RULES].sort())
 })
