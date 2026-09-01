@@ -21,12 +21,13 @@
     "tokens": "node tokens/build.js",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "npm run tokens && npm run lint && storybook build",
-    "build": "npm run tokens && npm run lint && vue-tsc --noEmit && vite build",
+    "build": "npm run tokens && npm run lint && npm test && vue-tsc --noEmit && vite build",
     "typecheck": "vue-tsc --noEmit",
     "icons": "node scripts/generate-icons.mjs",
     "module-art": "node scripts/generate-module-art.mjs",
     "dial-codes": "node scripts/generate-dial-codes.mjs",
-    "lint": "node scripts/lint-tokens.mjs"
+    "lint": "node scripts/lint-tokens.mjs",
+    "test": "node --test scripts/*.test.mjs"
   },
   "keywords": [
     "design-system",

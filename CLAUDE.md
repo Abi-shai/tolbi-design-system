@@ -76,6 +76,11 @@ Before working on any component, read:
   representation, and Primer ships nominal DTCG too. `$type` is set only where truthful; composites
   carry none. Descriptions emit as comments in `tokens/dist/` and are stripped from the published
   bundle. DTCG does **not** gate multi-platform output or deprecation — both are separate work.
+- **ADR-0018**: The linter is a pure function (`lintSource()`) behind a CLI wrapper, with **16 tests**
+  run by `npm test` in every build. Every rule is asserted **both ways** — fires on a violation,
+  silent on the valid form — and the four bugs found by probing have named regression tests. The
+  suite itself is **mutation-checked**: a new rule ships with a firing test, a silent test, and a
+  mutation proving the tests bite.
 
 ## Architecture
 

@@ -12,8 +12,7 @@
  */
 import { readFileSync, readdirSync, statSync } from 'fs'
 import { join, extname } from 'path'
-
-const WARN_ONLY = process.argv.includes('--warn')
+import { pathToFileURL } from 'url'
 
 const web = JSON.parse(readFileSync('tokens/src/typography/semantic.web.json', 'utf8'))
 const ROLES = Object.keys(web['font-size'])
@@ -55,22 +54,25 @@ function suppressions(src) {
   return { file, line }
 }
 
-const findings = []
-const seenFinding = new Set()
-let sup = { file: new Set(), line: new Map() }
-const report = (rule, file, line, msg) => {
-  if (sup.file.has(rule) || sup.line.has(line + '|' + rule)) return
-  const k = `${rule}|${file}|${line}|${msg}`
-  if (seenFinding.has(k)) return
-  seenFinding.add(k)
-  findings.push({ rule, file, line, msg })
-}
+export const RULES = ['no-raw-primitive', 'no-colour-literal', 'no-shadowing-var',
+                      'no-literal-type', 'role-completeness', 'font-order', 'solid-pairing',
+                      'spacing-on-ramp', 'no-raw-radius', 'no-literal-dimension-js']
 
-for (const file of walk('components')) {
-  const src = readFileSync(file, 'utf8')
-  const rel = file.replace('components/', '')
-  sup = suppressions(src)
-  const lines = src.split('\n')
+/**
+ * The rules, over one file's source. Pure: no filesystem, so the suite can
+ * exercise every rule and every escape hatch against fixtures.
+ */
+export function lintSource(rel, src) {
+  const findings = []
+  const seenFinding = new Set()
+  const sup = suppressions(src)
+  const report = (rule, file, line, msg) => {
+    if (sup.file.has(rule) || sup.line.has(line + '|' + rule)) return
+    const k = `${rule}|${file}|${line}|${msg}`
+    if (seenFinding.has(k)) return
+    seenFinding.add(k)
+    findings.push({ rule, file, line, msg })
+  }
   const lineOf = (idx) => src.slice(0, idx).split('\n').length
 
   /* ADR-0009 — components consume semantic tokens, never raw primitives.
@@ -169,13 +171,20 @@ for (const file of walk('components')) {
     if (solid && /(?:^|\s)color:\s*var\(--ds-text-(?!on-)/.test(body))
       report('solid-pairing', rel, at, `bg-${solid[1]}-solid needs text-on-${solid[1]}-solid, not a plain text-* token`)
   }
+
+  return findings
 }
 
-const byRule = findings.reduce((a, f) => ((a[f.rule] ??= []).push(f), a), {})
-const RULES = ['no-raw-primitive', 'no-colour-literal', 'no-shadowing-var',
-               'no-literal-type', 'role-completeness', 'font-order', 'solid-pairing',
-               'spacing-on-ramp', 'no-raw-radius', 'no-literal-dimension-js']
+/* ── CLI ──────────────────────────────────────────────────────────────── */
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) run()
 
+function run() {
+const WARN_ONLY = process.argv.includes('--warn')
+const findings = walk('components').flatMap((file) =>
+  lintSource(file.replace('components/', ''), readFileSync(file, 'utf8')),
+)
+
+const byRule = findings.reduce((a, f) => ((a[f.rule] ??= []).push(f), a), {})
 console.log('token discipline\n')
 for (const rule of RULES) {
   const hits = byRule[rule] ?? []
@@ -185,3 +194,4 @@ for (const rule of RULES) {
 }
 console.log(`\n  ${findings.length} finding(s)`)
 if (findings.length && !WARN_ONLY) process.exit(1)
+}
