@@ -22,13 +22,13 @@ const preview: Preview = {
         order: [
           'Introduction',
           'Foundations', [
-            'Color', ['Primitives', 'Semantic'],
+            'Color', ['Primitives', 'Semantic', 'Display palette', 'Chart series'],
             'Typography',
-            'Spacing', ['Primitives', 'Semantic'],
-            'Radius',
+            'Spacing', ['Primitives', 'Semantic', 'Control padding'],
+            'Radius', ['Primitives', 'Roles'],
             'Widths',
             'Containers',
-            'Effects', ['Shadows', 'Focus Rings', 'Backdrop Blurs'],
+            'Effects', ['Shadows', 'Elevation', 'Focus Rings'],
             'Motion',
           ],
           'Actions',
