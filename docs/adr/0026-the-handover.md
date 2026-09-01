@@ -78,4 +78,4 @@ being wrong.
 
 ## Still open
 
-- **`Button` resizes when it enters its loading state.** The fade waits on that being fixed.
+- ~~**`Button` resizes when it enters its loading state.**~~ — closed by ADR-0027. Stacking the two states in one grid cell fixed the resize and made the fade possible at the same time.

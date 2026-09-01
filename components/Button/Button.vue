@@ -56,27 +56,65 @@ function handleClick(event: MouseEvent) {
     :disabled="disabled || loading"
     :class="['ds-button', `ds-button--${variant}`, `ds-button--${size}`, { 'ds-button--icon-only': iconOnly }]"
     :aria-busy="loading || undefined"
-    :aria-label="iconOnly ? label : undefined"
+    :aria-label="iconOnly || loading ? label : undefined"
     @click="handleClick"
   >
-    <!-- size="1em" so the spinner tracks the button's own font size, as the
-         hand-rolled version did across all five sizes (ADR-0001). -->
-    <Spinner v-if="loading" size="1em" class="ds-button__spinner" />
-    <template v-else>
-      <Icon v-if="iconLeading" :name="iconLeading" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
-      <span v-if="!iconOnly" class="ds-button__label">{{ label }}</span>
-      <Icon v-if="iconTrailing && !iconOnly" :name="iconTrailing" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
-    </template>
+    <!--
+      ADR-0027: the body stays in the layout while loading so the button keeps
+      its width — it used to collapse from 233px to 44px, which shoves whatever
+      sits beside it. Both children share one grid cell; only their visibility
+      changes.
+
+      `visibility: hidden` takes the label out of the accessibility tree along
+      with the layout, so `aria-label` carries the name while loading. Without
+      it the button announces as "busy" with no name at all.
+
+      size="1em" so the spinner tracks the button's own font size, as the
+      hand-rolled version did across all five sizes (ADR-0001).
+    -->
+    <span class="ds-button__stack">
+      <span class="ds-button__body" :class="{ 'ds-button__body--hidden': loading }">
+        <Icon v-if="iconLeading" :name="iconLeading" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
+        <span v-if="!iconOnly" class="ds-button__label">{{ label }}</span>
+        <Icon v-if="iconTrailing && !iconOnly" :name="iconTrailing" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
+      </span>
+      <Spinner v-if="loading" size="1em" class="ds-button__spinner" />
+    </span>
   </button>
 </template>
 
 <style scoped>
+/* ADR-0027 — the spinner and the body share one grid cell, so the body keeps
+   defining the width even while it is invisible. `visibility: hidden` rather
+   than `display: none`: it holds the space AND leaves the accessibility tree,
+   so the label is not announced under aria-busy. */
+.ds-button__stack {
+  display: grid;
+  place-items: center;
+}
+
+.ds-button__stack > * {
+  grid-area: 1 / 1;
+}
+
+.ds-button__body {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-spacing-xs);
+  transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-out);
+}
+
+.ds-button__body--hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
 /* ── Base ─────────────────────────────────────────────────────────── */
 .ds-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--ds-spacing-xs);
   padding: var(--ds-control-padding-md);
   border: var(--ds-border-width-default) solid transparent;
   border-radius: var(--ds-radius-control);

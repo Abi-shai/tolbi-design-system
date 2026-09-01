@@ -124,6 +124,10 @@ Before working on any component, read:
   container jump. `Table` carries **two `<tbody>` elements** so the transition has a single element
   child. `Button` is deliberately excluded: swapping a spinner for a label changes its width, and
   fading through a resize reads as a wobble — fix the resize first.
+- **ADR-0027**: `Button` holds its width while loading — the body and the spinner share one grid
+  cell (`grid-area: 1 / 1`), and the body uses `visibility: hidden` so it keeps the space *and*
+  leaves the accessibility tree. Which means `aria-label` must carry the name while loading, or the
+  button announces as "busy" with no name at all.
 
 ## Architecture
 
