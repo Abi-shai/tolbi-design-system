@@ -141,7 +141,7 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
   border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-control);
   box-sizing: border-box;
-  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
   padding: var(--ds-control-padding-md); /* md */
 }
 

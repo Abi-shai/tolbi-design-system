@@ -215,7 +215,7 @@ function handleChange(event: Event) {
   transition:
     background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
     border-color     var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
-    box-shadow       var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+    box-shadow       var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
 /* ── Sizes ─────────────────────────────────────────────────────────── */

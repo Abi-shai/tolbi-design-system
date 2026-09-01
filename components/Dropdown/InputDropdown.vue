@@ -281,7 +281,7 @@ onUnmounted(() => {
   text-align: left;
   font: inherit;
   color: inherit;
-  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
 .ds-input-dropdown__trigger--open,

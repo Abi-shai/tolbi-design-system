@@ -145,7 +145,7 @@ function onKeydown(e: KeyboardEvent) {
   border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-control);
   overflow: hidden;
-  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
   /* Default : px-14px py-12px */
   padding: var(--ds-spacing-lg) 14px;
 }

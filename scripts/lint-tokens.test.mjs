@@ -120,6 +120,16 @@ test('no-literal-z-index', () => {
   silent('no-literal-z-index', style('.a { z-index: 0; }'))
 })
 
+test('focus-ring-instant', () => {
+  // a focus ring at 150ms reads as lag; `instant` exists for exactly this
+  fires('focus-ring-instant', style('.a { transition: box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default); }'))
+  silent('focus-ring-instant', style('.a { transition: box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default); }'))
+  // only the box-shadow part is constrained
+  silent('focus-ring-instant', style('.a { transition: color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default); }'))
+  // multi-line declarations count too
+  fires('focus-ring-instant', style('.a {\n  transition:\n    color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),\n    box-shadow var(--ds-motion-duration-quick) var(--ds-motion-easing-default);\n}'))
+})
+
 test('every exported rule has a test that fires it', () => {
   const covered = new Set()
   for (const [rule, src] of [
@@ -136,6 +146,7 @@ test('every exported rule has a test that fires it', () => {
     ['no-token-js-import', script("import { DsTextOnBrandSolid } from '../../tokens/dist/index.js'")],
     ['no-literal-border-width', style('.a { border: 1px solid var(--ds-border-default); }')],
     ['no-literal-z-index', style('.a { z-index: 100; }')],
+    ['focus-ring-instant', style('.a { transition: box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default); }')],
   ]) if (rules(src).has(rule)) covered.add(rule)
   assert.deepEqual([...covered].sort(), [...RULES].sort())
 })

@@ -157,7 +157,7 @@ onUnmounted(() => {
   font: var(--ds-font-label-lg-strong);
   color: var(--ds-text-default);
   white-space: nowrap;
-  transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+  transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
 .ds-dropdown__trigger--button:hover {

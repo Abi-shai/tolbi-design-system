@@ -99,6 +99,11 @@ Before working on any component, read:
   `easing-in` out. **The exit is faster than the entrance.** Its `<style>` is unscoped on purpose —
   Vue applies transition classes to the *slotted* element, so a scoped rule fails silently. The
   consuming surface sets its own `transform-origin`.
+- **ADR-0022**: A focus ring is **`--ds-motion-duration-instant` (50ms)**, split per-property out of
+  the blanket transition — at 150ms it reads as lag. Every state-driven `box-shadow` change in the
+  catalogue is a focus ring, and the `focus-ring-instant` rule keeps it that way. `considered`
+  (400ms) has no consumer on purpose: it is the third of `bg-overlay` / `z-overlay` /
+  `duration-considered`, all waiting on the modal that does not exist yet.
 
 ## Architecture
 

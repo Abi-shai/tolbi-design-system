@@ -57,7 +57,8 @@ function suppressions(src) {
 export const RULES = ['no-raw-primitive', 'no-colour-literal', 'no-shadowing-var',
                       'no-literal-type', 'role-completeness', 'font-order', 'solid-pairing',
                       'spacing-on-ramp', 'no-raw-radius', 'no-literal-dimension-js',
-                      'no-token-js-import', 'no-literal-border-width', 'no-literal-z-index']
+                      'no-token-js-import', 'no-literal-border-width', 'no-literal-z-index',
+                      'focus-ring-instant']
 
 /**
  * The rules, over one file's source. Pure: no filesystem, so the suite can
@@ -161,6 +162,18 @@ export function lintSource(rel, src) {
   for (const m of src.matchAll(/z-index:\s*(\d+)/g)) {
     if (Number(m[1]) < 10) continue
     report('no-literal-z-index', rel, lineOf(m.index), `z-index: ${m[1]} — use --ds-z-popover or --ds-z-overlay`)
+  }
+
+  /* ADR-0022 — every state-driven box-shadow change in the catalogue is a focus
+     ring, and a focus ring must confirm the keystroke immediately: at 150ms it
+     reads as lag. `instant` exists for exactly this — ADR-0002's own description
+     says "press states, focus rings" — and it had zero consumers until the
+     transitions were split. A component animating elevation instead can suppress
+     this with a reason. */
+  for (const m of src.matchAll(/transition:([^;]+);/gs)) {
+    const bs = m[1].match(/box-shadow\s+var\(--ds-motion-duration-([a-z]+)\)/)
+    if (bs && bs[1] !== 'instant')
+      report('focus-ring-instant', rel, lineOf(m.index), `box-shadow transitions the focus ring — use --ds-motion-duration-instant, not ${bs[1]}`)
   }
 
   /* Rule-block rules. */

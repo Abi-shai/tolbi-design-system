@@ -177,7 +177,7 @@ function display(v: number): string {
   border: var(--ds-border-width-strong) solid var(--ds-bg-brand-solid);
   box-shadow: var(--ds-elevation-raised);
   cursor: grab;
-  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
 .ds-slider__input::-webkit-slider-thumb:active {

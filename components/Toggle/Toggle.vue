@@ -99,7 +99,7 @@ function toggle() {
   background-color: var(--ds-bg-neutral);
   cursor: pointer;
   flex-shrink: 0;
-  transition: background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+  transition: background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
 .ds-toggle--sm {
