@@ -76,6 +76,20 @@ covering it to within a pixel. `aria-pressed` is `true` on one segment and absen
 - `ButtonGroupItem.active` removed in favour of `value` + group context.
 - Movement rises from 13% to **14%** of animated properties.
 
+### The registration fix is proven, not asserted
+
+The first version of `register` pushed onto an array, so an item that unmounted and remounted grew
+the list and shifted every index after it. The first attempt to verify the fix detached and
+re-attached the DOM — which exercises the `ResizeObserver` and **not** `onBeforeUnmount`, so it
+could not have caught the bug at all.
+
+`Segments added and removed` puts a `v-if` on the middle segment, which is the real unmount path.
+Run against the **reintroduced** defect, steps 0–3 still pass — the indicator happens to stay on
+`Mois` — and **step 4 fails**: selecting the remounted segment leaves the indicator elsewhere.
+That step is the discriminating case, and it is why the story exists rather than a smaller one.
+
+Restored, all five steps pass.
+
 ## Still open
 
 - **Expansion.** Nothing in the catalogue expands, so there is nothing to animate. It arrives with
