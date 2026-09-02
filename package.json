@@ -47,9 +47,6 @@
   "peerDependencies": {
     "vue": "^3.0.0"
   },
-  "dependencies": {
-    "vue": "^3.0.0"
-  },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@storybook/addon-essentials": "^8.6.14",
@@ -62,6 +59,7 @@
     "style-dictionary": "^5.4.1",
     "typescript": "^6.0.3",
     "vite": "^6.4.2",
+    "vue": "^3.5.35",
     "vue-tsc": "^3.3.2"
   }
 }
