@@ -47,6 +47,30 @@ export const LineShape: Story = {
   args: { shape: 'line' },
 }
 
+export const NoColour: Story = {
+  name: 'Séries sans couleur',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Une série sans `color` retombe sur la palette catégorielle **selon sa position**, ' +
+          'jamais sur `brand` — ADR-0016 : un graphique n\'est pas une affordance. ' +
+          'La palette étant ordonnée par ΔE mesuré, les premières séries sont les plus ' +
+          'distinguables ; retomber sur une seule et même étape les peindrait à l\'identique ' +
+          'et la légende ne distinguerait plus rien.',
+      },
+    },
+  },
+  args: {
+    items: [
+      { key: 'a', label: 'Sans couleur A', value: '4,82' },
+      { key: 'b', label: 'Sans couleur B', value: '4,41' },
+      { key: 'c', label: 'Sans couleur C', value: '4,10' },
+      { key: 'd', label: 'Sans couleur D', value: '3,96' },
+    ],
+  },
+}
+
 export const Interactive: Story = {
   name: 'Interactive',
   parameters: { docs: { description: { story: 'Cliquer une entrée bascule son état — le graphique reste piloté par le produit.' } } },

@@ -26,11 +26,31 @@ withDefaults(defineProps<Props>(), {
 })
 
 defineEmits<{ toggle: [key: string] }>()
+
+/*
+ * A series with no colour falls back to the categorical palette by position,
+ * never to brand — ADR-0016: charts never use brand, which is interactive-only.
+ *
+ * By position rather than to a fixed step, because the palette is ordered by
+ * measured ΔE: the first N entries are the most distinguishable, which is the
+ * whole reason ADR-0016 ordered it that way. Defaulting every colourless series
+ * to the same step would paint them identically and stop the legend doing its
+ * one job.
+ *
+ * Wraps at 7. ADR-0016 puts the comfortable ceiling at five and says to
+ * aggregate beyond it — that is the caller's decision, and wrapping is a less
+ * bad failure than an undefined custom property.
+ */
+const CATEGORICAL_STEPS = 7
+
+function seriesColor(color: string | undefined, index: number): string {
+  return color ?? `var(--ds-chart-categorical-${(index % CATEGORICAL_STEPS) + 1})`
+}
 </script>
 
 <template>
   <ul class="ds-chart-legend">
-    <li v-for="item in items" :key="item.key" class="ds-chart-legend__item">
+    <li v-for="(item, i) in items" :key="item.key" class="ds-chart-legend__item">
       <!--
         A real button when interactive, so toggling a series is reachable by
         keyboard and its state is announced.
@@ -46,7 +66,7 @@ defineEmits<{ toggle: [key: string] }>()
         <span
           class="ds-chart-legend__mark"
           :class="`ds-chart-legend__mark--${shape}`"
-          :style="{ backgroundColor: item.color ?? 'var(--ds-text-brand)' }"
+          :style="{ backgroundColor: seriesColor(item.color, i) }"
           aria-hidden="true"
         />
         <span class="ds-chart-legend__label">{{ item.label }}</span>

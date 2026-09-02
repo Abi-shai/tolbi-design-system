@@ -24,6 +24,18 @@ withDefaults(defineProps<Props>(), {
   tagTone: 'neutral',
   series: () => [],
 })
+
+/*
+ * Same rule as ChartLegend: a colourless series takes the categorical palette by
+ * position, never brand (ADR-0016 — brand is interactive-only, and a chart is
+ * not an affordance). Kept as a local copy rather than shared, because the two
+ * components have no common module and one function is not worth inventing one.
+ */
+const CATEGORICAL_STEPS = 7
+
+function seriesColor(color: string | undefined, index: number): string {
+  return color ?? `var(--ds-chart-categorical-${(index % CATEGORICAL_STEPS) + 1})`
+}
 </script>
 
 <template>
@@ -44,10 +56,10 @@ withDefaults(defineProps<Props>(), {
     </div>
 
     <ul v-if="series.length" class="ds-chart-tooltip__series">
-      <li v-for="s in series" :key="s.label" class="ds-chart-tooltip__serie">
+      <li v-for="(s, i) in series" :key="s.label" class="ds-chart-tooltip__serie">
         <span
           class="ds-chart-tooltip__swatch"
-          :style="{ backgroundColor: s.color ?? 'var(--ds-text-brand)' }"
+          :style="{ backgroundColor: seriesColor(s.color, i) }"
           aria-hidden="true"
         />
         <span class="ds-chart-tooltip__serie-label">{{ s.label }}</span>
