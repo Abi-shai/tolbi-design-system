@@ -149,7 +149,7 @@ const dotSize = computed(() => {
   --badge-dot:            var(--ds-bg-success-solid);
   --badge-outline-border: var(--ds-border-success-solid);
 }
-./* ADR-0009: categorical label palette — component tier, not semantic tones.
+/* ADR-0009: categorical label palette — component tier, not semantic tones.
    These eight hues have no primitive ramp. Pending a categorical-palette ADR. */
 
 /* ── Colours: categorical, straight off the display palette.
