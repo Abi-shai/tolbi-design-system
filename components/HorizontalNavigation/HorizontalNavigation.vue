@@ -6,6 +6,7 @@ import { Avatar } from '../Avatar'
 import { CreditsChip } from '../CreditsChip'
 import { Tooltip } from '../Tooltip'
 import { ModulesList } from '../ModulesList'
+import { SurfaceTransition } from '../SurfaceTransition'
 import type { ModulesListItem } from '../ModulesList'
 import type { CreditsState, CreditsContext } from '../CreditsChip'
 
@@ -188,13 +189,15 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
             arrow="top-center"
           />
 
-          <!-- Dropdown modules -->
-          <ModulesList
-            v-if="modulesOpen && modules.length"
-            class="ds-hnav__modules-dropdown"
-            :modules="modules"
-            @select="selectModule"
-          />
+          <!-- Dropdown modules — a floating surface, so it takes the house entrance (ADR-0021) -->
+          <SurfaceTransition>
+            <ModulesList
+              v-if="modulesOpen && modules.length"
+              class="ds-hnav__modules-dropdown"
+              :modules="modules"
+              @select="selectModule"
+            />
+          </SurfaceTransition>
         </div>
       </div>
 
@@ -370,7 +373,14 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  z-index: var(--ds-z-overlay);
+  /*
+    A popover, not an overlay. ADR-0020 puts z-overlay (200) above a scrim; this
+    panel is a dropdown anchored to its button, which is what z-popover (100) is
+    for — and what the other three floating panels in the catalogue use.
+  */
+  z-index: var(--ds-z-popover);
   box-shadow: var(--ds-elevation-overlay);
+  /* The anchor is the button above-right of the panel (ADR-0021: the surface grows from it). */
+  transform-origin: top right;
 }
 </style>
