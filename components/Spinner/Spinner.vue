@@ -61,8 +61,17 @@ const style = computed(() => ({
 /*
  * A spinner is the one place a stopped animation is worse than a moving one —
  * it would read as frozen. Slow it right down instead of stopping it.
+ *
+ * Both properties have to be re-declared. The global reduced-motion override in
+ * motion.css sets `animation-iteration-count: 1 !important` on `*`, which beats
+ * the non-important `infinite` in the shorthand above — so overriding only the
+ * duration bought a spinner that turns once over 2.4s and then freezes, which
+ * is precisely the outcome the paragraph above says this rule exists to avoid.
  */
 @media (prefers-reduced-motion: reduce) {
-  .ds-spinner { animation-duration: 2.4s !important; }
+  .ds-spinner {
+    animation-duration: 2.4s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
 </style>
