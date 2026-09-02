@@ -42,22 +42,56 @@ const arrowMap: Record<HelpPlacement, TooltipArrow> = {
 
 const arrow = computed(() => arrowMap[props.placement])
 
-// Position CSS du tooltip par rapport à l'icône (gap de 4px)
+/*
+ * Where the panel grows from (ADR-0021: a surface is scaled from its anchor).
+ *
+ * This was `bottom center` for every placement and nobody could tell, because
+ * the scale never ran — see the note on `translate` below. Now that it does,
+ * the origin is visible, so it has to be right.
+ */
+const originMap: Record<HelpPlacement, string> = {
+  'top':       'bottom center',
+  'top-arrow': 'bottom center',
+  'top-left':  'bottom right',
+  'top-right': 'bottom left',
+  'bottom':    'top center',
+  'left':      'center right',
+  'right':     'center left',
+}
+
+/*
+ * Position CSS du tooltip par rapport à l'icône (gap de 4px).
+ *
+ * Centring uses the independent `translate` property, NOT `transform`.
+ *
+ * `:style` is inline, so `transform: translateX(-50%)` here beat
+ * SurfaceTransition's `transform: scale(…)` — which is a stylesheet rule — and
+ * five of the seven placements silently got the fade without the scale. The
+ * failure is invisible: the entrance still runs, just without half of itself.
+ *
+ * `translate` / `scale` / `rotate` are separate properties that COMPOSE with
+ * `transform` rather than replacing it, so the offset and the entrance can sit
+ * on one element without competing. Keeping them on one element also keeps the
+ * DOM identical — an earlier attempt moved the offset to a wrapper div and
+ * shifted two placements, because an absolutely positioned box and a static
+ * child of one shrink-wrap differently.
+ */
 const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
+  const origin = { transformOrigin: originMap[props.placement] }
   switch (props.placement) {
     case 'top':
     case 'top-arrow':
-      return { bottom: 'calc(100% + 4px)', left: '50%', transform: 'translateX(-50%)' }
+      return { ...origin, bottom: 'calc(100% + 4px)', left: '50%', translate: '-50% 0' }
     case 'top-left':
-      return { bottom: 'calc(100% + 4px)', right: '-12px' }
+      return { ...origin, bottom: 'calc(100% + 4px)', right: '-12px' }
     case 'top-right':
-      return { bottom: 'calc(100% + 4px)', left: '-12px' }
+      return { ...origin, bottom: 'calc(100% + 4px)', left: '-12px' }
     case 'bottom':
-      return { top: 'calc(100% + 4px)', left: '50%', transform: 'translateX(-50%)' }
+      return { ...origin, top: 'calc(100% + 4px)', left: '50%', translate: '-50% 0' }
     case 'left':
-      return { right: 'calc(100% + 3px)', top: '50%', transform: 'translateY(-50%)' }
+      return { ...origin, right: 'calc(100% + 3px)', top: '50%', translate: '0 -50%' }
     case 'right':
-      return { left: 'calc(100% + 4px)', top: '50%', transform: 'translateY(-50%)' }
+      return { ...origin, left: 'calc(100% + 4px)', top: '50%', translate: '0 -50%' }
   }
 })
 </script>
@@ -127,7 +161,7 @@ const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
 }
 
 .ds-help-icon__tooltip {
-  transform-origin: bottom center;
+  /* transform-origin is set inline, per placement — see originMap. */
   position: absolute;
   z-index: var(--ds-z-popover);
   white-space: normal;
