@@ -31,21 +31,21 @@ withDefaults(defineProps<Props>(), { highlight: false })
   align-items: center;
   gap: 1rem;
   padding: 0.4rem 0;
-  border-bottom: 1px solid var(--ds-semantic-border-tertiary, #f2f4f7);
+  border-bottom: 1px solid var(--ds-border-subtlest, #f2f4f7);
 }
 
 .row__label {
   width: 9.5rem;
   font-family: monospace;
   font-size: 0.72rem;
-  color: var(--ds-semantic-text-secondary, #344054);
+  color: var(--ds-text-default, #344054);
   flex-shrink: 0;
 }
 
 .row__track {
   flex: 1;
   min-width: 0;
-  background: var(--ds-semantic-bg-secondary, #f9fafb);
+  background: var(--ds-bg-neutral-subtle, #f9fafb);
   border-radius: 2px;
 }
 
@@ -61,7 +61,7 @@ withDefaults(defineProps<Props>(), { highlight: false })
   width: 4rem;
   font-family: monospace;
   font-size: 0.7rem;
-  color: var(--ds-semantic-text-quarterary, #667085);
+  color: var(--ds-text-subtlest, #667085);
   text-align: right;
   flex-shrink: 0;
 }

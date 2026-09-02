@@ -3,9 +3,9 @@ import HelpIcon from './HelpIcon.vue'
 import HelpIconDocs from './HelpIcon.mdx'
 
 const meta: Meta<typeof HelpIcon> = {
-  title: 'Components/HelpIcon',
+  title: 'Superposition/HelpIcon',
   component: HelpIcon,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
   parameters: {
     layout: 'centered',
     docs: { page: HelpIconDocs },

@@ -2,14 +2,17 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import Badge from './Badge.vue'
 import StoryGrid from '../../stories/StoryGrid.vue'
 
+// ADR-0010: two axes, because they route differently. A tone states a role and
+// resolves through the semantic layer; a colour states an identity and resolves
+// straight to the display palette.
+const ALL_TONES  = ['neutral', 'error', 'warning', 'success'] as const
 const ALL_COLORS = [
-  'brand', 'error', 'warning', 'success', 'gray',
-  'blue', 'blue-light', 'blue-gray', 'gray-blue',
+  'blue', 'blue-light', 'blue-gray',
   'indigo', 'orange', 'pink', 'purple',
 ] as const
 
 const meta: Meta<typeof Badge> = {
-  title: 'Primitives/Badge',
+  title: 'Étiquettes/Badge',
   component: Badge,
   tags: ['wip'],
   parameters: {
@@ -25,12 +28,22 @@ const meta: Meta<typeof Badge> = {
       control: 'text',
       table: { category: 'Contenu' },
     },
-    color: {
+    tone: {
       control: 'select',
-      options: ALL_COLORS,
+      options: ALL_TONES,
       table: {
         category: 'Apparence',
-        defaultValue: { summary: "'brand'" },
+        type: { summary: 'BadgeTone' },
+        defaultValue: { summary: "'neutral'" },
+      },
+    },
+    color: {
+      control: 'select',
+      options: [undefined, ...ALL_COLORS],
+      table: {
+        category: 'Apparence',
+        type: { summary: 'BadgeColor' },
+        defaultValue: { summary: 'undefined' },
       },
     },
     variant: {
@@ -64,7 +77,8 @@ const meta: Meta<typeof Badge> = {
   },
   args: {
     label: 'Label',
-    color: 'brand',
+    tone: 'neutral',
+    color: undefined,
     variant: 'pill-color',
     size: 'sm',
     dot: false,
@@ -118,36 +132,45 @@ export const AllSizes: Story = {
 // ── Couleurs ─────────────────────────────────────────────────────────
 
 export const AllColors: Story = {
-  name: 'All colors — pill color',
+  name: 'Tones and colors — pill color',
   parameters: { layout: 'padded' },
   render: () => ({
     components: { StoryGrid },
     setup: () => ({
-      items: ALL_COLORS.map(color => ({ component: Badge, props: { label: color, color, variant: 'pill-color' } })),
+      items: [
+        ...ALL_TONES.map(tone   => ({ component: Badge, props: { label: tone,  tone,  variant: 'pill-color' } })),
+        ...ALL_COLORS.map(color => ({ component: Badge, props: { label: color, color, variant: 'pill-color' } })),
+      ],
     }),
     template: `<StoryGrid :items="items" gap="var(--ds-space-2)" />`,
   }),
 }
 
 export const AllColorsOutline: Story = {
-  name: 'All colors — pill outline',
+  name: 'Tones and colors — pill outline',
   parameters: { layout: 'padded' },
   render: () => ({
     components: { StoryGrid },
     setup: () => ({
-      items: ALL_COLORS.map(color => ({ component: Badge, props: { label: color, color, variant: 'pill-outline' } })),
+      items: [
+        ...ALL_TONES.map(tone   => ({ component: Badge, props: { label: tone,  tone,  variant: 'pill-outline' } })),
+        ...ALL_COLORS.map(color => ({ component: Badge, props: { label: color, color, variant: 'pill-outline' } })),
+      ],
     }),
     template: `<StoryGrid :items="items" gap="var(--ds-space-2)" />`,
   }),
 }
 
 export const AllColorsWithDot: Story = {
-  name: 'All colors — with dot',
+  name: 'Tones and colors — with dot',
   parameters: { layout: 'padded' },
   render: () => ({
     components: { StoryGrid },
     setup: () => ({
-      items: ALL_COLORS.map(color => ({ component: Badge, props: { label: color, color, dot: true } })),
+      items: [
+        ...ALL_TONES.map(tone   => ({ component: Badge, props: { label: tone,  tone,  dot: true } })),
+        ...ALL_COLORS.map(color => ({ component: Badge, props: { label: color, color, dot: true } })),
+      ],
     }),
     template: `<StoryGrid :items="items" gap="var(--ds-space-2)" />`,
   }),

@@ -4,7 +4,8 @@ import ButtonGroupItem from './ButtonGroupItem.vue'
 import ButtonGroup from './ButtonGroup.vue'
 
 const meta: Meta<typeof ButtonGroupItem> = {
-  title: 'Subcomponents/ButtonGroupItem',
+  title: 'Actions/ButtonGroup/Item',
+  tags: ['wip'],
   component: ButtonGroupItem,
   parameters: {
     layout: 'centered',
@@ -27,11 +28,6 @@ const meta: Meta<typeof ButtonGroupItem> = {
       description: 'Nom d\'icône du registre. Placée avant le label, ou seule si `label` est omis.',
       table: { category: 'Contenu', type: { summary: 'IconName' } },
     },
-    active: {
-      control: 'boolean',
-      description: 'Marque le segment comme sélectionné.',
-      table: { category: 'État', type: { summary: 'boolean' }, defaultValue: { summary: 'false' } },
-    },
     disabled: {
       control: 'boolean',
       description: 'Désactive le segment.',
@@ -46,7 +42,6 @@ const meta: Meta<typeof ButtonGroupItem> = {
   },
   args: {
     label: 'Texte',
-    active: false,
     disabled: false,
     type: 'button',
     onClick: fn(),
@@ -57,10 +52,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
-
-export const Active: Story = {
-  args: { active: true },
-}
 
 export const Disabled: Story = {
   args: { disabled: true },
@@ -91,7 +82,7 @@ export const InContext: Story = {
     template: `
       <ButtonGroup>
         <ButtonGroupItem label="Jour" />
-        <ButtonGroupItem label="Semaine" active />
+        <ButtonGroupItem value="semaine" label="Semaine" />
         <ButtonGroupItem label="Mois" />
         <ButtonGroupItem label="Année" disabled />
       </ButtonGroup>

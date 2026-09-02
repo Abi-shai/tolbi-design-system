@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { SurfaceTransition } from '../SurfaceTransition'
+/* token-lint-disable no-literal-dimension-js — tooltip positioning offsets,
+   not spacing: they align the bubble's tail to the trigger, and no token can
+   express that relationship. */
 import { ref, computed } from 'vue'
 import { Icon } from '../Icon'
 import { Tooltip } from '../Tooltip'
@@ -38,22 +42,56 @@ const arrowMap: Record<HelpPlacement, TooltipArrow> = {
 
 const arrow = computed(() => arrowMap[props.placement])
 
-// Position CSS du tooltip par rapport à l'icône (gap de 4px)
+/*
+ * Where the panel grows from (ADR-0021: a surface is scaled from its anchor).
+ *
+ * This was `bottom center` for every placement and nobody could tell, because
+ * the scale never ran — see the note on `translate` below. Now that it does,
+ * the origin is visible, so it has to be right.
+ */
+const originMap: Record<HelpPlacement, string> = {
+  'top':       'bottom center',
+  'top-arrow': 'bottom center',
+  'top-left':  'bottom right',
+  'top-right': 'bottom left',
+  'bottom':    'top center',
+  'left':      'center right',
+  'right':     'center left',
+}
+
+/*
+ * Position CSS du tooltip par rapport à l'icône (gap de 4px).
+ *
+ * Centring uses the independent `translate` property, NOT `transform`.
+ *
+ * `:style` is inline, so `transform: translateX(-50%)` here beat
+ * SurfaceTransition's `transform: scale(…)` — which is a stylesheet rule — and
+ * five of the seven placements silently got the fade without the scale. The
+ * failure is invisible: the entrance still runs, just without half of itself.
+ *
+ * `translate` / `scale` / `rotate` are separate properties that COMPOSE with
+ * `transform` rather than replacing it, so the offset and the entrance can sit
+ * on one element without competing. Keeping them on one element also keeps the
+ * DOM identical — an earlier attempt moved the offset to a wrapper div and
+ * shifted two placements, because an absolutely positioned box and a static
+ * child of one shrink-wrap differently.
+ */
 const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
+  const origin = { transformOrigin: originMap[props.placement] }
   switch (props.placement) {
     case 'top':
     case 'top-arrow':
-      return { bottom: 'calc(100% + 4px)', left: '50%', transform: 'translateX(-50%)' }
+      return { ...origin, bottom: 'calc(100% + 4px)', left: '50%', translate: '-50% 0' }
     case 'top-left':
-      return { bottom: 'calc(100% + 4px)', right: '-12px' }
+      return { ...origin, bottom: 'calc(100% + 4px)', right: '-12px' }
     case 'top-right':
-      return { bottom: 'calc(100% + 4px)', left: '-12px' }
+      return { ...origin, bottom: 'calc(100% + 4px)', left: '-12px' }
     case 'bottom':
-      return { top: 'calc(100% + 4px)', left: '50%', transform: 'translateX(-50%)' }
+      return { ...origin, top: 'calc(100% + 4px)', left: '50%', translate: '-50% 0' }
     case 'left':
-      return { right: 'calc(100% + 3px)', top: '50%', transform: 'translateY(-50%)' }
+      return { ...origin, right: 'calc(100% + 3px)', top: '50%', translate: '0 -50%' }
     case 'right':
-      return { left: 'calc(100% + 4px)', top: '50%', transform: 'translateY(-50%)' }
+      return { ...origin, left: 'calc(100% + 4px)', top: '50%', translate: '0 -50%' }
   }
 })
 </script>
@@ -76,7 +114,7 @@ const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
       <Icon name="circle-question-mark" :size="16" />
     </button>
 
-    <Transition name="ds-help-icon__tooltip">
+    <SurfaceTransition>
       <Tooltip
         v-if="isOpen"
         class="ds-help-icon__tooltip"
@@ -85,7 +123,7 @@ const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
         :supporting-text="supportingText"
         :arrow="arrow"
       />
-    </Transition>
+    </SurfaceTransition>
   </div>
 </template>
 
@@ -107,39 +145,26 @@ const tooltipStyle = computed<Partial<Record<string, string>>>(() => {
   border: none;
   background: transparent;
   cursor: pointer;
-  color: var(--ds-semantic-fg-quinary);
+  color: var(--ds-text-subtlest);
   transition: color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
 }
 
 .ds-help-icon__btn:hover,
 .ds-help-icon__btn--open {
-  color: var(--ds-semantic-fg-quinary-hover);
+  color: var(--ds-text-subtle);
 }
 
 .ds-help-icon__btn:focus-visible {
-  outline: 2px solid var(--ds-semantic-border-brand);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--ds-focus-ring-brand);
 }
 
 .ds-help-icon__tooltip {
+  /* transform-origin is set inline, per placement — see originMap. */
   position: absolute;
-  z-index: 100;
+  z-index: var(--ds-z-popover);
   white-space: normal;
 }
 
-/* Transition */
-.ds-help-icon__tooltip-enter-active {
-  transition: opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-out),
-              transform var(--ds-motion-duration-enter) var(--ds-motion-easing-out);
-}
-.ds-help-icon__tooltip-leave-active {
-  transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-in),
-              transform var(--ds-motion-duration-moderate) var(--ds-motion-easing-in);
-}
-.ds-help-icon__tooltip-enter-from,
-.ds-help-icon__tooltip-leave-to {
-  opacity: 0;
-  transform: scale(0.96);
-}
 </style>

@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import { Icon } from '../Icon'
+import { useFormField } from '../FormField/context'
 
 export type TextareaType = 'default' | 'tags'
 
 interface Props {
   modelValue?:  string
   type?:        TextareaType
-  label?:       string
   placeholder?: string
-  hint?:        string
   tags?:        string[]
   destructive?: boolean
   disabled?:    boolean
@@ -25,6 +24,13 @@ const props = withDefaults(defineProps<Props>(), {
   disabled:    false,
   required:    false,
 })
+
+const field = useFormField()
+
+const isInvalid   = computed(() => field?.invalid.value ?? props.destructive)
+const isRequired  = computed(() => field?.required.value ?? props.required)
+const isDisabled  = computed(() => (field?.disabled.value ?? false) || props.disabled)
+const describedBy = computed(() => field?.describedBy.value)
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
@@ -49,20 +55,14 @@ function onKeydown(e: KeyboardEvent) {
 </script>
 
 <template>
-  <div class="ds-textarea" :class="{ 'ds-textarea--disabled': disabled }">
-
-    <!-- Label -->
-    <label v-if="label" :for="inputId" class="ds-textarea__label">
-      {{ label }}
-      <span v-if="required" class="ds-textarea__required" aria-hidden="true">*</span>
-    </label>
+  <div class="ds-textarea" :class="{ 'ds-textarea--disabled': isDisabled }">
 
     <!-- Wrapper -->
     <div
       class="ds-textarea__wrapper"
       :class="{
-        'ds-textarea__wrapper--destructive': destructive,
-        'ds-textarea__wrapper--disabled':    disabled,
+        'ds-textarea__wrapper--destructive': isInvalid,
+        'ds-textarea__wrapper--disabled':    isDisabled,
         'ds-textarea__wrapper--tags':        type === 'tags',
       }"
     >
@@ -94,10 +94,10 @@ function onKeydown(e: KeyboardEvent) {
             class="ds-textarea__input ds-textarea__input--tags"
             :value="modelValue"
             :placeholder="!tags.length ? placeholder : undefined"
-            :disabled="disabled"
-            :required="required"
-            :aria-invalid="destructive || undefined"
-            :aria-describedby="hint ? `${inputId}-hint` : undefined"
+            :disabled="isDisabled"
+            :required="isRequired"
+            :aria-invalid="isInvalid || undefined"
+            :aria-describedby="describedBy"
             rows="1"
             @input="emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
             @keydown="onKeydown"
@@ -112,23 +112,14 @@ function onKeydown(e: KeyboardEvent) {
         class="ds-textarea__input"
         :value="modelValue"
         :placeholder="placeholder"
-        :disabled="disabled"
-        :required="required"
-        :aria-invalid="destructive || undefined"
-        :aria-describedby="hint ? `${inputId}-hint` : undefined"
+        :disabled="isDisabled"
+        :required="isRequired"
+        :aria-invalid="isInvalid || undefined"
+        :aria-describedby="describedBy"
         @input="emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
       />
     </div>
 
-    <!-- Hint -->
-    <p
-      v-if="hint"
-      :id="`${inputId}-hint`"
-      class="ds-textarea__hint"
-      :class="{ 'ds-textarea__hint--error': destructive }"
-    >
-      {{ hint }}
-    </p>
   </div>
 </template>
 
@@ -142,22 +133,6 @@ function onKeydown(e: KeyboardEvent) {
 }
 
 /* ── Label ────────────────────────────────────────────────────────── */
-.ds-textarea__label {
-  margin: 0;
-  display: block;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-text-secondary);
-  white-space: nowrap;
-}
-
-.ds-textarea__required {
-  color: var(--ds-semantic-fg-error-primary);
-  margin-left: 2px;
-}
-
 /* ── Wrapper ──────────────────────────────────────────────────────── */
 .ds-textarea__wrapper {
   display: flex;
@@ -165,36 +140,36 @@ function onKeydown(e: KeyboardEvent) {
   min-height: 128px;
   width: 100%;
   box-sizing: border-box;
-  background: var(--ds-semantic-bg-primary);
-  border: 1px solid var(--ds-semantic-border-primary);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-xs);
+  background: var(--ds-bg-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  border-radius: var(--ds-radius-control);
+  box-shadow: var(--ds-elevation-control);
   overflow: hidden;
-  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
   /* Default : px-14px py-12px */
   padding: var(--ds-spacing-lg) 14px;
 }
 
 /* Focused */
 .ds-textarea__wrapper:focus-within {
-  border-color: var(--ds-semantic-border-brand);
+  border-color: var(--ds-border-brand);
   box-shadow: var(--ds-focus-ring-brand-shadow-xs);
 }
 
 /* Destructive */
 .ds-textarea__wrapper--destructive {
-  border-color: var(--ds-color-error-300, #fda29b);
+  border-color: var(--ds-border-error);
 }
 
 .ds-textarea__wrapper--destructive:focus-within {
-  border-color: var(--ds-color-error-300, #fda29b);
+  border-color: var(--ds-border-error);
   box-shadow: var(--ds-focus-ring-error-shadow-xs);
 }
 
 /* Disabled */
 .ds-textarea__wrapper--disabled {
-  background: var(--ds-semantic-bg-primary);
-  border-color: var(--ds-semantic-border-primary);
+  background: var(--ds-bg-default);
+  border-color: var(--ds-border-default);
   box-shadow: none;
   cursor: not-allowed;
 }
@@ -218,20 +193,17 @@ function onKeydown(e: KeyboardEvent) {
   resize: none;
   appearance: none;
   background: transparent;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5rem;
-  color: var(--ds-semantic-text-primary);
+  font: var(--ds-font-body-lg);
+  color: var(--ds-text-strong);
   box-sizing: border-box;
 }
 
 .ds-textarea__input::placeholder {
-  color: var(--ds-semantic-text-placeholder);
+  color: var(--ds-text-placeholder);
 }
 
 .ds-textarea__input:disabled {
-  color: var(--ds-semantic-text-placeholder);
+  color: var(--ds-text-disabled);
   cursor: not-allowed;
 }
 
@@ -264,18 +236,14 @@ function onKeydown(e: KeyboardEvent) {
   align-items: center;
   gap: 3px;
   padding: var(--ds-spacing-xxs) var(--ds-spacing-xs) var(--ds-spacing-xxs) 9px;
-  background: var(--ds-semantic-bg-primary);
-  border: 1px solid var(--ds-semantic-border-primary);
-  border-radius: var(--ds-radius-sm);
+  background: var(--ds-bg-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  border-radius: var(--ds-radius-inner);
   flex-shrink: 0;
 }
 
-.ds-textarea__tag-label {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-text-secondary);
+.ds-textarea__tag-label {  font: var(--ds-font-label-lg);
+  color: var(--ds-text-default);
   white-space: nowrap;
 }
 
@@ -288,26 +256,14 @@ function onKeydown(e: KeyboardEvent) {
   background: transparent;
   border-radius: 3px;
   cursor: pointer;
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
   line-height: 0;
   transition: background var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-textarea__tag-remove:hover {
-  background: var(--ds-semantic-bg-primary-hover);
+  background: var(--ds-bg-hover);
 }
 
 /* ── Hint ─────────────────────────────────────────────────────────── */
-.ds-textarea__hint {
-  margin: 0;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-text-tertiary);
-}
-
-.ds-textarea__hint--error {
-  color: var(--ds-semantic-fg-error-primary);
-}
 </style>

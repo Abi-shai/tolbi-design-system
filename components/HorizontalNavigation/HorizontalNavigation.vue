@@ -6,6 +6,7 @@ import { Avatar } from '../Avatar'
 import { CreditsChip } from '../CreditsChip'
 import { Tooltip } from '../Tooltip'
 import { ModulesList } from '../ModulesList'
+import { SurfaceTransition } from '../SurfaceTransition'
 import type { ModulesListItem } from '../ModulesList'
 import type { CreditsState, CreditsContext } from '../CreditsChip'
 
@@ -188,13 +189,15 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
             arrow="top-center"
           />
 
-          <!-- Dropdown modules -->
-          <ModulesList
-            v-if="modulesOpen && modules.length"
-            class="ds-hnav__modules-dropdown"
-            :modules="modules"
-            @select="selectModule"
-          />
+          <!-- Dropdown modules — a floating surface, so it takes the house entrance (ADR-0021) -->
+          <SurfaceTransition>
+            <ModulesList
+              v-if="modulesOpen && modules.length"
+              class="ds-hnav__modules-dropdown"
+              :modules="modules"
+              @select="selectModule"
+            />
+          </SurfaceTransition>
         </div>
       </div>
 
@@ -214,7 +217,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   justify-content: space-between;
   width: 100%;
   box-sizing: border-box;
-  background: rgba(6, 105, 56, 0.95);
+  background: color-mix(in srgb, var(--ds-bg-brand-solid) 95%, transparent);
   padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
   overflow: visible;
 }
@@ -237,7 +240,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 }
 
 .ds-hnav__chevron {
-  color: rgba(255, 255, 255, 0.4);
+  color: color-mix(in srgb, var(--ds-text-on-brand-solid) 40%, transparent);
   flex-shrink: 0;
 }
 
@@ -246,28 +249,25 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   align-items: center;
   justify-content: center;
   padding: var(--ds-spacing-xs) var(--ds-spacing-md);
-  border-radius: var(--ds-radius-sm);
+  border-radius: var(--ds-radius-inner);
   background: transparent;
   border: none;
   cursor: pointer;
-  color: var(--ds-color-gray-light-300);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.25rem;
+  color: color-mix(in srgb, var(--ds-text-on-brand-solid) 70%, transparent);
+  font: var(--ds-font-label-lg);
   white-space: nowrap;
   transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-hnav__crumb-btn:hover {
-  background: var(--ds-semantic-bg-brand-solid-hover);
+  background: var(--ds-bg-brand-solid-hover);
 }
 
 .ds-hnav__crumb-btn--active {
-  background: rgba(5, 96, 51, 0.9);
-  color: var(--ds-color-gray-light-200, #eaecf0);
+  background: color-mix(in srgb, var(--ds-bg-brand-solid) 90%, transparent);
+  color: var(--ds-text-on-brand-solid);
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 600;
+  font-weight: var(--ds-font-weight-label-lg-strong);
 }
 
 /* ── Droite ───────────────────────────────────────────────────────── */
@@ -298,7 +298,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   top: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 100;
+  z-index: var(--ds-z-popover);
   white-space: nowrap;
 }
 
@@ -308,22 +308,19 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   align-items: center;
   gap: var(--ds-spacing-xs);
   padding: var(--ds-spacing-md) var(--ds-spacing-lg);
-  background: rgba(5, 96, 51, 0.9);
-  border: 1px solid var(--ds-color-brand-600, #056033);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-xs);
-  color: var(--ds-color-gray-light-200, #eaecf0);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25rem;
+  background: color-mix(in srgb, var(--ds-bg-brand-solid) 90%, transparent);
+  border: var(--ds-border-width-default) solid var(--ds-border-brand-solid);
+  border-radius: var(--ds-radius-control);
+  box-shadow: var(--ds-elevation-control);
+  color: var(--ds-text-on-brand-solid);
+  font: var(--ds-font-label-lg-strong);
   white-space: nowrap;
   cursor: pointer;
   transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-hnav__learn-btn:hover {
-  background: var(--ds-semantic-bg-brand-solid-hover);
+  background: var(--ds-bg-brand-solid-hover);
 }
 
 /* ── Boutons icônes ───────────────────────────────────────────────── */
@@ -332,17 +329,17 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   align-items: center;
   justify-content: center;
   padding: var(--ds-spacing-md);
-  border-radius: var(--ds-radius-4xl);
+  border-radius: var(--ds-radius-pill);
   background: transparent;
   border: none;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.85);
+  color: color-mix(in srgb, var(--ds-text-on-brand-solid) 85%, transparent);
   transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-hnav__icon-btn:hover,
 .ds-hnav__icon-btn--open {
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--ds-text-on-brand-solid) 10%, transparent);
 }
 
 /* ── Notifications ────────────────────────────────────────────────── */
@@ -356,9 +353,9 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   left: 22px;
   width: 6px;
   height: 6px;
-  border-radius: var(--ds-radius-full);
-  background: var(--ds-semantic-fg-error-primary, #d92d20);
-  border: 1.5px solid var(--ds-color-gray-light-200, #eaecf0);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-bg-error-solid);
+  border: var(--ds-border-width-strong) solid var(--ds-border-subtle);
 }
 
 /* ── Avatar utilisateur ───────────────────────────────────────────── */
@@ -367,7 +364,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   border: none;
   cursor: pointer;
   padding: 0;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   flex-shrink: 0;
 }
 
@@ -376,7 +373,14 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  z-index: 200;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
+  /*
+    A popover, not an overlay. ADR-0020 puts z-overlay (200) above a scrim; this
+    panel is a dropdown anchored to its button, which is what z-popover (100) is
+    for — and what the other three floating panels in the catalogue use.
+  */
+  z-index: var(--ds-z-popover);
+  box-shadow: var(--ds-elevation-overlay);
+  /* The anchor is the button above-right of the panel (ADR-0021: the surface grows from it). */
+  transform-origin: top right;
 }
 </style>

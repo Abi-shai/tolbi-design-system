@@ -3,9 +3,9 @@ import Tag from './Tag.vue'
 import StoryGrid from '../../stories/StoryGrid.vue'
 
 const meta: Meta<typeof Tag> = {
-  title: 'Components/Tag',
+  title: 'Étiquettes/Tag',
   component: Tag,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'wip'],
   parameters: {
     layout: 'centered',
     docs: {

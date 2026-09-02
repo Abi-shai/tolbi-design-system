@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Icon } from '../Icon'
+import { Spinner } from '../Spinner'
 import type { IconName } from '../Icon'
 
 export type ButtonVariant =
@@ -55,78 +56,115 @@ function handleClick(event: MouseEvent) {
     :disabled="disabled || loading"
     :class="['ds-button', `ds-button--${variant}`, `ds-button--${size}`, { 'ds-button--icon-only': iconOnly }]"
     :aria-busy="loading || undefined"
-    :aria-label="iconOnly ? label : undefined"
+    :aria-label="iconOnly || loading ? label : undefined"
     @click="handleClick"
   >
-    <span v-if="loading" class="ds-button__spinner" aria-hidden="true" />
-    <template v-else>
-      <Icon v-if="iconLeading" :name="iconLeading" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
-      <span v-if="!iconOnly" class="ds-button__label">{{ label }}</span>
-      <Icon v-if="iconTrailing && !iconOnly" :name="iconTrailing" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
-    </template>
+    <!--
+      ADR-0027: the body stays in the layout while loading so the button keeps
+      its width — it used to collapse from 233px to 44px, which shoves whatever
+      sits beside it. Both children share one grid cell; only their visibility
+      changes.
+
+      `visibility: hidden` takes the label out of the accessibility tree along
+      with the layout, so `aria-label` carries the name while loading. Without
+      it the button announces as "busy" with no name at all.
+
+      size="1em" so the spinner tracks the button's own font size, as the
+      hand-rolled version did across all five sizes (ADR-0001).
+    -->
+    <span class="ds-button__stack">
+      <span class="ds-button__body" :class="{ 'ds-button__body--hidden': loading }">
+        <Icon v-if="iconLeading" :name="iconLeading" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
+        <span v-if="!iconOnly" class="ds-button__label">{{ label }}</span>
+        <Icon v-if="iconTrailing && !iconOnly" :name="iconTrailing" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
+      </span>
+      <Spinner v-if="loading" size="1em" class="ds-button__spinner" />
+    </span>
   </button>
 </template>
 
 <style scoped>
+/* ADR-0027 — the spinner and the body share one grid cell, so the body keeps
+   defining the width even while it is invisible. `visibility: hidden` rather
+   than `display: none`: it holds the space AND leaves the accessibility tree,
+   so the label is not announced under aria-busy. */
+.ds-button__stack {
+  display: grid;
+  place-items: center;
+}
+
+.ds-button__stack > * {
+  grid-area: 1 / 1;
+}
+
+.ds-button__body {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-spacing-xs);
+  transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-out);
+}
+
+.ds-button__body--hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
 /* ── Base ─────────────────────────────────────────────────────────── */
 .ds-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 10px 14px;
-  border: 1px solid transparent;
-  border-radius: var(--ds-radius-md);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25rem;
+  padding: var(--ds-control-padding-md);
+  border: var(--ds-border-width-default) solid transparent;
+  border-radius: var(--ds-radius-control);
+  font: var(--ds-font-label-lg-strong);
   white-space: nowrap;
   cursor: pointer;
-  box-shadow: var(--ds-shadow-xs);
+  box-shadow: var(--ds-elevation-control);
   outline: none;
   transition:
     background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
     color            var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
     border-color     var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
-    box-shadow       var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+    box-shadow       var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
 .ds-button--sm {
-  padding: 8px 12px;
+  padding: var(--ds-control-padding-sm);
 }
 
 .ds-button--lg {
-  gap: 6px;
-  padding: 10px 16px;
-  font-size: 1rem;
-  line-height: 1.5rem;
+  gap: var(--ds-spacing-sm);
+  padding: var(--ds-control-padding-lg);
+  font: var(--ds-font-label-xl-strong);
 }
 
 .ds-button--xl {
-  gap: 6px;
-  padding: 12px 18px;
-  font-size: 1rem;
-  line-height: 1.5rem;
+  gap: var(--ds-spacing-sm);
+  padding: var(--ds-control-padding-xl);
+  font: var(--ds-font-label-xl-strong);
 }
 
 .ds-button--2xl {
   gap: 10px;
-  padding: 16px 22px;
-  font-size: 1.125rem;
-  line-height: 1.75rem;
+  padding: var(--ds-control-padding-2xl);
+  /* Component token (ADR-0010): 18px/28px is off the type ramp and has exactly
+     one consumer. A role would be minted for a single call site. */
+  --button-2xl-font: var(--ds-font-weight-label-xl-strong) 1.125rem/1.75rem var(--ds-typography-font-family-poppins);
+  font: var(--button-2xl-font);
 }
 
 /* ── Primary ──────────────────────────────────────────────────────── */
 .ds-button--primary {
-  background-color: var(--ds-semantic-bg-brand-solid);
-  border-color: var(--ds-semantic-border-brand-solid);
-  color: var(--ds-semantic-fg-white);
+  background-color: var(--ds-bg-brand-solid);
+  border-color: var(--ds-border-brand-solid);
+  color: var(--ds-text-on-brand-solid);
 }
 .ds-button--primary:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-brand-solid-hover);
-  border-color: var(--ds-color-brand-700);
+  background-color: var(--ds-bg-brand-solid-hover);
+  border-color: var(--ds-border-brand-solid-hover);
 }
 .ds-button--primary:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-brand-shadow-xs);
@@ -134,13 +172,13 @@ function handleClick(event: MouseEvent) {
 
 /* ── Secondary gray ───────────────────────────────────────────────── */
 .ds-button--secondary-gray {
-  background-color: var(--ds-semantic-bg-primary);
-  border-color: var(--ds-semantic-border-primary);
-  color: var(--ds-semantic-fg-secondary);
+  background-color: var(--ds-bg-default);
+  border-color: var(--ds-border-default);
+  color: var(--ds-text-default);
 }
 .ds-button--secondary-gray:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-primary-hover);
-  color: var(--ds-semantic-fg-secondary-hover);
+  background-color: var(--ds-bg-hover);
+  color: var(--ds-text-default-hover);
 }
 .ds-button--secondary-gray:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-gray-shadow-xs);
@@ -148,13 +186,13 @@ function handleClick(event: MouseEvent) {
 
 /* ── Secondary color ──────────────────────────────────────────────── */
 .ds-button--secondary-color {
-  background-color: var(--ds-semantic-bg-primary);
-  border-color: var(--ds-semantic-border-brand);
-  color: var(--ds-color-brand-700);
+  background-color: var(--ds-bg-default);
+  border-color: var(--ds-border-brand);
+  color: var(--ds-text-brand);
 }
 .ds-button--secondary-color:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-brand-primary);
-  color: var(--ds-color-brand-800);
+  background-color: var(--ds-bg-brand-subtle);
+  color: var(--ds-text-brand-hover);
 }
 .ds-button--secondary-color:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-brand-shadow-xs);
@@ -164,12 +202,12 @@ function handleClick(event: MouseEvent) {
 .ds-button--tertiary {
   background-color: transparent;
   border-color: transparent;
-  color: var(--ds-color-brand-700);
+  color: var(--ds-text-brand);
   box-shadow: none;
 }
 .ds-button--tertiary:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-brand-primary);
-  color: var(--ds-color-brand-800);
+  background-color: var(--ds-bg-brand-subtle);
+  color: var(--ds-text-brand-hover);
 }
 .ds-button--tertiary:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-brand-shadow-xs);
@@ -177,15 +215,15 @@ function handleClick(event: MouseEvent) {
 
 /* ── Link ─────────────────────────────────────────────────────────── */
 .ds-button--link {
-  gap: 6px;
+  gap: var(--ds-spacing-sm);
   padding: 0;
   background-color: transparent;
   border-color: transparent;
-  color: var(--ds-color-brand-700);
+  color: var(--ds-text-brand);
   box-shadow: none;
 }
 .ds-button--link:hover:not(:disabled) {
-  color: var(--ds-color-brand-800);
+  color: var(--ds-text-brand-hover);
   text-decoration: underline;
 }
 .ds-button--link:focus-visible:not(:disabled) {
@@ -194,13 +232,13 @@ function handleClick(event: MouseEvent) {
 
 /* ── Danger ───────────────────────────────────────────────────────── */
 .ds-button--danger {
-  background-color: var(--ds-semantic-bg-error-solid);
-  border-color: var(--ds-semantic-border-error-solid);
-  color: var(--ds-semantic-fg-white);
+  background-color: var(--ds-bg-error-solid);
+  border-color: var(--ds-border-error-solid);
+  color: var(--ds-text-on-error-solid);
 }
 .ds-button--danger:hover:not(:disabled) {
-  background-color: var(--ds-color-error-700);
-  border-color: var(--ds-color-error-700);
+  background-color: var(--ds-bg-error-solid-hover);
+  border-color: var(--ds-border-error-solid-hover);
 }
 .ds-button--danger:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-error-shadow-xs);
@@ -208,13 +246,13 @@ function handleClick(event: MouseEvent) {
 
 /* ── Danger secondary ─────────────────────────────────────────────── */
 .ds-button--danger-secondary {
-  background-color: var(--ds-semantic-bg-primary);
-  border-color: var(--ds-semantic-border-error);
-  color: var(--ds-color-error-700);
+  background-color: var(--ds-bg-default);
+  border-color: var(--ds-border-error);
+  color: var(--ds-text-error);
 }
 .ds-button--danger-secondary:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-error-primary);
-  color: var(--ds-color-error-800);
+  background-color: var(--ds-bg-error-subtle);
+  color: var(--ds-text-on-error-subtle);
 }
 .ds-button--danger-secondary:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-error-shadow-xs);
@@ -224,12 +262,12 @@ function handleClick(event: MouseEvent) {
 .ds-button--ghost {
   background-color: transparent;
   border-color: transparent;
-  color: var(--ds-semantic-text-tertiary);
+  color: var(--ds-text-subtle);
   box-shadow: none;
 }
 .ds-button--ghost:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-primary-hover);
-  color: var(--ds-semantic-text-secondary);
+  background-color: var(--ds-bg-hover);
+  color: var(--ds-text-default);
 }
 .ds-button--ghost:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-gray-shadow-xs);
@@ -248,9 +286,9 @@ function handleClick(event: MouseEvent) {
 
 /* ── Disabled ─────────────────────────────────────────────────────── */
 .ds-button:disabled {
-  background-color: var(--ds-semantic-bg-disabled);
-  border-color: var(--ds-semantic-border-disabled-subtle);
-  color: var(--ds-semantic-fg-disabled);
+  background-color: var(--ds-bg-disabled);
+  border-color: var(--ds-border-subtle);
+  color: var(--ds-text-disabled);
   box-shadow: none;
   cursor: not-allowed;
 }
@@ -262,16 +300,7 @@ function handleClick(event: MouseEvent) {
 }
 
 /* ── Spinner ──────────────────────────────────────────────────────── */
-.ds-button__spinner {
-  width: 1em;
-  height: 1em;
-  border: 2px solid currentColor;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: ds-spin 0.6s linear infinite;
-}
+/* Geometry and animation now live in Spinner. */
+.ds-button__spinner { flex-shrink: 0; }
 
-@keyframes ds-spin {
-  to { transform: rotate(360deg); }
-}
 </style>

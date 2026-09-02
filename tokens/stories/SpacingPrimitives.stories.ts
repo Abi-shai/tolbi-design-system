@@ -5,7 +5,7 @@ import SpacingRow from './components/SpacingRow.vue'
 const scale = Object.entries(primitives.space).map(([key, token]) => ({
   label: key,
   cssVar: `--ds-space-${key}`,
-  px: token.description,
+  px: token.$description,
 }))
 
 const meta: Meta = {

@@ -1,20 +1,30 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
 import { Icon } from '../Icon'
 import type { IconName } from '../Icon'
+import { BUTTON_GROUP_KEY } from './context'
 
+/**
+ * ADR-0024: selection comes from the group, not from a prop. `active` is gone —
+ * it allowed a segmented control with zero or two selected segments, and it
+ * meant nothing knew where the selection sat, so it could only cross-fade.
+ *
+ * The item still works outside a group (`useSlidingIndicator` is the group's
+ * business); it simply never reports as selected.
+ */
 interface Props {
+  /** Identifies this segment to the group's `v-model`. */
+  value?: string
   label?: string
   icon?: IconName
-  active?: boolean
   disabled?: boolean
   type?: 'button' | 'submit' | 'reset'
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  value: undefined,
   label: undefined,
   icon: undefined,
-  active: false,
   disabled: false,
   type: 'button',
 })
@@ -23,23 +33,34 @@ const emit = defineEmits<{
   click: [event: MouseEvent]
 }>()
 
+const group = inject(BUTTON_GROUP_KEY, null)
+const el = ref<HTMLButtonElement>()
+const key = computed(() => props.value ?? props.label ?? '')
+
+onMounted(() => { if (group && el.value) group.register(key.value, el.value) })
+onBeforeUnmount(() => group?.unregister(key.value))
+
+const selected = computed(() => group?.isSelected(key.value) ?? false)
 const iconOnly = computed(() => !!props.icon && !props.label)
 
 function handleClick(event: MouseEvent) {
-  if (!props.disabled) emit('click', event)
+  if (props.disabled) return
+  group?.select(key.value)
+  emit('click', event)
 }
 </script>
 
 <template>
   <button
+    ref="el"
     :type="type"
     :disabled="disabled"
-    :aria-pressed="active || undefined"
+    :aria-pressed="selected || undefined"
     :class="[
       'ds-button-group-item',
       iconOnly && 'ds-button-group-item--icon-only',
       icon && label && 'ds-button-group-item--leading-icon',
-      active && 'ds-button-group-item--active',
+      selected && 'ds-button-group-item--active',
     ]"
     @click="handleClick"
   >
@@ -63,22 +84,19 @@ function handleClick(event: MouseEvent) {
   justify-content: center;
   gap: 0;
   min-height: 40px;
-  padding: 8px 16px;
+  padding: var(--ds-spacing-md) var(--ds-spacing-xl);
   border: none;
-  border-right: 1px solid var(--ds-semantic-border-primary);
-  background-color: var(--ds-semantic-bg-primary);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-fg-secondary);
+  border-right: var(--ds-border-width-default) solid var(--ds-border-default);
+  background-color: var(--ds-bg-default);
+  font: var(--ds-font-label-lg-strong);
+  color: var(--ds-text-default);
   white-space: nowrap;
   cursor: pointer;
   outline: none;
   transition:
     background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
     color            var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
-    box-shadow       var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+    box-shadow       var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
 /* Remove right border on last child — container border handles the edge */
@@ -88,39 +106,36 @@ function handleClick(event: MouseEvent) {
 
 /* ── Icon modes ───────────────────────────────────────────────────── */
 .ds-button-group-item--icon-only {
-  padding: 8px 12px;
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
 }
 
 .ds-button-group-item--leading-icon {
-  gap: 8px;
-  padding: 8px 16px 8px 14px;
+  gap: var(--ds-spacing-md);
+  padding: var(--ds-spacing-md) var(--ds-spacing-xl) var(--ds-spacing-md) 14px;
 }
 
 /* ── States ───────────────────────────────────────────────────────── */
 .ds-button-group-item:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-primary-hover);
-  color: var(--ds-semantic-fg-secondary-hover);
-  z-index: 1;
+  background-color: var(--ds-bg-hover);
+  color: var(--ds-text-default-hover);
+  z-index: var(--ds-z-raised);
 }
 
 .ds-button-group-item:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-gray);
-  z-index: 1;
+  z-index: var(--ds-z-raised);
 }
 
+/* The selection is painted by the group's sliding indicator (ADR-0024); the
+   item only promotes its own text. */
 .ds-button-group-item--active {
-  background-color: var(--ds-semantic-bg-secondary);
-  color: var(--ds-semantic-fg-secondary-hover);
-}
-
-.ds-button-group-item--active:hover:not(:disabled) {
-  background-color: var(--ds-semantic-bg-secondary-hover);
+  color: var(--ds-text-default-hover);
 }
 
 /* ── Disabled ─────────────────────────────────────────────────────── */
 .ds-button-group-item:disabled {
-  background-color: var(--ds-semantic-bg-disabled);
-  color: var(--ds-semantic-fg-disabled);
+  background-color: var(--ds-bg-disabled);
+  color: var(--ds-text-disabled);
   cursor: not-allowed;
 }
 </style>

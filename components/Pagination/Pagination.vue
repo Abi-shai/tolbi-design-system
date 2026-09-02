@@ -91,7 +91,7 @@ function goToPage(page: number) {
   align-items: center;
   gap: var(--ds-spacing-lg);
   padding: 12px var(--ds-spacing-3xl) 16px;
-  border-top: 1px solid var(--ds-semantic-border-secondary);
+  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
 }
 
 /* ── Side slots (Previous / Next) ──────────────────────────────────── */
@@ -111,7 +111,7 @@ function goToPage(page: number) {
 .ds-pagination__numbers {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--ds-spacing-xxs);
   flex-shrink: 0;
 }
 
@@ -123,32 +123,30 @@ function goToPage(page: number) {
   width: 40px;
   height: 40px;
   border: none;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   background-color: transparent;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-text-tertiary);
+  font: var(--ds-font-label-lg);
+  color: var(--ds-text-subtle);
   cursor: pointer;
   transition:
     background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),
     color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+  font-variant-numeric: tabular-nums;
 }
 
 .ds-pagination__num:hover:not(:disabled):not(.ds-pagination__num--active) {
-  background-color: var(--ds-semantic-bg-primary-hover);
+  background-color: var(--ds-bg-hover);
 }
 
 .ds-pagination__num--active {
-  background-color: var(--ds-semantic-bg-brand-primary);
-  color: var(--ds-semantic-text-primary);
-  font-weight: 600;
+  background-color: var(--ds-bg-selected);
+  color: var(--ds-text-strong);
+  font-weight: var(--ds-font-weight-label-lg-strong);
 }
 
 .ds-pagination__num--ellipsis {
   cursor: default;
-  color: var(--ds-semantic-text-tertiary);
+  color: var(--ds-text-subtle);
 }
 
 .ds-pagination__num--ellipsis:disabled {

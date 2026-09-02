@@ -130,16 +130,13 @@ function onTagClick() {
 .ds-tag {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  background-color: var(--ds-semantic-bg-primary);
-  border: 1px solid var(--ds-semantic-border-primary);
-  border-radius: var(--ds-radius-sm);
-  color: var(--ds-semantic-text-secondary);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
-  font-size: 0.75rem;
-  line-height: 1.125rem;
+  gap: var(--ds-spacing-xs);
+  padding: 3px var(--ds-spacing-md);
+  background-color: var(--ds-bg-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  border-radius: var(--ds-radius-inner);
+  color: var(--ds-text-default);
+  font: var(--ds-font-label-md);
   white-space: nowrap;
   cursor: default;
   user-select: none;
@@ -150,20 +147,19 @@ function onTagClick() {
   padding: 3px 10px;
 }
 .ds-tag--lg {
-  padding: 4px 10px;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  padding: var(--ds-spacing-xs) 10px;
+  font: var(--ds-font-label-lg);
 }
 
 /* ── Leading icon — avatar / icon / slot: tighter left padding ───── */
-.ds-tag--has-leading { padding-left: 4px; }
+.ds-tag--has-leading { padding-left: var(--ds-spacing-xs); }
 
 /* ── Checkbox — slightly tighter left padding ────────────────────── */
 .ds-tag--has-checkbox { padding-left: 5px; }
 
 /* ── Trailing action — tighter right padding ─────────────────────── */
 .ds-tag--action-close,
-.ds-tag--action-count { padding-right: 4px; }
+.ds-tag--action-count { padding-right: var(--ds-spacing-xs); }
 
 /* ── Close action uses 3px gap (vs 4px default) ──────────────────── */
 .ds-tag--action-close { gap: 3px; }
@@ -171,7 +167,7 @@ function onTagClick() {
 /* ── Selectable (checkbox mode) ──────────────────────────────────── */
 .ds-tag--selectable { cursor: pointer; }
 .ds-tag--selectable:hover {
-  background-color: var(--ds-semantic-bg-primary-hover);
+  background-color: var(--ds-bg-hover);
 }
 .ds-tag--selectable:focus-visible {
   outline: none;
@@ -182,13 +178,13 @@ function onTagClick() {
 .ds-tag__dot {
   flex-shrink: 0;
   border-radius: 50%;
-  background-color: var(--ds-color-gray-light-400);
+  background-color: var(--ds-bg-neutral-strong);
 }
 
 /* ── Avatar ───────────────────────────────────────────────────────── */
 .ds-tag__avatar {
   flex-shrink: 0;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
   overflow: hidden;
 }
 .ds-tag__avatar img {
@@ -219,11 +215,10 @@ function onTagClick() {
   justify-content: center;
   height: 16px;
   min-width: 16px;
-  padding: 0 4px;
-  background-color: var(--ds-semantic-bg-tertiary);
-  border-radius: var(--ds-radius-xs);
-  font-size: 0.75rem;
-  font-weight: 500;
+  padding: 0 var(--ds-spacing-xs);
+  background-color: var(--ds-bg-neutral);
+  border-radius: var(--ds-radius-inner-sm);
+  font: var(--ds-font-label-md);
   line-height: 1;
   flex-shrink: 0;
 }
@@ -233,7 +228,7 @@ function onTagClick() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px;
+  padding: var(--ds-spacing-xxs);
   border: none;
   background: transparent;
   border-radius: 3px;
@@ -246,7 +241,7 @@ function onTagClick() {
 }
 .ds-tag__close:hover {
   opacity: 1;
-  background-color: var(--ds-semantic-bg-tertiary);
+  background-color: var(--ds-bg-neutral);
 }
 
 /* ── Checkbox indicator ───────────────────────────────────────────── */

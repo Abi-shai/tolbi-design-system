@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 import { Icon } from '../Icon'
 import type { IconName } from '../Icon'
 
+/**
+ * ADR-0010: `tone` and `color` are different props because they route
+ * differently. A tone expresses a role and resolves through the semantic layer;
+ * a colour is categorical — the only sentence you can write about it is "this
+ * one is blue" — and resolves straight to the display palette.
+ */
+export type BadgeTone  = 'neutral' | 'error' | 'warning' | 'success'
 export type BadgeColor =
-  | 'brand' | 'error' | 'warning' | 'success' | 'gray'
-  | 'blue' | 'blue-light' | 'blue-gray' | 'gray-blue'
+  | 'blue' | 'blue-light' | 'blue-gray'
   | 'indigo' | 'orange' | 'pink' | 'purple'
 
 export type BadgeVariant = 'pill-color' | 'pill-outline'
@@ -13,6 +19,9 @@ export type BadgeSize    = 'sm' | 'md' | 'lg'
 
 interface Props {
   label?:       string
+  /** Semantic role. Ignored when `color` is set. */
+  tone?:        BadgeTone
+  /** Categorical identity. Wins over `tone` when both are given. */
   color?:       BadgeColor
   variant?:     BadgeVariant
   size?:        BadgeSize
@@ -23,7 +32,8 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   label:       '',
-  color:       'brand',
+  tone:        'neutral',
+  color:       undefined,
   variant:     'pill-color',
   size:        'sm',
   dot:         false,
@@ -34,6 +44,20 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   dismiss: []
 }>()
+
+/** `color` wins over `tone`; Vue cannot express an exclusive prop union. */
+const appearance = computed(() => props.color ?? props.tone)
+
+if (import.meta.env?.DEV) {
+  watchEffect(() => {
+    if (props.color && props.tone !== 'neutral') {
+      console.warn(
+        `[Badge] both tone="${props.tone}" and color="${props.color}" were set. ` +
+        `color wins; drop one. A tone states a role, a colour states an identity.`,
+      )
+    }
+  })
+}
 
 const iconSize = computed(() => {
   if (props.size === 'lg') return 16
@@ -52,7 +76,7 @@ const dotSize = computed(() => {
   <span
     :class="[
       'ds-badge',
-      `ds-badge--${color}`,
+      `ds-badge--${appearance}`,
       `ds-badge--${variant}`,
       `ds-badge--${size}`,
       dot        && 'ds-badge--has-dot',
@@ -95,97 +119,140 @@ const dotSize = computed(() => {
 </template>
 
 <style scoped>
-/* ── Color tokens (set per color modifier) ────────────────────────── */
-.ds-badge {
-  --badge-bg:             var(--ds-color-brand-50);
-  --badge-border:         var(--ds-color-brand-200);
-  --badge-text:           var(--ds-color-brand-700);
-  --badge-dot:            var(--ds-color-brand-500);
-  --badge-outline-border: var(--ds-color-brand-600);
+/* ── Tones: variant switches over the semantic layer (ADR-0010) ───── */
+.ds-badge,
+.ds-badge--neutral {
+  --badge-bg:             var(--ds-bg-neutral);
+  --badge-border:         var(--ds-border-default);
+  --badge-text:           var(--ds-text-default);
+  --badge-dot:            var(--ds-bg-neutral-strong);
+  --badge-outline-border: var(--ds-border-default);
 }
 .ds-badge--error   {
-  --badge-bg:             var(--ds-color-error-50);
-  --badge-border:         var(--ds-color-error-200);
-  --badge-text:           var(--ds-color-error-700);
-  --badge-dot:            var(--ds-color-error-500);
-  --badge-outline-border: var(--ds-color-error-600);
+  --badge-bg:             var(--ds-bg-error-subtle);
+  --badge-border:         var(--ds-border-on-error-subtle);
+  --badge-text:           var(--ds-text-on-error-subtle);
+  --badge-dot:            var(--ds-bg-error-solid);
+  --badge-outline-border: var(--ds-border-error-solid);
 }
 .ds-badge--warning {
-  --badge-bg:             var(--ds-color-warning-50);
-  --badge-border:         var(--ds-color-warning-200);
-  --badge-text:           var(--ds-color-warning-700);
-  --badge-dot:            var(--ds-color-warning-500);
-  --badge-outline-border: var(--ds-color-warning-600);
+  --badge-bg:             var(--ds-bg-warning-subtle);
+  --badge-border:         var(--ds-border-on-warning-subtle);
+  --badge-text:           var(--ds-text-on-warning-subtle);
+  --badge-dot:            var(--ds-bg-warning-solid);
+  --badge-outline-border: var(--ds-border-warning-solid);
 }
 .ds-badge--success {
-  --badge-bg:             var(--ds-color-success-50);
-  --badge-border:         var(--ds-color-success-200);
-  --badge-text:           var(--ds-color-success-700);
-  --badge-dot:            var(--ds-color-success-500);
-  --badge-outline-border: var(--ds-color-success-600);
+  --badge-bg:             var(--ds-bg-success-subtle);
+  --badge-border:         var(--ds-border-on-success-subtle);
+  --badge-text:           var(--ds-text-on-success-subtle);
+  --badge-dot:            var(--ds-bg-success-solid);
+  --badge-outline-border: var(--ds-border-success-solid);
 }
-.ds-badge--gray {
-  --badge-bg:             var(--ds-color-gray-light-100);
-  --badge-border:         var(--ds-color-gray-light-300);
-  --badge-text:           var(--ds-color-gray-light-700);
-  --badge-dot:            var(--ds-color-gray-light-500);
-  --badge-outline-border: var(--ds-color-gray-light-600);
+/* ADR-0009: categorical label palette — component tier, not semantic tones.
+   These eight hues have no primitive ramp. Pending a categorical-palette ADR. */
+
+/* ── Colours: categorical, straight off the display palette.
+   ADR-0010 lets a component token alias a primitive when the value is
+   categorical — there is no role to route through. The outline border
+   uses step 700, not 600: in pill-outline the border IS the visual and
+   must clear 3:1, and blue-light measured 2.59:1 at 600. ─────────── */
+.ds-badge--blue {
+  --badge-bg:             var(--ds-color-display-blue-50);
+  --badge-border:         var(--ds-color-display-blue-200);
+  --badge-text:           var(--ds-color-display-blue-700);
+  --badge-dot:            var(--ds-color-display-blue-500);
+  --badge-outline-border: var(--ds-color-display-blue-700);
 }
-.ds-badge--blue       { --badge-bg:#EFF8FF; --badge-border:#B2DDFF; --badge-text:#175CD3; --badge-dot:#2E90FA; --badge-outline-border:#1570EF; }
-.ds-badge--blue-light { --badge-bg:#F0F9FF; --badge-border:#B9E6FE; --badge-text:#026AA2; --badge-dot:#36BFFA; --badge-outline-border:#0BA5EC; }
-.ds-badge--blue-gray  { --badge-bg:#F8F9FC; --badge-border:#D5D9EB; --badge-text:#363F72; --badge-dot:#717BBC; --badge-outline-border:#4E5BA6; }
-.ds-badge--gray-blue  { --badge-bg:#F8F9FC; --badge-border:#D5D9EB; --badge-text:#363F72; --badge-dot:#717BBC; --badge-outline-border:#4E5BA6; }
-.ds-badge--indigo     { --badge-bg:#EEF4FF; --badge-border:#C7D7FE; --badge-text:#3538CD; --badge-dot:#6172F3; --badge-outline-border:#444CE7; }
-.ds-badge--orange     { --badge-bg:#FFF6ED; --badge-border:#FDDCAB; --badge-text:#C4320A; --badge-dot:#FB6514; --badge-outline-border:#EC4A0A; }
-.ds-badge--pink       { --badge-bg:#FFF1F3; --badge-border:#FECDD6; --badge-text:#C01048; --badge-dot:#F63D68; --badge-outline-border:#E31B54; }
-.ds-badge--purple     { --badge-bg:#F9F5FF; --badge-border:#E9D7FE; --badge-text:#6941C6; --badge-dot:#9E77ED; --badge-outline-border:#7F56D9; }
+.ds-badge--blue-light {
+  --badge-bg:             var(--ds-color-display-blue-light-50);
+  --badge-border:         var(--ds-color-display-blue-light-200);
+  --badge-text:           var(--ds-color-display-blue-light-700);
+  --badge-dot:            var(--ds-color-display-blue-light-500);
+  --badge-outline-border: var(--ds-color-display-blue-light-700);
+}
+.ds-badge--blue-gray {
+  --badge-bg:             var(--ds-color-display-blue-gray-50);
+  --badge-border:         var(--ds-color-display-blue-gray-200);
+  --badge-text:           var(--ds-color-display-blue-gray-700);
+  --badge-dot:            var(--ds-color-display-blue-gray-500);
+  --badge-outline-border: var(--ds-color-display-blue-gray-700);
+}
+.ds-badge--indigo {
+  --badge-bg:             var(--ds-color-display-indigo-50);
+  --badge-border:         var(--ds-color-display-indigo-200);
+  --badge-text:           var(--ds-color-display-indigo-700);
+  --badge-dot:            var(--ds-color-display-indigo-500);
+  --badge-outline-border: var(--ds-color-display-indigo-700);
+}
+.ds-badge--orange {
+  --badge-bg:             var(--ds-color-display-orange-50);
+  --badge-border:         var(--ds-color-display-orange-200);
+  --badge-text:           var(--ds-color-display-orange-700);
+  --badge-dot:            var(--ds-color-display-orange-500);
+  --badge-outline-border: var(--ds-color-display-orange-700);
+}
+.ds-badge--pink {
+  --badge-bg:             var(--ds-color-display-pink-50);
+  --badge-border:         var(--ds-color-display-pink-200);
+  --badge-text:           var(--ds-color-display-pink-700);
+  --badge-dot:            var(--ds-color-display-pink-500);
+  --badge-outline-border: var(--ds-color-display-pink-700);
+}
+.ds-badge--purple {
+  --badge-bg:             var(--ds-color-display-purple-50);
+  --badge-border:         var(--ds-color-display-purple-200);
+  --badge-text:           var(--ds-color-display-purple-700);
+  --badge-dot:            var(--ds-color-display-purple-500);
+  --badge-outline-border: var(--ds-color-display-purple-700);
+}
 
 /* ── Base ─────────────────────────────────────────────────────────── */
 .ds-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  border-radius: var(--ds-radius-full);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
+  gap: var(--ds-spacing-xs);
+  border-radius: var(--ds-radius-pill);
   white-space: nowrap;
-  line-height: 1;
 }
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
 .ds-badge--sm {
-  padding: 2px 8px;
-  font-size: 0.75rem;
-  line-height: 1.125rem;
+  padding: var(--ds-spacing-xxs) var(--ds-spacing-md);
+  font: var(--ds-font-label-md);
+  line-height: 1;
 }
 .ds-badge--md {
-  padding: 2px 10px;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  padding: var(--ds-spacing-xxs) 10px;
+  font: var(--ds-font-label-lg);
+  line-height: 1;
 }
 .ds-badge--lg {
-  padding: 4px 12px;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+  padding: var(--ds-spacing-xs) var(--ds-spacing-lg);
+  font: var(--ds-font-label-lg);
+  line-height: 1;
 }
+
+/* Tabs renders counts through Badge, so digits must not jitter (ADR-0011). */
+.ds-badge__label { font-variant-numeric: tabular-nums; }
 
 /* ── Pill color ───────────────────────────────────────────────────── */
 .ds-badge--pill-color {
   background-color: var(--badge-bg);
-  border: 1px solid var(--badge-border);
+  border: var(--ds-border-width-default) solid var(--badge-border);
   color: var(--badge-text);
 }
 
 /* ── Pill outline ─────────────────────────────────────────────────── */
 .ds-badge--pill-outline {
   background-color: transparent;
-  border: 1.5px solid var(--badge-outline-border);
+  border: var(--ds-border-width-strong) solid var(--badge-outline-border);
   color: var(--badge-text);
 }
 
 /* ── Dot ──────────────────────────────────────────────────────────── */
 .ds-badge--has-dot {
-  padding-left: 6px;
+  padding-left: var(--ds-spacing-sm);
 }
 
 .ds-badge__dot {
@@ -197,8 +264,8 @@ const dotSize = computed(() => {
 
 /* ── Icon leading ─────────────────────────────────────────────────── */
 .ds-badge--has-icon {
-  gap: 2px;
-  padding-left: 6px;
+  gap: var(--ds-spacing-xxs);
+  padding-left: var(--ds-spacing-sm);
 }
 
 .ds-badge__icon {
@@ -207,13 +274,13 @@ const dotSize = computed(() => {
 
 /* ── Icon only ────────────────────────────────────────────────────── */
 .ds-badge--icon-only {
-  padding-left: 8px;
-  padding-right: 8px;
+  padding-left: var(--ds-spacing-md);
+  padding-right: var(--ds-spacing-md);
 }
 
 /* ── Dismissible ──────────────────────────────────────────────────── */
 .ds-badge--dismissible {
-  gap: 2px;
+  gap: var(--ds-spacing-xxs);
   padding-right: 3px;
 }
 
@@ -221,7 +288,7 @@ const dotSize = computed(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px;
+  padding: var(--ds-spacing-xxs);
   border: none;
   background: transparent;
   border-radius: 50%;

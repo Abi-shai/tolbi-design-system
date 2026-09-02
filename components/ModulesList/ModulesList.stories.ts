@@ -15,7 +15,7 @@ const FIGMA_MODULES = [
 ]
 
 const meta: Meta<typeof ModulesList> = {
-  title: 'Components/ModulesList',
+  title: 'Navigation/ModulesList',
   component: ModulesList,
   tags: ['wip'],
   parameters: {

@@ -2,6 +2,8 @@
 interface Props {
   cssVar: string
   primitiveCssVar: string
+  /** ADR-0009: the clause admitting this token, plus its contrast evidence. */
+  description?: string
 }
 
 defineProps<Props>()
@@ -16,17 +18,20 @@ defineProps<Props>()
     <td class="row__ref">
       <span class="ref">{{ primitiveCssVar }}</span>
     </td>
+    <td class="row__why">
+      <span class="why" v-if="description">{{ description }}</span>
+    </td>
   </tr>
 </template>
 
 <style scoped>
-.row { border-bottom: 1px solid var(--ds-semantic-border-tertiary, #f2f4f7); }
+.row { border-bottom: 1px solid var(--ds-border-subtlest); }
 
 .row__name {
   padding: 0.625rem 1.5rem 0.625rem 0;
   font-family: monospace;
   font-size: 0.75rem;
-  color: var(--ds-semantic-text-secondary, #344054);
+  color: var(--ds-text-default);
   white-space: nowrap;
 }
 
@@ -46,6 +51,15 @@ defineProps<Props>()
   font-family: monospace;
   font-size: 0.7rem;
   line-height: 1.6;
-  color: var(--ds-semantic-text-secondary, #344054);
+  color: var(--ds-text-default);
+}
+
+.row__why { padding: 0.625rem 0 0.625rem 1.25rem; }
+
+.why {
+  font-family: var(--ds-typography-font-family-poppins);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: var(--ds-text-subtle);
 }
 </style>

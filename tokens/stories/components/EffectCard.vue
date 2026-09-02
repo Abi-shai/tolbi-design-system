@@ -17,8 +17,8 @@ defineProps<Props>()
 
 <style scoped>
 .card {
-  background: var(--ds-semantic-bg-primary, #ffffff);
-  border: 1px solid var(--ds-semantic-border-secondary, #eaecf0);
+  background: var(--ds-bg-default, #ffffff);
+  border: 1px solid var(--ds-border-subtle, #eaecf0);
   border-radius: 12px;
   width: 200px;
   height: 160px;
@@ -32,13 +32,13 @@ defineProps<Props>()
   font-family: var(--ds-typography-font-family-poppins);
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--ds-semantic-text-primary, #101828);
+  color: var(--ds-text-strong, #101828);
 }
 
 .card__meta {
   font-family: monospace;
   font-size: 0.7rem;
-  color: var(--ds-semantic-text-tertiary, #475467);
+  color: var(--ds-text-subtle, #475467);
   line-height: 1.6;
 }
 </style>

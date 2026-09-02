@@ -32,19 +32,26 @@ import { Button } from 'tolbi-design-system'
 
 ## Organisation de la documentation
 
-La navigation suit l'ordre de construction du système — des décisions vers les assemblages.
+Deux tiers, puis neuf catégories fonctionnelles.
 
-| Niveau | Contenu | Règle d'appartenance |
-|---|---|---|
-| **Foundations** | Couleur, typographie, espacement, rayons, largeurs, conteneurs, effets, motion | Les décisions de design. Aucun composant, uniquement des tokens. |
-| **Primitives** | `Icon`, `ModuleIcon`, `Logo`, `Avatar`, `Badge`, `Scrollbar` | Rend un seul élément. Aucune composition, aucun état interne. |
+| Niveau | Contenu |
+|---|---|
+| **Foundations** | Couleur, typographie, espacement, rayons, largeurs, conteneurs, effets, motion. Les décisions de design — aucun composant. |
+| **Les neuf catégories** | Actions · Données · Étiquettes · Feedback & chargement · Identité & média · Navigation · Saisie · Structure · Superposition |
 
-| **Subcomponents** | `ButtonGroupItem`, `DropdownItem`, `DropdownSelectItem`, `DropdownDivider` | N'a de sens qu'à l'intérieur d'un parent. Ne s'utilise jamais seul. |
-| **Components** | Tout le reste | Porte des variantes, des états ou de l'interaction, et compose éventuellement les niveaux inférieurs. |
+Les catégories répondent à **« où est la chose qui fait X ? »**. C'est la question de celui qui
+cherche ; « quel est son degré de composition ? » est celle du mainteneur, et elle est portée par le
+tag `primitive`.
 
-L'ordre du volet latéral est figé dans `.storybook/preview.ts` (`options.storySort`). Les entrées
-non listées se rangent après leurs voisines déclarées ; l'ordre des stories *à l'intérieur* d'un
-fichier reste celui du code, jamais alphabétique.
+Une pièce qui n'existe qu'à l'intérieur d'un parent est rangée **sous ce parent** —
+`Actions/ButtonGroup/Item`, `Superposition/Dropdown/Item`, `Saisie/InputDropdown/SelectItem`. Il n'y
+a pas de tier « sous-composants » : aucun des systèmes comparés n'en a, et la règle « ne s'utilise
+jamais seul » se lit mieux à côté du parent.
+
+L'ordre du volet est figé dans `.storybook/preview.ts` (`options.storySort`). Les catégories sont
+alphabétiques par choix : tout classement « par importance » finit par se discuter, et la
+prévisibilité est justement l'objectif. L'ordre des stories *à l'intérieur* d'un fichier reste celui
+du code, jamais alphabétique.
 
 ---
 
@@ -117,48 +124,21 @@ npm run tokens
 
 ## Statut des composants
 
-| Composant | Statut | Description |
+Le statut vit sur les stories, pas dans un tableau. Chaque composant porte exactement un tag —
+`stable` ou `wip` — et le volet latéral de Storybook sait filtrer dessus.
+
+| Tag | Sens | Compte |
 |---|---|---|
-| Avatar | ✅ Stable | Avatar utilisateur avec initiales ou image |
-| Button | ✅ Stable | Composant d'action principal |
-| CreditsChip | ✅ Stable | Affichage du solde de crédits |
-| HelpIcon | ✅ Stable | Icône d'aide avec tooltip |
-| HorizontalNavigation | ✅ Stable | Barre de navigation horizontale |
-| InputField | ✅ Stable | Champ de saisie texte |
-| ModuleIcon | ✅ Stable | Artwork de module — illustration (primitive) ou logo (sémantique) |
-| TextareaInputField | ✅ Stable | Champ de saisie multi-lignes |
-| Tooltip | ✅ Stable | Infobulle contextuelle |
-| VerificationCodeInputField | ✅ Stable | Saisie de code de vérification |
-| Badge | 🚧 WIP | Étiquette de statut ou de catégorie |
-| BadgeGroup | 🚧 WIP | Groupe de badges |
-| Breadcrumbs | 🚧 WIP | Fil d'Ariane |
-| ButtonGroup | 🚧 WIP | Groupe de boutons liés |
-| ButtonGroupItem | 🚧 WIP | Segment d'un `ButtonGroup` — sous-composant |
-| Checkbox | 🚧 WIP | Case à cocher et bouton radio, avec état indéterminé |
-| CloseButton | 🚧 WIP | Bouton de fermeture |
-| Dropdown | 🚧 WIP | Menu déroulant avec déclencheurs bouton, icône et avatar |
-| DropdownDivider | 🚧 WIP | Séparateur de groupes dans un menu — sous-composant |
-| DropdownItem | 🚧 WIP | Ligne d'action d'un menu — sous-composant |
-| DropdownSelectItem | 🚧 WIP | Ligne de sélection d'un `InputDropdown` — sous-composant |
-| Icon | 🚧 WIP | Icône Lucide du système |
-| InputDropdown | 🚧 WIP | Champ de sélection filtrable, avec icône, avatar ou puce |
-| Logo | 🚧 WIP | Logo Tolbi |
-| ModulesList | 🚧 WIP | Liste de modules |
-| Pagination | 🚧 WIP | Navigation entre pages de résultats |
-| ProgressBar | 🚧 WIP | Barre de progression, label inline ou infobulle |
-| ProgressCircle | 🚧 WIP | Progression circulaire |
-| ProgressSteps | 🚧 WIP | Étapes d'un parcours |
-| Scrollbar | 🚧 WIP | Conteneur scrollable à barre superposée |
-| Slider | 🚧 WIP | Curseur de plage à deux poignées |
-| Table | 🚧 WIP | Tableau de données — sélection, pagination, chargement |
-| Tabs | 🚧 WIP | Onglets, tailles `sm` et `md` |
-| Tag | 🚧 WIP | Étiquette avec actions et variantes |
-| Toggle | 🚧 WIP | Interrupteur |
+| `stable` | Documenté, testé, utilisable en production | 10 |
+| `wip` | Fonctionnel, documentation incomplète. Peut évoluer sans préavis | 43 |
+| `primitive` | Élément unique, sans composition ni état interne — sûr comme socle | 8 |
 
-**Stable** — composant documenté, testé, utilisable en production.
-**WIP** — composant fonctionnel mais documentation incomplète. Peut évoluer sans préavis.
+Ce tableau comptait auparavant les composants à la main. Il en déclarait 42 en WIP quand
+Storybook n'en marquait que 8 : deux sources de vérité qui divergeaient sans que rien ne le
+signale. Une seule les porte désormais, et c'est celle qui est à côté du code.
 
-Les 35 composants exportés depuis `components/index.ts` sont listés, sous-composants inclus.
+`primitive` est un axe séparé, pas un niveau de maturité : il remplace l'ancien tier `Primitives`
+et se combine avec l'un des deux statuts.
 
 ---
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SurfaceTransition } from '../SurfaceTransition'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
@@ -106,7 +107,7 @@ onUnmounted(() => {
     </button>
 
     <!-- ── Panel ──────────────────────────────────────────────────── -->
-    <Transition name="ds-dropdown__panel">
+    <SurfaceTransition>
     <div
       v-if="open"
       class="ds-dropdown__panel"
@@ -128,7 +129,7 @@ onUnmounted(() => {
         </div>
       </Scrollbar>
     </div>
-    </Transition>
+    </SurfaceTransition>
   </div>
 </template>
 
@@ -145,29 +146,26 @@ onUnmounted(() => {
 .ds-dropdown__trigger--button {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 10px 14px;
+  gap: var(--ds-spacing-xs);
+  padding: var(--ds-control-padding-md);
   box-sizing: border-box;
-  background-color: var(--ds-semantic-bg-primary);
-  border: 1px solid var(--ds-semantic-border-primary);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-xs);
+  background-color: var(--ds-bg-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  border-radius: var(--ds-radius-control);
+  box-shadow: var(--ds-elevation-control);
   cursor: pointer;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-text-secondary);
+  font: var(--ds-font-label-lg-strong);
+  color: var(--ds-text-default);
   white-space: nowrap;
-  transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+  transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
 .ds-dropdown__trigger--button:hover {
-  background-color: var(--ds-semantic-bg-primary-hover);
+  background-color: var(--ds-bg-hover);
 }
 
 .ds-dropdown__trigger-chevron {
-  color: var(--ds-semantic-fg-secondary);
+  color: var(--ds-text-default);
 }
 
 /* ── Trigger: icon ────────────────────────────────────────────────── */
@@ -180,14 +178,14 @@ onUnmounted(() => {
   background: transparent;
   border: none;
   cursor: pointer;
-  color: var(--ds-semantic-fg-secondary);
-  border-radius: var(--ds-radius-sm);
+  color: var(--ds-text-default);
+  border-radius: var(--ds-radius-inner);
   padding: 0;
   transition: color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-dropdown__trigger--icon:hover {
-  color: var(--ds-semantic-fg-primary);
+  color: var(--ds-text-strong);
 }
 
 /* ── Trigger: avatar ──────────────────────────────────────────────── */
@@ -199,7 +197,7 @@ onUnmounted(() => {
   border: none;
   cursor: pointer;
   padding: 0;
-  border-radius: var(--ds-radius-full);
+  border-radius: var(--ds-radius-pill);
 }
 
 .ds-dropdown__trigger--avatar-open {
@@ -208,15 +206,16 @@ onUnmounted(() => {
 
 /* ── Panel ────────────────────────────────────────────────────────── */
 .ds-dropdown__panel {
+  transform-origin: top left;
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  z-index: 100;
+  z-index: var(--ds-z-popover);
   width: 240px;
-  background-color: var(--ds-semantic-bg-primary);
-  border: 1px solid var(--ds-semantic-border-secondary);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-lg);
+  background-color: var(--ds-bg-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-control);
+  box-shadow: var(--ds-elevation-overlay);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -226,9 +225,9 @@ onUnmounted(() => {
 .ds-dropdown__header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--ds-semantic-border-secondary);
+  gap: var(--ds-spacing-lg);
+  padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
+  border-bottom: var(--ds-border-width-default) solid var(--ds-border-subtle);
   flex-shrink: 0;
 }
 
@@ -239,23 +238,15 @@ onUnmounted(() => {
   flex: 1;
 }
 
-.ds-dropdown__header-name {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 600;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-text-secondary);
+.ds-dropdown__header-name {  font: var(--ds-font-heading-sm);
+  color: var(--ds-text-default);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.ds-dropdown__header-email {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-text-tertiary);
+.ds-dropdown__header-email {  font: var(--ds-font-body-md);
+  color: var(--ds-text-subtle);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -267,21 +258,7 @@ onUnmounted(() => {
 .ds-dropdown__items {
   display: flex;
   flex-direction: column;
-  padding: 4px 0;
+  padding: var(--ds-spacing-xs) 0;
 }
 
-/* ── Panel transition ──────────────────────────────────────────────── */
-.ds-dropdown__panel-enter-active {
-  transition: opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-out),
-              transform var(--ds-motion-duration-enter) var(--ds-motion-easing-out);
-}
-.ds-dropdown__panel-leave-active {
-  transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-in),
-              transform var(--ds-motion-duration-moderate) var(--ds-motion-easing-in);
-}
-.ds-dropdown__panel-enter-from,
-.ds-dropdown__panel-leave-to {
-  opacity: 0;
-  transform: translateY(-6px) scale(0.98);
-}
 </style>

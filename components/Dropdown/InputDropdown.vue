@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { SurfaceTransition } from '../SurfaceTransition'
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { useFormField } from '../FormField/context'
 import { Icon } from '../Icon'
 import { Scrollbar } from '../Scrollbar'
 import { Avatar } from '../Avatar'
@@ -22,9 +24,7 @@ export interface InputDropdownOption {
 
 interface Props {
   type?: InputDropdownType
-  label?: string
   placeholder?: string
-  hintText?: string
   options: InputDropdownOption[]
   modelValue?: string | null
   leadingIcon?: IconName
@@ -34,6 +34,13 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'default',
   placeholder: 'Select...',
 })
+
+const field = useFormField()
+
+// Both triggers are focusable, so both must answer to the wrapper's `for`.
+const triggerId   = computed(() => field?.id.value)
+const describedBy = computed(() => field?.describedBy.value)
+const isInvalid   = computed(() => field?.invalid.value ?? false)
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | null]
@@ -114,16 +121,17 @@ onUnmounted(() => {
 
 <template>
   <div class="ds-input-dropdown" ref="rootEl">
-    <!-- Label + field group -->
+    <!-- Field group. Label and message live on FormField — see ADR-0008. -->
     <div class="ds-input-dropdown__field-group">
-      <span v-if="label" class="ds-input-dropdown__label">{{ label }}</span>
-
       <div class="ds-input-dropdown__input-wrap">
         <!-- ── Search type ──────────────────────────────────────────── -->
         <div
           v-if="type === 'search'"
           class="ds-input-dropdown__trigger"
           :class="{ 'ds-input-dropdown__trigger--open': open }"
+          :id="triggerId"
+          :aria-describedby="describedBy"
+          :aria-invalid="isInvalid || undefined"
           role="combobox"
           :aria-expanded="open"
           aria-haspopup="listbox"
@@ -158,6 +166,9 @@ onUnmounted(() => {
           type="button"
           class="ds-input-dropdown__trigger"
           :class="{ 'ds-input-dropdown__trigger--open': open }"
+          :id="triggerId"
+          :aria-describedby="describedBy"
+          :aria-invalid="isInvalid || undefined"
           :aria-expanded="open"
           aria-haspopup="listbox"
           @click="toggle"
@@ -202,31 +213,32 @@ onUnmounted(() => {
         </button>
 
         <!-- ── Dropdown panel ──────────────────────────────────────── -->
-        <div v-if="open" class="ds-input-dropdown__panel" role="listbox">
-          <Scrollbar max-height="320px">
-            <div class="ds-input-dropdown__panel-items">
-              <DropdownSelectItem
-                v-for="option in filteredOptions"
-                :key="option.value"
-                :type="itemType"
-                :label="option.label"
-                :supporting-text="option.supportingText"
-                :icon="option.icon || leadingIcon"
-                :avatar-src="option.avatarSrc"
-                :avatar-alt="option.avatarAlt"
-                :dot-color="option.dotColor"
-                :selected="option.value === modelValue"
-                :disabled="option.disabled"
-                @click="selectOption(option)"
-              />
-            </div>
-          </Scrollbar>
-        </div>
+        <SurfaceTransition>
+          <div v-if="open" class="ds-input-dropdown__panel" role="listbox">
+            <Scrollbar max-height="320px">
+              <div class="ds-input-dropdown__panel-items">
+                <DropdownSelectItem
+                  v-for="option in filteredOptions"
+                  :key="option.value"
+                  :type="itemType"
+                  :label="option.label"
+                  :supporting-text="option.supportingText"
+                  :icon="option.icon || leadingIcon"
+                  :avatar-src="option.avatarSrc"
+                  :avatar-alt="option.avatarAlt"
+                  :dot-color="option.dotColor"
+                  :selected="option.value === modelValue"
+                  :disabled="option.disabled"
+                  @click="selectOption(option)"
+                />
+              </div>
+            </Scrollbar>
+          </div>
+        </SurfaceTransition>
       </div>
     </div>
 
     <!-- Hint text -->
-    <p v-if="hintText && !open" class="ds-input-dropdown__hint">{{ hintText }}</p>
   </div>
 </template>
 
@@ -235,7 +247,7 @@ onUnmounted(() => {
 .ds-input-dropdown {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   width: 100%;
 }
 
@@ -243,18 +255,10 @@ onUnmounted(() => {
 .ds-input-dropdown__field-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--ds-spacing-sm);
 }
 
 /* ── Label ─────────────────────────────────────────────────────────── */
-.ds-input-dropdown__label {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-text-secondary);
-}
-
 /* ── Input wrap (relative anchor for the panel) ────────────────────── */
 .ds-input-dropdown__input-wrap {
   position: relative;
@@ -265,25 +269,25 @@ onUnmounted(() => {
 .ds-input-dropdown__trigger {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   width: 100%;
-  padding: 10px 14px;
+  padding: var(--ds-control-padding-md);
   box-sizing: border-box;
-  background-color: var(--ds-semantic-bg-primary);
-  border: 1px solid var(--ds-semantic-border-primary);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-xs);
+  background-color: var(--ds-bg-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  border-radius: var(--ds-radius-control);
+  box-shadow: var(--ds-elevation-control);
   cursor: pointer;
   text-align: left;
   font: inherit;
   color: inherit;
-  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+  transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
 .ds-input-dropdown__trigger--open,
 .ds-input-dropdown__trigger:focus-visible {
   outline: none;
-  border-color: var(--ds-semantic-border-brand);
+  border-color: var(--ds-border-brand);
   box-shadow: var(--ds-focus-ring-brand-shadow-xs);
 }
 
@@ -291,19 +295,15 @@ onUnmounted(() => {
 .ds-input-dropdown__content {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   flex: 1;
   min-width: 0;
   overflow: hidden;
 }
 
 /* ── Value text ────────────────────────────────────────────────────── */
-.ds-input-dropdown__value {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  color: var(--ds-semantic-text-primary);
+.ds-input-dropdown__value {  font: var(--ds-font-body-lg-emphasis);
+  color: var(--ds-text-strong);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -312,30 +312,26 @@ onUnmounted(() => {
 
 .ds-input-dropdown__value--placeholder {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
-  color: var(--ds-semantic-text-placeholder);
+  font-weight: var(--ds-font-weight-body-lg);
+  color: var(--ds-text-placeholder);
 }
 
 /* ── Supporting text ───────────────────────────────────────────────── */
-.ds-input-dropdown__supporting {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  color: var(--ds-semantic-text-tertiary);
+.ds-input-dropdown__supporting {  font: var(--ds-font-body-lg-emphasis);
+  color: var(--ds-text-subtle);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 /* ── Chevron ───────────────────────────────────────────────────────── */
 .ds-input-dropdown__chevron {
-  color: var(--ds-semantic-fg-secondary);
+  color: var(--ds-text-default);
   flex-shrink: 0;
 }
 
 /* ── Leading icon ──────────────────────────────────────────────────── */
 .ds-input-dropdown__leading-icon {
-  color: var(--ds-semantic-fg-secondary);
+  color: var(--ds-text-default);
   flex-shrink: 0;
 }
 
@@ -349,14 +345,14 @@ onUnmounted(() => {
   display: inline-block;
   width: 8px;
   height: 8px;
-  border-radius: var(--ds-radius-full);
-  background-color: var(--ds-semantic-fg-success-primary);
+  border-radius: var(--ds-radius-pill);
+  background-color: var(--ds-text-success);
   flex-shrink: 0;
 }
 
 /* ── Search icon ───────────────────────────────────────────────────── */
 .ds-input-dropdown__search-icon {
-  color: var(--ds-semantic-fg-secondary);
+  color: var(--ds-text-default);
   flex-shrink: 0;
 }
 
@@ -367,31 +363,29 @@ onUnmounted(() => {
   background: transparent;
   border: none;
   outline: none;
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  color: var(--ds-semantic-text-primary);
+  font: var(--ds-font-body-lg-emphasis);
+  color: var(--ds-text-strong);
   padding: 0;
 }
 
 .ds-input-dropdown__search-input::placeholder {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
-  color: var(--ds-semantic-text-placeholder);
+  font-weight: var(--ds-font-weight-body-lg);
+  color: var(--ds-text-placeholder);
 }
 
 /* ── Dropdown panel ────────────────────────────────────────────────── */
 .ds-input-dropdown__panel {
+  transform-origin: top left;
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  z-index: 100;
-  background-color: var(--ds-semantic-bg-primary);
-  border: 1px solid var(--ds-semantic-border-secondary);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-lg);
+  z-index: var(--ds-z-popover);
+  background-color: var(--ds-bg-default);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-control);
+  box-shadow: var(--ds-elevation-overlay);
   overflow: hidden;
 }
 
@@ -401,16 +395,8 @@ onUnmounted(() => {
 .ds-input-dropdown__panel-items {
   display: flex;
   flex-direction: column;
-  padding: 4px 0;
+  padding: var(--ds-spacing-xs) 0;
 }
 
 /* ── Hint text ─────────────────────────────────────────────────────── */
-.ds-input-dropdown__hint {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-text-tertiary);
-  margin: 0;
-}
 </style>

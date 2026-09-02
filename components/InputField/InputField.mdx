@@ -3,7 +3,12 @@ import * as InputFieldStories from './InputField.stories'
 
 # InputField
 
-Champ de saisie textuelle. Supporte le label, le hint, un icône ou texte en leading, un tooltip d'aide, et les états disabled et destructif.
+Champ de saisie textuelle. Le composant ne rend **que sa boîte** : une icône ou un texte en leading,
+un contenu en trailing, un tooltip d'aide, et les états `disabled` et destructif.
+
+La légende, le marqueur d'obligation, le texte d'aide et le message d'erreur appartiennent à
+[`FormField`](/docs/saisie-formfield--docs), qui les porte pour **tous** les contrôles de saisie —
+voir ADR-0008.
 
 <Canvas of={InputFieldStories.Default} />
 
@@ -20,7 +25,7 @@ Champ de saisie textuelle. Supporte le label, le hint, un icône ou texte en lea
 | Default | Bordure grise, shadow-xs |
 | Focused | Bordure brand + focus ring brand (CSS `:focus-within`) |
 | Disabled | Fond gris, curseur `not-allowed` |
-| Destructive | Bordure rouge + icône `circle-alert` + hint rouge |
+| Destructive | Bordure rouge + icône `circle-alert`. Le message rouge est rendu par `FormField` |
 
 ---
 
@@ -33,11 +38,13 @@ Champ de saisie textuelle. Supporte le label, le hint, un icône ou texte en lea
 Utiliser le slot `#icon-leading` avec un `<Icon>` du DS.
 
 ```vue
-<InputField label="Email" placeholder="...">
-  <template #icon-leading>
-    <Icon name="mail" :size="20" />
-  </template>
-</InputField>
+<FormField label="Email">
+  <InputField placeholder="...">
+    <template #icon-leading>
+      <Icon name="mail" :size="20" />
+    </template>
+  </InputField>
+</FormField>
 ```
 
 ### Avec texte leading
@@ -47,16 +54,20 @@ Utiliser le slot `#icon-leading` avec un `<Icon>` du DS.
 Utiliser le slot `#leading-text` pour un préfixe textuel.
 
 ```vue
-<InputField label="Website">
-  <template #leading-text>https://</template>
-</InputField>
+<FormField label="Website">
+  <InputField>
+    <template #leading-text>https://</template>
+  </InputField>
+</FormField>
 ```
 
 ### Avec help icon
 
 <Canvas of={InputFieldStories.WithHelpIcon} />
 
-La prop `help-tooltip` affiche un `<HelpIcon>` dans le label avec le texte passé.
+La prop `help-tooltip` affiche un `<HelpIcon>` **dans la boîte**, à droite. C'est la raison pour
+laquelle elle est restée sur le contrôle plutôt que de partir sur `FormField` : ce qui se rend à
+l'intérieur de la boîte reste l'affaire du contrôle.
 
 ---
 
@@ -76,8 +87,14 @@ La prop `help-tooltip` affiche un `<HelpIcon>` dans le label avec le texte pass�
 Le composant expose `v-model` (string) en standard :
 
 ```vue
-<InputField v-model="email" label="Email" placeholder="..." />
+<FormField label="Email" hint="Votre adresse professionnelle.">
+  <InputField v-model="email" placeholder="..." />
+</FormField>
 ```
+
+`FormField` fournit l'`id`, l'`aria-describedby` et l'état invalide par `provide`/`inject` : le
+contrôle les reçoit sans qu'on ait à les câbler à la main, et fonctionne toujours seul en dehors
+d'un `FormField`.
 
 ---
 

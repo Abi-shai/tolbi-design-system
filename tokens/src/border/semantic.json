@@ -1,0 +1,14 @@
+{
+  "border-width": {
+    "default": {
+      "$value": "1px",
+      "$type": "dimension",
+      "$description": "The hairline. 38 sites chose it independently — the most repeated value in the catalogue"
+    },
+    "strong": {
+      "$value": "2px",
+      "$type": "dimension",
+      "$description": "A ring that has to read: slider thumb, progress step, badge outline, avatar ring. The 1.5px variants snap up here — one decision, one value"
+    }
+  }
+}

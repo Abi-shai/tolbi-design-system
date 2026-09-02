@@ -7,9 +7,9 @@ import { Badge } from '../Badge'
 import { Button } from '../Button'
 
 const meta: Meta<typeof Table> = {
-  title: 'Components/Table',
+  title: 'Données/Table',
   component: Table,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'wip'],
   parameters: {
     layout: 'padded',
     docs: {
@@ -77,8 +77,8 @@ export const Default: Story = {
           <div style="display:flex;align-items:center;gap:12px;min-width:0">
             <Avatar size="sm" :initials="initials(row.name)" />
             <div style="min-width:0">
-              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.875rem;font-weight:500;color:var(--ds-semantic-text-primary);line-height:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div>
-              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.75rem;color:var(--ds-semantic-text-tertiary);line-height:1.125rem">{{ row.handle }}</div>
+              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.875rem;font-weight:500;color:var(--ds-text-strong);line-height:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div>
+              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.75rem;color:var(--ds-text-subtle);line-height:1.125rem">{{ row.handle }}</div>
             </div>
           </div>
         </template>
@@ -99,7 +99,7 @@ export const Default: Story = {
             <Badge
               v-if="row.tags.length > 3"
               :label="'+' + (row.tags.length - 3)"
-              color="gray"
+              tone="neutral"
               size="sm"
             />
           </div>
@@ -145,8 +145,8 @@ export const WithPagination: Story = {
           <div style="display:flex;align-items:center;gap:12px;min-width:0">
             <Avatar size="sm" :initials="initials(row.name)" />
             <div style="min-width:0">
-              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.875rem;font-weight:500;color:var(--ds-semantic-text-primary);line-height:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div>
-              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.75rem;color:var(--ds-semantic-text-tertiary);line-height:1.125rem">{{ row.handle }}</div>
+              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.875rem;font-weight:500;color:var(--ds-text-strong);line-height:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.name }}</div>
+              <div style="font-family:var(--ds-typography-font-family-poppins);font-size:0.75rem;color:var(--ds-text-subtle);line-height:1.125rem">{{ row.handle }}</div>
             </div>
           </div>
         </template>
@@ -156,7 +156,7 @@ export const WithPagination: Story = {
         <template #cell-tags="{ row }">
           <div style="display:flex;flex-wrap:nowrap;align-items:center;gap:4px;overflow:hidden">
             <Badge v-for="(tag, i) in row.tags.slice(0, 3)" :key="tag" :label="tag" :color="TAG_COLORS[i % TAG_COLORS.length]" size="sm" />
-            <Badge v-if="row.tags.length > 3" :label="'+' + (row.tags.length - 3)" color="gray" size="sm" />
+            <Badge v-if="row.tags.length > 3" :label="'+' + (row.tags.length - 3)" tone="neutral" size="sm" />
           </div>
         </template>
         <template #cell-actions="{ row }">
@@ -192,5 +192,31 @@ export const Empty: Story = {
       }
     },
     template: `<Table :columns="columns" :rows="rows" empty-text="Aucun membre trouvé." />`,
+  }),
+}
+
+/**
+ * ADR-0026: skeleton → content is the most-watched transition in a data product,
+ * because it fires on every page load. Toggle it and watch the shimmer hand over
+ * rather than snap.
+ */
+export const LoadingHandover: Story = {
+  name: 'Loading handover',
+  render: () => ({
+    setup: () => ({ loading: ref(true), columns: COLUMNS, rows: ROWS }),
+    components: { Table },
+    template: `
+      <div style="display: flex; flex-direction: column; gap: var(--ds-spacing-xl); align-items: flex-start;">
+        <button
+          id="toggle-loading"
+          type="button"
+          @click="loading = !loading"
+          style="font: var(--ds-font-label-lg); padding: var(--ds-control-padding-sm);
+                 border: var(--ds-border-width-default) solid var(--ds-border-default);
+                 border-radius: var(--ds-radius-control); background: var(--ds-bg-default); cursor: pointer;"
+        >{{ loading ? 'Charger' : 'Recharger' }}</button>
+        <Table :columns="columns" :rows="rows" :loading="loading" />
+      </div>
+    `,
   }),
 }

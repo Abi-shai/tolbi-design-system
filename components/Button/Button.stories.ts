@@ -1,12 +1,13 @@
+import { ref } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { fn, userEvent, within, expect } from '@storybook/test'
 import Button from './Button.vue'
 import StoryGrid from '../../stories/StoryGrid.vue'
 
 const meta: Meta<typeof Button> = {
-  title: 'Components/Button',
+  title: 'Actions/Button',
   component: Button,
-  tags: [],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {},
@@ -216,5 +217,30 @@ export const AllSizes: Story = {
       ],
     }),
     template: `<StoryGrid :items="items" />`,
+  }),
+}
+
+/**
+ * ADR-0027: a button must not shrink while it loads. Toggle it and watch the
+ * width — the spinner takes the label's place without moving anything.
+ */
+export const LoadingKeepsWidth: Story = {
+  name: 'Loading keeps its width',
+  render: () => ({
+    setup: () => ({ busy: ref(false) }),
+    components: { Button },
+    template: `
+      <div style="display: flex; flex-direction: column; gap: var(--ds-spacing-xl); align-items: flex-start;">
+        <Button id="subject" label="Enregistrer les modifications" :loading="busy" />
+        <button
+          id="toggle-busy"
+          type="button"
+          @click="busy = !busy"
+          style="font: var(--ds-font-label-lg); padding: var(--ds-control-padding-sm);
+                 border: var(--ds-border-width-default) solid var(--ds-border-default);
+                 border-radius: var(--ds-radius-control); background: var(--ds-bg-default); cursor: pointer;"
+        >{{ busy ? 'Terminer' : 'Charger' }}</button>
+      </div>
+    `,
   }),
 }

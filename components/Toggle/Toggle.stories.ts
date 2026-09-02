@@ -3,9 +3,9 @@ import { ref } from 'vue'
 import Toggle from './Toggle.vue'
 
 const meta: Meta<typeof Toggle> = {
-  title: 'Components/Toggle',
+  title: 'Saisie/Toggle',
   component: Toggle,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'wip'],
   parameters: {
     layout: 'centered',
     docs: {

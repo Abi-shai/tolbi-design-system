@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/* token-lint-disable no-literal-dimension-js — the value scales with the ring
+   diameter; 30px, 36px and 48px are off the type ramp. Component tokens per
+   ADR-0010, recorded in ADR-0011. */
 import { computed } from 'vue'
 
 export type ProgressCircleSize  = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
@@ -31,7 +34,10 @@ const SIZE_MAP: Record<ProgressCircleSize, { diameter: number; strokeWidth: numb
 const HALF_OFFSET_NO_LABEL:   Record<ProgressCircleSize, number> = { xxs: 5, xs: 22, sm: 28, md: 36, lg: 35 }
 const HALF_OFFSET_WITH_LABEL: Record<ProgressCircleSize, number> = { xxs: 5, xs: 16, sm: 21, md: 26, lg: 27 }
 
-/* ── Value text styles ───────────────────────────────────────────── */
+/* ── Value text styles ───────────────────────────────────────────────
+   Component tokens (ADR-0010): the value scales with the ring diameter, so
+   these are geometry, not typographic roles — 30px, 36px and 48px are off the
+   type ramp entirely. Kept as a table rather than dissolved into roles. */
 const VALUE_FONT: Record<ProgressCircleSize, { size: string; line: string; tracking?: string }> = {
   xxs: { size: '0.875rem', line: '1.25rem'  },
   xs:  { size: '1.5rem',   line: '2rem'     },
@@ -141,7 +147,7 @@ const labelFont = computed(() => LABEL_FONT[props.size])
           :cy="cy"
           :r="radius"
           fill="none"
-          stroke="var(--ds-semantic-bg-tertiary)"
+          stroke="var(--ds-bg-neutral)"
           :stroke-width="strokeWidth"
           :stroke-dasharray="`${arcLength} ${arcLength}`"
           stroke-linecap="butt"
@@ -153,7 +159,7 @@ const labelFont = computed(() => LABEL_FONT[props.size])
           :cy="cy"
           :r="radius"
           fill="none"
-          stroke="var(--ds-semantic-fg-brand-primary)"
+          stroke="var(--ds-text-brand)"
           :stroke-width="strokeWidth"
           :stroke-dasharray="`${arcLength} ${arcLength}`"
           :stroke-dashoffset="dashOffset"
@@ -187,7 +193,7 @@ const labelFont = computed(() => LABEL_FONT[props.size])
           fontSize:   labelFont.size,
           fontWeight: '500',
           lineHeight: labelFont.line,
-          color:      'var(--ds-semantic-text-tertiary)',
+          color:      'var(--ds-text-subtle)',
         }"
       >{{ label }}</span>
 
@@ -198,7 +204,8 @@ const labelFont = computed(() => LABEL_FONT[props.size])
           fontWeight:    '600',
           lineHeight:    valueFont.line,
           letterSpacing: valueFont.tracking ?? 'normal',
-          color:         'var(--ds-semantic-text-primary)',
+          fontVariantNumeric: 'tabular-nums',
+          color:         'var(--ds-text-strong)',
         }"
       >{{ pct }}</span>
     </div>
@@ -215,7 +222,7 @@ const labelFont = computed(() => LABEL_FONT[props.size])
         fontSize:   labelFont.size,
         fontWeight: '500',
         lineHeight: labelFont.line,
-        color:      'var(--ds-semantic-text-tertiary)',
+        color:      'var(--ds-text-subtle)',
         whiteSpace: 'nowrap',
       }"
     >{{ label }}</span>

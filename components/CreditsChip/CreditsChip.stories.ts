@@ -3,9 +3,9 @@ import CreditsChip from './CreditsChip.vue'
 import Docs from './CreditsChip.mdx'
 
 const meta: Meta<typeof CreditsChip> = {
-  title: 'Components/CreditsChip',
+  title: 'Étiquettes/CreditsChip',
   component: CreditsChip,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
   parameters: {
     layout: 'centered',
     docs: { page: Docs },

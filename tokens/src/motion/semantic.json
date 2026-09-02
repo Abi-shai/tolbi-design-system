@@ -1,0 +1,75 @@
+{
+  "motion": {
+    "duration": {
+      "instant": {
+        "$value": "50ms",
+        "$type": "duration",
+        "$description": "Imperceptible confirm — press states, focus rings"
+      },
+      "quick": {
+        "$value": "100ms",
+        "$type": "duration",
+        "$description": "Immediate feedback — responds before you finish the gesture"
+      },
+      "moderate": {
+        "$value": "150ms",
+        "$type": "duration",
+        "$description": "State changes that communicate meaning — buttons, toggles, inputs"
+      },
+      "enter": {
+        "$value": "200ms",
+        "$type": "duration",
+        "$description": "Entering elements — the interface makes room"
+      },
+      "exit": {
+        "$value": "100ms",
+        "$type": "duration",
+        "$description": "Leaving elements. Deliberately faster than `enter` — a surface should get out of the way quicker than it arrives. Same value as `quick`, a different decision (ADR-0021)"
+      },
+      "process": {
+        "$value": "300ms",
+        "$type": "duration",
+        "$description": "Data in motion — progress bars, calculations"
+      },
+      "considered": {
+        "$value": "400ms",
+        "$type": "duration",
+        "$description": "Heavy surfaces — modals, drawers, destructive confirmations"
+      }
+    },
+    "easing": {
+      "default": {
+        "$value": "cubic-bezier(0.25, 0, 0, 1)",
+        "$type": "cubicBezier",
+        "$description": "Grounded — responds instantly, settles with weight. Default for state changes."
+      },
+      "in": {
+        "$value": "cubic-bezier(0.4, 0, 1, 1)",
+        "$type": "cubicBezier",
+        "$description": "Exit — accelerates away. The interface steps aside without lingering."
+      },
+      "out": {
+        "$value": "cubic-bezier(0, 0, 0.2, 1)",
+        "$type": "cubicBezier",
+        "$description": "Enter — decelerates into position. The interface makes room for you."
+      },
+      "in-out": {
+        "$value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "$type": "cubicBezier",
+        "$description": "Spatial — lateral movement. Tab indicator, drawer slides."
+      }
+    },
+    "scale": {
+      "enter": {
+        "$value": "0.96",
+        "$type": "number",
+        "$description": "A floating surface enters at 96% and settles at 100%, scaled from its anchor. Dropdown had 0.98 and HelpIcon 0.96 — one decision, one value (ADR-0021)"
+      },
+      "mark": {
+        "$value": "0.6",
+        "$type": "number",
+        "$description": "A mark stamps in from 60% — a check, a radio dot, a completed step. Smaller and faster than a surface, because it confirms rather than arrives (ADR-0023)"
+      }
+    }
+  }
+}

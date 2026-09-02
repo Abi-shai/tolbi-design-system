@@ -1,0 +1,41 @@
+{
+  "chart": {
+    "categorical": {
+      "1": {
+        "$value": "{color.display.indigo.500}",
+        "$type": "color",
+        "$description": "series 1 — indigo. most distinct pair anchors the ramp"
+      },
+      "2": {
+        "$value": "{color.display.orange.500}",
+        "$type": "color",
+        "$description": "series 2 — orange"
+      },
+      "3": {
+        "$value": "{color.display.blue-light.500}",
+        "$type": "color",
+        "$description": "series 3 — blue-light"
+      },
+      "4": {
+        "$value": "{color.display.pink.500}",
+        "$type": "color",
+        "$description": "series 4 — pink"
+      },
+      "5": {
+        "$value": "{color.display.blue-gray.500}",
+        "$type": "color",
+        "$description": "series 5 — blue-gray. min ΔE 35.5 to any earlier series — the comfortable ceiling"
+      },
+      "6": {
+        "$value": "{color.display.blue.500}",
+        "$type": "color",
+        "$description": "series 6 — blue. min ΔE 24.3 — acceptable only if not adjacent to series 1"
+      },
+      "7": {
+        "$value": "{color.display.purple.500}",
+        "$type": "color",
+        "$description": "series 7 — purple. min ΔE 16.1 to purple's neighbour; past this, aggregate rather than add a colour"
+      }
+    }
+  }
+}

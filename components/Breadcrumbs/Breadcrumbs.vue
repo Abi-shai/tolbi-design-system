@@ -63,16 +63,16 @@ defineProps<Props>()
   padding: var(--ds-spacing-xs, 4px);
   background: transparent;
   border: none;
-  border-radius: var(--ds-radius-sm);
-  color: var(--ds-semantic-fg-tertiary);
+  border-radius: var(--ds-radius-inner);
+  color: var(--ds-text-subtle);
   cursor: pointer;
   outline: none;
   transition: background-color 150ms ease, color 150ms ease;
 }
 
 .ds-breadcrumbs__home:hover {
-  background-color: var(--ds-semantic-bg-secondary);
-  color: var(--ds-semantic-fg-secondary);
+  background-color: var(--ds-bg-neutral-subtle);
+  color: var(--ds-text-default);
 }
 
 .ds-breadcrumbs__home:focus-visible {
@@ -82,27 +82,24 @@ defineProps<Props>()
 .ds-breadcrumbs__separator {
   display: flex;
   align-items: center;
-  color: var(--ds-semantic-fg-tertiary);
+  color: var(--ds-text-subtle);
 }
 
 .ds-breadcrumbs__crumb {
   display: flex;
   align-items: center;
   padding: var(--ds-spacing-xs, 4px) var(--ds-spacing-md, 8px);
-  border-radius: var(--ds-radius-sm);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-size: var(--ds-font-size-label-lg);
-  line-height: var(--ds-line-height-label-lg);
-  font-weight: 500;
-  color: var(--ds-semantic-fg-tertiary);
+  border-radius: var(--ds-radius-inner);
+  font: var(--ds-font-label-lg);
+  color: var(--ds-text-subtle);
   text-decoration: none;
   white-space: nowrap;
   transition: background-color 150ms ease, color 150ms ease;
 }
 
 a.ds-breadcrumbs__crumb:hover:not(.ds-breadcrumbs__crumb--current) {
-  background-color: var(--ds-semantic-bg-secondary);
-  color: var(--ds-semantic-fg-secondary);
+  background-color: var(--ds-bg-neutral-subtle);
+  color: var(--ds-text-default);
 }
 
 a.ds-breadcrumbs__crumb:focus-visible {
@@ -111,9 +108,9 @@ a.ds-breadcrumbs__crumb:focus-visible {
 }
 
 .ds-breadcrumbs__crumb--current {
-  background-color: var(--ds-semantic-bg-brand-primary);
-  color: var(--ds-semantic-text-brand-secondary);
+  background-color: var(--ds-bg-selected);
+  color: var(--ds-text-on-brand-subtle);
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 600;
+  font-weight: var(--ds-font-weight-label-lg-strong);
 }
 </style>

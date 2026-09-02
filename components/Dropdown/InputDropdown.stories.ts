@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { ref } from 'vue'
 import InputDropdown from './InputDropdown.vue'
+import FormField from '../FormField/FormField.vue'
 import type { InputDropdownOption } from './InputDropdown.vue'
 
 const teamMembers: InputDropdownOption[] = [
@@ -17,16 +18,16 @@ const teamMembers: InputDropdownOption[] = [
 const iconMembers: InputDropdownOption[] = teamMembers.map(m => ({ ...m, icon: 'user' as const }))
 
 const dotMembers: InputDropdownOption[] = [
-  { value: 'active',   label: 'Active',   supportingText: 'Online now',    dotColor: 'var(--ds-semantic-fg-success-primary)' },
-  { value: 'away',     label: 'Away',     supportingText: 'Be right back', dotColor: 'var(--ds-semantic-fg-warning-primary)' },
-  { value: 'offline',  label: 'Offline',  supportingText: 'Not available', dotColor: 'var(--ds-semantic-fg-quarterary)'      },
-  { value: 'busy',     label: 'Busy',     supportingText: 'Do not disturb',dotColor: 'var(--ds-semantic-fg-error-primary)'   },
+  { value: 'active',   label: 'Active',   supportingText: 'Online now',    dotColor: 'var(--ds-text-success)' },
+  { value: 'away',     label: 'Away',     supportingText: 'Be right back', dotColor: 'var(--ds-text-warning)' },
+  { value: 'offline',  label: 'Offline',  supportingText: 'Not available', dotColor: 'var(--ds-text-subtlest)'      },
+  { value: 'busy',     label: 'Busy',     supportingText: 'Do not disturb',dotColor: 'var(--ds-text-error)'   },
 ]
 
 const meta: Meta<typeof InputDropdown> = {
-  title: 'Components/InputDropdown',
+  title: 'Saisie/InputDropdown',
   component: InputDropdown,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'wip'],
   parameters: {
     layout: 'centered',
     docs: {
@@ -41,17 +42,9 @@ const meta: Meta<typeof InputDropdown> = {
       options: ['default', 'icon-leading', 'avatar-leading', 'dot-leading', 'search'],
       table: { category: 'Apparence', defaultValue: { summary: "'default'" } },
     },
-    label: {
-      control: 'text',
-      table: { category: 'Contenu' },
-    },
     placeholder: {
       control: 'text',
       table: { category: 'Contenu', defaultValue: { summary: "'Select...'" } },
-    },
-    hintText: {
-      control: 'text',
-      table: { category: 'Contenu' },
     },
     modelValue: {
       control: 'text',
@@ -60,9 +53,7 @@ const meta: Meta<typeof InputDropdown> = {
   },
   args: {
     type: 'default',
-    label: 'Team member',
     placeholder: 'Select team member',
-    hintText: 'This is a hint text to help user.',
     options: teamMembers,
     modelValue: null,
   },
@@ -76,18 +67,18 @@ type Story = StoryObj<typeof meta>
 export const Playground: Story = {
   name: 'Playground',
   render: (args) => ({
-    components: { InputDropdown },
+    components: { InputDropdown, FormField },
     setup() {
       const value = ref(args.modelValue ?? null)
       return { args, value }
     },
     template: `
-      <div style="width: 320px;">
+      <FormField label="Team member" hint="This is a hint text to help user." style="width: 320px;">
         <InputDropdown
           v-bind="args"
           v-model="value"
         />
-      </div>
+      </FormField>
     `,
   }),
 }
@@ -98,7 +89,7 @@ export const AllTypes: Story = {
   name: 'All types',
   parameters: { layout: 'padded' },
   render: () => ({
-    components: { InputDropdown },
+    components: { InputDropdown, FormField },
     setup() {
       const defaultVal     = ref('olivia')
       const iconVal        = ref('olivia')
@@ -116,64 +107,38 @@ export const AllTypes: Story = {
       ]
       const iconMembers: InputDropdownOption[]   = teamMembers.map(m => ({ ...m, icon: 'user' as const }))
       const dotMembers: InputDropdownOption[] = [
-        { value: 'active',  label: 'Active',  supportingText: 'Online now',     dotColor: 'var(--ds-semantic-fg-success-primary)' },
-        { value: 'away',    label: 'Away',    supportingText: 'Be right back',  dotColor: 'var(--ds-semantic-fg-warning-primary)' },
-        { value: 'offline', label: 'Offline', supportingText: 'Not available',  dotColor: 'var(--ds-semantic-fg-quarterary)'      },
+        { value: 'active',  label: 'Active',  supportingText: 'Online now',     dotColor: 'var(--ds-text-success)' },
+        { value: 'away',    label: 'Away',    supportingText: 'Be right back',  dotColor: 'var(--ds-text-warning)' },
+        { value: 'offline', label: 'Offline', supportingText: 'Not available',  dotColor: 'var(--ds-text-subtlest)'      },
       ]
       return { defaultVal, iconVal, avatarVal, dotVal, searchVal, teamMembers, iconMembers, dotMembers }
     },
     template: `
       <div style="display: flex; gap: 48px; align-items: flex-start; padding: 24px; flex-wrap: wrap;">
         <div style="width: 320px;">
-          <InputDropdown
-            type="default"
-            label="Default"
-            placeholder="Select team member"
-            hint-text="This is a hint text to help user."
-            :options="teamMembers"
-            v-model="defaultVal"
-          />
+          <FormField label="Default">
+            <InputDropdown type="default" placeholder="Select team member" hint-text="This is a hint text to help user." :options="teamMembers" v-model="defaultVal" />
+          </FormField>
         </div>
         <div style="width: 320px;">
-          <InputDropdown
-            type="icon-leading"
-            label="Icon leading"
-            placeholder="Select team member"
-            hint-text="This is a hint text to help user."
-            leading-icon="user"
-            :options="iconMembers"
-            v-model="iconVal"
-          />
+          <FormField label="Icon leading">
+            <InputDropdown type="icon-leading" placeholder="Select team member" hint-text="This is a hint text to help user." leading-icon="user" :options="iconMembers" v-model="iconVal" />
+          </FormField>
         </div>
         <div style="width: 320px;">
-          <InputDropdown
-            type="avatar-leading"
-            label="Avatar leading"
-            placeholder="Select team member"
-            hint-text="This is a hint text to help user."
-            :options="teamMembers"
-            v-model="avatarVal"
-          />
+          <FormField label="Avatar leading">
+            <InputDropdown type="avatar-leading" placeholder="Select team member" hint-text="This is a hint text to help user." :options="teamMembers" v-model="avatarVal" />
+          </FormField>
         </div>
         <div style="width: 320px;">
-          <InputDropdown
-            type="dot-leading"
-            label="Dot leading"
-            placeholder="Select status"
-            hint-text="This is a hint text to help user."
-            :options="dotMembers"
-            v-model="dotVal"
-          />
+          <FormField label="Dot leading">
+            <InputDropdown type="dot-leading" placeholder="Select status" hint-text="This is a hint text to help user." :options="dotMembers" v-model="dotVal" />
+          </FormField>
         </div>
         <div style="width: 320px;">
-          <InputDropdown
-            type="search"
-            label="Search"
-            placeholder="Search team member"
-            hint-text="This is a hint text to help user."
-            :options="teamMembers"
-            v-model="searchVal"
-          />
+          <FormField label="Search">
+            <InputDropdown type="search" placeholder="Search team member" hint-text="This is a hint text to help user." :options="teamMembers" v-model="searchVal" />
+          </FormField>
         </div>
       </div>
     `,
@@ -186,7 +151,7 @@ export const Placeholder: Story = {
   name: 'Placeholder states',
   parameters: { layout: 'padded' },
   render: () => ({
-    components: { InputDropdown },
+    components: { InputDropdown, FormField },
     setup() {
       const teamMembers: InputDropdownOption[] = [
         { value: 'olivia', label: 'Olivia Rhye', supportingText: '@olivia' },
@@ -194,26 +159,36 @@ export const Placeholder: Story = {
       ]
       const iconMembers = teamMembers.map(m => ({ ...m, icon: 'user' as const }))
       const dotMembers: InputDropdownOption[] = [
-        { value: 'active', label: 'Active', supportingText: 'Online now', dotColor: 'var(--ds-semantic-fg-success-primary)' },
+        { value: 'active', label: 'Active', supportingText: 'Online now', dotColor: 'var(--ds-text-success)' },
       ]
       return { teamMembers, iconMembers, dotMembers }
     },
     template: `
       <div style="display: flex; gap: 32px; align-items: flex-start; padding: 24px; flex-wrap: wrap;">
         <div style="width: 320px;">
-          <InputDropdown type="default"       label="Default"       placeholder="Select team member" :options="teamMembers" />
+          <FormField label="Default">
+            <InputDropdown type="default" placeholder="Select team member" :options="teamMembers" />
+          </FormField>
         </div>
         <div style="width: 320px;">
-          <InputDropdown type="icon-leading"  label="Icon leading"  placeholder="Select team member" leading-icon="user" :options="iconMembers" />
+          <FormField label="Icon leading">
+            <InputDropdown type="icon-leading" placeholder="Select team member" leading-icon="user" :options="iconMembers" />
+          </FormField>
         </div>
         <div style="width: 320px;">
-          <InputDropdown type="avatar-leading" label="Avatar leading" placeholder="Select team member" :options="teamMembers" />
+          <FormField label="Avatar leading">
+            <InputDropdown type="avatar-leading" placeholder="Select team member" :options="teamMembers" />
+          </FormField>
         </div>
         <div style="width: 320px;">
-          <InputDropdown type="dot-leading"   label="Dot leading"   placeholder="Select status"      :options="dotMembers" />
+          <FormField label="Dot leading">
+            <InputDropdown type="dot-leading" placeholder="Select status" :options="dotMembers" />
+          </FormField>
         </div>
         <div style="width: 320px;">
-          <InputDropdown type="search"        label="Search"        placeholder="Search team member" :options="teamMembers" />
+          <FormField label="Search">
+            <InputDropdown type="search" placeholder="Search team member" :options="teamMembers" />
+          </FormField>
         </div>
       </div>
     `,

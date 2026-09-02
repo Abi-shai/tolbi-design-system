@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, watch, nextTick } from 'vue'
+import { useSlidingIndicator } from '../../composables/useSlidingIndicator'
 import { Badge } from '../Badge'
 
 export type TabsSize = 'sm' | 'md'
@@ -28,42 +29,15 @@ const badgeSize = computed(() => (props.size === 'md' ? 'md' : 'sm') as 'sm' | '
 const activeIndex = computed(() => props.tabs.findIndex(t => t.value === props.modelValue))
 
 // ── Sliding indicator ──────────────────────────────────────────────────
-const containerRef = ref<HTMLDivElement>()
-const tabRefs = ref<HTMLButtonElement[]>([])
-const indicatorStyle = ref({ transform: 'translateX(0px)', width: '0px', top: '0px', height: '0px' })
-const indicatorReady = ref(false)
+const {
+  containerRef,
+  itemRefs: tabRefs,
+  style: indicatorStyle,
+  ready: indicatorReady,
+  measure,
+} = useSlidingIndicator(activeIndex)
 
-function updateIndicator(index: number) {
-  const btn = tabRefs.value[index]
-  if (!btn) return
-  indicatorStyle.value = {
-    transform: `translateX(${btn.offsetLeft}px)`,
-    width:     `${btn.offsetWidth}px`,
-    top:       `${btn.offsetTop}px`,
-    height:    `${btn.offsetHeight}px`,
-  }
-}
-
-let ro: ResizeObserver | null = null
-
-onMounted(async () => {
-  await nextTick()
-  updateIndicator(activeIndex.value)
-  // Enable transition only after the first paint so there's no jump on mount
-  requestAnimationFrame(() => { indicatorReady.value = true })
-
-  ro = new ResizeObserver(() => updateIndicator(activeIndex.value))
-  if (containerRef.value) ro.observe(containerRef.value)
-})
-
-onUnmounted(() => ro?.disconnect())
-
-watch(activeIndex, (idx) => { if (idx !== -1) updateIndicator(idx) })
-
-watch(() => props.tabs, async () => {
-  await nextTick()
-  updateIndicator(activeIndex.value)
-}, { deep: true })
+watch(() => props.tabs, async () => { await nextTick(); measure() }, { deep: true })
 
 // ── Keyboard navigation ────────────────────────────────────────────────
 function activate(index: number) {
@@ -110,7 +84,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
       <Badge
         v-if="tab.badge !== undefined"
         :label="String(tab.badge)"
-        color="gray"
+        tone="neutral"
         variant="pill-color"
         :size="badgeSize"
       />
@@ -125,19 +99,19 @@ function onKeydown(e: KeyboardEvent, i: number) {
   display: flex;
   align-items: center;
   width: 100%;
-  background-color: var(--ds-semantic-bg-secondary);
-  border: 1px solid var(--ds-semantic-border-secondary);
-  gap: 4px;
+  background-color: var(--ds-bg-neutral-subtle);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  gap: var(--ds-spacing-xs);
 }
 
 .ds-tabs--md {
-  padding: 6px;
-  border-radius: var(--ds-radius-xl);
+  padding: var(--ds-spacing-sm);
+  border-radius: var(--ds-radius-surface);
 }
 
 .ds-tabs--sm {
-  padding: 4px;
-  border-radius: var(--ds-radius-lg);
+  padding: var(--ds-spacing-xs);
+  border-radius: var(--ds-radius-surface-sm);
 }
 
 /* ── Sliding indicator ─────────────────────────────────────────────── */
@@ -145,9 +119,9 @@ function onKeydown(e: KeyboardEvent, i: number) {
   position: absolute;
   left: 0;
   top: 0;
-  border-radius: var(--ds-radius-sm);
-  background-color: var(--ds-semantic-bg-primary);
-  box-shadow: var(--ds-shadow-sm);
+  border-radius: var(--ds-radius-inner);
+  background-color: var(--ds-bg-default);
+  box-shadow: var(--ds-elevation-surface);
   pointer-events: none;
   z-index: 0;
   /* No transition until after first paint to prevent mount jump */
@@ -162,19 +136,19 @@ function onKeydown(e: KeyboardEvent, i: number) {
 /* ── Tab button (base) ─────────────────────────────────────────────── */
 .ds-tabs__tab {
   position: relative;
-  z-index: 1;
+  z-index: var(--ds-z-raised);
   display: flex;
   flex: 1 0 0;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   min-width: 1px;
   overflow: hidden;
-  padding: 8px 12px;
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
   background: transparent;
   border: none;
-  border-radius: var(--ds-radius-sm);
-  color: var(--ds-semantic-text-quarterary);
+  border-radius: var(--ds-radius-inner);
+  color: var(--ds-text-subtlest);
   cursor: pointer;
   outline: none;
   transition: color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
@@ -190,13 +164,13 @@ function onKeydown(e: KeyboardEvent, i: number) {
 
 /* ── Hover — subtle tint, text promotes, clearly lighter than active ── */
 .ds-tabs__tab:not(.ds-tabs__tab--active):hover {
-  background-color: rgba(255, 255, 255, 0.5);
-  color: var(--ds-semantic-text-secondary);
+  background-color: color-mix(in srgb, var(--ds-bg-default) 50%, transparent);
+  color: var(--ds-text-default);
 }
 
 /* ── Active — indicator provides the card; button carries text color ── */
 .ds-tabs__tab--active {
-  color: var(--ds-semantic-text-secondary);
+  color: var(--ds-text-default);
 }
 
 /* ── Focus (inactive) — ring only, no extra bg needed ─────────────── */
@@ -212,17 +186,15 @@ function onKeydown(e: KeyboardEvent, i: number) {
 /* ── Label ─────────────────────────────────────────────────────────── */
 .ds-tabs__label {
   font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 600;
+  font-weight: var(--ds-font-weight-label-lg-strong);
   white-space: nowrap;
 }
 
 .ds-tabs--md .ds-tabs__label {
-  font-size: var(--ds-font-size-heading-md);
-  line-height: var(--ds-line-height-heading-md);
+  font: var(--ds-font-heading-md);
 }
 
 .ds-tabs--sm .ds-tabs__label {
-  font-size: var(--ds-font-size-heading-sm);
-  line-height: var(--ds-line-height-heading-sm);
+  font: var(--ds-font-heading-sm);
 }
 </style>

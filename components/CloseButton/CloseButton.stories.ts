@@ -4,7 +4,7 @@ import CloseButton from './CloseButton.vue'
 import StoryGrid from '../../stories/StoryGrid.vue'
 
 const meta: Meta<typeof CloseButton> = {
-  title: 'Components/CloseButton',
+  title: 'Actions/CloseButton',
   component: CloseButton,
   tags: ['wip'],
   parameters: {

@@ -48,7 +48,7 @@ const emit = defineEmits<{
 .ds-dropdown-item {
   display: flex;
   align-items: center;
-  padding: 1px 6px;
+  padding: 1px var(--ds-spacing-sm);
   cursor: pointer;
   flex-shrink: 0;
   width: 100%;
@@ -58,16 +58,16 @@ const emit = defineEmits<{
 .ds-dropdown-item__content {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--ds-spacing-lg);
   flex: 1;
   min-width: 0;
   padding: 9px 10px;
-  border-radius: var(--ds-radius-sm);
+  border-radius: var(--ds-radius-inner);
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-dropdown-item:hover:not(.ds-dropdown-item--disabled) .ds-dropdown-item__content {
-  background-color: var(--ds-semantic-bg-primary-hover);
+  background-color: var(--ds-bg-hover);
 }
 
 .ds-dropdown-item:focus-visible {
@@ -75,7 +75,7 @@ const emit = defineEmits<{
 }
 
 .ds-dropdown-item:focus-visible .ds-dropdown-item__content {
-  background-color: var(--ds-semantic-bg-primary-hover);
+  background-color: var(--ds-bg-hover);
 }
 
 .ds-dropdown-item--disabled {
@@ -86,22 +86,18 @@ const emit = defineEmits<{
 .ds-dropdown-item__icon-text {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--ds-spacing-md);
   flex: 1;
   min-width: 0;
 }
 
 .ds-dropdown-item__icon {
   flex-shrink: 0;
-  color: var(--ds-semantic-fg-secondary);
+  color: var(--ds-text-default);
 }
 
-.ds-dropdown-item__label {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 500;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: var(--ds-semantic-text-secondary);
+.ds-dropdown-item__label {  font: var(--ds-font-label-lg);
+  color: var(--ds-text-default);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -109,12 +105,8 @@ const emit = defineEmits<{
   min-width: 0;
 }
 
-.ds-dropdown-item__shortcut {
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: 400;
-  font-size: 0.75rem;
-  line-height: 1.125rem;
-  color: var(--ds-semantic-text-quarterary);
+.ds-dropdown-item__shortcut {  font: var(--ds-font-body-sm);
+  color: var(--ds-text-subtlest);
   white-space: nowrap;
   flex-shrink: 0;
 }

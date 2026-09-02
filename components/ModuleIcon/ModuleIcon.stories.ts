@@ -4,9 +4,9 @@ import ModuleIconDocs from './ModuleIcon.mdx'
 import { moduleNames } from './registry'
 
 const meta: Meta<typeof ModuleIcon> = {
-  title: 'Primitives/ModuleIcon',
+  title: 'Identité & média/ModuleIcon',
   component: ModuleIcon,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable', 'primitive'],
   parameters: {
     layout: 'centered',
     docs: { page: ModuleIconDocs },
@@ -72,7 +72,7 @@ const GRID = (variant: 'logo' | 'illustration') => ({
         style="display:flex; flex-direction:column; align-items:center; gap:10px; width:88px;"
       >
         <ModuleIcon :module="mod" :variant="variant" :size="48" />
-        <span style="font-size:0.7rem; color:var(--ds-semantic-text-tertiary); text-align:center;">{{ mod }}</span>
+        <span style="font-size:0.7rem; color:var(--ds-text-subtle); text-align:center;">{{ mod }}</span>
       </div>
     </div>
   `,
@@ -131,14 +131,14 @@ export const Pairing: Story = {
           <div
             v-for="mod in modules"
             :key="mod"
-            style="display:flex; flex-direction:column; align-items:center; gap:0.75rem; padding:0.875rem; border:1px solid var(--ds-semantic-border-secondary); border-radius:var(--ds-radius-xl);"
+            style="display:flex; flex-direction:column; align-items:center; gap:0.75rem; padding:0.875rem; border:1px solid var(--ds-border-subtle); border-radius:var(--ds-radius-surface);"
           >
             <div style="display:flex; align-items:center; gap:0.75rem;">
               <ModuleIcon :module="mod" variant="illustration" :size="48" />
-              <span style="color:var(--ds-semantic-fg-quinary);">→</span>
+              <span style="color:var(--ds-text-subtlest);">→</span>
               <ModuleIcon :module="mod" variant="logo" :size="48" />
             </div>
-            <span style="font-size:0.7rem; color:var(--ds-semantic-text-tertiary);">{{ mod }}</span>
+            <span style="font-size:0.7rem; color:var(--ds-text-subtle);">{{ mod }}</span>
           </div>
         </div>
       </div>
@@ -156,7 +156,7 @@ export const Sizes: Story = {
       <div style="display:flex; gap:2rem; align-items:flex-end; padding:1.5rem; font-family:var(--ds-typography-font-family-poppins);">
         <div v-for="s in sizes" :key="s" style="display:flex; flex-direction:column; align-items:center; gap:0.75rem;">
           <ModuleIcon module="Carbone" :size="s" />
-          <span style="font-family:monospace; font-size:0.7rem; color:var(--ds-semantic-text-tertiary);">{{ s }}px</span>
+          <span style="font-family:monospace; font-size:0.7rem; color:var(--ds-text-subtle);">{{ s }}px</span>
         </div>
       </div>
     `,

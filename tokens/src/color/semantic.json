@@ -1,0 +1,338 @@
+{
+  "text": {
+    "strong": {
+      "$value": "{color.gray-light.900}",
+      "$type": "color",
+      "$description": "contract — 17.75:1 on bg-default, 16.98:1 on bg-neutral-subtle"
+    },
+    "default": {
+      "$value": "{color.gray-light.700}",
+      "$type": "color",
+      "$description": "contract — 10.46:1 on bg-default"
+    },
+    "default-hover": {
+      "$value": "{color.gray-light.800}",
+      "$type": "color",
+      "$description": "state — hover partner of text-default"
+    },
+    "subtle": {
+      "$value": "{color.gray-light.600}",
+      "$type": "color",
+      "$description": "contract — 7.69:1 on bg-default"
+    },
+    "subtlest": {
+      "$value": "{color.gray-light.500}",
+      "$type": "color",
+      "$description": "contract — 4.97:1 on bg-default. The floor: gray-400 is 2.58:1 and has no foreground name"
+    },
+    "disabled": {
+      "$value": "{color.gray-light.500}",
+      "$type": "color",
+      "$description": "state"
+    },
+    "placeholder": {
+      "$value": "{color.gray-light.500}",
+      "$type": "color",
+      "$description": "contract — 4.97:1 on bg-default"
+    },
+    "brand": {
+      "$value": "{color.brand.600}",
+      "$type": "color",
+      "$description": "contract — 7.70:1 on bg-default"
+    },
+    "brand-hover": {
+      "$value": "{color.brand.700}",
+      "$type": "color",
+      "$description": "state — hover partner of text-brand. 10.28:1 on bg-default, 8.83:1 on bg-brand-subtle"
+    },
+    "error": {
+      "$value": "{color.error.600}",
+      "$type": "color",
+      "$description": "contract — 4.83:1 on bg-default. NOT valid on bg-error-subtle (4.44) — use text-on-error-subtle"
+    },
+    "warning": {
+      "$value": "{color.warning.600}",
+      "$type": "color",
+      "$description": "contract — on bg-default only. NOT valid on bg-warning-subtle (3.34)"
+    },
+    "success": {
+      "$value": "{color.success.600}",
+      "$type": "color",
+      "$description": "contract — on bg-default only. NOT valid on bg-success-subtle (3.70)"
+    },
+    "on-brand-subtle": {
+      "$value": "{color.brand.700}",
+      "$type": "color",
+      "$description": "contract — 8.83:1 on bg-brand-subtle / bg-selected"
+    },
+    "on-error-subtle": {
+      "$value": "{color.error.700}",
+      "$type": "color",
+      "$description": "contract — 6.05:1 on bg-error-subtle"
+    },
+    "on-warning-subtle": {
+      "$value": "{color.warning.700}",
+      "$type": "color",
+      "$description": "contract — 5.20:1 on bg-warning-subtle"
+    },
+    "on-success-subtle": {
+      "$value": "{color.success.700}",
+      "$type": "color",
+      "$description": "contract — 5.40:1 on bg-success-subtle"
+    },
+    "on-brand-solid": {
+      "$value": "{color.base.white}",
+      "$type": "color",
+      "$description": "contract — 7.70:1 on bg-brand-solid"
+    },
+    "on-error-solid": {
+      "$value": "{color.base.white}",
+      "$type": "color",
+      "$description": "contract — 4.83:1 on bg-error-solid"
+    },
+    "on-warning-solid": {
+      "$value": "{color.base.white}",
+      "$type": "color",
+      "$description": "contract — 5.43:1 on bg-warning-solid"
+    },
+    "on-success-solid": {
+      "$value": "{color.base.white}",
+      "$type": "color",
+      "$description": "contract — 5.69:1 on bg-success-solid"
+    },
+    "on-inverse": {
+      "$value": "{color.base.white}",
+      "$type": "color",
+      "$description": "contract — 18.86:1 on bg-inverse"
+    },
+    "on-inverse-subtle": {
+      "$value": "{color.gray-light.300}",
+      "$type": "color",
+      "$description": "contract — 12.85:1 on bg-inverse. Tooltip description text"
+    }
+  },
+  "bg": {
+    "default": {
+      "$value": "{color.base.white}",
+      "$type": "color",
+      "$description": "ground — the page, cards, fields. All text-* are legible here"
+    },
+    "hover": {
+      "$value": "{color.gray-light.50}",
+      "$type": "color",
+      "$description": "state — hover on bg-default"
+    },
+    "selected": {
+      "$value": "{color.brand.50}",
+      "$type": "color",
+      "$description": "state — chosen from a list. Pairs with text-on-brand-subtle. Segmented-control selection is a component token, not this"
+    },
+    "selected-hover": {
+      "$value": "{color.brand.100}",
+      "$type": "color",
+      "$description": "state — hover on bg-selected"
+    },
+    "disabled": {
+      "$value": "{color.gray-light.100}",
+      "$type": "color",
+      "$description": "state"
+    },
+    "inverse": {
+      "$value": "{color.gray-light.950}",
+      "$type": "color",
+      "$description": "ground — dark surface that carries text. Pairs with text-on-inverse"
+    },
+    "overlay": {
+      "$value": "color-mix(in srgb, {color.gray-light.950} 60%, transparent)",
+      "$type": "color",
+      "$description": "contract — the scrim. bg-default separates from the dimmed page at 4.94:1; the floor is 48%, below which a dialog's own edge stops being perceivable. Alpha is baked in: a scrim that needs the caller to supply opacity ships the broken default"
+    },
+    "neutral-subtle": {
+      "$value": "{color.gray-light.50}",
+      "$type": "color",
+      "$description": "ground — recessed surfaces, tracks, the neutral tone"
+    },
+    "neutral-subtle-hover": {
+      "$value": "{color.gray-light.100}",
+      "$type": "color",
+      "$description": "state — hover on bg-neutral-subtle"
+    },
+    "neutral": {
+      "$value": "{color.gray-light.100}",
+      "$type": "color",
+      "$description": "ground — deeper recess"
+    },
+    "neutral-strong": {
+      "$value": "{color.gray-light.300}",
+      "$type": "color",
+      "$description": "ground — inert control channels: slider track, scrollbar thumb"
+    },
+    "brand-subtle": {
+      "$value": "{color.brand.50}",
+      "$type": "color",
+      "$description": "ground — pairs with text-on-brand-subtle"
+    },
+    "brand-subtle-hover": {
+      "$value": "{color.brand.100}",
+      "$type": "color",
+      "$description": "state — hover on bg-brand-subtle"
+    },
+    "brand-solid": {
+      "$value": "{color.brand.600}",
+      "$type": "color",
+      "$description": "fill — text-* is ILLEGIBLE here; use text-on-brand-solid"
+    },
+    "brand-solid-hover": {
+      "$value": "{color.brand.700}",
+      "$type": "color",
+      "$description": "state"
+    },
+    "error-subtle": {
+      "$value": "{color.error.50}",
+      "$type": "color",
+      "$description": "ground — pairs with text-on-error-subtle"
+    },
+    "error-subtle-hover": {
+      "$value": "{color.error.100}",
+      "$type": "color",
+      "$description": "state — hover on bg-error-subtle"
+    },
+    "warning-subtle": {
+      "$value": "{color.warning.50}",
+      "$type": "color",
+      "$description": "ground — pairs with text-on-warning-subtle"
+    },
+    "warning-subtle-hover": {
+      "$value": "{color.warning.100}",
+      "$type": "color",
+      "$description": "state — hover on bg-warning-subtle"
+    },
+    "success-subtle": {
+      "$value": "{color.success.50}",
+      "$type": "color",
+      "$description": "ground — pairs with text-on-success-subtle"
+    },
+    "success-subtle-hover": {
+      "$value": "{color.success.100}",
+      "$type": "color",
+      "$description": "state — hover on bg-success-subtle"
+    },
+    "error-solid": {
+      "$value": "{color.error.600}",
+      "$type": "color",
+      "$description": "fill — white is 4.83:1, passes AA at 600"
+    },
+    "error-solid-hover": {
+      "$value": "{color.error.700}",
+      "$type": "color",
+      "$description": "state"
+    },
+    "warning-solid": {
+      "$value": "{color.warning.700}",
+      "$type": "color",
+      "$description": "fill — repointed from 600, where white was 3.49:1 and failed AA"
+    },
+    "success-solid": {
+      "$value": "{color.success.700}",
+      "$type": "color",
+      "$description": "fill — repointed from 600, where white was 3.91:1 and failed AA"
+    }
+  },
+  "border": {
+    "default": {
+      "$value": "{color.gray-light.300}",
+      "$type": "color",
+      "$description": "contract — the load-bearing border"
+    },
+    "subtle": {
+      "$value": "{color.gray-light.200}",
+      "$type": "color",
+      "$description": "decorative — 1.18:1, deliberately non-load-bearing"
+    },
+    "subtlest": {
+      "$value": "{color.gray-light.100}",
+      "$type": "color",
+      "$description": "decorative — deliberately non-load-bearing"
+    },
+    "inset": {
+      "$value": "color-mix(in srgb, {color.gray-light.950} 8%, transparent)",
+      "$type": "color",
+      "$description": "decorative — the hairline that keeps a filled circular shape (an avatar) legible against any background. 8% of gray-950; 8% pure black differs by 2/255, so no black primitive is needed"
+    },
+    "disabled": {
+      "$value": "{color.gray-light.300}",
+      "$type": "color",
+      "$description": "state"
+    },
+    "brand": {
+      "$value": "{color.brand.300}",
+      "$type": "color",
+      "$description": "contract — interactive affordance"
+    },
+    "brand-solid": {
+      "$value": "{color.brand.600}",
+      "$type": "color",
+      "$description": "contract — pairs with bg-brand-solid"
+    },
+    "brand-solid-hover": {
+      "$value": "{color.brand.700}",
+      "$type": "color",
+      "$description": "state — pairs with bg-brand-solid-hover"
+    },
+    "error": {
+      "$value": "{color.error.300}",
+      "$type": "color",
+      "$description": "contract — conveys invalidity (InputField error ring)"
+    },
+    "error-solid": {
+      "$value": "{color.error.600}",
+      "$type": "color",
+      "$description": "contract — pairs with bg-error-solid"
+    },
+    "error-solid-hover": {
+      "$value": "{color.error.700}",
+      "$type": "color",
+      "$description": "state — pairs with bg-error-solid-hover"
+    },
+    "warning": {
+      "$value": "{color.warning.300}",
+      "$type": "color",
+      "$description": "contract — conveys state. Was semantic-utility-warning-300"
+    },
+    "warning-solid": {
+      "$value": "{color.warning.700}",
+      "$type": "color",
+      "$description": "contract — pairs with bg-warning-solid"
+    },
+    "success": {
+      "$value": "{color.success.300}",
+      "$type": "color",
+      "$description": "contract — conveys state. Was semantic-utility-success-300"
+    },
+    "success-solid": {
+      "$value": "{color.success.700}",
+      "$type": "color",
+      "$description": "contract — pairs with bg-success-solid"
+    },
+    "on-brand-subtle": {
+      "$value": "{color.brand.200}",
+      "$type": "color",
+      "$description": "decorative — 2.17:1 hairline on bg-brand-subtle"
+    },
+    "on-error-subtle": {
+      "$value": "{color.error.200}",
+      "$type": "color",
+      "$description": "decorative — 1.42:1 hairline on bg-error-subtle"
+    },
+    "on-warning-subtle": {
+      "$value": "{color.warning.200}",
+      "$type": "color",
+      "$description": "decorative — 1.30:1 hairline on bg-warning-subtle"
+    },
+    "on-success-subtle": {
+      "$value": "{color.success.200}",
+      "$type": "color",
+      "$description": "decorative — 1.33:1 hairline on bg-success-subtle"
+    }
+  }
+}
