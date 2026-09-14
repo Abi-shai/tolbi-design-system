@@ -24,6 +24,7 @@
   ],
   "scripts": {
     "tokens": "node tokens/build.js",
+    "prestorybook": "npm run tokens",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "npm run tokens && npm run lint && storybook build",
     "build": "npm run tokens && npm run lint && npm test && vue-tsc --noEmit && vite build",
