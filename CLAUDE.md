@@ -128,6 +128,19 @@ Before working on any component, read:
   cell (`grid-area: 1 / 1`), and the body uses `visibility: hidden` so it keeps the space *and*
   leaves the accessibility tree. Which means `aria-label` must carry the name while loading, or the
   button announces as "busy" with no name at all.
+- **ADR-0028**: The redesigned nav bar **mints nothing** — the three unbound hexes in Figma were
+  `accent-50/200/700`, and the Figma Semantic collection **already defined** `bg/accent-subtle`,
+  `border/on-accent-subtle` and `text/on-accent-subtle` for them. The gap was the code export, so
+  ADR-0009's deletion of accent is reversed: it returns as a **tint** pair, not the solid pair that
+  ADR predicted. There is no `text-accent` — accent-600 is 3.06:1 on `bg-default`. A 36px control
+  joins the padding scale (`control-padding-lg-compact`, lg's type at a 36px height) and `Button`
+  gains the matching size. `IconButton` exists because **Figma's component had no code counterpart** —
+  ADR-0001 in reverse, which a code-only audit never finds. The bar carries **no ground**,
+  deliberately. `CreditsChip` drops to one axis: no state prop, the presence of `reminder` decides
+  the form, and the expiry escalates `info → soon → expired`, the last **changing register** to a
+  solid fill. **Opacity is not a contrast strategy** — Figma's 75% composites to 3.15:1. In Figma a
+  glyph stroke binds to a **primitive** (`text/*` is scoped `TEXT_FILL`); in code it stays
+  `currentColor`, so the two disagree on provenance for the same pixel.
 
 ## Architecture
 
