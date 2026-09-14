@@ -1,6 +1,6 @@
 {
   "name": "@abi-shai/tolbi-design-system",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "description": "Tolbi multi-product Design System — Vue 3 components",
   "type": "module",
   "main": "./dist/index.js",
