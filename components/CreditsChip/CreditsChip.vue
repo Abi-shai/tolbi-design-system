@@ -6,6 +6,16 @@ import coinSrc from './credits-coin.svg'
 export type CreditsState   = 'good' | 'low' | 'empty'
 export type CreditsContext = 'home' | 'project'
 
+/**
+ * How close the balance is to expiring. Three steps, and the last one changes
+ * register rather than deepening the tint: `expired` is a solid fill with its
+ * own on-colour, because a tint cannot say "too late" (Figma Échéance/*).
+ *
+ * The thresholds are product policy, not a design system decision — the
+ * caller picks the step, the component does not derive it from a day count.
+ */
+export type CreditsReminderTone = 'info' | 'soon' | 'expired'
+
 interface Props {
   credits:  number
   state?:   CreditsState
@@ -16,11 +26,14 @@ interface Props {
    * derived from the content, not declared by a second state prop (ADR-0008).
    */
   reminder?: string
+  /** Tone of the reminder badge. Defaults to the calmest step. */
+  reminderTone?: CreditsReminderTone
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  state:   'good',
-  context: 'home',
+  state:        'good',
+  context:      'home',
+  reminderTone: 'info',
 })
 
 const emit = defineEmits<{ 'contact-sales': []; click: [event: MouseEvent] }>()
@@ -63,7 +76,11 @@ const unitLabel  = computed(() => (props.context === 'project' ? 'crédits utili
       <span class="ds-credits-chip__unit">{{ unitLabel }}</span>
     </span>
 
-    <span v-if="reminder" class="ds-credits-chip__reminder">
+    <span
+      v-if="reminder"
+      class="ds-credits-chip__reminder"
+      :class="`ds-credits-chip__reminder--${reminderTone}`"
+    >
       <Icon name="alarm-clock" :size="16" aria-hidden="true" />
       <span>{{ reminder }}</span>
     </span>
@@ -168,14 +185,38 @@ const unitLabel  = computed(() => (props.context === 'project' ? 'crédits utili
   display: inline-flex;
   align-items: center;
   gap: var(--ds-spacing-xs);
-  /* Figma asks for 2px 10px 2px 8px; 10px is control-padding territory
-     (ADR-0013), not on the spacing ramp, so the padding is symmetric. */
+  /* Figma asked for 2px 10px 2px 8px; 10px is control-padding territory
+     (ADR-0013), not on the spacing ramp, so the padding is symmetric — and
+     the Figma frames were brought to 8px to match. */
   padding: var(--ds-spacing-xxs) var(--ds-spacing-md);
-  border: var(--ds-border-width-default) solid var(--ds-border-on-accent-subtle);
+  border: var(--ds-border-width-default) solid var(--reminder-border);
   border-radius: var(--ds-radius-pill);
-  background-color: var(--ds-bg-accent-subtle);
-  color: var(--ds-text-on-accent-subtle);
+  background-color: var(--reminder-bg);
+  color: var(--reminder-text);
   font: var(--ds-font-label-lg);
+}
+
+/*
+  Three steps of one escalation. `info` and `soon` are tints with a hairline;
+  `expired` is a solid fill, which needs no hairline and takes the on-colour
+  its ground names (ADR-0009).
+*/
+.ds-credits-chip__reminder--info {
+  --reminder-bg:     var(--ds-bg-neutral-subtle);
+  --reminder-border: var(--ds-border-subtle);
+  --reminder-text:   var(--ds-text-default);
+}
+
+.ds-credits-chip__reminder--soon {
+  --reminder-bg:     var(--ds-bg-accent-subtle);
+  --reminder-border: var(--ds-border-on-accent-subtle);
+  --reminder-text:   var(--ds-text-on-accent-subtle);
+}
+
+.ds-credits-chip__reminder--expired {
+  --reminder-bg:     var(--ds-bg-error-solid);
+  --reminder-border: var(--ds-bg-error-solid);
+  --reminder-text:   var(--ds-text-on-error-solid);
 }
 
 .ds-credits-chip__chevron { flex-shrink: 0; }
