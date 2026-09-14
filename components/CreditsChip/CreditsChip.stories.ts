@@ -97,7 +97,7 @@ export const AllStates: Story = {
     template: `
       <div style="display:flex;flex-direction:column;gap:16px;align-items:flex-start;">
         <CreditsChip :credits="250" state="good" context="home"    />
-        <CreditsChip :credits="250" state="good" reminder="Expire dans 14 jours" />
+        <CreditsChip :credits="250" state="good" reminder="Expirent dans 14 jours" />
         <CreditsChip :credits="25" state="good"  context="project" />
         <CreditsChip :credits="5"  state="low"                     />
         <CreditsChip :credits="0"  state="empty"                   />

@@ -98,6 +98,15 @@ const unitLabel  = computed(() => (props.context === 'project' ? 'crédits utili
 
 <style scoped>
 /* ── Coin ─────────────────────────────────────────────────────────── */
+/*
+  24px, deliberately, against the 27x28 drawing Figma's CreditsChip/démo
+  carries. The two are different artwork, and Figma's fills sit just off the
+  palette — near-misses of accent-400 and accent-500 at deltaE 0.76 and 3.75.
+  This one is drawn on the primitives themselves.
+
+  The cost is 3px of width, so the chip measures 339 against Figma's 341. That
+  gap is a decision, not drift.
+*/
 .ds-credits-chip__coin {
   display: block;
   width: 24px;
@@ -137,18 +146,16 @@ const unitLabel  = computed(() => (props.context === 'project' ? 'crédits utili
 /*
   Reminder — the chip expands onto a plain surface and hands the tint to the
   échéance badge, so it marks the thing that needs attention.
+
+  No border and no lift: the badge is what has to be seen, and the surface
+  behind the bar is what separates the chip (Figma CreditsChip/démo carries
+  neither a stroke nor an effect).
 */
 .ds-credits-chip__good--reminder {
   padding: var(--ds-spacing-sm) var(--ds-spacing-md) var(--ds-spacing-sm) var(--ds-spacing-sm);
-  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border: none;
   background-color: var(--ds-bg-default);
-  box-shadow: var(--ds-elevation-control);
   color: var(--ds-text-default);
-}
-
-.ds-credits-chip__good--reminder:focus-visible {
-  /* Keep the resting lift under the ring rather than replacing it. */
-  box-shadow: var(--ds-elevation-control), var(--ds-focus-ring-brand);
 }
 
 .ds-credits-chip__balance {
