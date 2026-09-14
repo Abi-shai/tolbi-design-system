@@ -1,0 +1,12 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    The credits coin, exported from Figma (node 797:4515). Brand artwork, not a
+    Lucide glyph, so it does not belong in components/Icon/icons (ADR-0004).
+    Its fills are the accent-400 / accent-500 primitives; they stay literal
+    because an SVG file cannot read a custom property from the stylesheet.
+  -->
+  <path d="M24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12Z" fill="#EAAA08" fill-opacity="0.9"/>
+  <path d="M21.8427 12C21.8427 17.436 17.436 21.8427 12 21.8427C6.56403 21.8427 2.1573 17.436 2.1573 12C2.1573 6.56403 6.56403 2.1573 12 2.1573C17.436 2.1573 21.8427 6.56403 21.8427 12Z" fill="#FAC720"/>
+  <path d="M5.70058 8.76826C9.76171 7.3757 15.4705 16.8375 15.3695 19.4157C3.21348 15.6428 3.98146 10.1342 5.27554 8.9921C5.44145 8.85864 5.69747 8.76861 5.70058 8.76826Z" fill="#EAAA08"/>
+  <path d="M8.63053 4.58427C20.7865 8.35716 20.0185 13.8658 18.7245 15.0079C18.5588 15.1412 18.3032 15.2311 18.2994 15.2317C14.2383 16.6243 8.52953 7.16255 8.63053 4.58427Z" fill="#EAAA08"/>
+</svg>

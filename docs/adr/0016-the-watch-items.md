@@ -26,6 +26,13 @@ the class names, which were misleading, and nothing else.
 The classes are renamed `__coin`, `__coin-img`, `__coin-ring`. No `Avatar` size is added, and the
 "blocked" item is withdrawn rather than solved.
 
+> **Note (2026-09-14).** The asset is no longer `credits-icon.png`. The nav-bar redesign replaced it
+> with `credits-coin.svg` — 24px, drawn in the `accent-400` / `accent-500` primitives — and the chip
+> now renders it directly, so `__coin-img` and the `__coin-ring` hairline are gone with it. Dropping
+> the 318 kB PNG took the published bundle from 854 kB to 428 kB. **The reasoning above is
+> unaffected:** a coin is still a currency glyph rather than an identity, so ADR-0001 still does not
+> reach it, and `--ds-border-inset` still earns its place on `Avatar`.
+
 `--ds-border-inset` still earns its place. The ring keeps a filled circular shape legible against any
 background, which is true of an avatar and of a coin — the token was named for the job, not the
 component, and that turns out to have been the right call for the wrong reason.

@@ -14,7 +14,7 @@ export type ButtonVariant =
   | 'danger-secondary'
   | 'ghost'
 
-export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'lg-compact' | 'xl' | '2xl'
 
 interface Props {
   label: string
@@ -138,6 +138,17 @@ function handleClick(event: MouseEvent) {
 .ds-button--lg {
   gap: var(--ds-spacing-sm);
   padding: var(--ds-control-padding-lg);
+  font: var(--ds-font-label-xl-strong);
+}
+
+/*
+  lg's type and horizontal rhythm at a 36px height. It is not `sm`: sm is also
+  36px but carries 14px type, and this one keeps label-xl-strong. Used by the
+  navigation bar, where a 44px control does not fit the 64px bar.
+*/
+.ds-button--lg-compact {
+  gap: var(--ds-spacing-sm);
+  padding: var(--ds-control-padding-lg-compact);
   font: var(--ds-font-label-xl-strong);
 }
 
@@ -281,6 +292,7 @@ function handleClick(event: MouseEvent) {
 .ds-button--icon-only.ds-button--sm  { width: 36px; height: 36px; }
 .ds-button--icon-only.ds-button--md  { width: 40px; height: 40px; }
 .ds-button--icon-only.ds-button--lg  { width: 44px; height: 44px; }
+.ds-button--icon-only.ds-button--lg-compact { width: 36px; height: 36px; }
 .ds-button--icon-only.ds-button--xl  { width: 48px; height: 48px; }
 .ds-button--icon-only.ds-button--2xl { width: 56px; height: 56px; }
 

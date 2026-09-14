@@ -2,7 +2,7 @@ export { Button } from './Button'
 export type { ButtonVariant, ButtonSize } from './Button'
 
 export { Logo } from './Logo'
-export type { LogoVariant } from './Logo'
+export type { LogoVariant, LogoSize } from './Logo'
 
 export { Icon, icons } from './Icon'
 export type { IconName, IconSize } from './Icon'

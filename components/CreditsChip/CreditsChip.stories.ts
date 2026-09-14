@@ -25,6 +25,10 @@ const meta: Meta<typeof CreditsChip> = {
       control: 'number',
       table: { category: 'Contenu' },
     },
+    reminder: {
+      control: 'text',
+      table: { category: 'Contenu' },
+    },
   },
   args: {
     credits: 32,
@@ -56,6 +60,11 @@ export const Empty: Story = {
   args: { state: 'empty', credits: 0 },
 }
 
+export const Reminder: Story = {
+  name: 'Rappel d’échéance',
+  args: { state: 'good', credits: 250, reminder: 'Expire dans 14 jours' },
+}
+
 export const AllStates: Story = {
   name: 'Tous les états',
   parameters: { layout: 'padded' },
@@ -63,7 +72,8 @@ export const AllStates: Story = {
     components: { CreditsChip },
     template: `
       <div style="display:flex;flex-direction:column;gap:16px;align-items:flex-start;">
-        <CreditsChip :credits="32" state="good"  context="home"    />
+        <CreditsChip :credits="250" state="good" context="home"    />
+        <CreditsChip :credits="250" state="good" reminder="Expire dans 14 jours" />
         <CreditsChip :credits="25" state="good"  context="project" />
         <CreditsChip :credits="5"  state="low"                     />
         <CreditsChip :credits="0"  state="empty"                   />

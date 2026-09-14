@@ -4,6 +4,7 @@ import { Logo } from '../Logo'
 import { Icon } from '../Icon'
 import { Avatar } from '../Avatar'
 import { CreditsChip } from '../CreditsChip'
+import { Button } from '../Button'
 import { Tooltip } from '../Tooltip'
 import { ModulesList } from '../ModulesList'
 import { SurfaceTransition } from '../SurfaceTransition'
@@ -25,6 +26,8 @@ interface Props {
   credits?:         number
   creditState?:     CreditsState
   creditContext?:   CreditsContext
+  /** Expiry reminder shown in the credits chip, e.g. `Expire dans 14 jours`. */
+  creditsReminder?: string
   userInitials?:    string
   hasNotification?: boolean
   modules?:         NavModule[]
@@ -46,6 +49,7 @@ const emit = defineEmits<{
   notifications:   []
   user:            []
   'contact-sales': []
+  credits:         []
   'module-select': [module: NavModule]
 }>()
 
@@ -90,7 +94,8 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 
     <!-- ── Gauche : logo + breadcrumbs ────────────────────────────────── -->
     <div class="ds-hnav__left" :class="{ 'ds-hnav__left--spaced': hasBreadcrumbs }">
-      <Logo variant="nav" alt="Tolbi" />
+      <!-- The coloured lockup at Figma's tightened `sm` size. -->
+      <Logo variant="default" size="sm" alt="Tolbi" />
 
       <nav v-if="hasBreadcrumbs" class="ds-hnav__breadcrumbs" aria-label="Navigation">
         <button class="ds-hnav__crumb-btn" @click="emit('learn')" aria-label="Accueil">
@@ -117,17 +122,22 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
         :credits="credits"
         :state="creditState"
         :context="creditContext"
+        :reminder="creditsReminder"
         @contact-sales="emit('contact-sales')"
+        @click="emit('credits')"
       />
 
       <!-- Actions -->
       <div class="ds-hnav__actions">
 
-        <!-- Bouton Apprendre -->
-        <button class="ds-hnav__learn-btn" @click="emit('learn')">
-          <Icon name="book-open" :size="20" aria-hidden="true" />
-          <span>Apprendre</span>
-        </button>
+        <!-- The real Button, not a re-implementation (ADR-0001). `lg-compact`
+             is the 36px control the bar needs; `lg` at 44px does not fit. -->
+        <Button
+          label="Apprendre"
+          variant="secondary-gray"
+          size="lg-compact"
+          @click="emit('learn')"
+        />
 
         <!-- Paramètres -->
         <div
@@ -217,7 +227,11 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   justify-content: space-between;
   width: 100%;
   box-sizing: border-box;
-  background: color-mix(in srgb, var(--ds-bg-brand-solid) 95%, transparent);
+  /*
+    No ground and no rule, deliberately: the bar takes whatever surface sits
+    behind it. The Figma frame carries no fill for the same reason — that is a
+    decision, not an omission.
+  */
   padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
   overflow: visible;
 }
@@ -240,7 +254,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 }
 
 .ds-hnav__chevron {
-  color: color-mix(in srgb, var(--ds-text-on-brand-solid) 40%, transparent);
+  color: var(--ds-text-subtlest);
   flex-shrink: 0;
 }
 
@@ -253,19 +267,19 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   background: transparent;
   border: none;
   cursor: pointer;
-  color: color-mix(in srgb, var(--ds-text-on-brand-solid) 70%, transparent);
+  color: var(--ds-text-subtle);
   font: var(--ds-font-label-lg);
   white-space: nowrap;
   transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-hnav__crumb-btn:hover {
-  background: var(--ds-bg-brand-solid-hover);
+  background: var(--ds-bg-hover);
 }
 
 .ds-hnav__crumb-btn--active {
-  background: color-mix(in srgb, var(--ds-bg-brand-solid) 90%, transparent);
-  color: var(--ds-text-on-brand-solid);
+  background: var(--ds-bg-neutral-subtle);
+  color: var(--ds-text-strong);
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: var(--ds-font-weight-label-lg-strong);
 }
@@ -295,32 +309,11 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 
 .ds-hnav__tip {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + var(--ds-spacing-sm));
   left: 50%;
   transform: translateX(-50%);
   z-index: var(--ds-z-popover);
   white-space: nowrap;
-}
-
-/* ── Bouton Apprendre ─────────────────────────────────────────────── */
-.ds-hnav__learn-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-spacing-xs);
-  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
-  background: color-mix(in srgb, var(--ds-bg-brand-solid) 90%, transparent);
-  border: var(--ds-border-width-default) solid var(--ds-border-brand-solid);
-  border-radius: var(--ds-radius-control);
-  box-shadow: var(--ds-elevation-control);
-  color: var(--ds-text-on-brand-solid);
-  font: var(--ds-font-label-lg-strong);
-  white-space: nowrap;
-  cursor: pointer;
-  transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
-}
-
-.ds-hnav__learn-btn:hover {
-  background: var(--ds-bg-brand-solid-hover);
 }
 
 /* ── Boutons icônes ───────────────────────────────────────────────── */
@@ -333,13 +326,13 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   background: transparent;
   border: none;
   cursor: pointer;
-  color: color-mix(in srgb, var(--ds-text-on-brand-solid) 85%, transparent);
+  color: var(--ds-text-default);
   transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-hnav__icon-btn:hover,
 .ds-hnav__icon-btn--open {
-  background: color-mix(in srgb, var(--ds-text-on-brand-solid) 10%, transparent);
+  background: var(--ds-bg-hover);
 }
 
 /* ── Notifications ────────────────────────────────────────────────── */
@@ -348,6 +341,11 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 }
 
 .ds-hnav__notif-dot {
+  /*
+    Positional geometry, not rhythm: these place a 6px dot over the bell's
+    glyph inside a 36px target. There is no token for either — ADR-0020 keeps
+    glyph sizes out of the scales deliberately.
+  */
   position: absolute;
   top: 18px;
   left: 22px;
@@ -355,7 +353,8 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   height: 6px;
   border-radius: var(--ds-radius-pill);
   background: var(--ds-bg-error-solid);
-  border: var(--ds-border-width-strong) solid var(--ds-border-subtle);
+  /* The ring punches the dot out of whatever the bar is painted with. */
+  border: var(--ds-border-width-strong) solid var(--ds-bg-default);
 }
 
 /* ── Avatar utilisateur ───────────────────────────────────────────── */
@@ -371,7 +370,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 /* ── Dropdown modules : positionnement uniquement ─────────────────── */
 .ds-hnav__modules-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + var(--ds-spacing-md));
   right: 0;
   /*
     A popover, not an overlay. ADR-0020 puts z-overlay (200) above a scrim; this

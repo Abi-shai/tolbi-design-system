@@ -30,6 +30,10 @@ const meta: Meta<typeof HorizontalNavigation> = {
       options: ['Accueil', 'Module', 'Project', 'tabs'],
       table: { category: 'État', defaultValue: { summary: "'Accueil'" } },
     },
+    creditsReminder: {
+      control: 'text',
+      table: { category: 'Contenu' },
+    },
     credits: {
       control: 'number',
       table: { category: 'Contenu', defaultValue: { summary: '0' } },
@@ -45,8 +49,8 @@ const meta: Meta<typeof HorizontalNavigation> = {
   },
   args: {
     state: 'Accueil',
-    credits: 32,
-    userInitials: 'TD',
+    credits: 250,
+    userInitials: 'MD',
     hasNotification: false,
     modules: ALL_MODULES,
   },
@@ -108,4 +112,18 @@ export const WithActiveModule: Story = {
     breadcrumbs: [{ label: 'Analyses', active: true }],
     modules: ALL_MODULES.map(m => ({ ...m, active: m.name === 'Carbone' })),
   },
+}
+
+export const WithCreditsReminder: Story = {
+  name: 'Avec rappel d’échéance',
+  args: {
+    state: 'Accueil',
+    credits: 250,
+    creditsReminder: 'Expire dans 14 jours',
+  },
+}
+
+export const LowCredits: Story = {
+  name: 'Solde presque vide',
+  args: { state: 'Accueil', credits: 5, creditState: 'low' },
 }
