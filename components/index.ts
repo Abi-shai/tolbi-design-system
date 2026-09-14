@@ -24,6 +24,7 @@ export type { ModuleName, ModuleVariant } from './ModuleIcon'
 export { ModulesList } from './ModulesList'
 export type { ModulesListItem } from './ModulesList'
 
+export { IconButton } from './IconButton'
 export { HorizontalNavigation } from './HorizontalNavigation'
 export type { NavState, BreadcrumbItem, NavModule } from './HorizontalNavigation'
 

@@ -5,6 +5,7 @@ import { Icon } from '../Icon'
 import { Avatar } from '../Avatar'
 import { CreditsChip } from '../CreditsChip'
 import { Button } from '../Button'
+import { IconButton } from '../IconButton'
 import { Tooltip } from '../Tooltip'
 import { ModulesList } from '../ModulesList'
 import { SurfaceTransition } from '../SurfaceTransition'
@@ -145,9 +146,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
           @mouseenter="showTooltip('settings')"
           @mouseleave="hideTooltip"
         >
-          <button class="ds-hnav__icon-btn" @click="emit('settings')" aria-label="Paramètres">
-            <Icon name="settings" :size="20" />
-          </button>
+          <IconButton icon="settings" ariaLabel="Paramètres" @click="emit('settings')" />
           <Tooltip
             v-if="activeTooltip === 'settings'"
             class="ds-hnav__tip"
@@ -162,10 +161,8 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
           @mouseenter="showTooltip('notifications')"
           @mouseleave="hideTooltip"
         >
-          <button class="ds-hnav__icon-btn ds-hnav__notif" @click="emit('notifications')" aria-label="Notifications">
-            <Icon name="bell" :size="20" />
-            <span v-if="hasNotification" class="ds-hnav__notif-dot" aria-hidden="true" />
-          </button>
+          <IconButton icon="bell" ariaLabel="Notifications" @click="emit('notifications')" />
+          <span v-if="hasNotification" class="ds-hnav__notif-dot" aria-hidden="true" />
           <Tooltip
             v-if="activeTooltip === 'notifications'"
             class="ds-hnav__tip"
@@ -181,16 +178,14 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
           @mouseenter="showTooltip('apps')"
           @mouseleave="hideTooltip"
         >
-          <button
-            class="ds-hnav__icon-btn"
-            :class="{ 'ds-hnav__icon-btn--open': modulesOpen }"
+          <IconButton
+            icon="layout-grid"
+            ariaLabel="Modules"
+            :active="modulesOpen"
             :aria-expanded="modulesOpen"
             aria-haspopup="true"
-            aria-label="Modules"
             @click="toggleModules"
-          >
-            <Icon name="layout-grid" :size="20" />
-          </button>
+          />
 
           <Tooltip
             v-if="activeTooltip === 'apps' && !modulesOpen"
@@ -316,30 +311,12 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   white-space: nowrap;
 }
 
-/* ── Boutons icônes ───────────────────────────────────────────────── */
-.ds-hnav__icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--ds-spacing-md);
-  border-radius: var(--ds-radius-pill);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--ds-text-default);
-  transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
-}
-
-.ds-hnav__icon-btn:hover,
-.ds-hnav__icon-btn--open {
-  background: var(--ds-bg-hover);
-}
-
 /* ── Notifications ────────────────────────────────────────────────── */
-.ds-hnav__notif {
-  position: relative;
-}
-
+/*
+  The dot sits on the tooltip wrapper rather than inside the button: the
+  wrapper shrink-wraps IconButton, so it is the same 36px box, and IconButton
+  takes a glyph rather than a slot (its Figma counterpart is an instance swap).
+*/
 .ds-hnav__notif-dot {
   /*
     Positional geometry, not rhythm: these place a 6px dot over the bell's
