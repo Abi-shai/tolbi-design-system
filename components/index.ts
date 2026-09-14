@@ -54,7 +54,7 @@ export { VerificationCodeInputField } from './VerificationCodeInputField'
 export type { OtpSize, OtpDigits } from './VerificationCodeInputField'
 
 export { CreditsChip } from './CreditsChip'
-export type { CreditsState, CreditsContext, CreditsReminderTone } from './CreditsChip'
+export type { CreditsReminderTone } from './CreditsChip'
 
 export { Tag } from './Tag'
 export type { TagSize, TagAction } from './Tag'

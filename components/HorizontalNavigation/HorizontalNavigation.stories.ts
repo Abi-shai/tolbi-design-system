@@ -124,7 +124,12 @@ export const WithCreditsReminder: Story = {
   },
 }
 
-export const LowCredits: Story = {
-  name: 'Solde presque vide',
-  args: { state: 'Accueil', credits: 5, creditState: 'low' },
+export const CreditsExpired: Story = {
+  name: 'Crédits expirés',
+  args: {
+    state: 'Accueil',
+    credits: 250,
+    creditsReminder: 'Vos crédits ont expirés',
+    creditsReminderTone: 'expired',
+  },
 }

@@ -3,62 +3,71 @@ import * as Stories from './CreditsChip.stories'
 
 # CreditsChip
 
-Pastille de crédits affichée dans la `HorizontalNavigation`. Indique le solde de crédits de l'utilisateur ou du projet, avec trois niveaux d'urgence.
+Pastille de crédits affichée dans la `HorizontalNavigation`. Indique le solde,
+et — quand une échéance approche — le temps qu'il reste.
 
-<Canvas of={Stories.AllStates} />
+<Canvas of={Stories.Compact} />
 
-<Controls of={Stories.GoodHome} />
+<Controls of={Stories.Compact} />
 
 ---
 
-## États
+## Deux formes, et c'est le contenu qui décide
 
-| État | Visuel | Usage |
+Il n'y a pas de prop d'état. La présence de `reminder` suffit : sans elle la
+pastille est compacte et teintée accent, avec elle elle s'étale sur une surface
+neutre et confie la teinte au badge. C'est la même règle que `FormField`, qui
+dérive l'invalidité de la présence d'`error` plutôt que de la déclarer
+(ADR-0008).
+
+<Canvas of={Stories.Compact} />
+<Canvas of={Stories.Reminder} />
+
+---
+
+## L'échéance escalade en trois crans
+
+<Canvas of={Stories.ReminderTones} />
+
+| `reminderTone` | Fond | Texte |
 |---|---|---|
-| `good` | Fond jaune warning-50 | Solde suffisant |
-| `low` | Fond rouge error-50 + bordure error-700 + CTA | Moins de 10 crédits |
-| `empty` | Identique à `low` | Solde épuisé |
+| `info` | `bg-neutral-subtle` | `text-default` |
+| `soon` | `bg-accent-subtle` | `text-on-accent-subtle` |
+| `expired` | `bg-error-solid` | `text-on-error-solid` |
+
+Le dernier cran **change de registre** plutôt que d'assombrir la teinte : un
+fond plein n'a pas besoin de filet et ne peut pas porter les `text-*`, donc il
+prend l'on-colour que son fond nomme (ADR-0009). Une teinte ne sait pas dire
+« trop tard ».
+
+Le sens ne repose pas sur la couleur seule : le libellé change à chaque cran.
+
+**Les seuils ne sont pas dans le composant.** 14 jours contre 7, c'est une
+décision produit — l'appelant choisit le cran.
 
 ---
 
-## Contexte
+## Le chiffre est tabulaire
 
-La prop `context` change le label affiché en état `good` :
+Un solde qui descend ne doit pas faire sauter ce qui l'entoure.
 
-<Canvas of={Stories.GoodHome} />
-<Canvas of={Stories.GoodProject} />
-
----
-
-## États critiques
-
-<Canvas of={Stories.Low} />
-<Canvas of={Stories.Empty} />
-
-En état critique, le bouton "Contacter sales" émet l'événement `contact-sales`.
-
-```vue
-<CreditsChip
-  :credits="5"
-  state="low"
-  :avatar-src="user.avatarUrl"
-  @contact-sales="openSalesModal"
-/>
-```
+<Canvas of={Stories.TabularCount} />
 
 ---
 
 ## Utilisation dans HorizontalNavigation
 
 ```vue
-<CreditsChip
-  :credits="userCredits"
-  :state="creditState"
-  context="home"
-  :avatar-src="user.avatarUrl"
-  @contact-sales="handleContactSales"
+<HorizontalNavigation
+  :credits="250"
+  credits-reminder="Expirent dans 7 jours"
+  credits-reminder-tone="soon"
+  @credits="openCreditsPanel"
 />
 ```
+
+La pastille est un `<button>` : le chevron promet qu'elle ouvre quelque chose,
+et un `<div>` qui émet `click` est inatteignable au clavier (ADR-0014).
 
 ---
 

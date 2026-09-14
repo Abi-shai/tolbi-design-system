@@ -11,63 +11,31 @@ const meta: Meta<typeof CreditsChip> = {
     docs: { page: Docs },
   },
   argTypes: {
-    state: {
-      control: 'select',
-      options: ['good', 'low', 'empty'],
-      table: { category: 'État', defaultValue: { summary: "'good'" } },
-    },
-    context: {
-      control: 'inline-radio',
-      options: ['home', 'project'],
-      table: { category: 'Contenu', defaultValue: { summary: "'home'" } },
-    },
-    credits: {
-      control: 'number',
-      table: { category: 'Contenu' },
-    },
-    reminder: {
-      control: 'text',
-      table: { category: 'Contenu' },
-    },
+    credits:  { control: 'number', table: { category: 'Contenu' } },
+    unit:     { control: 'text',   table: { category: 'Contenu', defaultValue: { summary: "'crédits'" } } },
+    reminder: { control: 'text',   table: { category: 'Contenu' } },
     reminderTone: {
       control: 'inline-radio',
       options: ['info', 'soon', 'expired'],
       table: { category: 'État', defaultValue: { summary: "'info'" } },
     },
   },
-  args: {
-    credits: 32,
-    state:   'good',
-    context: 'home',
-  },
+  args: { credits: 250 },
 }
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const GoodHome: Story = {
-  name: 'Bon — accueil',
-  args: { state: 'good', context: 'home', credits: 32 },
+/** Sans échéance : la pastille reste compacte et teintée accent. */
+export const Compact: Story = {
+  name: 'Compacte',
+  args: { credits: 250 },
 }
 
-export const GoodProject: Story = {
-  name: 'Bon — projet',
-  args: { state: 'good', context: 'project', credits: 25 },
-}
-
-export const Low: Story = {
-  name: 'Solde presque vide',
-  args: { state: 'low', credits: 5 },
-}
-
-export const Empty: Story = {
-  name: 'Solde vide',
-  args: { state: 'empty', credits: 0 },
-}
-
+/** Avec échéance : elle s'étale et confie la teinte au badge. */
 export const Reminder: Story = {
-  name: 'Rappel d’échéance',
-  args: { state: 'good', credits: 250, reminder: 'Expirent dans 14 jours' },
+  name: 'Avec échéance',
+  args: { credits: 250, reminder: 'Expirent dans 14 jours' },
 }
 
 /**
@@ -81,26 +49,25 @@ export const ReminderTones: Story = {
     components: { CreditsChip },
     template: `
       <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start;">
-        <CreditsChip :credits="250" reminder="Expirent dans 14 jours" reminder-tone="info" />
-        <CreditsChip :credits="250" reminder="Expirent dans 7 jours"  reminder-tone="soon" />
+        <CreditsChip :credits="250" reminder="Expirent dans 14 jours"  reminder-tone="info" />
+        <CreditsChip :credits="250" reminder="Expirent dans 7 jours"   reminder-tone="soon" />
         <CreditsChip :credits="250" reminder="Vos crédits ont expirés" reminder-tone="expired" />
       </div>
     `,
   }),
 }
 
-export const AllStates: Story = {
-  name: 'Tous les états',
+/** Le chiffre est tabulaire : un solde qui descend ne décale pas ses voisins. */
+export const TabularCount: Story = {
+  name: 'Chiffres tabulaires',
   parameters: { layout: 'padded' },
   render: () => ({
     components: { CreditsChip },
     template: `
-      <div style="display:flex;flex-direction:column;gap:16px;align-items:flex-start;">
-        <CreditsChip :credits="250" state="good" context="home"    />
-        <CreditsChip :credits="250" state="good" reminder="Expirent dans 14 jours" />
-        <CreditsChip :credits="25" state="good"  context="project" />
-        <CreditsChip :credits="5"  state="low"                     />
-        <CreditsChip :credits="0"  state="empty"                   />
+      <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start;">
+        <CreditsChip :credits="1111" />
+        <CreditsChip :credits="250" />
+        <CreditsChip :credits="8" />
       </div>
     `,
   }),

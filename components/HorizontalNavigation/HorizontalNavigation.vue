@@ -10,7 +10,7 @@ import { Tooltip } from '../Tooltip'
 import { ModulesList } from '../ModulesList'
 import { SurfaceTransition } from '../SurfaceTransition'
 import type { ModulesListItem } from '../ModulesList'
-import type { CreditsState, CreditsContext, CreditsReminderTone } from '../CreditsChip'
+import type { CreditsReminderTone } from '../CreditsChip'
 
 export type NavState = 'Accueil' | 'Module' | 'Project' | 'tabs'
 
@@ -25,8 +25,6 @@ interface Props {
   state?:           NavState
   breadcrumbs?:     BreadcrumbItem[]
   credits?:         number
-  creditState?:     CreditsState
-  creditContext?:   CreditsContext
   /** Expiry reminder shown in the credits chip, e.g. `Expirent dans 14 jours`. */
   creditsReminder?: string
   /** How close that expiry is — see `CreditsReminderTone`. */
@@ -39,8 +37,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   state:           'Accueil',
   credits:         0,
-  creditState:     'good',
-  creditContext:   'home',
   userInitials:    'TD',
   hasNotification: false,
   modules:         () => [],
@@ -51,7 +47,6 @@ const emit = defineEmits<{
   settings:        []
   notifications:   []
   user:            []
-  'contact-sales': []
   credits:         []
   'module-select': [module: NavModule]
 }>()
@@ -123,11 +118,8 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
       <!-- Crédits -->
       <CreditsChip
         :credits="credits"
-        :state="creditState"
-        :context="creditContext"
         :reminder="creditsReminder"
         :reminder-tone="creditsReminderTone"
-        @contact-sales="emit('contact-sales')"
         @click="emit('credits')"
       />
 
