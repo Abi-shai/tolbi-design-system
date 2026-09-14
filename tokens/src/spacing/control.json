@@ -12,6 +12,10 @@
       "$value": "{space.2-5} {space.4}",
       "$description": "10px 16px — 44px control"
     },
+    "lg-compact": {
+      "$value": "{space.1-5} {space.4}",
+      "$description": "6px 16px — 36px control. lg's type and horizontal rhythm compressed to a 36px height (6x2 + the 24px label-xl line box). Distinct from sm, which is also 36px but carries 14px type"
+    },
     "xl": {
       "$value": "{space.3} {space.4-5}",
       "$description": "12px 18px — 48px control"

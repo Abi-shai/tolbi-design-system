@@ -80,6 +80,11 @@
       "$type": "color",
       "$description": "contract — 5.40:1 on bg-success-subtle"
     },
+    "on-accent-subtle": {
+      "$value": "{color.accent.700}",
+      "$type": "color",
+      "$description": "contract — 4.98:1 on bg-accent-subtle. Mirrors Figma text/on-accent-subtle. Accent has no text-accent: step 600 is 3.06:1 on bg-default and fails AA, so this tone exists only on its own tint"
+    },
     "on-brand-solid": {
       "$value": "{color.base.white}",
       "$type": "color",
@@ -217,6 +222,11 @@
       "$type": "color",
       "$description": "state — hover on bg-success-subtle"
     },
+    "accent-subtle": {
+      "$value": "{color.accent.50}",
+      "$type": "color",
+      "$description": "ground — pairs with text-on-accent-subtle. Mirrors Figma bg/accent-subtle. The credits tint: accent is the secondary brand colour, not a status tone"
+    },
     "error-solid": {
       "$value": "{color.error.600}",
       "$type": "color",
@@ -333,6 +343,11 @@
       "$value": "{color.success.200}",
       "$type": "color",
       "$description": "decorative — 1.33:1 hairline on bg-success-subtle"
+    },
+    "on-accent-subtle": {
+      "$value": "{color.accent.200}",
+      "$type": "color",
+      "$description": "decorative — 1.13:1 hairline on bg-accent-subtle. Mirrors Figma border/on-accent-subtle"
     }
   }
 }
