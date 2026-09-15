@@ -9,12 +9,14 @@ import AlarmClock          from './icons/alarm-clock.vue'
 import Archive             from './icons/archive.vue'
 import ArrowDown           from './icons/arrow-down.vue'
 import ArrowDownLeft       from './icons/arrow-down-left.vue'
+import ArrowDownRight      from './icons/arrow-down-right.vue'
 import ArrowDownWideNarrow from './icons/arrow-down-wide-narrow.vue'
 import ArrowLeft           from './icons/arrow-left.vue'
 import ArrowLeftRight      from './icons/arrow-left-right.vue'
 import ArrowRight          from './icons/arrow-right.vue'
 import ArrowUp             from './icons/arrow-up.vue'
 import ArrowUpDown         from './icons/arrow-up-down.vue'
+import ArrowUpLeft         from './icons/arrow-up-left.vue'
 import ArrowUpNarrowWide   from './icons/arrow-up-narrow-wide.vue'
 import ArrowUpRight        from './icons/arrow-up-right.vue'
 import BadgeCheck          from './icons/badge-check.vue'
@@ -201,12 +203,14 @@ export const icons = {
   'archive':                Archive,
   'arrow-down':             ArrowDown,
   'arrow-down-left':        ArrowDownLeft,
+  'arrow-down-right':       ArrowDownRight,
   'arrow-down-wide-narrow': ArrowDownWideNarrow,
   'arrow-left':             ArrowLeft,
   'arrow-left-right':       ArrowLeftRight,
   'arrow-right':            ArrowRight,
   'arrow-up':               ArrowUp,
   'arrow-up-down':          ArrowUpDown,
+  'arrow-up-left':          ArrowUpLeft,
   'arrow-up-narrow-wide':   ArrowUpNarrowWide,
   'arrow-up-right':         ArrowUpRight,
   'badge-check':            BadgeCheck,

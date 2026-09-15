@@ -10,12 +10,14 @@ alarm-clock
 archive
 arrow-down
 arrow-down-left
+arrow-down-right
 arrow-down-wide-narrow
 arrow-left
 arrow-left-right
 arrow-right
 arrow-up
 arrow-up-down
+arrow-up-left
 arrow-up-narrow-wide
 arrow-up-right
 badge-check
