@@ -244,9 +244,25 @@ const dotSize = computed(() => {
 }
 
 /* ── Pill outline ─────────────────────────────────────────────────── */
+/*
+  A hairline, like the filled variant. What makes the outline read is not
+  thickness but the token swap underneath it: `--badge-outline-border` is the
+  solid tone (border-{tone}-solid) where the filled variant uses the decorative
+  hairline, taking the border from ~1.4:1 to ~5:1 on white. That already clears
+  the 3:1 non-text threshold, so 2px was doubling a legibility already won.
+
+  It also returns `border-width-strong` to its job: ADR-0020 names it "a ring
+  that has to read", and its other four consumers are all rings punched out of
+  a background — the slider thumb, the avatar hairline, the notification dot,
+  the step marker. A container border is a different thing.
+
+  Benchmarked: eleven outline badges across Employment Hero, Canva, Whop,
+  Confluence, Dovetail, Peec AI, X, Care.com and Wrike are all 1px. The only
+  2px border in that sample is a selected-row ring.
+*/
 .ds-badge--pill-outline {
   background-color: transparent;
-  border: var(--ds-border-width-strong) solid var(--badge-outline-border);
+  border: var(--ds-border-width-default) solid var(--badge-outline-border);
   color: var(--badge-text);
 }
 
