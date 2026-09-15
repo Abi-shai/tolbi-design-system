@@ -9,6 +9,7 @@
 alarm-clock
 archive
 arrow-down
+arrow-down-left
 arrow-down-wide-narrow
 arrow-left
 arrow-left-right

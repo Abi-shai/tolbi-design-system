@@ -8,6 +8,7 @@
 import AlarmClock          from './icons/alarm-clock.vue'
 import Archive             from './icons/archive.vue'
 import ArrowDown           from './icons/arrow-down.vue'
+import ArrowDownLeft       from './icons/arrow-down-left.vue'
 import ArrowDownWideNarrow from './icons/arrow-down-wide-narrow.vue'
 import ArrowLeft           from './icons/arrow-left.vue'
 import ArrowLeftRight      from './icons/arrow-left-right.vue'
@@ -199,6 +200,7 @@ export const icons = {
   'alarm-clock':            AlarmClock,
   'archive':                Archive,
   'arrow-down':             ArrowDown,
+  'arrow-down-left':        ArrowDownLeft,
   'arrow-down-wide-narrow': ArrowDownWideNarrow,
   'arrow-left':             ArrowLeft,
   'arrow-left-right':       ArrowLeftRight,
