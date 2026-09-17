@@ -181,7 +181,7 @@ const checkSize = computed(() => {
 
 /* ── Check icon (complete) ─────────────────────────────────────────── */
 .ds-steps__check {
-  color: white;
+  color: var(--ds-text-on-brand-solid);
 }
 
 /* ── Status dot (current / incomplete) ────────────────────────────── */

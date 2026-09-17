@@ -38,6 +38,16 @@ function walk(dir, out = []) {
   return out
 }
 
+function walkTs(dir, out = []) {
+  for (const n of readdirSync(dir)) {
+    const p = join(dir, n)
+    if (p.includes('/ModuleIcon/art/') || p.includes('/Icon/icons/')) continue
+    if (statSync(p).isDirectory()) walkTs(p, out)
+    else if (extname(p) === '.ts' && !p.endsWith('.stories.ts')) out.push(p)
+  }
+  return out
+}
+
 /** `// token-lint-disable-next-line <rule> — reason` and a file-level
  *  `/* token-lint-disable <rule> — reason *\/`. A deliberate exception must
  *  say which rule and why; a bare disable is not accepted. */
@@ -58,7 +68,98 @@ export const RULES = ['no-raw-primitive', 'no-colour-literal', 'no-shadowing-var
                       'no-literal-type', 'role-completeness', 'font-order', 'solid-pairing',
                       'spacing-on-ramp', 'no-raw-radius', 'no-literal-dimension-js',
                       'no-token-js-import', 'no-literal-border-width', 'no-literal-z-index',
-                      'focus-ring-instant']
+                      'focus-ring-instant', 'dark-mode-parity', 'mode-neutral-ramp']
+
+export const LIGHT_SRC = 'tokens/src/color/semantic.json'
+export const DARK_SRC = 'tokens/src/color/semantic.dark.json'
+export const MODE_PAIRS = [
+  [LIGHT_SRC, DARK_SRC],
+  ['tokens/src/effect/focus-rings.json', 'tokens/src/effect/focus-rings.dark.json'],
+  ['tokens/src/effect/shadows.json', 'tokens/src/effect/shadows.dark.json'],
+]
+
+/**
+ * The two mode files are ONE decision recorded twice, and the failure mode is
+ * silent: a light token added without its dark twin does not error, it inherits
+ * the light value — which on a dark page is a white flash. Nothing in the build
+ * would say so, which is precisely ADR-0012's argument for a linter.
+ *
+ * Structural, over the token sources, so it cannot live in lintSource(): that
+ * one is over one .vue file's text. Pure for the same reason it is (ADR-0018).
+ */
+/**
+ * The only names the library may take from the JS token export. A resolved value
+ * read in JS is a second source of truth that bypasses the cascade (ADR-0019) —
+ * but an easing curve has no cascade to bypass: there is no `var()` that
+ * evaluates a cubic-bezier at t, which is the "computation" case that ADR gives
+ * as the platform's whole reason to exist.
+ */
+export const TOKEN_JS_ALLOW = ['easing', 'cubicBezier']
+
+/**
+ * ADR-0019 over the .ts half of the library. `lintSource` only ever sees `.vue`,
+ * so a composable importing resolved colours would sail straight past it — which
+ * is exactly where the first such import landed.
+ */
+export function lintTokenImports(files) {
+  const findings = []
+  for (const { file, source: raw } of files) {
+    // Comments are stripped first, and the reason is this rule's own comment in
+    // useMarquee: it contains the word `import` and sits directly above one, so
+    // an unstripped scan reads the prose as the import clause.
+    const source = raw.replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '))
+                      .replace(/(^|[^:])\/\/[^\n]*/g, (m0, p1) => p1 + ' '.repeat(m0.length - p1.length))
+    for (const m of source.matchAll(/import\s+([^;'"]*?)\s+from\s*['"][^'"]*tokens\/dist[^'"]*['"]/g)) {
+      const clause = m[1].trim()
+      const line = source.slice(0, m.index).split('\n').length
+      const named = clause.match(/^\{([^}]*)\}$/)
+      if (!named) {
+        findings.push({ rule: 'no-token-js-import', file, line,
+          msg: `${clause} — a default or namespace import takes the whole token export` })
+        continue
+      }
+      const bad = named[1].split(',')
+        .map((n) => n.trim().split(/\s+as\s+/)[0].trim())
+        .filter(Boolean)
+        .filter((n) => !TOKEN_JS_ALLOW.includes(n))
+      if (bad.length)
+        findings.push({ rule: 'no-token-js-import', file, line,
+          msg: `${bad.join(', ')} — read values from the cascade; only ${TOKEN_JS_ALLOW.join(' and ')} have no var() form` })
+    }
+  }
+  return findings
+}
+
+export function lintModes(light, dark, darkSrc = DARK_SRC, lightSrc = LIGHT_SRC) {
+  const findings = []
+  const push = (rule, file, msg) => findings.push({ rule, file, line: 1, msg })
+
+  for (const group of new Set([...Object.keys(light), ...Object.keys(dark)])) {
+    const l = Object.keys(light[group] ?? {})
+    const d = new Set(Object.keys(dark[group] ?? {}))
+    for (const name of l)
+      if (!d.has(name))
+        push('dark-mode-parity', darkSrc, `${group}-${name} has no dark value — it would inherit the light one`)
+    for (const name of d)
+      if (!l.includes(name))
+        push('dark-mode-parity', darkSrc, `${group}-${name} exists only in dark`)
+  }
+
+  /* Each mode has exactly one neutral ramp: gray-light carries light,
+     gray-forest carries dark. A reference to the other mode's neutral is a
+     copy-paste that survived — and it is the white flash again. */
+  for (const [file, doc, wrong, right] of [
+    [lightSrc, light, 'gray-forest', 'gray-light'],
+    [darkSrc, dark, 'gray-light', 'gray-forest'],
+  ]) {
+    for (const [group, tokens] of Object.entries(doc))
+      for (const [name, token] of Object.entries(tokens))
+        if (String(token.$value).match(new RegExp(`color[.-]${wrong}[.-]`)))
+          push('mode-neutral-ramp', file, `${group}-${name} reaches for ${wrong} — this mode's neutral is ${right}`)
+  }
+
+  return findings
+}
 
 /**
  * The rules, over one file's source. Pure: no filesystem, so the suite can
@@ -85,11 +186,25 @@ export function lintSource(rel, src) {
   }
 
   /* ADR-0009 — no colour literals. */
-  for (const m of src.matchAll(/#[0-9a-fA-F]{6}\b|rgba?\([^)]*\)/g)) {
+  for (const m of src.matchAll(/#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b|(?:rgba?|hsla?)\([^)]*\)/g)) {
     const val = m[0]
     if (COLOUR_LITERAL_ALLOW.some(([f, v]) => rel === f && val === v)) continue
-    if (/^rgba?\(\s*(?:var|--)/.test(val)) continue
+    if (/^(?:rgba?|hsla?)\(\s*(?:var|--)/.test(val)) continue
     report('no-colour-literal', rel, lineOf(m.index), val)
+  }
+
+  /* ADR-0009 — and the same rule for colour KEYWORDS, which it did not cover.
+     Three `color: white` declarations sat in the catalogue under a linter
+     reporting zero — the exact failure ADR-0018 exists to make impossible, found
+     the same way the four in ADR-0013 were. `white` is also the one literal that
+     a second colour mode breaks (ADR-0029): it does not move, and everything
+     around it does. `transparent` and `currentColor` are not colours in this
+     sense and stay silent. */
+  for (const m of src.matchAll(/(?:^|[{;])\s*(--[a-z][a-z0-9-]*|[a-z-]+)\s*:\s*([^;{}]+)/gm)) {
+    const [, prop, value] = m
+    if (!prop.startsWith('--') && !/colou?r|background|fill|stroke|border|outline|shadow/.test(prop)) continue
+    const kw = value.match(/\b(white|black)\b/)
+    if (kw) report('no-colour-literal', rel, lineOf(m.index), kw[1])
   }
 
   /* ADR-0010 — a variant switch must not shadow a semantic token name. */
@@ -214,9 +329,16 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 
 function run() {
 const WARN_ONLY = process.argv.includes('--warn')
-const findings = walk('components').flatMap((file) =>
-  lintSource(file.replace('components/', ''), readFileSync(file, 'utf8')),
-)
+const findings = [
+  ...walk('components').flatMap((file) =>
+    lintSource(file.replace('components/', ''), readFileSync(file, 'utf8'))),
+  ...MODE_PAIRS.flatMap(([l, d]) =>
+    lintModes(JSON.parse(readFileSync(l, 'utf8')), JSON.parse(readFileSync(d, 'utf8')), d, l)),
+  ...lintTokenImports(
+    ['components', 'composables'].flatMap((dir) => walkTs(dir))
+      .map((file) => ({ file, source: readFileSync(file, 'utf8') })),
+  ),
+]
 
 const byRule = findings.reduce((a, f) => ((a[f.rule] ??= []).push(f), a), {})
 console.log('token discipline\n')

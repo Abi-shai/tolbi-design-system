@@ -1,0 +1,353 @@
+{
+  "text": {
+    "strong": {
+      "$value": "{color.gray-forest.100}",
+      "$type": "color",
+      "$description": "contract — 12.58:1 on bg-default"
+    },
+    "default": {
+      "$value": "{color.gray-forest.200}",
+      "$type": "color",
+      "$description": "contract — 10.22:1 on bg-default"
+    },
+    "default-hover": {
+      "$value": "{color.gray-forest.100}",
+      "$type": "color",
+      "$description": "state — hover partner of text-default. Lightens in dark, where light darkens"
+    },
+    "subtle": {
+      "$value": "{color.gray-forest.300}",
+      "$type": "color",
+      "$description": "contract — 7.41:1 on bg-default"
+    },
+    "subtlest": {
+      "$value": "{color.gray-forest.400}",
+      "$type": "color",
+      "$description": "contract — 5.15:1 on bg-default. The floor: gray-forest/500 is 3.14:1 and has no foreground name"
+    },
+    "disabled": {
+      "$value": "{color.gray-forest.500}",
+      "$type": "color",
+      "$description": "state — 3.14:1 on bg-default. Deliberately dimmer than light mode's disabled, which sits at 4.97:1 and reads as live text; this is the one place dark does not mirror light's step. text-subtlest stays the legible floor"
+    },
+    "placeholder": {
+      "$value": "{color.gray-forest.400}",
+      "$type": "color",
+      "$description": "contract — 5.15:1 on bg-default"
+    },
+    "brand": {
+      "$value": "{color.brand.200}",
+      "$type": "color",
+      "$description": "contract — 7.66:1 on bg-default. brand/600 would be 1.63:1 here — the deep green needs a light step, not a dark one"
+    },
+    "brand-hover": {
+      "$value": "{color.brand.100}",
+      "$type": "color",
+      "$description": "state — hover partner of text-brand. 10.13:1 on bg-default"
+    },
+    "error": {
+      "$value": "{color.error.400}",
+      "$type": "color",
+      "$description": "contract — 5.97:1 on bg-default. Red travels further down the ramp than the other tones for the same brightness"
+    },
+    "warning": {
+      "$value": "{color.warning.500}",
+      "$type": "color",
+      "$description": "contract — 7.09:1 on bg-default"
+    },
+    "success": {
+      "$value": "{color.success.500}",
+      "$type": "color",
+      "$description": "contract — 6.03:1 on bg-default"
+    },
+    "on-brand-subtle": {
+      "$value": "{color.brand.200}",
+      "$type": "color",
+      "$description": "contract — 6.69:1 on bg-brand-subtle / bg-selected"
+    },
+    "on-error-subtle": {
+      "$value": "{color.error.400}",
+      "$type": "color",
+      "$description": "contract — 5.19:1 on bg-error-subtle"
+    },
+    "on-warning-subtle": {
+      "$value": "{color.warning.500}",
+      "$type": "color",
+      "$description": "contract — 6.16:1 on bg-warning-subtle"
+    },
+    "on-success-subtle": {
+      "$value": "{color.success.500}",
+      "$type": "color",
+      "$description": "contract — 5.24:1 on bg-success-subtle"
+    },
+    "on-accent-subtle": {
+      "$value": "{color.accent.400}",
+      "$type": "color",
+      "$description": "contract — 9.15:1 on bg-accent-subtle. Accent finally has room here — in light it fails on bg-default at 3.06:1"
+    },
+    "on-brand-solid": {
+      "$value": "{color.base.white}",
+      "$type": "color",
+      "$description": "contract — 6.81:1 on bg-brand-solid"
+    },
+    "on-error-solid": {
+      "$value": "{color.base.white}",
+      "$type": "color",
+      "$description": "contract — 4.83:1 on bg-error-solid"
+    },
+    "on-warning-solid": {
+      "$value": "{color.base.white}",
+      "$type": "color",
+      "$description": "contract — 5.43:1 on bg-warning-solid"
+    },
+    "on-success-solid": {
+      "$value": "{color.base.white}",
+      "$type": "color",
+      "$description": "contract — 5.69:1 on bg-success-solid"
+    },
+    "on-inverse": {
+      "$value": "{color.gray-forest.900}",
+      "$type": "color",
+      "$description": "contract — 14.41:1 on bg-inverse. Inverse flips with the mode: the light surface is the inverted one here"
+    },
+    "on-inverse-subtle": {
+      "$value": "{color.gray-forest.600}",
+      "$type": "color",
+      "$description": "contract — 6.57:1 on bg-inverse. Tooltip description text"
+    }
+  },
+  "bg": {
+    "default": {
+      "$value": "{color.gray-forest.900}",
+      "$type": "color",
+      "$description": "ground — the page, cards, fields. Raised one step off gray-forest/950 so a recessed surface has somewhere to go"
+    },
+    "hover": {
+      "$value": "{color.gray-forest.800}",
+      "$type": "color",
+      "$description": "state — hover on bg-default. Dark lifts where light recedes"
+    },
+    "selected": {
+      "$value": "{color.brand.dark-subtle}",
+      "$type": "color",
+      "$description": "state — chosen from a list. Pairs with text-on-brand-subtle"
+    },
+    "selected-hover": {
+      "$value": "{color.brand.dark-border}",
+      "$type": "color",
+      "$description": "state — hover on bg-selected"
+    },
+    "disabled": {
+      "$value": "{color.gray-forest.700}",
+      "$type": "color",
+      "$description": "state"
+    },
+    "inverse": {
+      "$value": "{color.gray-forest.50}",
+      "$type": "color",
+      "$description": "ground — the surface that inverts against the mode — light here. Pairs with text-on-inverse"
+    },
+    "overlay": {
+      "$value": "color-mix(in srgb, {color.gray-forest.950} 72%, transparent)",
+      "$type": "color",
+      "$description": "contract — the scrim. Denser than light mode's 60% because a dark page has less room to lose. Separation in dark comes from elevation, not from the scrim: gray-forest/900 over a 950 scrim is 1.18:1. Settle with the modal (ADR-0022)"
+    },
+    "neutral-subtle": {
+      "$value": "{color.gray-forest.800}",
+      "$type": "color",
+      "$description": "ground — recessed surfaces, tracks, the neutral tone. A layer RISES in dark: 800/700/600 is the ladder light runs as 50/100/300"
+    },
+    "neutral-subtle-hover": {
+      "$value": "{color.gray-forest.700}",
+      "$type": "color",
+      "$description": "state — hover on bg-neutral-subtle"
+    },
+    "neutral": {
+      "$value": "{color.gray-forest.700}",
+      "$type": "color",
+      "$description": "ground — deeper recess"
+    },
+    "neutral-strong": {
+      "$value": "{color.gray-forest.600}",
+      "$type": "color",
+      "$description": "ground — inert control channels: slider track, scrollbar thumb"
+    },
+    "brand-subtle": {
+      "$value": "{color.brand.dark-subtle}",
+      "$type": "color",
+      "$description": "ground — 1.14:1 on bg-default — pairs with text-on-brand-subtle"
+    },
+    "brand-subtle-hover": {
+      "$value": "{color.brand.dark-border}",
+      "$type": "color",
+      "$description": "state — hover on bg-brand-subtle"
+    },
+    "brand-solid": {
+      "$value": "{color.brand.500}",
+      "$type": "color",
+      "$description": "fill — text-* is ILLEGIBLE here; use text-on-brand-solid. Steps up from 600: the deep green reads as a hole on a dark page"
+    },
+    "brand-solid-hover": {
+      "$value": "{color.brand.600}",
+      "$type": "color",
+      "$description": "state — darkens, as in light — brand/400 would drop white to 4.37:1"
+    },
+    "error-subtle": {
+      "$value": "{color.error.dark-subtle}",
+      "$type": "color",
+      "$description": "ground — 1.15:1 on bg-default — pairs with text-on-error-subtle"
+    },
+    "error-subtle-hover": {
+      "$value": "{color.error.dark-border}",
+      "$type": "color",
+      "$description": "state — hover on bg-error-subtle"
+    },
+    "warning-subtle": {
+      "$value": "{color.warning.dark-subtle}",
+      "$type": "color",
+      "$description": "ground — 1.15:1 on bg-default — pairs with text-on-warning-subtle"
+    },
+    "warning-subtle-hover": {
+      "$value": "{color.warning.dark-border}",
+      "$type": "color",
+      "$description": "state — hover on bg-warning-subtle"
+    },
+    "success-subtle": {
+      "$value": "{color.success.dark-subtle}",
+      "$type": "color",
+      "$description": "ground — 1.15:1 on bg-default — pairs with text-on-success-subtle"
+    },
+    "success-subtle-hover": {
+      "$value": "{color.success.dark-border}",
+      "$type": "color",
+      "$description": "state — hover on bg-success-subtle"
+    },
+    "accent-subtle": {
+      "$value": "{color.accent.dark-subtle}",
+      "$type": "color",
+      "$description": "ground — 1.15:1 on bg-default — pairs with text-on-accent-subtle"
+    },
+    "error-solid": {
+      "$value": "{color.error.600}",
+      "$type": "color",
+      "$description": "fill — white is 4.83:1, unchanged from light — the red already carries on a dark page"
+    },
+    "error-solid-hover": {
+      "$value": "{color.error.700}",
+      "$type": "color",
+      "$description": "state"
+    },
+    "warning-solid": {
+      "$value": "{color.warning.700}",
+      "$type": "color",
+      "$description": "fill — white is 5.43:1"
+    },
+    "success-solid": {
+      "$value": "{color.success.700}",
+      "$type": "color",
+      "$description": "fill — white is 5.69:1"
+    }
+  },
+  "border": {
+    "default": {
+      "$value": "{color.gray-forest.600}",
+      "$type": "color",
+      "$description": "contract — the load-bearing border — 2.19:1 on bg-default"
+    },
+    "subtle": {
+      "$value": "{color.gray-forest.700}",
+      "$type": "color",
+      "$description": "decorative — 1.64:1, deliberately non-load-bearing"
+    },
+    "subtlest": {
+      "$value": "{color.gray-forest.800}",
+      "$type": "color",
+      "$description": "decorative — deliberately non-load-bearing"
+    },
+    "inset": {
+      "$value": "color-mix(in srgb, {color.gray-forest.25} 12%, transparent)",
+      "$type": "color",
+      "$description": "decorative — the avatar hairline. It LIGHTENS in dark — an 8%-black edge is invisible on gray-forest/900"
+    },
+    "disabled": {
+      "$value": "{color.gray-forest.600}",
+      "$type": "color",
+      "$description": "state"
+    },
+    "brand": {
+      "$value": "{color.brand.300}",
+      "$type": "color",
+      "$description": "contract — interactive affordance — 5.06:1 on bg-default, unchanged from light: a 300 step is light enough to read on either ground"
+    },
+    "brand-solid": {
+      "$value": "{color.brand.500}",
+      "$type": "color",
+      "$description": "contract — pairs with bg-brand-solid"
+    },
+    "brand-solid-hover": {
+      "$value": "{color.brand.600}",
+      "$type": "color",
+      "$description": "state — pairs with bg-brand-solid-hover"
+    },
+    "error": {
+      "$value": "{color.error.300}",
+      "$type": "color",
+      "$description": "contract — conveys invalidity (InputField error ring) — 8.57:1 on bg-default"
+    },
+    "error-solid": {
+      "$value": "{color.error.600}",
+      "$type": "color",
+      "$description": "contract — pairs with bg-error-solid"
+    },
+    "error-solid-hover": {
+      "$value": "{color.error.700}",
+      "$type": "color",
+      "$description": "state — pairs with bg-error-solid-hover"
+    },
+    "warning": {
+      "$value": "{color.warning.300}",
+      "$type": "color",
+      "$description": "contract — conveys state — 10.76:1 on bg-default"
+    },
+    "warning-solid": {
+      "$value": "{color.warning.500}",
+      "$type": "color",
+      "$description": "contract — 7.09:1 on bg-default. Same reason as success-solid: standalone in Badge, and warning/700 is 3.07:1 — on the threshold, not clear of it"
+    },
+    "success": {
+      "$value": "{color.success.300}",
+      "$type": "color",
+      "$description": "contract — conveys state — 10.28:1 on bg-default"
+    },
+    "success-solid": {
+      "$value": "{color.success.500}",
+      "$type": "color",
+      "$description": "contract — 6.03:1 on bg-default. Brightens away from its fill: Badge uses this STANDALONE as the pill-outline border, where success/700 is 2.92:1 and fails the 3:1 non-text threshold. Nothing pairs it with bg-success-solid. Figma binds #17b26a"
+    },
+    "on-brand-subtle": {
+      "$value": "{color.brand.dark-border}",
+      "$type": "color",
+      "$description": "decorative — 1.35:1 hairline on bg-brand-subtle"
+    },
+    "on-error-subtle": {
+      "$value": "{color.error.dark-border}",
+      "$type": "color",
+      "$description": "decorative — 1.35:1 hairline on bg-error-subtle"
+    },
+    "on-warning-subtle": {
+      "$value": "{color.warning.dark-border}",
+      "$type": "color",
+      "$description": "decorative — 1.34:1 hairline on bg-warning-subtle"
+    },
+    "on-success-subtle": {
+      "$value": "{color.success.dark-border}",
+      "$type": "color",
+      "$description": "decorative — 1.35:1 hairline on bg-success-subtle"
+    },
+    "on-accent-subtle": {
+      "$value": "{color.accent.dark-border}",
+      "$type": "color",
+      "$description": "decorative — 1.35:1 hairline on bg-accent-subtle"
+    }
+  }
+}

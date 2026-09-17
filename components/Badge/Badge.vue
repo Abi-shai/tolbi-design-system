@@ -207,6 +207,73 @@ const dotSize = computed(() => {
   --badge-outline-border: var(--ds-color-display-purple-700);
 }
 
+/* ── Colours: categorical, dark ────────────────────────────────────
+   ADR-0030. The tint and its hairline follow ADR-0029's rule for the
+   status tones — a `dark-subtle` ground at 1.15:1 and a `dark-border`
+   hairline at 1.55:1, both blended off the hue's own 500.
+
+   Two values MOVE rather than being restated, and both for the reason
+   the light comment above already gives:
+
+   `--badge-text` goes 700 → 200. A 700 on a near-black tint is the
+   same unreadable pairing 700-on-50 avoids in light, inverted.
+
+   `--badge-outline-border` goes 700 → 500. In pill-outline the border
+   IS the visual and must clear 3:1; on gray-forest/900 step 700 cannot
+   and step 500 does — 4.13:1 at worst (indigo), 7.91:1 at best.
+
+   `--badge-dot` stays at 500: it is decorative, and it is the one value
+   that reads on both grounds. ──────────────────────────────────── */
+[data-theme="dark"] .ds-badge--blue {
+  --badge-bg:             var(--ds-color-display-blue-dark-subtle);
+  --badge-border:         var(--ds-color-display-blue-dark-border);
+  --badge-text:           var(--ds-color-display-blue-200);
+  --badge-dot:            var(--ds-color-display-blue-500);
+  --badge-outline-border: var(--ds-color-display-blue-500);
+}
+[data-theme="dark"] .ds-badge--blue-light {
+  --badge-bg:             var(--ds-color-display-blue-light-dark-subtle);
+  --badge-border:         var(--ds-color-display-blue-light-dark-border);
+  --badge-text:           var(--ds-color-display-blue-light-200);
+  --badge-dot:            var(--ds-color-display-blue-light-500);
+  --badge-outline-border: var(--ds-color-display-blue-light-500);
+}
+[data-theme="dark"] .ds-badge--blue-gray {
+  --badge-bg:             var(--ds-color-display-blue-gray-dark-subtle);
+  --badge-border:         var(--ds-color-display-blue-gray-dark-border);
+  --badge-text:           var(--ds-color-display-blue-gray-200);
+  --badge-dot:            var(--ds-color-display-blue-gray-500);
+  --badge-outline-border: var(--ds-color-display-blue-gray-500);
+}
+[data-theme="dark"] .ds-badge--indigo {
+  --badge-bg:             var(--ds-color-display-indigo-dark-subtle);
+  --badge-border:         var(--ds-color-display-indigo-dark-border);
+  --badge-text:           var(--ds-color-display-indigo-200);
+  --badge-dot:            var(--ds-color-display-indigo-500);
+  --badge-outline-border: var(--ds-color-display-indigo-500);
+}
+[data-theme="dark"] .ds-badge--orange {
+  --badge-bg:             var(--ds-color-display-orange-dark-subtle);
+  --badge-border:         var(--ds-color-display-orange-dark-border);
+  --badge-text:           var(--ds-color-display-orange-200);
+  --badge-dot:            var(--ds-color-display-orange-500);
+  --badge-outline-border: var(--ds-color-display-orange-500);
+}
+[data-theme="dark"] .ds-badge--pink {
+  --badge-bg:             var(--ds-color-display-pink-dark-subtle);
+  --badge-border:         var(--ds-color-display-pink-dark-border);
+  --badge-text:           var(--ds-color-display-pink-200);
+  --badge-dot:            var(--ds-color-display-pink-500);
+  --badge-outline-border: var(--ds-color-display-pink-500);
+}
+[data-theme="dark"] .ds-badge--purple {
+  --badge-bg:             var(--ds-color-display-purple-dark-subtle);
+  --badge-border:         var(--ds-color-display-purple-dark-border);
+  --badge-text:           var(--ds-color-display-purple-200);
+  --badge-dot:            var(--ds-color-display-purple-500);
+  --badge-outline-border: var(--ds-color-display-purple-500);
+}
+
 /* ── Base ─────────────────────────────────────────────────────────── */
 .ds-badge {
   display: inline-flex;

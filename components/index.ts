@@ -18,6 +18,13 @@ export type { BadgeTone, BadgeColor, BadgeVariant, BadgeSize } from './Badge'
 export { BadgeGroup } from './BadgeGroup'
 export type { BadgeGroupTone, BadgeGroupSize, BadgeGroupBadge } from './BadgeGroup'
 
+export { RevealTransition } from './RevealTransition'
+
+export { ModuleBanner } from './ModuleBanner'
+
+export { ModuleCapsule } from './ModuleCapsule'
+export type { CapsuleBadge, CapsuleSignal, CapsuleProgress } from './ModuleCapsule'
+
 export { ModuleIcon, moduleNames } from './ModuleIcon'
 export type { ModuleName, ModuleVariant } from './ModuleIcon'
 

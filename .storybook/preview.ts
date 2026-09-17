@@ -3,7 +3,51 @@ import theme from './theme'
 import '../tokens/fonts.css'
 import '../tokens/dist/index.css'
 
+// ADR-0029: dark mode is an attribute, not a media query, so the toolbar throws
+// exactly the switch a product throws. The !important is scoped to dark: in
+// light the backgrounds addon keeps working untouched.
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style')
+  style.textContent = `
+    html[data-theme="dark"] body,
+    html[data-theme="dark"] .sb-show-main {
+      background: var(--ds-bg-default) !important;
+      color: var(--ds-text-default);
+    }
+  `
+  document.head.append(style)
+}
+
 const preview: Preview = {
+  globalTypes: {
+    theme: {
+      description: 'Colour mode',
+      defaultValue: 'light',
+      toolbar: {
+        title: 'Mode',
+        icon: 'contrast',
+        items: [
+          { value: 'light', title: 'Light' },
+          { value: 'dark', title: 'Dark' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+  },
+
+  decorators: [
+    (story, context) => ({
+      components: { story },
+      setup() {
+        const root = document.documentElement
+        if (context.globals.theme === 'dark') root.setAttribute('data-theme', 'dark')
+        else root.removeAttribute('data-theme')
+        return {}
+      },
+      template: '<story />',
+    }),
+  ],
+
   parameters: {
     options: {
       // Must be inline — Storybook statically analyses this to build the index,
@@ -22,7 +66,7 @@ const preview: Preview = {
         order: [
           'Introduction',
           'Foundations', [
-            'Color', ['Primitives', 'Semantic', 'Display palette', 'Chart series'],
+            'Color', ['Primitives', 'Semantic', 'Modes', 'Display palette', 'Chart series'],
             'Typography',
             'Spacing', ['Primitives', 'Semantic', 'Control padding'],
             'Radius', ['Primitives', 'Roles'],
@@ -57,7 +101,7 @@ const preview: Preview = {
       values: [
         { name: 'White',     value: '#FFFFFF' },
         { name: 'Secondary', value: '#F9FAFB' },
-        { name: 'Dark',      value: '#1F242F' },
+        { name: 'Dark',      value: '#18201C' },
         { name: 'Brand',     value: '#033A1F' },
       ],
     },

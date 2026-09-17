@@ -94,7 +94,7 @@ function handleClick(event: MouseEvent) {
 
 /* ── Dark background ──────────────────────────────────────────────── */
 .ds-close-button--dark .ds-close-button__icon {
-  color: white;
+  color: var(--ds-text-on-inverse);
   opacity: 0.7;
 }
 
@@ -103,7 +103,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .ds-close-button--dark:hover:not(:disabled) .ds-close-button__icon {
-  color: white;
+  color: var(--ds-text-on-inverse);
   opacity: 1;
 }
 

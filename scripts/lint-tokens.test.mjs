@@ -10,11 +10,14 @@
  * The four historical bugs each have a named test so they cannot come back.
  */
 import { test } from 'node:test'
+import { readFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
-import { lintSource, RULES } from './lint-tokens.mjs'
+import { lintSource, lintModes, lintTokenImports, RULES, LIGHT_SRC, DARK_SRC } from './lint-tokens.mjs'
 
 const rules = (src) => new Set(lintSource('Fixture.vue', src).map((f) => f.rule))
 const fires = (rule, src) => assert.ok(rules(src).has(rule), `expected ${rule} to fire on:\n${src}`)
+const fires2 = (rule, l, d) => assert.ok(modeRules(l, d).has(rule), `expected ${rule} to fire`)
+const silent2 = (rule, l, d) => assert.ok(!modeRules(l, d).has(rule), `expected ${rule} NOT to fire`)
 const silent = (rule, src) => assert.ok(!rules(src).has(rule), `expected ${rule} NOT to fire on:\n${src}`)
 
 const style = (css) => `<template><i /></template>\n<style scoped>\n${css}\n</style>\n`
@@ -32,8 +35,32 @@ test('no-raw-primitive', () => {
 test('no-colour-literal', () => {
   fires('no-colour-literal', style('.a { color: #ff0000; }'))
   fires('no-colour-literal', style('.a { background: rgba(0, 0, 0, 0.08); }'))
+  fires('no-colour-literal', style('.a { color: #f00; }'))
+  fires('no-colour-literal', style('.a { color: hsl(210 100% 50%); }'))
   silent('no-colour-literal', style('.a { color: var(--ds-text-strong); }'))
   silent('no-colour-literal', style('.a { background: color-mix(in srgb, var(--ds-bg-inverse) 8%, transparent); }'))
+})
+
+test('no-colour-literal covers keywords, not just hex and rgb()', () => {
+  // ADR-0029: `white` is the one literal a second colour mode breaks — it does
+  // not move and everything around it does.
+  fires('no-colour-literal', style('.a { color: white; }'))
+  fires('no-colour-literal', style('.a { background: white; }'))
+  fires('no-colour-literal', style('.a { border: 1px solid black; }'))
+  fires('no-colour-literal', style('.a { --badge-dot: white; }'))
+  // not colours in this sense
+  silent('no-colour-literal', style('.a { background: transparent; }'))
+  silent('no-colour-literal', style('.a { color: currentColor; }'))
+  silent('no-colour-literal', style('.a { color: inherit; }'))
+  // and the word has to be a value, not part of a name
+  silent('no-colour-literal', style('.ds-avatar--white-label { padding: 0; }'))
+})
+
+test('regression: three `color: white` sat under a linter reporting zero (ADR-0029)', () => {
+  // CloseButton, ProgressSteps and Avatar each hardcoded white where a token
+  // already existed — and no-colour-literal only ever looked for #hex and rgb()
+  fires('no-colour-literal', style('.ds-close-button--dark .icon { color: white; }'))
+  silent('no-colour-literal', style('.ds-close-button--dark .icon { color: var(--ds-text-on-inverse); }'))
 })
 
 test('no-shadowing-var', () => {
@@ -130,6 +157,11 @@ test('focus-ring-instant', () => {
   fires('focus-ring-instant', style('.a {\n  transition:\n    color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),\n    box-shadow var(--ds-motion-duration-quick) var(--ds-motion-easing-default);\n}'))
 })
 
+const modeRules = (light, dark) => new Set(lintModes(light, dark).map((f) => f.rule))
+const c = (ref) => ({ $value: `{color.${ref}}`, $type: 'color' })
+const LIGHT = { text: { strong: c('gray-light.900') }, bg: { default: c('base.white') }, border: {} }
+const DARK = { text: { strong: c('gray-forest.100') }, bg: { default: c('gray-forest.900') }, border: {} }
+
 test('every exported rule has a test that fires it', () => {
   const covered = new Set()
   for (const [rule, src] of [
@@ -148,6 +180,14 @@ test('every exported rule has a test that fires it', () => {
     ['no-literal-z-index', style('.a { z-index: 100; }')],
     ['focus-ring-instant', style('.a { transition: box-shadow var(--ds-motion-duration-moderate) var(--ds-motion-easing-default); }')],
   ]) if (rules(src).has(rule)) covered.add(rule)
+
+  // The mode rules are structural — they read the two token sources, not a
+  // .vue file — so they reach `covered` through lintModes rather than a fixture.
+  for (const [rule, light, dark] of [
+    ['dark-mode-parity', { ...LIGHT, text: { ...LIGHT.text, orphan: c('gray-light.600') } }, DARK],
+    ['mode-neutral-ramp', LIGHT, { ...DARK, text: { strong: c('gray-light.900') } }],
+  ]) if (modeRules(light, dark).has(rule)) covered.add(rule)
+
   assert.deepEqual([...covered].sort(), [...RULES].sort())
 })
 
@@ -184,4 +224,84 @@ test('findings carry file, line and message', () => {
   assert.equal(typeof f.line, 'number')
   assert.ok(f.line > 1, 'line number should point past the template')
   assert.match(f.msg, /#ff0000/)
+})
+
+/* ── the mode rules, over the token sources rather than a .vue file ────── */
+
+test('dark-mode-parity', () => {
+  silent2('dark-mode-parity', LIGHT, DARK)
+  // the real failure: a light token added, the dark twin forgotten. It does not
+  // error at build time — it inherits the light value and flashes white.
+  fires2('dark-mode-parity', { ...LIGHT, text: { ...LIGHT.text, subtle: c('gray-light.600') } }, DARK)
+  fires2('dark-mode-parity', LIGHT, { ...DARK, text: { ...DARK.text, ghost: c('gray-forest.300') } })
+})
+
+test('mode-neutral-ramp', () => {
+  silent2('mode-neutral-ramp', LIGHT, DARK)
+  // a dark token still reaching for the light neutral — the same white flash,
+  // arrived at by copy-paste instead of by omission
+  fires2('mode-neutral-ramp', LIGHT, { ...DARK, text: { strong: c('gray-light.900') } })
+  fires2('mode-neutral-ramp', { ...LIGHT, text: { strong: c('gray-forest.100') } }, DARK)
+})
+
+test('the mode rules read the real token sources, not just fixtures', () => {
+  // ADR-0018: a rule that only ever sees fixtures proves nothing about the ship
+  const light = JSON.parse(readFileSync(LIGHT_SRC, 'utf8'))
+  const dark = JSON.parse(readFileSync(DARK_SRC, 'utf8'))
+  assert.equal(lintModes(light, dark).length, 0, 'shipped token sources must be clean')
+  // and the suite bites: break one and it must be caught
+  const broken = structuredClone(dark)
+  delete broken.text.strong
+  assert.ok(modeRules(light, broken).has('dark-mode-parity'))
+  const swapped = structuredClone(dark)
+  swapped.bg.default = c('gray-light.950')
+  assert.ok(modeRules(light, swapped).has('mode-neutral-ramp'))
+})
+
+/* ── the JS token export boundary, over .ts ────────────────────────────── */
+
+const imports = (src) => new Set(
+  lintTokenImports([{ file: 'composables/x.ts', source: src }]).map((f) => f.rule),
+)
+const TOK = "'../tokens/dist/index.js'"
+
+test('no-token-js-import reaches TypeScript, not only .vue', () => {
+  // ADR-0019: a resolved value read in JS bypasses the cascade. lintSource only
+  // ever walks .vue, so a composable was invisible to it.
+  assert.ok(imports(`import { DsBgDefault } from ${TOK}`).has('no-token-js-import'))
+  assert.ok(imports(`import tokens from ${TOK}`).has('no-token-js-import'))
+  assert.ok(imports(`import * as tokens from ${TOK}`).has('no-token-js-import'))
+  // an easing has no var() form — it is the computation case that platform is for
+  assert.ok(!imports(`import { easing } from ${TOK}`).has('no-token-js-import'))
+  assert.ok(!imports(`import { easing, cubicBezier } from ${TOK}`).has('no-token-js-import'))
+  // one allowed name does not smuggle a forbidden one in beside it
+  assert.ok(imports(`import { easing, DsBgDefault } from ${TOK}`).has('no-token-js-import'))
+  // and an unrelated import is not the token export
+  assert.ok(!imports("import { ref } from 'vue'").has('no-token-js-import'))
+})
+
+test("regression: the rule's own comment is not read as an import (ADR-0032)", () => {
+  // useMarquee explains the exception directly above the import, and the prose
+  // contains the word `import`. Unstripped, the scan read the comment as the
+  // clause and reported the explanation as a violation.
+  const src = [
+    '// `no-token-js-import` forbids importing resolved VALUES, not this.',
+    `import { easing } from ${TOK}`,
+  ].join('\n')
+  assert.ok(!imports(src).has('no-token-js-import'))
+})
+
+test('regression: a clause does not span the import before it (ADR-0032)', () => {
+  // The codebase writes no semicolons, so a lazy `[^;]*?` ran from one import
+  // across the next and blamed the wrong line.
+  const src = [
+    "import { computed, ref } from 'vue'",
+    `import { easing } from ${TOK}`,
+  ].join('\n')
+  assert.ok(!imports(src).has('no-token-js-import'))
+})
+
+test('the shipped .ts sources are clean', () => {
+  const src = readFileSync('composables/useMarquee.ts', 'utf8')
+  assert.equal(lintTokenImports([{ file: 'composables/useMarquee.ts', source: src }]).length, 0)
 })

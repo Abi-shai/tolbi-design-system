@@ -67,6 +67,57 @@
         "$type": "color"
       }
     },
+    "gray-forest": {
+      "25": {
+        "$value": "#F4F8F6",
+        "$type": "color"
+      },
+      "50": {
+        "$value": "#EAF0ED",
+        "$type": "color"
+      },
+      "100": {
+        "$value": "#D9E2DE",
+        "$type": "color"
+      },
+      "200": {
+        "$value": "#C0CEC7",
+        "$type": "color"
+      },
+      "300": {
+        "$value": "#A0B1A8",
+        "$type": "color"
+      },
+      "400": {
+        "$value": "#7F948A",
+        "$type": "color"
+      },
+      "500": {
+        "$value": "#5C7066",
+        "$type": "color",
+        "$description": "Hue 150 — the neutral tinted onto the brand (brand/500 is #066938)"
+      },
+      "600": {
+        "$value": "#46584F",
+        "$type": "color"
+      },
+      "700": {
+        "$value": "#36453D",
+        "$type": "color"
+      },
+      "800": {
+        "$value": "#26312B",
+        "$type": "color"
+      },
+      "900": {
+        "$value": "#18201C",
+        "$type": "color"
+      },
+      "950": {
+        "$value": "#080C0A",
+        "$type": "color"
+      }
+    },
     "brand": {
       "25": {
         "$value": "#F6F9F8",
@@ -116,6 +167,16 @@
       "950": {
         "$value": "#022112",
         "$type": "color"
+      },
+      "dark-subtle": {
+        "$value": "#152E21",
+        "$type": "color",
+        "$description": "dark mode only — brand/500 blended into gray-forest/900 to 1.15:1, the tinted ground"
+      },
+      "dark-border": {
+        "$value": "#0F472B",
+        "$type": "color",
+        "$description": "dark mode only — brand/500 blended into gray-forest/900 to 1.55:1, the hairline on brand/dark-subtle"
       }
     },
     "accent": {
@@ -167,6 +228,16 @@
       "950": {
         "$value": "#542C0D",
         "$type": "color"
+      },
+      "dark-subtle": {
+        "$value": "#272B1C",
+        "$type": "color",
+        "$description": "dark mode only — accent/400 blended into gray-forest/900 to 1.15:1, the tinted ground"
+      },
+      "dark-border": {
+        "$value": "#413F1D",
+        "$type": "color",
+        "$description": "dark mode only — accent/400 blended into gray-forest/900 to 1.55:1, the hairline on accent/dark-subtle"
       }
     },
     "error": {
@@ -218,6 +289,16 @@
       "950": {
         "$value": "#55160C",
         "$type": "color"
+      },
+      "dark-subtle": {
+        "$value": "#382520",
+        "$type": "color",
+        "$description": "dark mode only — error/500 blended into gray-forest/900 to 1.15:1, the tinted ground"
+      },
+      "dark-border": {
+        "$value": "#652D26",
+        "$type": "color",
+        "$description": "dark mode only — error/500 blended into gray-forest/900 to 1.55:1, the hairline on error/dark-subtle"
       }
     },
     "warning": {
@@ -269,6 +350,16 @@
       "950": {
         "$value": "#4E1D09",
         "$type": "color"
+      },
+      "dark-subtle": {
+        "$value": "#2C2A1A",
+        "$type": "color",
+        "$description": "dark mode only — warning/500 blended into gray-forest/900 to 1.15:1, the tinted ground"
+      },
+      "dark-border": {
+        "$value": "#4E3B17",
+        "$type": "color",
+        "$description": "dark mode only — warning/500 blended into gray-forest/900 to 1.55:1, the hairline on warning/dark-subtle (exact value from Figma; the solve landed one unit off in red)"
       }
     },
     "success": {
@@ -320,6 +411,16 @@
       "950": {
         "$value": "#053321",
         "$type": "color"
+      },
+      "dark-subtle": {
+        "$value": "#182E23",
+        "$type": "color",
+        "$description": "dark mode only — success/500 blended into gray-forest/900 to 1.15:1, the tinted ground"
+      },
+      "dark-border": {
+        "$value": "#184630",
+        "$type": "color",
+        "$description": "dark mode only — success/500 blended into gray-forest/900 to 1.55:1, the hairline on success/dark-subtle"
       }
     },
     "display": {
@@ -343,6 +444,16 @@
           "$value": "#175CD3",
           "$type": "color",
           "$description": "label text and outline border"
+        },
+        "dark-subtle": {
+          "$value": "#1A2C33",
+          "$type": "color",
+          "$description": "dark mode only — display/blue/500 blended into gray-forest/900 to 1.15:1, the categorical tint"
+        },
+        "dark-border": {
+          "$value": "#1E415C",
+          "$type": "color",
+          "$description": "dark mode only — display/blue/500 blended into gray-forest/900 to 1.55:1, the hairline on display/blue/dark-subtle"
         }
       },
       "blue-light": {
@@ -365,6 +476,16 @@
           "$value": "#026AA2",
           "$type": "color",
           "$description": "label text and outline border"
+        },
+        "dark-subtle": {
+          "$value": "#1A2D2E",
+          "$type": "color",
+          "$description": "dark mode only — display/blue-light/500 blended into gray-forest/900 to 1.15:1, the categorical tint"
+        },
+        "dark-border": {
+          "$value": "#1F434C",
+          "$type": "color",
+          "$description": "dark mode only — display/blue-light/500 blended into gray-forest/900 to 1.55:1, the hairline on display/blue-light/dark-subtle"
         }
       },
       "blue-gray": {
@@ -387,6 +508,16 @@
           "$value": "#363F72",
           "$type": "color",
           "$description": "label text and outline border"
+        },
+        "dark-subtle": {
+          "$value": "#222B2E",
+          "$type": "color",
+          "$description": "dark mode only — display/blue-gray/500 blended into gray-forest/900 to 1.15:1, the categorical tint"
+        },
+        "dark-border": {
+          "$value": "#353E50",
+          "$type": "color",
+          "$description": "dark mode only — display/blue-gray/500 blended into gray-forest/900 to 1.55:1, the hairline on display/blue-gray/dark-subtle"
         }
       },
       "indigo": {
@@ -409,6 +540,16 @@
           "$value": "#3538CD",
           "$type": "color",
           "$description": "label text and outline border"
+        },
+        "dark-subtle": {
+          "$value": "#212A37",
+          "$type": "color",
+          "$description": "dark mode only — display/indigo/500 blended into gray-forest/900 to 1.15:1, the categorical tint"
+        },
+        "dark-border": {
+          "$value": "#303C64",
+          "$type": "color",
+          "$description": "dark mode only — display/indigo/500 blended into gray-forest/900 to 1.55:1, the hairline on display/indigo/dark-subtle"
         }
       },
       "orange": {
@@ -431,6 +572,16 @@
           "$value": "#C4320A",
           "$type": "color",
           "$description": "label text and outline border"
+        },
+        "dark-subtle": {
+          "$value": "#31281B",
+          "$type": "color",
+          "$description": "dark mode only — display/orange/500 blended into gray-forest/900 to 1.15:1, the categorical tint"
+        },
+        "dark-border": {
+          "$value": "#5B341A",
+          "$type": "color",
+          "$description": "dark mode only — display/orange/500 blended into gray-forest/900 to 1.55:1, the hairline on display/orange/dark-subtle"
         }
       },
       "pink": {
@@ -453,6 +604,16 @@
           "$value": "#C01048",
           "$type": "color",
           "$description": "label text and outline border"
+        },
+        "dark-subtle": {
+          "$value": "#382427",
+          "$type": "color",
+          "$description": "dark mode only — display/pink/500 blended into gray-forest/900 to 1.15:1, the categorical tint"
+        },
+        "dark-border": {
+          "$value": "#662A37",
+          "$type": "color",
+          "$description": "dark mode only — display/pink/500 blended into gray-forest/900 to 1.55:1, the hairline on display/pink/dark-subtle"
         }
       },
       "purple": {
@@ -475,6 +636,16 @@
           "$value": "#6941C6",
           "$type": "color",
           "$description": "label text and outline border"
+        },
+        "dark-subtle": {
+          "$value": "#272933",
+          "$type": "color",
+          "$description": "dark mode only — display/purple/500 blended into gray-forest/900 to 1.15:1, the categorical tint"
+        },
+        "dark-border": {
+          "$value": "#3F3A59",
+          "$type": "color",
+          "$description": "dark mode only — display/purple/500 blended into gray-forest/900 to 1.55:1, the hairline on display/purple/dark-subtle"
         }
       }
     }

@@ -141,6 +141,74 @@ Before working on any component, read:
   solid fill. **Opacity is not a contrast strategy** — Figma's 75% composites to 3.15:1. In Figma a
   glyph stroke binds to a **primitive** (`text/*` is scoped `TEXT_FILL`); in code it stays
   `currentColor`, so the two disagree on provenance for the same pixel.
+- **ADR-0029**: Dark mode is back — as a Figma mode first, which is the only condition ADR-0003 set.
+  The dark neutral is **`gray-forest`**, tinted to the brand's hue 150, and light keeps `gray-light`:
+  the modes do not share a neutral. The frame specified 16 roles; **69 ship**, because a token with
+  no dark value inherits the light one — a white flash on a dark page. The derivations follow four
+  rules: a layer **rises** in dark (800/700/600 where light recesses 50/100/300), accents travel
+  toward the light end by **different distances** (equal contrast, not equal index — brand goes
+  600→200), tinted grounds are **minted** (`{tone}/dark-subtle`, `{tone}/dark-border`, solved from
+  the frame's 1.15:1 and 1.55:1), and `inverse` **flips with the mode**. The switch is
+  `[data-theme="dark"]`, never `prefers-color-scheme`. `semantic.dark.json` is kept **out of the JS
+  export** — same 69 paths, so it would overwrite rather than add. Parity is enforced by
+  `dark-mode-parity` and `mode-neutral-ramp`. A focus ring keeps its **alpha** and swaps only the
+  base it is taken from. The component pass was three `white` literals (`CloseButton`,
+  `ProgressSteps`, `Avatar`) — white is the one literal a second mode breaks — and the linter could
+  not see them, so `no-colour-literal` now covers keywords too.
+- **ADR-0030**: In dark, **elevation stops being what separates**. 100% black — the strongest shadow
+  `gray-forest/900` can physically hold — is 1.262:1, and `border-subtle` is already **1.644:1**;
+  every elevated surface in the catalogue already carries that border, so the roles swap and the
+  shadow only grounds. Dark alphas are ×5 on `gray-forest/950`, not solved to match light (that wants
+  53–98%, a halo). `elevation-dark.css` is emitted from the **same** `elevation.json` — redefinition
+  is required because `var(--ds-shadow-*)` resolves on the element that *declares* it, so subtree
+  theming would otherwise inherit the light value. `Badge`'s seven categorical hues take ADR-0029's
+  tint rule (14 new primitives); `--badge-text` goes 700→200 and `--badge-outline-border` goes
+  700→**500**, the one step that clears 3:1 on the dark ground for all seven. Contrast is now
+  **measured, not described** — `scripts/contrast.test.mjs` runs ADR-0009's pairing contract in both
+  modes.
+- **ADR-0031**: `ModuleCapsule` — one module's harvested data on one row, and the first surface
+  **drawn in dark mode** rather than ported into it. Because it was, Figma's hexes independently
+  check ADR-0029's derivation: `warning/dark-subtle` matched **exactly**, `dark-border` was one unit
+  of red out (Figma's `#4E3B17` adopted, it measures the 1.55:1 the solve aimed at), and
+  `bg-neutral-subtle` = `gray-forest/800` confirms the *rule*, not just the arithmetic. A `-solid`
+  border **does two jobs** — match its fill where a component pairs them, clear 3:1 where `Badge`'s
+  outline uses it alone — and where those diverge in dark, **usage decides**: `warning`/`success`
+  brighten to 500, `error` already satisfies both, `brand` is never standalone. The "wider range of
+  module sizes" needed **no artwork**: the 44-grid export is the 48-grid drawing scaled, and a
+  `viewBox` makes `size="44"` identical. `ina` and `conformite` still have no artwork.
+  The banner is **two components**: `ModuleBanner` is the band — `bg-neutral-subtle`, square corners,
+  6px padding and gap — and `ModuleCapsule` is what sits in it at `bg-default`. **That pair is the
+  only edge a capsule has**: on its own it is `bg-default` on `bg-default` and cannot be seen. The
+  capsule's full form is the first of the seven in `1308:5261` (`Bandeau/Capsule — TOLBI Yield`,
+  `1219:3489`, the only published instance); `A`–`E` are the same component with sections off.
+  A width Figma draws is a **ceiling, not a size**: reproducing the 260px identity column literally
+  left **343px of empty ground** across the band's seven capsules (93 in one), so the columns hug and
+  stop at the drawn width — `max-width`, not `width`. Both halves matter, since the cap is what still
+  truncates the one title that overruns it. The **progress column is the exception** and stays fixed:
+  a bar is a scale, and two capsules must measure against the same ruler.
+- **ADR-0032**: Motion travels **out** of the product for once. `--ds-motion-duration-ambient`
+  (600ms) extends the duration scale one step at its own ×1.5 ratio — the product had it in
+  `main.css` with a note to promote it. `RevealTransition` is the fourth transition: a surface that
+  **opens its own height in place**, `ambient` + `easing-in-out`, with the content following one
+  `enter` later — that offset is the difference between "it opens" and "it appears". It uses
+  ADR-0025's `0fr → 1fr` grid, which collapses padding and margins for free where the product
+  animated five properties, and it renders its **own** element so the grid cannot land on the wrong
+  one. It also makes a bug unwritable: the product's reveal never ran because a single
+  `requestAnimationFrame` fires *before* style recalculation — Vue's `<Transition>` already does the
+  double rAF (`nextFrame`). `useMarquee` (internal, like `useSlidingIndicator`) carries the scroll:
+  **px per second, not per frame** (2px/frame ran 120Hz screens at double speed), elapsed capped at
+  50ms for backgrounded tabs, and a wrap that **subtracts** rather than resets. A marquee is not a
+  transition — only its start and stop borrow from the duration scale. The easings shipped as CSS
+  **strings only**, so the one consumer needing a curve at *t* re-derived it and was **25 points
+  off**; `./tokens/js` now exports them as **callable functions** (`easing.default(t)`), generated
+  from the same values, and `no-token-js-import` walks `.ts` too, allowing only `easing` and
+  `cubicBezier` — a resolved value bypasses the cascade, a bezier has no cascade to bypass.
+  Deliberately **not** added: a delay token (a delay is a duration in another slot) and a travel
+  distance (three sites, three values — not a scale). Under reduced motion the clipped row becomes
+  hand-scrollable: **less motion must not mean less content**. Its two axes collapse on purpose:
+  `Campagne` drives the status badge *and* the figure's badge wording together, `Comparaison` is
+  hausse/baisse/aucune. A delta figure takes the **on-tint partner** on `bg-default` — identical to
+  `text-{tone}` in dark, and the legible one in light.
 
 ## Architecture
 
@@ -156,3 +224,6 @@ Before working on any component, read:
 - Semantic tokens (`--ds-semantic-*`) are what components consume — never raw primitive tokens directly
 - Typography roles (`--ds-font-size-*`, `--ds-line-height-*`, `--ds-letter-spacing-*`, `--ds-font-weight-*`) are the typography equivalent — the `--ds-typography-{font-size,line-height}-{number}` ramps exist only to be aliased
 - The mobile type scale is opt-in via `[data-typography="mobile"]`, not a media query
+- Dark mode is opt-in via `[data-theme="dark"]`, not a media query. Every semantic colour token has a
+  value in both `tokens/src/color/semantic.json` and `tokens/src/color/semantic.dark.json` — adding
+  one to either without the other fails `npm run lint`

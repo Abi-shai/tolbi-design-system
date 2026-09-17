@@ -35,6 +35,11 @@
         "$value": "400ms",
         "$type": "duration",
         "$description": "Heavy surfaces — modals, drawers, destructive confirmations"
+      },
+      "ambient": {
+        "$value": "600ms",
+        "$type": "duration",
+        "$description": "Scene-setting — a movement nobody watches. A full-width surface opening its own height. Extends the ramp at its own ratio (x1.5: 200 -> 300 -> 400 -> 600). Promoted from the product, which had it in main.css because ds-tokens.css is generated"
       }
     },
     "easing": {
@@ -56,7 +61,7 @@
       "in-out": {
         "$value": "cubic-bezier(0.4, 0, 0.2, 1)",
         "$type": "cubicBezier",
-        "$description": "Spatial — lateral movement. Tab indicator, drawer slides."
+        "$description": "Spatial — a thing that travels, rather than a state that changes. Lateral movement (tab indicator, drawer slide) and a surface opening its own height: `default` is a pronounced ease-out that leaves flat out, which reads as a snap on a large surface. Measured on a full-width band: `default` at 300ms was 44% open in 50ms; this is 2%"
       }
     },
     "scale": {

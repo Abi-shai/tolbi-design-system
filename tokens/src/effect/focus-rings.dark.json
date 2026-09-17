@@ -1,0 +1,40 @@
+{
+  "focus-ring": {
+    "brand": {
+      "$value": "0px 0px 0px 4px color-mix(in srgb, var(--ds-color-brand-300) 24%, transparent)",
+      "$description": "brand-300 · 24%"
+    },
+    "gray": {
+      "$value": "0px 0px 0px 4px color-mix(in srgb, var(--ds-color-gray-forest-400) 14%, transparent)",
+      "$description": "gray-forest-400 · 14%"
+    },
+    "gray-secondary": {
+      "$value": "0px 0px 0px 4px color-mix(in srgb, var(--ds-color-gray-forest-400) 20%, transparent)",
+      "$description": "gray-forest-400 · 20%"
+    },
+    "error": {
+      "$value": "0px 0px 0px 4px color-mix(in srgb, var(--ds-color-error-400) 24%, transparent)",
+      "$description": "error-400 · 24%"
+    },
+    "brand-shadow-xs": {
+      "$value": "0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-forest-950) 5%, transparent), 0px 0px 0px 4px color-mix(in srgb, var(--ds-color-brand-300) 24%, transparent)",
+      "$description": "shadow-xs + brand-300 · 24%"
+    },
+    "brand-shadow-sm": {
+      "$value": "0px 1px 3px 0px color-mix(in srgb, var(--ds-color-gray-forest-950) 10%, transparent), 0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-forest-950) 6%, transparent), 0px 0px 0px 4px color-mix(in srgb, var(--ds-color-brand-300) 24%, transparent)",
+      "$description": "shadow-sm + brand-300 · 24%"
+    },
+    "gray-shadow-xs": {
+      "$value": "0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-forest-950) 5%, transparent), 0px 0px 0px 4px color-mix(in srgb, var(--ds-color-gray-forest-400) 14%, transparent)",
+      "$description": "shadow-xs + gray-forest-400 · 14%"
+    },
+    "gray-shadow-sm": {
+      "$value": "0px 1px 3px 0px color-mix(in srgb, var(--ds-color-gray-forest-950) 10%, transparent), 0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-forest-950) 6%, transparent), 0px 0px 0px 4px color-mix(in srgb, var(--ds-color-gray-forest-400) 14%, transparent)",
+      "$description": "shadow-sm + gray-forest-400 · 14%"
+    },
+    "error-shadow-xs": {
+      "$value": "0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-forest-950) 5%, transparent), 0px 0px 0px 4px color-mix(in srgb, var(--ds-color-error-400) 24%, transparent)",
+      "$description": "shadow-xs + error-400 · 24%"
+    }
+  }
+}

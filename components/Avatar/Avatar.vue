@@ -198,7 +198,7 @@ const showInitials = computed(() => !props.src && !!props.initials)
 
 .ds-avatar__status--company {
   transform: translate(15%, 15%);
-  background: white;
+  background: var(--ds-bg-default);
 }
 
 .ds-avatar__status--verified {
