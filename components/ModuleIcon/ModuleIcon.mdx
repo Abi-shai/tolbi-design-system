@@ -74,6 +74,12 @@ Sources : `Module illustration` (nœud 9945:197) et `Modules logos` (nœud 9892:
 `size` accepte un nombre (px) ou une longueur CSS (`"2rem"`, `"100%"`). L'artwork est un carré
 de 48px.
 
+**La taille ne dépend pas de la variante.** Les deux jeux partagent le même `viewBox` `0 0 48 48`
+et n'ont aucune dimension intrinsèque : `size` pose la boîte, le dessin suit. Et comme le logo
+n'est que l'illustration avec la tuile ajoutée dessous — mêmes coordonnées exactement —, à `size`
+égal le dessin fait la même taille dans les deux. La tuile, elle, remplit la boîte bord à bord :
+c'est la seule différence d'encombrement.
+
 ---
 
 ## Usage

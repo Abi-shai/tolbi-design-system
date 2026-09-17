@@ -148,15 +148,36 @@ export const Pairing: Story = {
 
 export const Sizes: Story = {
   name: 'Tailles',
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        story:
+          '`size` ne dépend pas de la variante. La tuile du logo remplit la boîte bord à bord ' +
+          'et l\'artwork occupe les mêmes coordonnées dans les deux jeux : à `size` égal, le ' +
+          'dessin fait exactement la même taille en primitive et en sémantique.',
+      },
+    },
+  },
   render: () => ({
     components: { ModuleIcon },
-    setup: () => ({ sizes: [24, 32, 48, 64, 96] }),
+    setup: () => ({
+      sizes: [24, 32, 48, 64, 96],
+      rows: [
+        { variant: 'illustration' as const, label: 'illustration — primitive' },
+        { variant: 'logo' as const, label: 'logo — sémantique' },
+      ],
+    }),
     template: `
-      <div style="display:flex; gap:2rem; align-items:flex-end; padding:1.5rem; font-family:var(--ds-typography-font-family-poppins);">
-        <div v-for="s in sizes" :key="s" style="display:flex; flex-direction:column; align-items:center; gap:0.75rem;">
-          <ModuleIcon module="Carbone" :size="s" />
-          <span style="font-family:monospace; font-size:0.7rem; color:var(--ds-text-subtle);">{{ s }}px</span>
+      <div style="display:flex; flex-direction:column; gap:2rem; padding:1.5rem; font-family:var(--ds-typography-font-family-poppins);">
+        <div v-for="row in rows" :key="row.variant" style="display:flex; flex-direction:column; gap:0.75rem;">
+          <span style="font-size:0.7rem; color:var(--ds-text-subtle);">{{ row.label }}</span>
+          <div style="display:flex; gap:2rem; align-items:flex-end;">
+            <div v-for="s in sizes" :key="s" style="display:flex; flex-direction:column; align-items:center; gap:0.75rem;">
+              <ModuleIcon module="Carbone" :variant="row.variant" :size="s" />
+              <span style="font-family:monospace; font-size:0.7rem; color:var(--ds-text-subtle);">{{ s }}px</span>
+            </div>
+          </div>
         </div>
       </div>
     `,
