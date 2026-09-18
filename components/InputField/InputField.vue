@@ -20,7 +20,7 @@ interface Props {
   placeholder?:  string
   /** Renders inside the box, so it stays the control's business — not FormField's. */
   helpTooltip?:  string
-  type?:         'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search'
+  type?:         'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'time'
   /** Standalone use only. Inside a FormField, the wrapper's `error` decides. */
   destructive?:  boolean
   disabled?:     boolean

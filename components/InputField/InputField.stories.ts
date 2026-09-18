@@ -42,7 +42,7 @@ const meta: Meta<typeof InputField> = {
     },
     type: {
       control: 'select',
-      options: ['text', 'email', 'password', 'number', 'tel', 'url', 'search'],
+      options: ['text', 'email', 'password', 'number', 'tel', 'url', 'search', 'time'],
       table: { category: 'HTML', defaultValue: { summary: "'text'" } },
     },
   },
