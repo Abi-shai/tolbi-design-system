@@ -7,6 +7,16 @@ import { ref, watch, onMounted, onBeforeUnmount, nextTick, type Ref } from 'vue'
  * ADR-0024. Extracted from `Tabs`, which had it inline, so `ButtonGroup` could
  * have the same motion instead of a second copy.
  *
+ * It carries **both axes in the transform**. The first two consumers were
+ * horizontal rows, so the vertical offset never moved and shipped as a static
+ * `top` — which meant a vertical consumer would have *jumped*, because `top`
+ * is not what the transition list animates. `SideNavigation` is that consumer.
+ * A horizontal row has `offsetTop` constant, so `translate(x, 0)` is exactly
+ * what `translateX(x)` was: the change is free for Tabs and ButtonGroup.
+ *
+ * Which axis actually animates is the consumer's CSS, not this composable's:
+ * a row transitions `transform, width`, a column `transform, height`.
+ *
  * Two details that are easy to get wrong and are the reason this is shared:
  *
  * - The transition is withheld until after the first paint (`ready`). Without
@@ -18,7 +28,6 @@ import { ref, watch, onMounted, onBeforeUnmount, nextTick, type Ref } from 'vue'
 export interface SlidingIndicatorStyle {
   transform: string
   width: string
-  top: string
   height: string
 }
 
@@ -26,7 +35,7 @@ export function useSlidingIndicator(activeIndex: Ref<number>) {
   const containerRef = ref<HTMLElement>()
   const itemRefs = ref<HTMLElement[]>([])
   const style = ref<SlidingIndicatorStyle>({
-    transform: 'translateX(0px)', width: '0px', top: '0px', height: '0px',
+    transform: 'translate(0px, 0px)', width: '0px', height: '0px',
   })
   /** False until the first paint, so the indicator does not fly in on mount. */
   const ready = ref(false)
@@ -35,9 +44,8 @@ export function useSlidingIndicator(activeIndex: Ref<number>) {
     const el = itemRefs.value[activeIndex.value]
     if (!el) return
     style.value = {
-      transform: `translateX(${el.offsetLeft}px)`,
+      transform: `translate(${el.offsetLeft}px, ${el.offsetTop}px)`,
       width:     `${el.offsetWidth}px`,
-      top:       `${el.offsetTop}px`,
       height:    `${el.offsetHeight}px`,
     }
   }

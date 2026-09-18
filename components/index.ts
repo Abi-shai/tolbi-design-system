@@ -35,6 +35,8 @@ export { IconButton } from './IconButton'
 export { HorizontalNavigation } from './HorizontalNavigation'
 export type { NavState, BreadcrumbItem, NavModule } from './HorizontalNavigation'
 
+export { SideNavigation, SideNavItem } from './SideNavigation'
+
 export { Avatar } from './Avatar'
 export type { AvatarSize, AvatarStatus } from './Avatar'
 
