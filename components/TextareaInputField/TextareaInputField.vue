@@ -47,7 +47,11 @@ const emit = defineEmits<{
 }>()
 
 const uid     = useId()
-const inputId = computed(() => props.id ?? `textarea-${uid}`)
+// Comme partout ailleurs : l'enveloppe l'emporte là où elle a un avis. Sans
+// cela le `for` du label désigne l'id que `FormField` s'est donné et le
+// textarea en porte un autre — le libellé ne donne plus le focus et ne nomme
+// plus le champ.
+const inputId = computed(() => field?.id.value ?? props.id ?? `textarea-${uid}`)
 
 function onKeydown(e: KeyboardEvent) {
   if (props.type !== 'tags') return
@@ -98,7 +102,7 @@ function onKeydown(e: KeyboardEvent) {
 
           <!-- Tag input -->
           <textarea
-          v-bind="$attrs"
+            v-bind="$attrs"
             :id="inputId"
             class="ds-textarea__input ds-textarea__input--tags"
             :value="modelValue"
@@ -117,6 +121,7 @@ function onKeydown(e: KeyboardEvent) {
       <!-- Default mode : textarea simple -->
       <textarea
         v-else
+        v-bind="$attrs"
         :id="inputId"
         class="ds-textarea__input"
         :value="modelValue"
