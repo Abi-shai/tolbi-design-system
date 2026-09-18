@@ -1,4 +1,8 @@
 <script setup lang="ts">
+
+// Même règle que `InputField` : les attributs non déclarés vont au contrôle, à
+// travers lui, et non sur la div englobante où ils ne feraient rien.
+defineOptions({ inheritAttrs: false })
 import { computed } from 'vue'
 import { InputField, type InputFieldSize } from '../InputField'
 import { dialCodes } from './dialCodes'
@@ -71,6 +75,7 @@ const grouped = computed(() => {
 <template>
   <div class="ds-phone-field">
     <InputField
+      v-bind="$attrs"
       :model-value="modelValue"
       type="tel"
       :placeholder="placeholder"

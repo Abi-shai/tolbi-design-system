@@ -1,4 +1,12 @@
 <script setup lang="ts">
+
+// Les attributs non déclarés vont au CONTRÔLE, pas à la racine. Sans cela, un
+// `autocomplete`, un `min`/`max`, un `readonly`, un `maxlength` ou un
+// `inputmode` posé par l'appelant atterrit sur la div englobante, où il ne fait
+// rien — silencieusement. Un champ de mot de passe sans `autocomplete` casse
+// les gestionnaires de mots de passe, un champ nombre sans bornes accepte
+// n'importe quoi : ce sont des régressions invisibles à la relecture.
+defineOptions({ inheritAttrs: false })
 import { computed, useId } from 'vue'
 import { Icon } from '../Icon'
 import { useFormField } from '../FormField/context'
@@ -90,6 +98,7 @@ function onKeydown(e: KeyboardEvent) {
 
           <!-- Tag input -->
           <textarea
+          v-bind="$attrs"
             :id="inputId"
             class="ds-textarea__input ds-textarea__input--tags"
             :value="modelValue"

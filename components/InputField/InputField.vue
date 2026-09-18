@@ -1,4 +1,12 @@
 <script setup lang="ts">
+
+// Les attributs non déclarés vont au CONTRÔLE, pas à la racine. Sans cela, un
+// `autocomplete`, un `min`/`max`, un `readonly`, un `maxlength` ou un
+// `inputmode` posé par l'appelant atterrit sur la div englobante, où il ne fait
+// rien — silencieusement. Un champ de mot de passe sans `autocomplete` casse
+// les gestionnaires de mots de passe, un champ nombre sans bornes accepte
+// n'importe quoi : ce sont des régressions invisibles à la relecture.
+defineOptions({ inheritAttrs: false })
 import { computed, useId } from 'vue'
 import { Icon } from '../Icon'
 import { HelpIcon } from '../HelpIcon'
@@ -82,6 +90,7 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
 
         <!-- Native input -->
         <input
+          v-bind="$attrs"
           :id="inputId"
           class="ds-input-field__input"
           :type="type"

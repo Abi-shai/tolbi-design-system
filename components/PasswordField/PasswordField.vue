@@ -1,4 +1,8 @@
 <script setup lang="ts">
+
+// Même règle que `InputField` : les attributs non déclarés vont au contrôle, à
+// travers lui, et non sur la div englobante où ils ne feraient rien.
+defineOptions({ inheritAttrs: false })
 import { computed, ref } from 'vue'
 import { InputField, type InputFieldSize } from '../InputField'
 import { Icon } from '../Icon'
@@ -41,6 +45,7 @@ const toggleLabel = computed(() =>
 <template>
   <div class="ds-password-field">
     <InputField
+      v-bind="$attrs"
       :model-value="modelValue"
       :type="inputType"
       :placeholder="placeholder"
