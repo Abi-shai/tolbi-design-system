@@ -110,6 +110,33 @@ rail's 36px column, 6px each side, which is `spacing-sm`.
 Its panel cannot align to a 36px trigger, so it keeps `Dropdown`'s own 240px and opens *beside* the
 rail rather than under the mark.
 
+### A rule under the header, and a border ramp that was solved on white
+
+The header is separated from the items by a 1px rule. It was not in the first build and the rail is
+what needed it: **expanded, the toggle is already distinct** — it sits beside a boxed selector —
+**but in the rail it is a bare `panel-left` glyph 4px above a bare `house` glyph, and reads as a
+sixth destination.** The rule says which of the two groups a glyph belongs to. Kept in both forms
+for consistency, though only one form has the problem.
+
+It takes **`border-default`**, which is the wrong token by role and the only one that works. A
+divider is decorative; `DropdownDivider` — the catalogue's only other one — uses `border-subtle`,
+which ADR-0009 admits under the *decorative* clause. On this ground it does not survive:
+
+| on `bg-neutral` | |
+|---|---|
+| `border-default` | **1.338:1** |
+| `border-subtle` | 1.073:1 |
+| `border-subtlest` | 1.000:1 — the ground's own colour |
+
+`border-subtle`'s description says *"decorative — 1.18:1"*. That is its figure on `bg-default`. **The
+border ramp was solved against white**, and on a recessed surface it loses a step: the decorative
+end collapses into the ground and the only visible option is the one admitted as *contract* — "the
+load-bearing border". So a decorative rule on `bg-neutral` has no correct token, and the component
+spends a contract token to get a line.
+
+Same shape as the `bg-hover` / `bg-neutral-subtle` collision above: a ramp solved on one ground,
+used on another. Found the same way too — by drawing it and measuring, not by reading the file.
+
 ## Measured
 
 Live, `Navigation/SideNavigation` → *Déployée vs réduite*:
@@ -148,6 +175,11 @@ Re-bound on all six. Worth knowing before the next variant is cloned: the fix is
   transition and moves correctly, but the rail's own width and the label's disappearance do not —
   ADR-0025's `0fr → 1fr` grid is the tool for the label, and the width is a plain transition. Left
   out because a half-animated collapse reads worse than an honest cut.
+- **The border ramp has no decorative step that survives `bg-neutral`.** `border-subtle` measures
+  1.073:1 there and `border-subtlest` *is* the ground. Every decorative rule on a recessed surface
+  will reach for `border-default` and spend a contract token, as this one does. The fix is a ramp
+  solved per ground rather than against white — the same work ADR-0029 did for the neutral, one
+  tier over. Two sites is not yet a scale; a third should trigger it.
 - **Nothing pins the rail's width to the row.** `--side-nav-rail-row` makes them agree, but a
   consumer setting `width` on the collapsed nav would override the derived value and knock the rows
   off centre. No lint rule can see that.

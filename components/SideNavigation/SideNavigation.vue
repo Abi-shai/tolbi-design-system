@@ -105,17 +105,20 @@ watch(() => props.collapsed, async () => { await nextTick(); measure() })
   >
     <!-- The workspace mark and the collapse control share a row, and stack
          once the rail is one column wide. -->
-    <div v-if="hasHeader" class="ds-side-nav__header">
-      <div v-if="slots.header" class="ds-side-nav__header-slot">
-        <slot name="header" />
+    <div v-if="hasHeader" class="ds-side-nav__head">
+      <div class="ds-side-nav__header">
+        <div v-if="slots.header" class="ds-side-nav__header-slot">
+          <slot name="header" />
+        </div>
+        <IconButton
+          v-if="toggle"
+          icon="panel-left"
+          :ariaLabel="collapsed ? expandLabel : collapseLabel"
+          class="ds-side-nav__toggle"
+          @click="emit('update:collapsed', !collapsed)"
+        />
       </div>
-      <IconButton
-        v-if="toggle"
-        icon="panel-left"
-        :ariaLabel="collapsed ? expandLabel : collapseLabel"
-        class="ds-side-nav__toggle"
-        @click="emit('update:collapsed', !collapsed)"
-      />
+      <div class="ds-side-nav__divider" aria-hidden="true" />
     </div>
 
     <!-- Sliding selection — behind the items, like Tabs' indicator -->
@@ -159,6 +162,32 @@ watch(() => props.collapsed, async () => { await nextTick(); measure() })
 }
 
 /* ── Header ───────────────────────────────────────────────────────── */
+.ds-side-nav__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-xs);
+  width: 100%;
+}
+
+/*
+  The rule separates *where you are and what you can do to the panel* from
+  *where you can go*. In the expanded form the toggle is already distinct — it
+  sits beside a boxed selector. In the rail it is not: a bare `panel-left` glyph
+  4px above a bare `house` glyph reads as a sixth destination.
+
+  `border-default`, not `border-subtle` — which is what `DropdownDivider` uses
+  and is the semantically right one, a divider being decorative rather than
+  load-bearing. It does not survive this ground: on `bg-neutral` it measures
+  1.073:1, against `border-default`'s 1.338:1. Its own description says 1.18:1,
+  which is its figure on `bg-default`. The ramp was solved on white and loses a
+  step on a recessed surface — see ADR-0034's open items.
+*/
+.ds-side-nav__divider {
+  height: var(--ds-border-width-default);
+  width: 100%;
+  background-color: var(--ds-border-default);
+}
+
 .ds-side-nav__header {
   display: flex;
   align-items: center;
@@ -173,6 +202,7 @@ watch(() => props.collapsed, async () => { await nextTick(); measure() })
 /* One column wide: the toggle drops below the mark rather than beside it. */
 .ds-side-nav--collapsed .ds-side-nav__header {
   flex-direction: column;
+  align-items: center;
   gap: var(--ds-spacing-xs);
 }
 

@@ -238,7 +238,11 @@ Before working on any component, read:
   put it in three different places — **reversed the same day**: asked "then which button?", ten more
   products put it in four places and **four of ten agreed** (top of the column, trailing edge). Three
   points cannot show a distribution. So it ships an `IconButton` with `panel-left`, and
-  `toggle: false` removes it. The row stays **36px in both forms**
+  `toggle: false` removes it. A **1px rule** sits under the header — the rail needed it, where a bare
+  `panel-left` 4px above a bare `house` reads as a sixth destination — and it takes `border-default`,
+  the wrong token by role and the only one that works: **the border ramp was solved on white**, so on
+  `bg-neutral` `border-subtle` measures 1.073:1 and `border-subtlest` *is* the ground. The row stays
+  **36px in both forms**
   so the pill never resizes vertically, and the rail is written as `row + 2 × spacing-md` (52px) with
   the row as a private component token both stylesheets read. `SideNavItem` gained a **wrapper**, and
   the group registers *that*, not the button: the wrapper anchors the tooltip so it is
