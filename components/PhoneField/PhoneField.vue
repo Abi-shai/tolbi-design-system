@@ -74,6 +74,10 @@ const grouped = computed(() => {
 
 <template>
   <div class="ds-phone-field">
+    <!--
+      `String()` narrows, it does not convert: `InputField` only returns a number
+      under `type="number"`, and this control pins its own type.
+    -->
     <InputField
       v-bind="$attrs"
       :model-value="modelValue"
@@ -83,10 +87,6 @@ const grouped = computed(() => {
       :destructive="destructive"
       :disabled="disabled"
       :required="required"
-      <!--
-        `String()` narrows, it does not convert: `InputField` only returns a
-        number under `type="number"`, and this control pins its own type.
-      -->
       @update:model-value="emit('update:modelValue', String($event))"
     >
       <!--
