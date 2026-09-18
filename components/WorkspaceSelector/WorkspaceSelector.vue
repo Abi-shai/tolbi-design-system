@@ -40,6 +40,15 @@ export interface Workspace {
 interface Props {
   /** The current workspace's `id`. */
   modelValue?: string
+  /**
+   * Icon-only rail: the mark alone, with no box.
+   *
+   * Not a narrower `DropdownTrigger` — every icon-only rail in the survey
+   * (Weavy, Midday, Aboard, Shop) drops the chrome entirely and leaves the
+   * workspace mark bare. Keeping the box would also have meant a 36px square
+   * around a 24px avatar, whose padding lands off the control scale.
+   */
+  collapsed?:  boolean
   workspaces?: Workspace[]
   /** Accessible name for the trigger, which otherwise announces only the name. */
   ariaLabel?:  string
@@ -48,6 +57,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: undefined,
+  collapsed:  false,
   workspaces: () => [],
   ariaLabel:  'Changer d’espace de travail',
   disabled:   false,
@@ -88,9 +98,34 @@ function select(w: Workspace) {
 </script>
 
 <template>
-  <Dropdown v-model:open="open" class="ds-workspace-selector">
+  <Dropdown
+    v-model:open="open"
+    class="ds-workspace-selector"
+    :class="{ 'ds-workspace-selector--collapsed': collapsed }"
+  >
     <template #trigger>
+      <!-- Collapsed: the mark alone, still a real control. -->
+      <button
+        v-if="collapsed"
+        type="button"
+        class="ds-workspace-selector__mark"
+        :aria-expanded="open"
+        :aria-label="current ? `${ariaLabel} — ${current.name}` : ariaLabel"
+        :disabled="disabled || undefined"
+        aria-haspopup="true"
+        @click="open = !open"
+      >
+        <Avatar
+          v-if="current"
+          size="xs"
+          :src="current.src"
+          :initials="marks(current)"
+          :alt="current.name"
+        />
+      </button>
+
       <DropdownTrigger
+        v-else
         size="sm"
         :open="open"
         :disabled="disabled"
@@ -123,6 +158,44 @@ function select(w: Workspace) {
 .ds-workspace-selector,
 .ds-workspace-selector__trigger {
   width: 100%;
+}
+
+/* ── Collapsed ────────────────────────────────────────────────────── */
+/* A 24px mark centred in the rail's 36px column — 6px each side, on the
+   spacing ramp, which a 36px box around the same avatar would not have been. */
+.ds-workspace-selector--collapsed {
+  width: auto;
+}
+
+.ds-workspace-selector__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ds-spacing-sm);
+  border: none;
+  border-radius: var(--ds-radius-pill);
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  transition: box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
+}
+
+.ds-workspace-selector__mark:focus-visible {
+  box-shadow: var(--ds-focus-ring-gray);
+}
+
+.ds-workspace-selector__mark:disabled {
+  cursor: not-allowed;
+}
+
+/* The panel cannot match a 36px trigger — it keeps `Dropdown`'s own width and
+   opens beside the rail rather than under the mark. */
+.ds-workspace-selector--collapsed :deep(.ds-dropdown__panel) {
+  left: 100%;
+  right: auto;
+  top: 0;
+  width: 240px;
+  margin-left: var(--ds-spacing-md);
 }
 
 /* `Dropdown`'s panel is a fixed 240px pinned to `right: 0`, which is right for a

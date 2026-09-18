@@ -230,6 +230,18 @@ Before working on any component, read:
   it — and it had no `:focus-visible` rule at all. The type `DropdownTrigger` is now
   `DropdownTriggerVariant`. `control-padding-*` descriptions omit the border, so every bordered
   control is **2px taller** than its token says (42px, not 40px, at `md`).
+- **ADR-0034**: A collapsing sidebar is **three patterns**, not one — icon-only rail (36–48px,
+  label in a tooltip), icon+caption rail (64–72px, no tooltip needed), and two-tier (a permanent rail
+  plus a panel, which is not a collapse). We ship the first, as a `collapsed` prop on the same
+  component. That makes the **`Tooltip` structural**: it is where the label lives, so `aria-label`
+  carries it too. `SideNavigation` owns `collapsed` but **not the toggle** — three surveyed products
+  put it in three different places, so it belongs to the shell. The row stays **36px in both forms**
+  so the pill never resizes vertically, and the rail is written as `row + 2 × spacing-md` (52px) with
+  the row as a private component token both stylesheets read. `SideNavItem` gained a **wrapper**, and
+  the group registers *that*, not the button: the wrapper anchors the tooltip so it is
+  `position: relative`, and a button inside one reports `offsetTop: 0`. Collapsed, `WorkspaceSelector`
+  **drops its box** and renders a bare `Avatar`. Figma gotcha: **cloning a variant drops
+  `componentPropertyReferences` silently** — re-bind them by hand.
 
 ## Architecture
 

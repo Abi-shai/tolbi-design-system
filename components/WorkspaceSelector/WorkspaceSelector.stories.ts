@@ -86,3 +86,26 @@ export const Disabled: Story = {
     `,
   }),
 }
+
+export const Collapsed: Story = {
+  name: 'Réduit',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Dans un rail icônes seules la boîte disparaît et il ne reste que la marque — ce que font " +
+          'Weavy, Midday, Aboard et Shop. Le panneau ne peut pas s’aligner sur un déclencheur de ' +
+          '36px : il garde sa largeur et s’ouvre à côté du rail.',
+      },
+    },
+  },
+  render: () => ({
+    setup: () => ({ current: ref('kaolack'), workspaces }),
+    components: { WorkspaceSelector },
+    template: `
+      <div style="width: 52px; padding: 8px; background: var(--ds-bg-neutral); box-sizing: border-box;">
+        <WorkspaceSelector v-model="current" :workspaces="workspaces" collapsed />
+      </div>
+    `,
+  }),
+}

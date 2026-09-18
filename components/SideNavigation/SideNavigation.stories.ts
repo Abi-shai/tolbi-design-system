@@ -114,3 +114,70 @@ export const LongLabel: Story = {
     `,
   }),
 }
+
+export const Collapsed: Story = {
+  name: 'Réduite',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Rail icônes seules. Le libellé ne disparaît pas — il passe dans un `Tooltip` au survol " +
+          "et dans `aria-label`, sans quoi les lignes n'auraient plus de nom du tout. Survole une " +
+          'ligne pour le voir.',
+      },
+    },
+  },
+  render: () => ({
+    setup: () => ({ current: ref('accueil') }),
+    components: { SideNavigation, SideNavItem },
+    template: `
+      <div style="height: 480px; display: flex;">
+        <SideNavigation v-model="current" collapsed aria-label="Navigation principale">
+          <SideNavItem value="accueil"    icon="house"        label="Accueil" />
+          <SideNavItem value="parcelles"  icon="map"          label="Parcelles" />
+          <SideNavItem value="producteurs" icon="users"       label="Producteurs" />
+          <SideNavItem value="rapports"   icon="chart-column" label="Rapports" />
+          <SideNavItem value="parametres" icon="settings"     label="Paramètres" />
+        </SideNavigation>
+      </div>
+    `,
+  }),
+}
+
+export const SideBySide: Story = {
+  name: 'Déployée vs réduite',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Les deux formes du même composant, une seule prop les sépare. La ligne garde sa hauteur ' +
+          "de 36px : en se repliant la pastille se déplace et se rétrécit, elle ne change jamais de " +
+          'hauteur.',
+      },
+    },
+  },
+  render: () => ({
+    setup: () => ({ a: ref('accueil'), b: ref('accueil') }),
+    components: { SideNavigation, SideNavItem },
+    template: `
+      <div style="display: flex; gap: 80px; height: 480px; padding: 24px;">
+        <div style="width: 260px; display: flex;">
+          <SideNavigation v-model="a" aria-label="Déployée" style="width: 100%;">
+          <SideNavItem value="accueil"    icon="house"        label="Accueil" />
+          <SideNavItem value="parcelles"  icon="map"          label="Parcelles" />
+          <SideNavItem value="producteurs" icon="users"       label="Producteurs" />
+          <SideNavItem value="rapports"   icon="chart-column" label="Rapports" />
+          <SideNavItem value="parametres" icon="settings"     label="Paramètres" />
+          </SideNavigation>
+        </div>
+        <SideNavigation v-model="b" collapsed aria-label="Réduite">
+          <SideNavItem value="accueil"    icon="house"        label="Accueil" />
+          <SideNavItem value="parcelles"  icon="map"          label="Parcelles" />
+          <SideNavItem value="producteurs" icon="users"       label="Producteurs" />
+          <SideNavItem value="rapports"   icon="chart-column" label="Rapports" />
+          <SideNavItem value="parametres" icon="settings"     label="Paramètres" />
+        </SideNavigation>
+      </div>
+    `,
+  }),
+}
