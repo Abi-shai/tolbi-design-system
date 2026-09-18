@@ -12,7 +12,12 @@ import type { DropdownSelectItemType } from './DropdownSelectItem.vue'
 export type InputDropdownType = 'default' | 'icon-leading' | 'avatar-leading' | 'dot-leading' | 'search'
 
 export interface InputDropdownOption {
-  value: string
+  /**
+   * Ce que l'appelant tient déjà — un identifiant de base est un nombre aussi
+   * souvent qu'une chaîne. Forcer la chaîne ici ne supprime pas la conversion,
+   * elle la déplace chez chaque appelant, aller et retour.
+   */
+  value: string | number
   label: string
   supportingText?: string
   icon?: IconName
@@ -26,13 +31,16 @@ interface Props {
   type?: InputDropdownType
   placeholder?: string
   options: InputDropdownOption[]
-  modelValue?: string | null
+  modelValue?: string | number | null
   leadingIcon?: IconName
+  /** Standalone use only. Inside a FormField, the wrapper's `disabled` decides. */
+  disabled?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'default',
   placeholder: 'Select...',
+  disabled: false,
 })
 
 const field = useFormField()
@@ -41,9 +49,10 @@ const field = useFormField()
 const triggerId   = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedBy.value)
 const isInvalid   = computed(() => field?.invalid.value ?? false)
+const isDisabled  = computed(() => (field?.disabled.value ?? false) || props.disabled)
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string | null]
+  'update:modelValue': [value: string | number | null]
 }>()
 
 const open = ref(false)
@@ -52,9 +61,9 @@ const rootEl = ref<HTMLElement | null>(null)
 const searchInputEl = ref<HTMLInputElement | null>(null)
 
 const selectedOption = computed(() =>
-  props.modelValue
-    ? props.options.find(o => o.value === props.modelValue) ?? null
-    : null,
+  props.modelValue === null || props.modelValue === undefined
+    ? null
+    : props.options.find(o => o.value === props.modelValue) ?? null,
 )
 
 const filteredOptions = computed(() => {
@@ -75,7 +84,7 @@ const itemType = computed((): DropdownSelectItemType => {
 })
 
 async function openPanel() {
-  if (open.value) return
+  if (open.value || isDisabled.value) return
   open.value = true
   if (props.type === 'search') {
     searchQuery.value = ''
@@ -90,6 +99,7 @@ function close() {
 }
 
 function toggle() {
+  if (isDisabled.value) return
   if (open.value) close()
   else openPanel()
 }
@@ -128,7 +138,11 @@ onUnmounted(() => {
         <div
           v-if="type === 'search'"
           class="ds-input-dropdown__trigger"
-          :class="{ 'ds-input-dropdown__trigger--open': open }"
+          :class="{
+            'ds-input-dropdown__trigger--open':     open,
+            'ds-input-dropdown__trigger--disabled': isDisabled,
+          }"
+          :aria-disabled="isDisabled || undefined"
           :id="triggerId"
           :aria-describedby="describedBy"
           :aria-invalid="isInvalid || undefined"
@@ -165,7 +179,11 @@ onUnmounted(() => {
           v-else
           type="button"
           class="ds-input-dropdown__trigger"
-          :class="{ 'ds-input-dropdown__trigger--open': open }"
+          :class="{
+            'ds-input-dropdown__trigger--open':     open,
+            'ds-input-dropdown__trigger--disabled': isDisabled,
+          }"
+          :disabled="isDisabled"
           :id="triggerId"
           :aria-describedby="describedBy"
           :aria-invalid="isInvalid || undefined"
@@ -289,6 +307,18 @@ onUnmounted(() => {
   outline: none;
   border-color: var(--ds-border-brand);
   box-shadow: var(--ds-focus-ring-brand-shadow-xs);
+}
+
+/* Mêmes valeurs que le champ désactivé d'InputField : c'est le même état. */
+.ds-input-dropdown__trigger--disabled {
+  box-shadow: none;
+  cursor: not-allowed;
+  color: var(--ds-text-disabled);
+}
+
+.ds-input-dropdown__trigger--disabled .ds-input-dropdown__value,
+.ds-input-dropdown__trigger--disabled .ds-input-dropdown__chevron {
+  color: var(--ds-text-disabled);
 }
 
 /* ── Content row ───────────────────────────────────────────────────── */
