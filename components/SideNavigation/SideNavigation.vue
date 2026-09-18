@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { computed, provide, ref, toRef, watch, nextTick } from 'vue'
+import { computed, provide, ref, toRef, useSlots, watch, nextTick } from 'vue'
 import { useSlidingIndicator } from '../../composables/useSlidingIndicator'
+import { IconButton } from '../IconButton'
 import { SIDE_NAVIGATION_KEY, type SideNavigationContext } from './context'
 
 /**
  * The product's left-hand navigation column.
  *
- * Two decisions it carries, both of which its items would get wrong on their own:
+ * Decisions it carries, all of which its items would get wrong on their own:
  *
  * **It owns the selection** (ADR-0024). Items register in order and the group
  * holds `v-model`, so exactly one is selected and the group knows *where* — the
@@ -21,28 +22,46 @@ import { SIDE_NAVIGATION_KEY, type SideNavigationContext } from './context'
  * and not by taste: `bg-hover` and `bg-neutral-subtle` alias the same primitive
  * (gray-light/50), so on Tabs' value the hover state would be invisible.
  *
- * **It owns `collapsed` too**, and does not own the control that flips it. Every
- * icon-only rail in the survey put that toggle somewhere else — a header, an
- * edge handle, a settings panel — which is the evidence it belongs to the shell
- * and not to the nav. The rail's width is the row (36px) plus `spacing-md` each
- * side, so the pill's height never changes: collapsing moves and narrows it,
- * it does not resize it vertically.
+ * **It owns `collapsed` and the control that flips it.** ADR-0034 first said the
+ * toggle belonged to the shell, on the evidence of three products that each
+ * placed it differently. Ten more said otherwise: four put an icon button at the
+ * top of the column on the trailing edge (Suno, Sentry, Charma, Clay), two at
+ * the bottom, one in the top bar. Four out of ten agreeing is a convention, not
+ * a free choice, so the component ships it and `toggle` turns it off for a shell
+ * that places its own.
+ *
+ * The rail's width is the row (36px) plus `spacing-md` each side, so the pill's
+ * height never changes: collapsing moves and narrows it, it does not resize it
+ * vertically.
  */
 interface Props {
   /** The selected item's value. */
   modelValue?: string
   /** Icon-only rail. Items move their label into a tooltip. */
   collapsed?: boolean
+  /** Renders the collapse control. Off for a shell that places its own. */
+  toggle?: boolean
+  collapseLabel?: string
+  expandLabel?: string
   ariaLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: undefined,
   collapsed: false,
+  toggle: true,
+  collapseLabel: 'Réduire la navigation',
+  expandLabel: 'Déployer la navigation',
   ariaLabel: undefined,
 })
 
-const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
+const emit = defineEmits<{
+  'update:modelValue': [value: string]
+  'update:collapsed': [value: boolean]
+}>()
+
+const slots = useSlots()
+const hasHeader = computed(() => !!slots.header || props.toggle)
 
 const values = ref<string[]>([])
 const activeIndex = computed(() => values.value.indexOf(props.modelValue ?? ''))
@@ -84,6 +103,21 @@ watch(() => props.collapsed, async () => { await nextTick(); measure() })
     :class="{ 'ds-side-nav--collapsed': collapsed }"
     :aria-label="ariaLabel"
   >
+    <!-- The workspace mark and the collapse control share a row, and stack
+         once the rail is one column wide. -->
+    <div v-if="hasHeader" class="ds-side-nav__header">
+      <div v-if="slots.header" class="ds-side-nav__header-slot">
+        <slot name="header" />
+      </div>
+      <IconButton
+        v-if="toggle"
+        icon="panel-left"
+        :ariaLabel="collapsed ? expandLabel : collapseLabel"
+        class="ds-side-nav__toggle"
+        @click="emit('update:collapsed', !collapsed)"
+      />
+    </div>
+
     <!-- Sliding selection — behind the items, like Tabs' indicator -->
     <div
       v-if="activeIndex !== -1"
@@ -92,7 +126,10 @@ watch(() => props.collapsed, async () => { await nextTick(); measure() })
       :style="style"
       aria-hidden="true"
     />
-    <slot />
+
+    <div class="ds-side-nav__items">
+      <slot />
+    </div>
   </nav>
 </template>
 
@@ -102,7 +139,7 @@ watch(() => props.collapsed, async () => { await nextTick(); measure() })
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--ds-spacing-xs);
+  gap: var(--ds-spacing-3xl);
   padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
   box-sizing: border-box;
   background-color: var(--ds-bg-neutral);
@@ -119,6 +156,36 @@ watch(() => props.collapsed, async () => { await nextTick(); measure() })
   width: calc(var(--side-nav-rail-row) + 2 * var(--ds-spacing-md));
   align-items: center;
   padding: var(--ds-spacing-lg) var(--ds-spacing-md);
+}
+
+/* ── Header ───────────────────────────────────────────────────────── */
+.ds-side-nav__header {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-md);
+}
+
+.ds-side-nav__header-slot {
+  flex: 1 1 auto;
+  min-width: 1px;
+}
+
+/* One column wide: the toggle drops below the mark rather than beside it. */
+.ds-side-nav--collapsed .ds-side-nav__header {
+  flex-direction: column;
+  gap: var(--ds-spacing-xs);
+}
+
+.ds-side-nav--collapsed .ds-side-nav__header-slot {
+  flex: none;
+}
+
+/* ── Items ────────────────────────────────────────────────────────── */
+.ds-side-nav__items {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+  gap: var(--ds-spacing-xs);
 }
 
 /* ── Sliding indicator ─────────────────────────────────────────────── */

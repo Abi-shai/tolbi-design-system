@@ -39,16 +39,37 @@ The second row would have removed that dependency entirely — a caption under t
 and `label-xs` (11px) already exists to set it. It is the better answer for a rail that must work
 without hover, and it is recorded here as the alternative rather than dismissed.
 
-### The group owns `collapsed`, and does not own the toggle
+### The group owns `collapsed` **and** the toggle — reversed, same day
 
 `SideNavigation` already owns the selection (ADR-0024) and the ground (ADR-0006). `collapsed` joins
 them, passed to items through the same context — an item cannot know the rail's form on its own, and
 a per-item prop would allow half a rail to collapse.
 
-It does **not** ship the control that flips it. The survey put that toggle in a header (Fibery), on
-an edge handle (Toggl), and in a settings panel (ClickUp) — three placements across three products
-is the evidence that it belongs to the shell. A built-in toggle would have been a fourth opinion
-nobody asked for, in a component that cannot know where its own edge is.
+This ADR first said the component should *not* ship the control that flips it. The reasoning was
+that the survey had put the toggle in a header (Fibery), on an edge handle (Toggl) and in a settings
+panel (ClickUp) — three products, three placements, therefore a shell concern.
+
+**Three was not a sample.** Asked the obvious follow-up — "then which button?" — and ten more
+products answered it almost in unison:
+
+| Placement | Products |
+|---|---|
+| **Top of the column, trailing edge, on the mark's row** | Suno, Sentry, Charma, Clay |
+| Bottom of the column | Neon, Linear |
+| Top bar, outside the sidebar | Frame |
+| Text link rather than an icon | Coursera |
+
+Four of ten in one place is a convention. The first three had looked like disagreement only because
+three points cannot show a distribution. So the component ships an `IconButton` with `panel-left` —
+the glyph VS Code, Linear and Figma all use, already in the manifest — at the top of the column on
+the trailing edge, and `toggle: false` removes it for a shell that places its own.
+
+`IconButton` needed no adjustment: it is already 8px around a 20px glyph, so 36px, which is exactly
+the rail's row.
+
+The accessible name changes rather than the state being announced separately —
+*Réduire la navigation* / *Déployer la navigation*, and no `aria-expanded`. A name that says what the
+next press does and an `aria-expanded` that says what the current state is will double-report.
 
 ### The rail's width is derived, and the row's height does not move
 
@@ -98,6 +119,11 @@ Live, `Navigation/SideNavigation` → *Déployée vs réduite*:
 - `aria-label` is present only when collapsed, and carries the label.
 - The label element is absent from the DOM when collapsed, not hidden.
 - Hovering the third row shows the tooltip reading `Producteurs`, left-arrowed, clear of the rail.
+
+Clicking the toggle, *Repli — le bouton*: nav 260px → 52px and back; the button's name goes
+*Réduire* → *Déployer* → *Réduire*; the header's `flex-direction` goes `row` → `column`; the
+indicator goes 228×36 → 36×36; `WorkspaceSelector` swaps its boxed trigger for the bare mark. Three
+clicks, no drift.
 
 ## The Figma pass, and one thing it cost
 
