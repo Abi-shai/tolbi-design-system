@@ -161,23 +161,41 @@ function select(w: Workspace) {
 }
 
 /* ── Collapsed ────────────────────────────────────────────────────── */
-/* A 24px mark centred in the rail's 36px column — 6px each side, on the
-   spacing ramp, which a 36px box around the same avatar would not have been. */
 .ds-workspace-selector--collapsed {
   width: auto;
 }
 
+/*
+  The mark is the avatar and nothing else — 24px, no padding, as drawn. An
+  earlier version padded it to the rail's 36px row, which pushed the collapsed
+  header 12px taller than the design.
+
+  The click target keeps the 36px anyway, through an overlay rather than
+  through padding: absolutely positioned, so it costs no layout. 24px would
+  have met WCAG 2.2's Target Size minimum exactly, with nothing to spare.
+*/
 .ds-workspace-selector__mark {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--ds-spacing-sm);
+  padding: 0;
   border: none;
   border-radius: var(--ds-radius-pill);
   background: transparent;
   cursor: pointer;
   outline: none;
   transition: box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
+}
+
+.ds-workspace-selector__mark::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--side-nav-rail-row, 36px);
+  height: var(--side-nav-rail-row, 36px);
+  transform: translate(-50%, -50%);
 }
 
 .ds-workspace-selector__mark:focus-visible {

@@ -104,8 +104,13 @@ button. Every icon-only rail in the survey does this — Weavy, Midday, Aboard a
 workspace mark unboxed.
 
 It is also the only option that lands on the scale. A 36px box around a 24px avatar leaves 5px of
-padding once the border is counted, which is on no ramp; the bare mark is a 24px avatar in the
-rail's 36px column, 6px each side, which is `spacing-sm`.
+padding once the border is counted, which is on no ramp.
+
+**The mark is 24px, not padded to the rail's 36px row.** A first version padded it with `spacing-sm`
+to fill the column, which pushed the collapsed header 12px taller than the design — measured 76px
+against the drawing's 68. The click target keeps 36px through an absolutely-positioned overlay
+instead, which costs no layout: 24px would have met WCAG 2.2's Target Size (Minimum) exactly, with
+nothing to spare, and there was no reason to spend the margin on nothing.
 
 Its panel cannot align to a 36px trigger, so it keeps `Dropdown`'s own 240px and opens *beside* the
 rail rather than under the mark.
@@ -146,6 +151,14 @@ Live, `Navigation/SideNavigation` → *Déployée vs réduite*:
 - `aria-label` is present only when collapsed, and carries the label.
 - The label element is absent from the DOM when collapsed, not hidden.
 - Hovering the third row shows the tooltip reading `Producteurs`, left-arrowed, clear of the rail.
+
+Against the drawn frames (`1406:6511`, `1406:6558`), box by box: column 260/52 with padding 12/16
+and 12/8 and a 24px gap; head and items at a 4px gap; rows 228×36 at 8/12 and 36×36 at 8/8; mark
+24×24; toggle 36×36; rule full width. Every box matches but one — the expanded header measures 42px
+against the drawing's 40, which is `strokeAlign: INSIDE`: Figma paints the border *within* the 40px
+box, CSS adds it on top of an auto height. Not fixable on either side without breaking something
+truer — `OUTSIDE` strokes do not push auto-layout siblings apart, and absorbing the border into the
+padding puts it off the control scale. It is the same 2px recorded in ADR-0033.
 
 Clicking the toggle, *Repli — le bouton*: nav 260px → 52px and back; the button's name goes
 *Réduire* → *Déployer* → *Réduire*; the header's `flex-direction` goes `row` → `column`; the
