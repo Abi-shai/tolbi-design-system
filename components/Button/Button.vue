@@ -26,6 +26,14 @@ interface Props {
   disabled?: boolean
   loading?: boolean
   type?: 'button' | 'submit' | 'reset'
+  /**
+   * Renders an `<a>` instead of a `<button>`, same as `BadgeGroup` (ADR-0014).
+   * A button that navigates is a link: it must open in a new tab on
+   * middle-click, offer "copy address", and be reachable without JavaScript.
+   */
+  href?: string
+  /** Fills its container. A full-width action is a layout decision, not a size. */
+  block?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -35,6 +43,7 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   loading: false,
   type: 'button',
+  block: false,
 })
 
 const emit = defineEmits<{
@@ -43,7 +52,20 @@ const emit = defineEmits<{
 
 const iconSize = computed(() => (props.size === '2xl' ? 24 : 20))
 
+const tag = computed(() => (props.href && !props.disabled ? 'a' : 'button'))
+
+// Un `<a>` n'a pas d'attribut `disabled` : quand le bouton est éteint on rend un
+// `<button>`, qui sait l'être. Une ancre inerte se contournerait au clavier.
+const isLink = computed(() => tag.value === 'a')
+
 function handleClick(event: MouseEvent) {
+  // Un `<button disabled>` n'émet rien de lui-même ; une ancre, si. Sous
+  // `loading` elle naviguerait alors que le bouton se dit occupé — d'où le
+  // `preventDefault`, qui manque à `aria-disabled` seul.
+  if (isLink.value && props.loading) {
+    event.preventDefault()
+    return
+  }
   if (!props.disabled && !props.loading) {
     emit('click', event)
   }
@@ -51,10 +73,18 @@ function handleClick(event: MouseEvent) {
 </script>
 
 <template>
-  <button
-    :type="type"
-    :disabled="disabled || loading"
-    :class="['ds-button', `ds-button--${variant}`, `ds-button--${size}`, { 'ds-button--icon-only': iconOnly }]"
+  <component
+    :is="tag"
+    :type="isLink ? undefined : type"
+    :href="isLink ? href : undefined"
+    :disabled="isLink ? undefined : disabled || loading"
+    :aria-disabled="isLink && loading ? 'true' : undefined"
+    :class="[
+      'ds-button',
+      `ds-button--${variant}`,
+      `ds-button--${size}`,
+      { 'ds-button--icon-only': iconOnly, 'ds-button--block': block },
+    ]"
     :aria-busy="loading || undefined"
     :aria-label="iconOnly || loading ? label : undefined"
     @click="handleClick"
@@ -80,10 +110,17 @@ function handleClick(event: MouseEvent) {
       </span>
       <Spinner v-if="loading" size="1em" class="ds-button__spinner" />
     </span>
-  </button>
+  </component>
 </template>
 
 <style scoped>
+/* Un bouton pleine largeur : `flex` plutôt qu'`inline-flex`, sinon il ne
+   s'étire pas dans une colonne. */
+.ds-button--block {
+  display: flex;
+  width: 100%;
+}
+
 /* ADR-0027 — the spinner and the body share one grid cell, so the body keeps
    defining the width even while it is invisible. `visibility: hidden` rather
    than `display: none`: it holds the space AND leaves the accessibility tree,
@@ -113,6 +150,7 @@ function handleClick(event: MouseEvent) {
 /* ── Base ─────────────────────────────────────────────────────────── */
 .ds-button {
   display: inline-flex;
+  text-decoration: none;
   align-items: center;
   justify-content: center;
   padding: var(--ds-control-padding-md);
