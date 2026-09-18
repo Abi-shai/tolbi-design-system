@@ -223,6 +223,13 @@ Before working on any component, read:
   the indicator. Default and selected share a **weight**, because the pill's geometry is what
   travels and a width change would resize it mid-flight. `aria-current="page"`, not `aria-pressed`:
   this is navigation, not a toggle.
+  Reduced motion is answered **in the composable** — `ready` never turns true, so no consumer ever
+  gets its `--animated` class; `transition: none` is honest here because a selection that jumps still
+  says which item is selected (unlike ADR-0032's marquee, where stopping hid content). `Dropdown`'s
+  boxed trigger became `DropdownTrigger`, which **owns the chrome** so a fourth shape cannot redraw
+  it — and it had no `:focus-visible` rule at all. The type `DropdownTrigger` is now
+  `DropdownTriggerVariant`. `control-padding-*` descriptions omit the border, so every bordered
+  control is **2px taller** than its token says (42px, not 40px, at `md`).
 
 ## Architecture
 

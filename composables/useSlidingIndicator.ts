@@ -24,6 +24,15 @@ import { ref, watch, onMounted, onBeforeUnmount, nextTick, type Ref } from 'vue'
  * - A `ResizeObserver` re-measures, because the active child's geometry changes
  *   when the container reflows — a label wrapping, a font loading — and a stale
  *   indicator is worse than none.
+ * - **Reduced motion is answered here**, not in three stylesheets. `ready` simply
+ *   never turns true, so the consumer's `--animated` class never lands and its
+ *   transition is never applied. A fourth consumer inherits it without knowing.
+ *
+ * `transition: none` is the honest reduced form for *this* motion. ADR-0032's
+ * rule — less motion must not mean less content — bit on the marquee, where
+ * stopping the loop would have hidden everything past the clip. Here nothing is
+ * hidden: a selection that jumps still says which item is selected, and only
+ * the travel is lost.
  */
 export interface SlidingIndicatorStyle {
   transform: string
@@ -37,8 +46,12 @@ export function useSlidingIndicator(activeIndex: Ref<number>) {
   const style = ref<SlidingIndicatorStyle>({
     transform: 'translate(0px, 0px)', width: '0px', height: '0px',
   })
-  /** False until the first paint, so the indicator does not fly in on mount. */
+  /**
+   * False until the first paint, so the indicator does not fly in on mount —
+   * and false forever when the system asks for less motion.
+   */
   const ready = ref(false)
+  const reducedMotion = ref(false)
 
   function measure() {
     const el = itemRefs.value[activeIndex.value]
@@ -52,17 +65,39 @@ export function useSlidingIndicator(activeIndex: Ref<number>) {
 
   let ro: ResizeObserver | null = null
 
+  let query: MediaQueryList | null = null
+  const onMotionChange = (e: MediaQueryListEvent) => {
+    reducedMotion.value = e.matches
+    ready.value = !e.matches
+  }
+
   onMounted(async () => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      query = window.matchMedia('(prefers-reduced-motion: reduce)')
+      reducedMotion.value = query.matches
+      query.addEventListener('change', onMotionChange)
+    }
     await nextTick()
     measure()
-    requestAnimationFrame(() => { ready.value = true })
+    requestAnimationFrame(() => { ready.value = !reducedMotion.value })
     ro = new ResizeObserver(() => measure())
     if (containerRef.value) ro.observe(containerRef.value)
   })
 
-  onBeforeUnmount(() => { ro?.disconnect(); ro = null })
+  onBeforeUnmount(() => {
+    ro?.disconnect(); ro = null
+    query?.removeEventListener('change', onMotionChange); query = null
+  })
 
   watch(activeIndex, async () => { await nextTick(); measure() })
 
-  return { containerRef, itemRefs, style, ready, measure }
+  return {
+    containerRef,
+    itemRefs,
+    style,
+    ready,
+    measure,
+    /** True when the system asks for less motion. The indicator then jumps. */
+    reducedMotion,
+  }
 }

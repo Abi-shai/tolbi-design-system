@@ -134,19 +134,22 @@ selected row is the current page — `aria-current="page"` is the one that says 
 
 ### What was not added
 
-**A `prefers-reduced-motion` guard.** It was written and then removed. The guard exists on
-`Skeleton` and `Spinner` — both looping animations — and on `useMarquee` (ADR-0032). Neither `Tabs`
-nor `ButtonGroup` guards its indicator, so adding it to the third consumer of the same composable
-would have made this component the inconsistency rather than the fix. The question is real and is
-**open below**, at the composable, for all three at once.
+**A `prefers-reduced-motion` guard *in this component*.** One was written and removed. The guard
+exists on `Skeleton` and `Spinner` — both looping animations — and on `useMarquee` (ADR-0032), but
+neither `Tabs` nor `ButtonGroup` guards its indicator. Adding it to the third consumer of one shared
+composable would have made this component the inconsistency rather than the fix. It went into the
+composable instead, for all three at once — see the closed item below.
 
 **A collapsed/rail width.** Figma has not drawn one. A width the design has not drawn is a guess,
 and ADR-0031 already paid for reproducing a width literally.
 
-**`WorkspaceSelector`.** It is a `Dropdown` trigger in all but name, and `Dropdown` already ships
+**`WorkspaceSelector`.** It is a `Dropdown` trigger in all but name, and `Dropdown` already shipped
 `trigger` as `button | icon | avatar` with `control-padding-md`, `border-default`, `radius-control`
-and `elevation-control`. ADR-0001 says extend that set rather than compose a fourth one. That is a
-change to a shipped component and gets its own pass.
+and `elevation-control`. ADR-0001 says extend that set rather than compose a fourth one. Done in a
+separate pass rather than here: `DropdownTrigger` now owns the boxed chrome and the content is a
+slot, `Dropdown` takes a `#trigger` slot, and `WorkspaceSelector` ships whole. That pass also found
+the boxed trigger had **no `:focus-visible` rule at all** — the chrome was not only drifting in
+Figma, it was incomplete in code.
 
 ## Measured
 
@@ -171,14 +174,32 @@ Non-regression, same session:
 
 ## Still open
 
-- **`prefers-reduced-motion` on the sliding indicator.** Three consumers now share one motion and
-  none of them guards it. The guard belongs in the composable or in a shared stylesheet, not in a
-  third copy — and the honest version is not `transition: none`, since ADR-0032 established that
-  less motion must not mean less content. A selection that jumps is still legible; the open question
-  is whether the reduced form is a jump or a shortened move.
-- **`WorkspaceSelector` as a `Dropdown` trigger.** Its padding is `8px 12px 8px 8px` today, off the
-  control-padding scale entirely — the 8px left is an avatar accommodation, and nothing in that
-  scale is asymmetric. Resolving it into `Dropdown` is where that gets settled.
+- ~~**`prefers-reduced-motion` on the sliding indicator.**~~ — closed in the same pass. The guard is
+  in the composable, not in three stylesheets: `ready` never turns true under
+  `(prefers-reduced-motion: reduce)`, so the consumer's `--animated` class never lands and its
+  transition is never applied. A fourth consumer inherits it without knowing. `transition: none`
+  turned out to be the honest reduced form here — ADR-0032's rule bit on the marquee because
+  stopping the loop *hid* the clipped content, whereas a selection that jumps still says which item
+  is selected. Nothing is lost but the travel.
+
+  **The test for it is weaker than it looks.** Playwright's `reducedMotion: 'reduce'` forces *every*
+  transition duration in the page to `1e-05s`, including ones the change never touched — verified
+  against `.ds-side-nav-item`'s own background transition, which reads `0.1s, 0.1s, 0.05s` normally
+  and `1e-05s` under emulation. So the duration proves nothing: under that emulator the result looks
+  identical whether or not the composable does anything. The one discriminating assertion is that
+  the `--animated` class is **absent**, since that comes from `ready` through Vue rather than from
+  CSS. Real browsers do not blanket-override transition durations, which is exactly why the guard
+  has to exist — but no test in this repo can currently show that, and pretending otherwise would be
+  ADR-0018's broken linter again.
+- ~~**`WorkspaceSelector` as a `Dropdown` trigger.**~~ — closed. It takes `size="sm"` (8/12), which
+  with a 24px mark reaches the same control height `md` reaches with a 20px line box. The
+  asymmetric `8px 12px 8px 8px` is gone.
+- **`control-padding-*` descriptions are 2px short.** They read "40px control", "44px control" and
+  so on, computed as padding plus line box with **no border**. Every bordered control in the
+  catalogue is 2px taller than its token claims — `Button`, `Dropdown`'s text trigger and
+  `WorkspaceSelector`'s all measure 42px at `md`. Found while checking that two routes to one height
+  agreed; they do, at 42. The geometry is right and the prose is wrong, which is ADR-0009's reason
+  for measuring rather than describing, arriving one tier down.
 - **Control padding has no Figma representation.** `--ds-control-padding-*` are composite strings
   (`"8px 12px"`), which a Figma FLOAT variable cannot hold, so designers reach for the spacing ramp
   and land on values that happen to match. Here 8/12 *is* `control-padding-sm` and the pixels came
