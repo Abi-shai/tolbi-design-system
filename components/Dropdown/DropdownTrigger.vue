@@ -98,9 +98,14 @@ withDefaults(defineProps<Props>(), {
   padding: var(--ds-control-padding-sm);
 }
 
+/* `currentColor`, not `text-default` — carried over from `Dropdown`, where it
+   was harmless because that trigger had no disabled state. Pinned, the chevron
+   stays dark while the label dims, since the `:disabled` rule sets the button's
+   colour and a pinned child ignores it. ADR-0028: in code a glyph is
+   `currentColor`. */
 .ds-dropdown-trigger__chevron {
   flex: none;
-  color: var(--ds-text-default);
+  color: currentColor;
 }
 
 /* ── States ───────────────────────────────────────────────────────── */

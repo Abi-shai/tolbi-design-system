@@ -194,6 +194,12 @@ Non-regression, same session:
 - ~~**`WorkspaceSelector` as a `Dropdown` trigger.**~~ — closed. It takes `size="sm"` (8/12), which
   with a 24px mark reaches the same control height `md` reaches with a 20px line box. The
   asymmetric `8px 12px 8px 8px` is gone.
+- **`text-disabled` and `text-subtlest` are the same primitive** (`gray-light/500`, `#667085`).
+  Admitted under different clauses — one a state, one a contract — so ADR-0009 permits it, and the
+  names are not redundant. But nothing distinguishes disabled text from the faintest legible text,
+  which means one of the two is wrong: either disabled reads too much like content, or subtlest is
+  as dim as something switched off. Surfaced by aligning Figma, where the chevron sat unbound on
+  that hex and so looked disabled in every state.
 - **`control-padding-*` descriptions are 2px short.** They read "40px control", "44px control" and
   so on, computed as padding plus line box with **no border**. Every bordered control in the
   catalogue is 2px taller than its token claims — `Button`, `Dropdown`'s text trigger and
