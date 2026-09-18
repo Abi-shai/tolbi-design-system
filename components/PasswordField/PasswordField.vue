@@ -53,7 +53,11 @@ const toggleLabel = computed(() =>
       :destructive="destructive"
       :disabled="disabled"
       :required="required"
-      @update:model-value="emit('update:modelValue', $event)"
+      <!--
+        `String()` narrows, it does not convert: `InputField` only returns a
+        number under `type="number"`, and this control pins its own type.
+      -->
+      @update:model-value="emit('update:modelValue', String($event))"
     >
       <template #trailing>
         <!--

@@ -96,6 +96,21 @@ Le composant expose `v-model` (string) en standard :
 contrôle les reçoit sans qu'on ait à les câbler à la main, et fonctionne toujours seul en dehors
 d'un `FormField`.
 
+### `type="number"` rend un nombre
+
+Un `<input>` rend toujours une chaîne, `type="number"` compris. `InputField` convertit donc
+lui-même : avec `type="number"`, `v-model` reçoit un `number`.
+
+```vue
+<InputField v-model="quantite" type="number" min="1" />
+<!-- quantite === 12, pas "12" -->
+```
+
+Le modificateur `v-model.number` est inutile — il n'est pas lu, la prop `type` suffit.
+
+Un champ vidé rend la **chaîne vide**, pas `0` ni `NaN` : « rien » n'est pas une quantité nulle, et
+un `NaN` traverserait la validation en muet. C'est au schéma de dire si le champ est obligatoire.
+
 ---
 
 ## Slots

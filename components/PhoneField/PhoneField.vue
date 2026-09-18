@@ -83,7 +83,11 @@ const grouped = computed(() => {
       :destructive="destructive"
       :disabled="disabled"
       :required="required"
-      @update:model-value="emit('update:modelValue', $event)"
+      <!--
+        `String()` narrows, it does not convert: `InputField` only returns a
+        number under `type="number"`, and this control pins its own type.
+      -->
+      @update:model-value="emit('update:modelValue', String($event))"
     >
       <!--
         The prefix is a native select welded into the leading slot rather than an

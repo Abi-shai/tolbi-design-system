@@ -15,7 +15,7 @@ import { useFormField } from '../FormField/context'
 export type InputFieldSize = 'sm' | 'md'
 
 interface Props {
-  modelValue?:   string
+  modelValue?:   string | number
   size?:         InputFieldSize
   placeholder?:  string
   /** Renders inside the box, so it stays the control's business — not FormField's. */
@@ -40,8 +40,20 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string]
+  'update:modelValue': [value: string | number]
 }>()
+
+// Un `<input>` rend toujours une chaîne, `type="number"` compris. Un contrôle
+// qui annonce `type="number"` doit donc rendre un nombre lui-même, sinon chaque
+// appelant reconvertit — et celui qui oublie valide une chaîne contre un schéma
+// numérique, avec une erreur qui parle du type au lieu de la saisie.
+// Champ vidé : la chaîne vide survit telle quelle, parce que 0 n'est pas
+// « rien » et que NaN ne se valide pas.
+function read(el: HTMLInputElement): string | number {
+  if (props.type !== 'number') return el.value
+  const n = Number.parseFloat(el.value)
+  return Number.isNaN(n) ? el.value : n
+}
 
 const uid   = useId()
 const field = useFormField()
@@ -100,7 +112,7 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
           :required="isRequired"
           :aria-invalid="isInvalid || undefined"
           :aria-describedby="describedBy"
-          @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+          @input="emit('update:modelValue', read($event.target as HTMLInputElement))"
         />
       </div>
 
