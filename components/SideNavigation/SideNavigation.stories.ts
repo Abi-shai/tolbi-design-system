@@ -76,7 +76,7 @@ export const Toggling: Story = {
     setup: () => ({ current: ref('accueil'), collapsed: ref(false), workspaces }),
     components: { SideNavigation, SideNavItem, WorkspaceSelector },
     template: `
-      <div style="display: flex; align-items: flex-start; gap: 24px; height: 520px;">
+      <div style="display: flex; align-items: stretch; gap: 24px; height: 520px;">
         <SideNavigation
           v-model="current"
           v-model:collapsed="collapsed"
@@ -111,7 +111,7 @@ export const Collapsed: Story = {
     setup: () => ({ current: ref('accueil'), workspaces }),
     components: { SideNavigation, SideNavItem, WorkspaceSelector },
     template: `
-      <div style="height: 480px; display: flex;">
+      <div style="height: 480px; display: flex; align-items: stretch;">
         <SideNavigation v-model="current" collapsed aria-label="Navigation principale">
           <template #header>
             <WorkspaceSelector :workspaces="workspaces" model-value="kaolack" collapsed />
@@ -148,7 +148,7 @@ export const SideBySide: Story = {
             ${ITEMS}
           </SideNavigation>
         </div>
-        <SideNavigation v-model="b" collapsed aria-label="Réduite">
+        <SideNavigation v-model="b" collapsed aria-label="Réduite" style="align-self: stretch;">
           <template #header>
             <WorkspaceSelector :workspaces="workspaces" model-value="kaolack" collapsed />
           </template>
