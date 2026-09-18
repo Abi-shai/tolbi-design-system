@@ -181,14 +181,21 @@ separators, because each is now as wide as its own content. In the band they sit
 there is nothing to align to and 343px of ground to win back. If a stacked layout ever needs the
 columns to line up, that is a second mode, not a default.
 
+### `ina` and `conformite` are out on purpose
+
+Both appear as `ModuleIllustration` frames in the banner, and neither is in `ModuleName`. That is a
+**decision, not a missing export** — the same one ADR-0005 already recorded for `Eudr`, which has a
+`logo/eudr.svg` on disk and is deliberately absent from the module list. A module enters
+`ModuleName` when its artwork is exported to `scripts/module-art-raw/` in **both** variants
+(`moduleNames` is built from the ones that have a *logo*); these two have not been, and are not
+waiting to be.
+
+The consequence for the catalogue is one story: the INA capsule renders `Survey`'s drawing under the
+label `INA`, which is what `moduleLabel` is for — a capsule can name a thing the system carries no
+artwork for.
+
 ## Still open
 
-- **`ina` and `conformite` have no artwork in the system.** Both appear as `ModuleIllustration`
-  frames; neither is in `ModuleName`. ADR-0005 makes `components/ModuleIcon/art/` generated output,
-  so the path is raw SVGs into `scripts/module-art-raw/` — **both variants**, since `moduleNames` is
-  built from the ones that have a *logo* — then `npm run module-art`. The banner frame only exports
-  illustrations, so this needs the designer's logo exports, not a code change. `Survey` stands in for
-  INA in the story.
 - **The figures in five of the six capsules** are Figma layer names (`valeur`, `unité`), not content.
   The `Data` capsule is reproduced content for content; the rest carry representative figures with
   the real modules, titles and glyphs.

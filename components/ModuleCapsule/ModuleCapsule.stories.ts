@@ -73,9 +73,10 @@ export const UnitBelow: Story = {
 /**
  * `1334:4397` — one signal rather than two, and no status badge.
  *
- * Figma draws this with an `ina` illustration, which has no counterpart in
- * `ModuleName`; `Survey` stands in until the artwork is exported. `moduleLabel`
- * is what lets the two differ.
+ * Figma draws this with an `ina` illustration. `ina` is deliberately not a
+ * `ModuleName` — like `Eudr` before it (ADR-0005), its artwork is not exported —
+ * so `Survey`'s drawing carries the label. This is exactly what `moduleLabel` is
+ * for: a capsule can name a module the system holds no artwork for.
  */
 export const SingleSignal: Story = {
   args: {

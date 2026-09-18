@@ -175,7 +175,9 @@ Before working on any component, read:
   outline uses it alone — and where those diverge in dark, **usage decides**: `warning`/`success`
   brighten to 500, `error` already satisfies both, `brand` is never standalone. The "wider range of
   module sizes" needed **no artwork**: the 44-grid export is the 48-grid drawing scaled, and a
-  `viewBox` makes `size="44"` identical. `ina` and `conformite` still have no artwork.
+  `viewBox` makes `size="44"` identical. `ina` and `conformite` are **deliberately** not in
+  `ModuleName` — the same call ADR-0005 recorded for `Eudr`; `moduleLabel` is how a capsule names
+  a module the system carries no artwork for.
   The banner is **two components**: `ModuleBanner` is the band — `bg-neutral-subtle`, square corners,
   6px padding and gap — and `ModuleCapsule` is what sits in it at `bg-default`. **That pair is the
   only edge a capsule has**: on its own it is `bg-default` on `bg-default` and cannot be seen. The
