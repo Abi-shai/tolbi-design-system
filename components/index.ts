@@ -37,6 +37,9 @@ export type { NavState, BreadcrumbItem, NavModule } from './HorizontalNavigation
 
 export { SideNavigation, SideNavItem } from './SideNavigation'
 
+export { WorkspaceSelector } from './WorkspaceSelector'
+export type { Workspace } from './WorkspaceSelector'
+
 export { Avatar } from './Avatar'
 export type { AvatarSize, AvatarStatus } from './Avatar'
 
@@ -68,8 +71,8 @@ export type { CreditsReminderTone } from './CreditsChip'
 export { Tag } from './Tag'
 export type { TagSize, TagAction } from './Tag'
 
-export { Dropdown, DropdownItem, DropdownDivider, DropdownSelectItem, InputDropdown } from './Dropdown'
-export type { DropdownTrigger, DropdownSelectItemType, InputDropdownType, InputDropdownOption } from './Dropdown'
+export { Dropdown, DropdownTrigger, DropdownItem, DropdownDivider, DropdownSelectItem, InputDropdown } from './Dropdown'
+export type { DropdownTriggerVariant, DropdownSelectItemType, InputDropdownType, InputDropdownOption } from './Dropdown'
 
 export { Scrollbar } from './Scrollbar'
 

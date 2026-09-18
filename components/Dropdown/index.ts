@@ -1,6 +1,7 @@
 export { default as Dropdown } from './Dropdown.vue'
-export type { DropdownTrigger } from './Dropdown.vue'
+export type { DropdownTriggerVariant } from './Dropdown.vue'
 
+export { default as DropdownTrigger } from './DropdownTrigger.vue'
 export { default as DropdownItem } from './DropdownItem.vue'
 export { default as DropdownDivider } from './DropdownDivider.vue'
 export { default as DropdownSelectItem } from './DropdownSelectItem.vue'

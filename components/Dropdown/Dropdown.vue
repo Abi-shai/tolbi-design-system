@@ -4,11 +4,19 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
 import { Scrollbar } from '../Scrollbar'
+import DropdownTrigger from './DropdownTrigger.vue'
 
-export type DropdownTrigger = 'button' | 'icon' | 'avatar'
+/**
+ * Which built-in trigger `Dropdown` renders when nothing is slotted.
+ *
+ * Renamed from `DropdownTrigger`, which now names the boxed trigger *component*.
+ * One identifier cannot mean both a component and the enum that selects between
+ * three of them.
+ */
+export type DropdownTriggerVariant = 'button' | 'icon' | 'avatar'
 
 interface Props {
-  trigger?:    DropdownTrigger
+  trigger?:    DropdownTriggerVariant
   open?:       boolean
   buttonLabel?: string
   avatarSrc?:  string
@@ -62,49 +70,49 @@ onUnmounted(() => {
 
 <template>
   <div class="ds-dropdown" ref="rootEl">
-    <!-- ── Button trigger ─────────────────────────────────────────── -->
-    <button
-      v-if="trigger === 'button'"
-      type="button"
-      class="ds-dropdown__trigger ds-dropdown__trigger--button"
-      :aria-expanded="open"
-      aria-haspopup="true"
-      @click="toggle"
-    >
-      <span class="ds-dropdown__trigger-label">{{ buttonLabel }}</span>
-      <Icon
-        :name="open ? 'chevron-up' : 'chevron-down'"
-        :size="20"
-        class="ds-dropdown__trigger-chevron"
-        aria-hidden="true"
-      />
-    </button>
+    <!--
+      A slotted trigger wins over the three built-ins. This is safe to open up
+      only because `DropdownTrigger` exists: a consumer slots that and inherits
+      the chrome, rather than rebuilding a box out of control tokens and
+      drifting — which is what happened the one time it was done by hand.
+    -->
+    <slot name="trigger" :open="open" :toggle="toggle">
+      <!-- ── Button trigger ───────────────────────────────────────── -->
+      <DropdownTrigger
+        v-if="trigger === 'button'"
+        :open="open"
+        chevron
+        @click="toggle"
+      >
+        {{ buttonLabel }}
+      </DropdownTrigger>
 
-    <!-- ── Icon trigger ───────────────────────────────────────────── -->
-    <button
-      v-else-if="trigger === 'icon'"
-      type="button"
-      class="ds-dropdown__trigger ds-dropdown__trigger--icon"
-      :aria-expanded="open"
-      aria-haspopup="true"
-      aria-label="Options"
-      @click="toggle"
-    >
-      <Icon name="ellipsis-vertical" :size="20" aria-hidden="true" />
-    </button>
+      <!-- ── Icon trigger — bare, no chrome to own ────────────────── -->
+      <button
+        v-else-if="trigger === 'icon'"
+        type="button"
+        class="ds-dropdown__trigger ds-dropdown__trigger--icon"
+        :aria-expanded="open"
+        aria-haspopup="true"
+        aria-label="Options"
+        @click="toggle"
+      >
+        <Icon name="ellipsis-vertical" :size="20" aria-hidden="true" />
+      </button>
 
-    <!-- ── Avatar trigger ─────────────────────────────────────────── -->
-    <button
-      v-else-if="trigger === 'avatar'"
-      type="button"
-      class="ds-dropdown__trigger ds-dropdown__trigger--avatar"
-      :class="{ 'ds-dropdown__trigger--avatar-open': open }"
-      :aria-expanded="open"
-      aria-haspopup="true"
-      @click="toggle"
-    >
-      <Avatar :src="avatarSrc" :alt="avatarAlt" :status="open ? undefined : undefined" size="md" />
-    </button>
+      <!-- ── Avatar trigger — bare, no chrome to own ──────────────── -->
+      <button
+        v-else-if="trigger === 'avatar'"
+        type="button"
+        class="ds-dropdown__trigger ds-dropdown__trigger--avatar"
+        :class="{ 'ds-dropdown__trigger--avatar-open': open }"
+        :aria-expanded="open"
+        aria-haspopup="true"
+        @click="toggle"
+      >
+        <Avatar :src="avatarSrc" :alt="avatarAlt" size="md" />
+      </button>
+    </slot>
 
     <!-- ── Panel ──────────────────────────────────────────────────── -->
     <SurfaceTransition>
@@ -143,32 +151,8 @@ onUnmounted(() => {
 }
 
 /* ── Trigger: button ──────────────────────────────────────────────── */
-.ds-dropdown__trigger--button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-spacing-xs);
-  padding: var(--ds-control-padding-md);
-  box-sizing: border-box;
-  background-color: var(--ds-bg-default);
-  border: var(--ds-border-width-default) solid var(--ds-border-default);
-  border-radius: var(--ds-radius-control);
-  box-shadow: var(--ds-elevation-control);
-  cursor: pointer;
-  font: var(--ds-font-label-lg-strong);
-  color: var(--ds-text-default);
-  white-space: nowrap;
-  transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
-}
+/* The boxed trigger's chrome now lives in `DropdownTrigger.vue`. */
 
-.ds-dropdown__trigger--button:hover {
-  background-color: var(--ds-bg-hover);
-}
-
-.ds-dropdown__trigger-chevron {
-  color: var(--ds-text-default);
-}
-
-/* ── Trigger: icon ────────────────────────────────────────────────── */
 .ds-dropdown__trigger--icon {
   display: inline-flex;
   align-items: center;
