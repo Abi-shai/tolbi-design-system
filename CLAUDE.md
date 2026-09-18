@@ -211,6 +211,18 @@ Before working on any component, read:
   `Campagne` drives the status badge *and* the figure's badge wording together, `Comparaison` is
   hausse/baisse/aucune. A delta figure takes the **on-tint partner** on `bg-default` — identical to
   `text-{tone}` in dark, and the legible one in light.
+- **ADR-0033**: `SideNavigation` — Figma had the component, code had nothing, which is ADR-0028's
+  `IconButton` again and the blind direction of a code-only audit. Selection is **Tabs' pill**
+  (a surface that rises off a recessed ground), not `bg-selected`. The ground is `bg-neutral` and
+  the **token values chose it**: `bg-hover` and `bg-neutral-subtle` alias the same primitive, so on
+  Tabs' track value hover measures **1.000:1** — absent, not faint. `useSlidingIndicator` shipped
+  **half-broken** in ADR-0024 — it emitted `top` as static position, so the first vertical consumer
+  would have jumped; both offsets now go through the `transform`, and which axis *animates* stays
+  the consumer's CSS. The group owns the selection **and the ground** (ADR-0006) — a row is
+  `bg-default` on nothing without it — so the row carries no background at all, or it would cover
+  the indicator. Default and selected share a **weight**, because the pill's geometry is what
+  travels and a width change would resize it mid-flight. `aria-current="page"`, not `aria-pressed`:
+  this is navigation, not a toggle.
 
 ## Architecture
 
