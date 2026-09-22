@@ -172,6 +172,11 @@
       "$type": "color",
       "$description": "ground — inert control channels: slider track, scrollbar thumb"
     },
+    "pending": {
+      "$value": "{color.gray-light.200}",
+      "$type": "color",
+      "$description": "decorative — the mark for what is not there yet: a skeleton bar, a snapshot still loading, a stage not yet reached. No text sits on it, so it takes no on-colour partner"
+    },
     "brand-subtle": {
       "$value": "{color.brand.50}",
       "$type": "color",
