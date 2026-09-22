@@ -7,21 +7,34 @@ import { Avatar } from '../Avatar'
  * The workspace the user is currently in, and the switch to another one.
  *
  * It composes rather than draws: `Dropdown` for the panel and the dismissal
- * behaviour, `DropdownTrigger` for the box, `Avatar` for the mark, `DropdownItem`
+ * behaviour, `DropdownTrigger` for the control, `Avatar` for the mark, `DropdownItem`
  * for the rows. ADR-0001 — every one of those existed, and the Figma component
  * had re-drawn the box by hand, losing `elevation-control` and landing on
  * `8px 12px 8px 8px`, which is off the control-padding scale entirely.
  *
- * The trigger is `size="sm"` (8/12). With a 24px mark it lands on exactly the
- * height `Dropdown`'s own text trigger reaches with `md` (10/14) and a 20px line
- * box — two routes to one control height, which is what the control-padding
- * scale is for (ADR-0013).
+ * The trigger is `chrome="quiet"`: **nothing at rest**, a tint under the
+ * pointer, and a lifted surface while the panel is out. It lives in the
+ * navigation column, where the catalogue's bordered box reads as a foreign
+ * control dropped into the ground — so the switcher diverges from `Dropdown`
+ * deliberately, and the divergence is expressed as a named chrome on
+ * `DropdownTrigger` rather than a box rebuilt here.
  *
- * That height measures **42px**, not the 40px `control-padding-md`'s description
- * claims. The scale's descriptions are padding plus line box and omit the
- * border, so every bordered control in the catalogue is 2px taller than its
- * token says — `Button` measures 42px too. Recorded, not fixed here: the
- * descriptions are wrong, the geometry is not.
+ * `size="sm"` (8/12), and the mark is `Avatar` `sm` — **32px**, so the control
+ * measures 8 + 32 + 8 = **48px**.
+ *
+ * It used to be 24px, which made the height 40 and let `sm` with a mark and
+ * `md` with a 20px line box land on the same number from two directions. That
+ * coincidence is gone, deliberately: the mark was drawn up, and a control's
+ * height follows what it carries. The scale still names the *padding*, which is
+ * all it ever named — `control-padding-*`'s descriptions assume a 20px line box
+ * and omit the border, which is why every bordered control in the catalogue is
+ * 2px taller than its token says (`Button` measures 42). This one has neither
+ * the line box nor the border.
+ *
+ * There is no size token to reach for, and that is settled rather than missing:
+ * ADR-0020 kept icon sizes out of the token set because a size is **a typed
+ * component API**, and `AvatarSize` is the same shape. `size="sm"` is the
+ * handle; the pixels live in `Avatar`'s own table, under a named suppression.
  *
  * Product vocabulary in the design system on purpose. A workspace switcher is
  * as specific as `ModuleCapsule`, and the argument that carried there carries
@@ -45,8 +58,9 @@ interface Props {
    *
    * Not a narrower `DropdownTrigger` — every icon-only rail in the survey
    * (Weavy, Midday, Aboard, Shop) drops the chrome entirely and leaves the
-   * workspace mark bare. Keeping the box would also have meant a 36px square
-   * around a 24px avatar, whose padding lands off the control scale.
+   * workspace mark bare. Keeping the box would also have meant squaring the
+   * rail's 36px row around the mark, whose padding lands off the control
+   * scale — and at 32px there is only 2px a side left to put it in.
    */
   collapsed?:  boolean
   workspaces?: Workspace[]
@@ -117,7 +131,7 @@ function select(w: Workspace) {
       >
         <Avatar
           v-if="current"
-          size="xs"
+          size="sm"
           :src="current.src"
           :initials="marks(current)"
           :alt="current.name"
@@ -127,6 +141,7 @@ function select(w: Workspace) {
       <DropdownTrigger
         v-else
         size="sm"
+        chrome="quiet"
         :open="open"
         :disabled="disabled"
         :aria-label="ariaLabel"
@@ -136,7 +151,7 @@ function select(w: Workspace) {
       >
         <Avatar
           v-if="current"
-          size="xs"
+          size="sm"
           :src="current.src"
           :initials="marks(current)"
           :alt="current.name"
@@ -166,13 +181,14 @@ function select(w: Workspace) {
 }
 
 /*
-  The mark is the avatar and nothing else — 24px, no padding, as drawn. An
+  The mark is the avatar and nothing else — 32px, no padding, as drawn. An
   earlier version padded it to the rail's 36px row, which pushed the collapsed
-  header 12px taller than the design.
+  header taller than the design.
 
   The click target keeps the 36px anyway, through an overlay rather than
-  through padding: absolutely positioned, so it costs no layout. 24px would
-  have met WCAG 2.2's Target Size minimum exactly, with nothing to spare.
+  through padding: absolutely positioned, so it costs no layout. The mark is
+  the one thing in the rail narrower than the row, and the overlay is what
+  stops it being the one thing harder to hit.
 */
 .ds-workspace-selector__mark {
   position: relative;

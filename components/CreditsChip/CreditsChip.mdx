@@ -25,25 +25,37 @@ dérive l'invalidité de la présence d'`error` plutôt que de la déclarer
 
 ---
 
-## L'échéance escalade en trois crans
+## Le badge existe quand il y a deux quantités
 
-<Canvas of={Stories.ReminderTones} />
+<Canvas of={Stories.Tones} />
 
-| `reminderTone` | Fond | Texte |
+Hors démo il n'y a qu'une quantité — des crédits — et **le chip la porte**.
+En démo il y en a deux, des crédits *et* une fenêtre de temps, et un seul
+compteur ne peut pas les dire tous les deux : le chip redevient neutre et
+confie la teinte au badge. Une seule chose colorée à la fois, dans les deux cas.
+
+Il n'y a donc toujours qu'**un axe** : `tone` dit la gravité, la présence de
+`reminder` décide qui la porte (ADR-0028).
+
+| `tone` | sans `reminder` | avec `reminder` |
 |---|---|---|
-| `info` | `bg-neutral-subtle` | `text-default` |
-| `soon` | `bg-accent-subtle` | `text-on-accent-subtle` |
-| `expired` | `bg-error-solid` | `text-on-error-solid` |
+| `default` | `bg-default` + `border-subtle` | chip neutre + badge accent |
+| `warning` | `bg-warning-subtle` | chip neutre + badge accent |
+| `error` | `bg-error-solid` | chip neutre + badge `error-solid` |
 
-Le dernier cran **change de registre** plutôt que d'assombrir la teinte : un
-fond plein n'a pas besoin de filet et ne peut pas porter les `text-*`, donc il
-prend l'on-colour que son fond nomme (ADR-0009). Une teinte ne sait pas dire
-« trop tard ».
+L'escalade change de **mécanisme** plutôt que d'intensité — filet, teinte, fond
+plein — ce qui permet à `error` de vouloir dire « arrêté » et pas « plus
+orange ». `accent` n'est pas disponible comme alerte : sur le chip il est déjà
+l'état calme, d'où l'échelle qui passe par `warning`.
 
-Le sens ne repose pas sur la couleur seule : le libellé change à chaque cran.
+**Tous les états portent un filet et aucun ne porte d'élévation.** La barre n'a
+pas de fond à elle (ADR-0028), donc un chip `bg-default` posé dessus n'aurait
+aucune arête — c'est ce que `ModuleCapsule` a trouvé (ADR-0031). Un filet
+sépare là où une ombre ne fait que poser, ce qui est aussi la règle que le mode
+sombre impose (ADR-0030).
 
-**Les seuils ne sont pas dans le composant.** 14 jours contre 7, c'est une
-décision produit — l'appelant choisit le cran.
+**Les seuils ne sont pas dans le composant.** 14 jours contre 7, ou 12 crédits
+contre 250, c'est une décision produit — l'appelant choisit le cran.
 
 ---
 

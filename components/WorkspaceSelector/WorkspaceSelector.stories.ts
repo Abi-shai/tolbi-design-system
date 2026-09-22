@@ -11,9 +11,13 @@ const meta: Meta = {
       description: {
         component:
           "L'espace de travail courant, et le passage à un autre. Ne dessine rien : `Dropdown` pour " +
-          'le panneau, `DropdownTrigger` pour la boîte, `Avatar` pour la marque, `DropdownItem` pour ' +
-          'les lignes. Le trigger est en `size="sm"` — avec une marque de 24px il atteint les 40px ' +
-          "que le trigger texte de `Dropdown` atteint en `md` avec une ligne de 20px.",
+          'le panneau, `DropdownTrigger` pour le contrôle, `Avatar` pour la marque, `DropdownItem` ' +
+          "pour les lignes. Le trigger est en `chrome=\"quiet\"` — rien au repos, une teinte au " +
+          'survol, une surface posée tant que le panneau est sorti : dans la colonne de navigation ' +
+          'la boîte bordée du catalogue lit comme un contrôle étranger. `size="sm"` : avec une ' +
+          "marque de 24px il atteint les 40px que le trigger texte de `Dropdown` atteint en `md` " +
+          'avec une ligne de 20px. Les vues ci-dessous sont posées sur `bg-neutral` — sur blanc, ' +
+          'son repos et son survol sont le même pixel.',
       },
     },
   },
@@ -33,7 +37,8 @@ export const Default: Story = {
     setup: () => ({ current: ref('kaolack'), workspaces }),
     components: { WorkspaceSelector },
     template: `
-      <div style="width: 228px;">
+      <div style="width: 228px; padding: 12px 16px; box-sizing: content-box;
+                  background: var(--ds-bg-neutral); border-radius: var(--ds-radius-surface);">
         <WorkspaceSelector v-model="current" :workspaces="workspaces" />
       </div>
     `,
@@ -60,7 +65,8 @@ export const LongName: Story = {
     }),
     components: { WorkspaceSelector },
     template: `
-      <div style="width: 228px;">
+      <div style="width: 228px; padding: 12px 16px; box-sizing: content-box;
+                  background: var(--ds-bg-neutral); border-radius: var(--ds-radius-surface);">
         <WorkspaceSelector v-model="current" :workspaces="workspaces" />
       </div>
     `,
@@ -80,7 +86,8 @@ export const Disabled: Story = {
     setup: () => ({ current: ref('kaolack'), workspaces: [workspaces[0]] }),
     components: { WorkspaceSelector },
     template: `
-      <div style="width: 228px;">
+      <div style="width: 228px; padding: 12px 16px; box-sizing: content-box;
+                  background: var(--ds-bg-neutral); border-radius: var(--ds-radius-surface);">
         <WorkspaceSelector v-model="current" :workspaces="workspaces" disabled />
       </div>
     `,

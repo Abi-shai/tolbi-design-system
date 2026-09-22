@@ -119,8 +119,8 @@ export const WithCreditsReminder: Story = {
   args: {
     state: 'Accueil',
     credits: 250,
-    creditsReminder: 'Expirent dans 7 jours',
-    creditsReminderTone: 'soon',
+    creditsReminder: 'Expire dans 14 jours',
+    creditsTone: 'warning',
   },
 }
 
@@ -129,7 +129,7 @@ export const CreditsExpired: Story = {
   args: {
     state: 'Accueil',
     credits: 250,
-    creditsReminder: 'Vos crédits ont expirés',
-    creditsReminderTone: 'expired',
+    creditsReminder: 'Vos crédits ont expiré',
+    creditsTone: 'error',
   },
 }

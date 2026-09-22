@@ -10,7 +10,7 @@ import { Tooltip } from '../Tooltip'
 import { ModulesList } from '../ModulesList'
 import { SurfaceTransition } from '../SurfaceTransition'
 import type { ModulesListItem } from '../ModulesList'
-import type { CreditsReminderTone } from '../CreditsChip'
+import type { CreditsChipTone } from '../CreditsChip'
 
 export type NavState = 'Accueil' | 'Module' | 'Project' | 'tabs'
 
@@ -27,8 +27,8 @@ interface Props {
   credits?:         number
   /** Expiry reminder shown in the credits chip, e.g. `Expirent dans 14 jours`. */
   creditsReminder?: string
-  /** How close that expiry is — see `CreditsReminderTone`. */
-  creditsReminderTone?: CreditsReminderTone
+  /** How bad the credits situation is — see `CreditsChipTone`. */
+  creditsTone?: CreditsChipTone
   userInitials?:    string
   hasNotification?: boolean
   modules?:         NavModule[]
@@ -119,7 +119,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
       <CreditsChip
         :credits="credits"
         :reminder="creditsReminder"
-        :reminder-tone="creditsReminderTone"
+        :tone="creditsTone"
         @click="emit('credits')"
       />
 

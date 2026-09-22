@@ -105,7 +105,11 @@ function handleClick(event: MouseEvent) {
         class="ds-side-nav-item__icon"
         aria-hidden="true"
       />
-      <span v-if="label && !collapsed" class="ds-side-nav-item__label">{{ label }}</span>
+      <!-- The label stays in the DOM and loses its column instead: a `v-if` has
+           nothing to animate, and the collapse is where this row's motion is. -->
+      <span v-if="label" class="ds-side-nav-item__label-track">
+        <span class="ds-side-nav-item__label">{{ label }}</span>
+      </span>
       <slot />
     </component>
 
@@ -127,9 +131,6 @@ function handleClick(event: MouseEvent) {
   width: 100%;
 }
 
-.ds-side-nav-item--collapsed {
-  width: auto;
-}
 
 .ds-side-nav-item__control {
   display: flex;
@@ -151,16 +152,19 @@ function handleClick(event: MouseEvent) {
   transition:
     background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),
     color            var(--ds-motion-duration-quick) var(--ds-motion-easing-default),
-    box-shadow       var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
+    box-shadow       var(--ds-motion-duration-instant) var(--ds-motion-easing-default),
+    padding          var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
+    gap              var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
 }
 
-/* Square, and the same height as the expanded row: the pill must not change
-   height when the rail collapses, only width. The size comes from the group
-   (`--side-nav-rail-row`), so the rail's width and the row's width cannot
-   drift apart. */
+/* The row keeps filling the column and lets the column's own width carry it
+   down — a row pinned to `--side-nav-rail-row` would have jumped to 36px while
+   the column was still closing. It ends up square anyway: the rail's inner
+   width *is* that row, which is how the token derives the rail in the first
+   place. What changes here is what a transition can follow — the padding
+   tightening to `spacing-md` and the gap closing, which is what walks the glyph
+   to the middle. Height never moves: 8 + 20 + 8 in both forms. */
 .ds-side-nav-item--collapsed .ds-side-nav-item__control {
-  width: var(--side-nav-rail-row, 36px);
-  height: var(--side-nav-rail-row, 36px);
   justify-content: center;
   gap: 0;
   padding: var(--ds-spacing-md);
@@ -171,11 +175,52 @@ function handleClick(event: MouseEvent) {
   color: currentColor;
 }
 
-.ds-side-nav-item__label {
+/*
+  The label is the collapse's **second** movement, not the same one.
+  `RevealTransition` found the rule (ADR-0032): the offset between the surface
+  opening and the content arriving is the whole difference between "it opens"
+  and "it appears". Rotated onto this axis — the column widens, then the labels
+  land into it.
+
+  The track is ADR-0025's `0fr -> 1fr` grid, because `width: auto` is not
+  animatable and the grid collapses the column without the text reflowing on
+  the way. The asymmetry is read off the *target* state, so each direction
+  takes its own list: arriving, the fade waits a `quick` and lands just after
+  the column settles; leaving, it goes at `exit` with no delay and the labels
+  are gone before the rail closes on them. ADR-0021's rule, met from a third
+  direction: the exit is faster than the entrance.
+*/
+.ds-side-nav-item__label-track {
+  display: grid;
+  grid-template-columns: 1fr;
   min-width: 1px;
+  opacity: 1;
+  transition:
+    grid-template-columns var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
+    opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-out)
+      var(--ds-motion-duration-quick);
+}
+
+.ds-side-nav-item--collapsed .ds-side-nav-item__label-track {
+  grid-template-columns: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-columns var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
+    opacity var(--ds-motion-duration-exit) var(--ds-motion-easing-in);
+}
+
+.ds-side-nav-item__label {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-side-nav-item__control,
+  .ds-side-nav-item__label-track {
+    transition: none;
+  }
 }
 
 /* ── States ───────────────────────────────────────────────────────── */

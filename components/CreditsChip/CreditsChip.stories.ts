@@ -14,10 +14,10 @@ const meta: Meta<typeof CreditsChip> = {
     credits:  { control: 'number', table: { category: 'Contenu' } },
     unit:     { control: 'text',   table: { category: 'Contenu', defaultValue: { summary: "'crédits'" } } },
     reminder: { control: 'text',   table: { category: 'Contenu' } },
-    reminderTone: {
+    tone: {
       control: 'inline-radio',
-      options: ['info', 'soon', 'expired'],
-      table: { category: 'État', defaultValue: { summary: "'info'" } },
+      options: ['default', 'warning', 'error'],
+      table: { category: 'État', defaultValue: { summary: "'default'" } },
     },
   },
   args: { credits: 250 },
@@ -26,32 +26,36 @@ const meta: Meta<typeof CreditsChip> = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Sans échéance : la pastille reste compacte et teintée accent. */
+/** Hors démo : un seul compteur, et c'est le chip qui porte l'état. */
 export const Compact: Story = {
   name: 'Compacte',
   args: { credits: 250 },
 }
 
-/** Avec échéance : elle s'étale et confie la teinte au badge. */
+/** En démo il y a deux quantités : le chip redevient neutre, le badge prend la teinte. */
 export const Reminder: Story = {
   name: 'Avec échéance',
-  args: { credits: 250, reminder: 'Expirent dans 14 jours' },
+  args: { credits: 250, reminder: 'Expire dans 14 jours', tone: 'warning' },
 }
 
 /**
- * Trois crans d'une même escalade. Le dernier change de registre : fond plein
- * plutôt que teinte, parce qu'une teinte ne sait pas dire « trop tard ».
+ * Les cinq états, et la règle qui les sépare : **le badge existe quand il y a
+ * deux quantités à montrer**. Hors démo il n'y en a qu'une, et le chip la
+ * porte ; en démo il y a des crédits *et* une fenêtre de temps, et un seul
+ * compteur ne peut pas les dire tous les deux.
  */
-export const ReminderTones: Story = {
-  name: 'Échéance — les trois crans',
+export const Tones: Story = {
+  name: 'Les cinq états',
   parameters: { layout: 'padded' },
   render: () => ({
     components: { CreditsChip },
     template: `
       <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start;">
-        <CreditsChip :credits="250" reminder="Expirent dans 14 jours"  reminder-tone="info" />
-        <CreditsChip :credits="250" reminder="Expirent dans 7 jours"   reminder-tone="soon" />
-        <CreditsChip :credits="250" reminder="Vos crédits ont expirés" reminder-tone="expired" />
+        <CreditsChip :credits="250" />
+        <CreditsChip :credits="12" tone="warning" />
+        <CreditsChip :credits="0" tone="error" />
+        <CreditsChip :credits="250" reminder="Expire dans 14 jours" tone="warning" />
+        <CreditsChip :credits="250" reminder="Vos crédits ont expiré" tone="error" />
       </div>
     `,
   }),

@@ -3,14 +3,40 @@ import { Icon } from '../Icon'
 import coinSrc from './credits-coin.svg'
 
 /**
- * How close the balance is to expiring. Three steps, and the last one changes
- * register rather than deepening the tint: `expired` is a solid fill with its
- * own on-colour, because a tint cannot say "too late" (Figma CreditsChip/démo).
+ * The credits balance in the navigation bar.
  *
- * The thresholds are product policy, not a design system decision — the caller
- * picks the step, the component does not derive it from a day count.
+ * **The badge exists when there are two quantities to show.** Outside the demo
+ * there is only one — credits — and the chip counts it, wearing the state
+ * itself. In the demo there are two, credits *and* a window of time, and a
+ * single counter cannot carry both: the chip goes plain and hands the tint to
+ * an échéance badge. One coloured thing at a time, either way.
+ *
+ * So there is still **one axis**. `tone` says how bad it is; the presence of
+ * `reminder` decides who wears it (ADR-0028 — derived from the content, not
+ * declared by a second state prop).
+ *
+ * | | no `reminder` | with `reminder` |
+ * |---|---|---|
+ * | `default` | white, hairline | white + accent badge |
+ * | `warning` | `warning-subtle` | white + accent badge |
+ * | `error`   | `error-solid`    | white + `error-solid` badge |
+ *
+ * The escalation changes **mechanism** rather than intensity — hairline, tint,
+ * solid fill — which is what lets `error` mean "stopped" rather than "more
+ * orange". Accent is not available as the alert: on the chip it is already the
+ * calm state, which is why the standalone ladder runs through `warning`.
+ *
+ * **Every state carries a border and none carries elevation.** The bar has no
+ * ground of its own (ADR-0028), so a `bg-default` chip on it would have no edge
+ * at all — the same thing `ModuleCapsule` found (ADR-0031). A hairline separates
+ * where a shadow only grounds, which is also the rule dark mode forces
+ * (ADR-0030), so the border does the job in both modes and the lift is gone.
+ *
+ * The width runs 132–345px across the states, which is the cost of letting the
+ * badge speak. The alternative — a chip that only ever counts, never explains —
+ * is drawn beside this one in Figma and was set aside.
  */
-export type CreditsReminderTone = 'info' | 'soon' | 'expired'
+export type CreditsChipTone = 'default' | 'warning' | 'error'
 
 interface Props {
   /** The balance. Rendered tabular so it does not jitter as it counts down. */
@@ -18,17 +44,17 @@ interface Props {
   /** Unit after the count. */
   unit?: string
   /**
-   * The expiry notice. Its presence is what expands the chip onto a plain
-   * surface and hands the tint to the badge — derived from the content, not
-   * declared by a second state prop (ADR-0008).
+   * The expiry notice. Its **presence** is what makes this the demo form: the
+   * chip goes plain and the badge appears to carry the second quantity.
    */
   reminder?: string
-  reminderTone?: CreditsReminderTone
+  /** How bad it is. Worn by the chip, or by the badge when there is one. */
+  tone?: CreditsChipTone
 }
 
 withDefaults(defineProps<Props>(), {
-  unit:         'crédits',
-  reminderTone: 'info',
+  unit: 'crédits',
+  tone: 'default',
 })
 
 const emit = defineEmits<{ click: [event: MouseEvent] }>()
@@ -42,42 +68,46 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   <button
     type="button"
     class="ds-credits-chip"
-    :class="reminder ? 'ds-credits-chip--reminder' : 'ds-credits-chip--compact'"
+    :class="`ds-credits-chip--${reminder ? 'default' : tone}`"
     @click="emit('click', $event)"
   >
     <span class="ds-credits-chip__balance">
       <img :src="coinSrc" alt="" class="ds-credits-chip__coin" width="24" height="24" />
-      <span class="ds-credits-chip__count">{{ credits }}</span>
-      <span class="ds-credits-chip__unit">{{ unit }}</span>
+      <!-- One run of text, not two boxes: the count and its unit are separated
+           by a space rather than a gap, and share one colour. -->
+      <span><span class="ds-credits-chip__count">{{ credits }}</span> <span
+        class="ds-credits-chip__unit">{{ unit }}</span></span>
     </span>
 
     <span
       v-if="reminder"
       class="ds-credits-chip__reminder"
-      :class="`ds-credits-chip__reminder--${reminderTone}`"
+      :class="`ds-credits-chip__reminder--${tone === 'error' ? 'expired' : 'soon'}`"
     >
-      <Icon name="alarm-clock" :size="16" aria-hidden="true" />
+      <Icon :name="tone === 'error' ? 'clock' : 'alarm-clock'" :size="16" aria-hidden="true" />
       <span>{{ reminder }}</span>
     </span>
 
-    <!-- 14px is off the 16/20/24/32 scale on purpose: a glyph inside a control
-         is an ornament and is exempt (ADR-0004). -->
-    <Icon
-      name="chevron-down"
-      :size="reminder ? 16 : 14"
-      class="ds-credits-chip__chevron"
-      aria-hidden="true"
-    />
+    <Icon name="chevron-down" :size="16" class="ds-credits-chip__chevron" aria-hidden="true" />
   </button>
 </template>
 
 <style scoped>
+/*
+  One geometry for all five states. The padding used to differ between the
+  compact and the expanded form; it does not any more, because a chip that
+  changes its own padding when the badge arrives moves the balance under the
+  pointer for no reason.
+*/
 .ds-credits-chip {
   display: inline-flex;
   align-items: center;
   gap: var(--ds-spacing-sm);
-  border: none;
+  padding: var(--ds-spacing-sm) var(--ds-spacing-md) var(--ds-spacing-sm) var(--ds-spacing-sm);
+  box-sizing: border-box;
+  border: var(--ds-border-width-default) solid var(--chip-border);
   border-radius: var(--ds-radius-pill);
+  background-color: var(--chip-bg);
   cursor: pointer;
   flex-shrink: 0;
   white-space: nowrap;
@@ -90,33 +120,43 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 }
 
 /*
-  Compact — the resting chip, toned to its own coin. Accent is the secondary
-  brand colour; the tint and its on-colour come from the Figma Semantic
-  collection (bg/accent-subtle, text/on-accent-subtle).
+  Three registers, one per step, and each is a different *kind* of surface
+  rather than a deeper version of the last. ADR-0010: these alias semantic
+  tokens, so they are variant switches with component-scoped names, not tokens.
 */
-.ds-credits-chip--compact {
-  padding: var(--ds-spacing-sm);
-  background-color: var(--ds-bg-accent-subtle);
-  color: var(--ds-text-on-accent-subtle);
+.ds-credits-chip--default {
+  --chip-bg:      var(--ds-bg-default);
+  --chip-border:  var(--ds-border-subtle);
+  --chip-text:    var(--ds-text-strong);
+  --chip-chevron: var(--ds-text-subtlest);
 }
 
-/*
-  Reminder — the chip expands onto a plain surface and hands the tint to the
-  échéance badge, so it marks the thing that needs attention. No border and no
-  lift: the badge is what has to be seen, and the surface behind the bar is
-  what separates the chip.
-*/
-.ds-credits-chip--reminder {
-  padding: var(--ds-spacing-sm) var(--ds-spacing-md) var(--ds-spacing-sm) var(--ds-spacing-sm);
-  background-color: var(--ds-bg-default);
-  color: var(--ds-text-default);
+/* `warning`, not `accent`: accent is the chip's calm identity, so it cannot
+   also be its alarm. */
+.ds-credits-chip--warning {
+  --chip-bg:      var(--ds-bg-warning-subtle);
+  --chip-border:  var(--ds-border-on-warning-subtle);
+  --chip-text:    var(--ds-text-on-warning-subtle);
+  --chip-chevron: var(--ds-text-on-warning-subtle);
+}
+
+.ds-credits-chip--error {
+  --chip-bg:      var(--ds-bg-error-solid);
+  --chip-border:  var(--ds-border-error);
+  --chip-text:    var(--ds-text-on-error-solid);
+  --chip-chevron: var(--ds-text-on-error-solid);
 }
 
 /* ── Balance ──────────────────────────────────────────────────────── */
+/* The gap is the coin's alone. The unit used to be a third flex child dimmed to
+   `text-default`; it is now the same colour as the count, so the two are one
+   run of text and the hierarchy rides on size and weight only — 16 semibold
+   against 14 medium. */
 .ds-credits-chip__balance {
   display: inline-flex;
   align-items: center;
   gap: var(--ds-spacing-sm);
+  color: var(--chip-text);
 }
 
 /*
@@ -124,9 +164,6 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   carries. The two are different artwork, and Figma's fills sit just off the
   palette — near-misses of accent-400 and accent-500 at deltaE 0.76 and 3.75.
   This one is drawn on the primitives themselves.
-
-  The cost is 3px of width, so the chip measures 339 against Figma's 341. That
-  gap is a decision, not drift.
 */
 .ds-credits-chip__coin {
   display: block;
@@ -145,56 +182,34 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   font: var(--ds-font-label-lg);
 }
 
-/*
-  Figma runs the unit at 75% opacity. Composited on the tint that is 3.35:1 and
-  fails AA for 14px text, so the hierarchy is carried by weight and size
-  instead — semibold 16 against medium 14 (ADR-0009).
-*/
-.ds-credits-chip--compact .ds-credits-chip__count,
-.ds-credits-chip--compact .ds-credits-chip__unit {
-  color: var(--ds-text-on-accent-subtle);
-}
-
-.ds-credits-chip--reminder .ds-credits-chip__count { color: var(--ds-text-strong); }
-.ds-credits-chip--reminder .ds-credits-chip__unit  { color: var(--ds-text-default); }
-
 /* ── Badge d'échéance ─────────────────────────────────────────────── */
 .ds-credits-chip__reminder {
   display: inline-flex;
   align-items: center;
   gap: var(--ds-spacing-xs);
   padding: var(--ds-spacing-xxs) var(--ds-spacing-md);
-  border: var(--ds-border-width-default) solid var(--reminder-border);
   border-radius: var(--ds-radius-pill);
-  background-color: var(--reminder-bg);
-  color: var(--reminder-text);
   font: var(--ds-font-label-lg);
 }
 
-/*
-  Three steps of one escalation. `info` and `soon` are tints with a hairline;
-  `expired` is a solid fill, which needs no hairline and takes the on-colour
-  its ground names (ADR-0009).
-*/
-.ds-credits-chip__reminder--info {
-  --reminder-bg:     var(--ds-bg-neutral-subtle);
-  --reminder-border: var(--ds-border-subtle);
-  --reminder-text:   var(--ds-text-default);
-}
-
 .ds-credits-chip__reminder--soon {
-  --reminder-bg:     var(--ds-bg-accent-subtle);
-  --reminder-border: var(--ds-border-on-accent-subtle);
-  --reminder-text:   var(--ds-text-on-accent-subtle);
+  border: var(--ds-border-width-default) solid var(--ds-border-on-accent-subtle);
+  background-color: var(--ds-bg-accent-subtle);
+  color: var(--ds-text-on-accent-subtle);
 }
 
+/* A solid fill needs no hairline (ADR-0009) — but it keeps a transparent one,
+   or the two badges differ by 2px and the chip's height flickers between the
+   two demo states. The background paints under it, so nothing shows. */
 .ds-credits-chip__reminder--expired {
-  --reminder-bg:     var(--ds-bg-error-solid);
-  --reminder-border: var(--ds-bg-error-solid);
-  --reminder-text:   var(--ds-text-on-error-solid);
+  border: var(--ds-border-width-default) solid transparent;
+  background-color: var(--ds-bg-error-solid);
+  color: var(--ds-text-on-error-solid);
 }
 
 /* ── Chevron ──────────────────────────────────────────────────────── */
-.ds-credits-chip__chevron { flex-shrink: 0; }
-.ds-credits-chip--reminder .ds-credits-chip__chevron { color: var(--ds-text-subtlest); }
+.ds-credits-chip__chevron {
+  flex-shrink: 0;
+  color: var(--chip-chevron);
+}
 </style>
