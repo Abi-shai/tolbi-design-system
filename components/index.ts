@@ -80,7 +80,10 @@ export { Tag } from './Tag'
 export type { TagSize, TagAction } from './Tag'
 
 export { Dropdown, DropdownTrigger, DropdownItem, DropdownDivider, DropdownSelectItem, InputDropdown } from './Dropdown'
-export type { DropdownTriggerVariant, DropdownSelectItemType, InputDropdownType, InputDropdownOption } from './Dropdown'
+export type {
+  DropdownTriggerVariant, DropdownTriggerSize, DropdownTriggerChrome,
+  DropdownSelectItemType, InputDropdownType, InputDropdownOption,
+} from './Dropdown'
 
 export { Scrollbar } from './Scrollbar'
 
@@ -133,7 +136,7 @@ export type { CardVariant, CardPadding } from './Card'
 export { Spinner } from './Spinner'
 
 export { Skeleton } from './Skeleton'
-export type { SkeletonVariant } from './Skeleton'
+export type { SkeletonVariant, SkeletonEmphasis } from './Skeleton'
 
 export { MetricValue } from './MetricValue'
 export type { MetricTrend, MetricSize } from './MetricValue'
