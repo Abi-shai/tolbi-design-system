@@ -39,6 +39,7 @@ export { ModulesList } from './ModulesList'
 export type { ModulesListItem } from './ModulesList'
 
 export { IconButton } from './IconButton'
+export type { IconButtonSize } from './IconButton'
 export { HorizontalNavigation } from './HorizontalNavigation'
 export type { NavState, BreadcrumbItem, NavModule } from './HorizontalNavigation'
 

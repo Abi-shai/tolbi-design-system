@@ -51,7 +51,14 @@ const style = computed(() => ({
   border-color: currentColor;
   border-top-color: transparent;
   border-radius: var(--ds-radius-pill);
-  animation: ds-spinner-rotate 0.6s linear infinite;
+  /*
+   * A **period, not a duration** — the scale names durations by the intent of a
+   * state change, and a loop has no start to time (ADR-0032 settled this for the
+   * marquee: only its start and stop borrow from the scale). `linear` because a
+   * rotation that eases pulses, and a pulsing spinner reads as stuttering.
+   */
+  --spinner-period: 0.6s;
+  animation: ds-spinner-rotate var(--spinner-period) linear infinite;
 }
 
 @keyframes ds-spinner-rotate {
@@ -70,7 +77,7 @@ const style = computed(() => ({
  */
 @media (prefers-reduced-motion: reduce) {
   .ds-spinner {
-    animation-duration: 2.4s !important;
+    animation-duration: calc(var(--spinner-period) * 4) !important;
     animation-iteration-count: infinite !important;
   }
 }
