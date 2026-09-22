@@ -4,6 +4,13 @@ export type { ButtonVariant, ButtonSize } from './Button'
 export { Logo } from './Logo'
 export type { LogoVariant, LogoSize } from './Logo'
 
+export { BrandPattern } from './BrandPattern'
+export type {
+  BrandPatternSurface,
+  BrandPatternScale,
+  BrandPatternPadding,
+} from './BrandPattern'
+
 export { Icon, icons } from './Icon'
 export type { IconName, IconSize } from './Icon'
 

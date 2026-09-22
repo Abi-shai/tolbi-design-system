@@ -35,6 +35,7 @@
     "typecheck": "vue-tsc --noEmit",
     "icons": "node scripts/generate-icons.mjs",
     "module-art": "node scripts/generate-module-art.mjs",
+    "brand-pattern": "node scripts/generate-brand-pattern.mjs",
     "dial-codes": "node scripts/generate-dial-codes.mjs",
     "lint": "node scripts/lint-tokens.mjs",
     "test": "node --test scripts/*.test.mjs"

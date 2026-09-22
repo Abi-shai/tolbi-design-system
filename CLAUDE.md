@@ -249,6 +249,18 @@ Before working on any component, read:
   `position: relative`, and a button inside one reports `offsetTop: 0`. Collapsed, `WorkspaceSelector`
   **drops its box** and renders a bare `Avatar`. Figma gotcha: **cloning a variant drops
   `componentPropertyReferences` silently** — re-bind them by hand.
+- **ADR-0035**: `BrandPattern` — the brand sheet's `Pattern — Kaleidoscope` as a surface. The Figma
+  node is **one flattened vector, 7 680 paths, 23 MB**, and it has exactly **one** exact
+  translational symmetry: it cannot ship and it cannot be tiled. Measured, it is **480 stamps of a
+  single 11-path drawing** at **0° and 180° only**, scale 1.0000, no mirrors — the Tolbi mark twice,
+  which is why a rosette reads as three arms. So the tile is **laid out again** from the stamp on the
+  measured lattice (22 KB), and is **seamless by construction** — every stamp wrapped, then redrawn
+  at each neighbouring offset it still reaches — which is what licenses rounding the row shift to
+  227/3 and dropping the sheet's 1.0095° tilt. Tile height **931.14** is the sheet's own period.
+  The **doubled stamp is the whole tonal variation**: 20% ink on 20% ink, no second colour. Three
+  surfaces, each naming its own ink (ADR-0006); **no opacity prop and no radius prop** — the radius
+  is *inherited*. `scale` defaults to `md`, not the sheet's own size: **a width Figma draws is a
+  ceiling, not a size** (ADR-0031 again).
 
 ## Architecture
 
@@ -259,6 +271,7 @@ Before working on any component, read:
 - Design tokens live in `tokens/` — run `npm run tokens` after any token change, and `npm run lint` to check token discipline (both builds run it)
 - Icons are generated — run `npm run icons` after editing `scripts/icons.manifest.txt`; `components/Icon/registry.ts` and `components/Icon/icons/` are build output, not source
 - Module artwork is generated — run `npm run module-art`; `components/ModuleIcon/registry.ts` and `components/ModuleIcon/art/` are build output, not source
+- The brand pattern is generated — run `npm run brand-pattern`; `components/BrandPattern/tile.ts` is build output, not source. Its input is the *stamp* in `scripts/brand-pattern-raw/`, not the Figma sheet: the sheet is 23 MB and has no 2D period (ADR-0035)
 - All components are exported from `components/index.ts`
 - Tokens use the `--ds-` prefix and are exposed as CSS custom properties on `:root`
 - Semantic tokens (`--ds-semantic-*`) are what components consume — never raw primitive tokens directly

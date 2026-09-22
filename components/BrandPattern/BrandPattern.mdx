@@ -1,0 +1,96 @@
+import { Canvas, Controls } from '@storybook/blocks'
+import * as BrandPatternStories from './BrandPattern.stories'
+
+# BrandPattern
+
+Le motif de marque — `Pattern — Kaleidoscope` dans Figma — comme **surface**. La marque Tolbi
+tessellée, sans couture, à n'importe quelle taille, sur un fond qui possède aussi l'encre qui s'y
+lit.
+
+<Canvas of={BrandPatternStories.Default} />
+
+<Controls of={BrandPatternStories.Default} />
+
+---
+
+## Trois axes, pas un de plus
+
+| Prop | Ce que ça décide |
+|---|---|
+| `surface` | Le fond **et** l'encre. `inverse` (défaut) est la planche de marque ; `brand` la pose sur le vert ; `neutral` est la version claire. |
+| `scale` | La taille de la marque. Chaque cran la double. `md` par défaut. |
+| `padding` | Le même vocabulaire que `Card`, pour que les deux se calent pareil. |
+
+Il n'y a **pas** de prop de rayon et **pas** de prop d'opacité. Le rayon est hérité (voir plus
+bas) ; l'opacité est la valeur de la planche, 20 %, et un curseur dessus ne serait pas une
+décision de design, juste une occasion d'en prendre une mauvaise.
+
+<Canvas of={BrandPatternStories.Surfaces} />
+
+---
+
+## Le fond possède l'encre
+
+Un motif est toujours le fond de *quelque chose*. Le composant qui peint la surface possède donc
+aussi ce qui s'y lit (ADR-0006) : chaque `surface` nomme son couple `bg` / `text-on-*`, et la
+même couleur sert à l'encre du motif et au texte du slot. C'est ce qui fait de la paire une
+garantie plutôt qu'un espoir.
+
+L'encre est à 20 % sur les trois fonds et dans les deux modes. Le contraste texture/fond mesure
+**1,41:1 à 1,84:1**, et **1,91:1 à 3,32:1** là où la planche empile deux tampons au même point —
+c'est toute la variation tonale du motif, il n'y a ni deuxième couleur ni deuxième opacité.
+
+`inverse` s'inverse avec le mode, parce que c'est ce que `inverse` veut dire ici (ADR-0029) :
+fond sombre en clair, fond clair en sombre. Si la bande doit rester sombre dans les deux modes,
+c'est `brand` qu'il faut.
+
+<Canvas of={BrandPatternStories.Scales} />
+
+---
+
+## Le rayon est hérité
+
+`border-radius: inherit`. Le motif prend la forme de ce dans quoi on le dépose — une `Card`, une
+bande de héros — et ne peut donc pas inventer un sixième rayon (ADR-0006). Dans une carte :
+`Card padding="none"` puis le `BrandPattern` en premier enfant.
+
+<Canvas of={BrandPatternStories.InACard} />
+
+---
+
+## Le raccord
+
+<Canvas of={BrandPatternStories.Seamless} />
+
+La tuile est **sans couture par construction** : chaque tampon est replié dans la tuile, puis
+redessiné à chaque décalage voisin qu'il atteint encore. La tuile découpe, donc un tampon coupé
+par un bord arrive entier de l'autre côté. Rien n'a besoin de tomber juste — c'est exactement ce
+qui autorise à arrondir le pas relevé sur la planche.
+
+Le motif est **décoratif** : `aria-hidden` sur le SVG, `pointer-events: none`, et rien dans
+l'arbre d'accessibilité. Ce qui est dans le slot y est, lui.
+
+---
+
+## Provenance
+
+Le fichier de géométrie est **généré**, jamais écrit à la main :
+
+```bash
+# le tampon brut vit dans scripts/brand-pattern-raw/
+npm run brand-pattern
+```
+
+L'export Figma du nœud `9892:11986` est un vecteur aplati unique : **7 680 chemins, 23 Mo**, et
+il n'est pas périodique en 2D — il possède exactement **une** symétrie de translation exacte.
+Impossible à livrer, impossible à carreler.
+
+Ce qu'il est vraiment : **480 tampons d'un seul dessin de 11 chemins**, à **0° et 180°**,
+échelle 1,000, aucun miroir. Le générateur repose ce dessin sur la trame relevée et la referme
+en une tuile de **454 × 931** — 22 Ko au lieu de 23 Mo, et qui se répète partout.
+
+Le tampon, c'est la marque Tolbi — le dessin de l'Afrique de `Logo` — **deux fois**, à deux
+rotations. C'est pour ça qu'une rosette se lit comme trois bras : deux tampons se recouvrent.
+
+Voir `docs/adr/0035-the-pattern-is-the-mark-tessellated.md` pour la méthode de mesure et les deux
+endroits où elle arrondit volontairement.
