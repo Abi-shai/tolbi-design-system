@@ -90,6 +90,16 @@ export type { ToggleSize } from './Toggle'
 export { Checkbox } from './Checkbox'
 export type { CheckboxSize, CheckboxInputType } from './Checkbox'
 
+export { ProjectCard } from './ProjectCard'
+export type {
+  ProjectCardState,
+  ProjectCardMeta,
+  ProjectCardMetric,
+  ProjectCardShare,
+  ProjectCardStage,
+  ProjectCardCrop,
+} from './ProjectCard'
+
 export { ProgressBar } from './ProgressBar'
 export type { ProgressBarLabel } from './ProgressBar'
 

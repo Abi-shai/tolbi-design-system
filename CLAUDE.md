@@ -261,6 +261,61 @@ Before working on any component, read:
   surfaces, each naming its own ink (ADR-0006); **no opacity prop and no radius prop** — the radius
   is *inherited*. `scale` defaults to `md`, not the sheet's own size: **a width Figma draws is a
   ceiling, not a size** (ADR-0031 again).
+- **ADR-0036**: `DropdownTrigger` gains a second chrome — `chrome="quiet"` is **nothing at rest**,
+  and it lives there rather than in `WorkspaceSelector` for ADR-0033's own reason: a chrome with two
+  owners has none. (`variant` was taken — `DropdownTriggerVariant` names `Dropdown`'s three built-in
+  triggers.) It escalates by **mechanism, not intensity** — absent → `bg-neutral-subtle` → `bg-default`
+  + `elevation-control` — which is why it survives dark, where the same three steps run the opposite
+  way and stay ordered. On `bg-neutral` there are only **three usable surfaces**: `bg-hover` and
+  `bg-neutral-subtle` alias one primitive, and `bg-neutral-subtle-hover` and `bg-disabled` alias
+  `bg-neutral` itself — so hover and focus share the tint, and disabled paints nothing. **A `bg-*`
+  token is solved against `bg-default`**; on a recessed ground its distance is not preserved.
+  Focus takes the tint too, because in Figma a drop shadow on a fill-less frame traces the *glyphs*.
+  Padding is `control-padding-sm` in **every** state (a padding that appears on hover shifts the
+  content 8px; 12px is what aligns the mark with the destinations' glyphs at 28px) — symmetric
+  `spacing-md` is for **square icon-only** controls. In Figma the pair splits per axis
+  (`control-padding/sm-{y,x}`): **the numbers being right is not the tokens being right.**
+  Knock-on: ADR-0034's rule under the header **narrows to the rail** — it was exempted from the
+  expanded form on the premise that the toggle "sits beside a boxed selector", which this ADR
+  deletes, but its real argument is *vertical stacking* and the expanded header shares a row.
+- **ADR-0037**: the sidebar collapse **travels** instead of cutting. `easing-in-out` is not a choice —
+  its description names "drawer slide". `enter` (200ms) beats `considered` (400ms, which the scale
+  literally names for drawers and which still has no consumer) because **the indicator inside the
+  column already travels at `enter`** and two durations on one gesture tear. The non-obvious part:
+  `useSlidingIndicator`'s `ResizeObserver` fires every frame of the column's width transition, so a
+  transitioned pill would trail the edge by a whole duration — the group therefore **withholds
+  `--animated` while the column is in flight**, and the pill inherits the column's easing through the
+  measurement. Its length is read off the cascade, never repeated in JS. The row stops being pinned
+  to `--side-nav-rail-row` (a pinned row jumps; padding and gap can travel). The label is the
+  **second** movement — ADR-0025's `0fr → 1fr` on `grid-template-columns`, asymmetric because CSS
+  reads the transition off the *target* state. The header's restack stays a **cut**: `SwapTransition`
+  is wrong here by its own ADR-0026 argument — `out-in` would empty the header and drop the rows
+  twice instead of once.
+
+- **ADR-0038**: `ProjectCard` — **the shell is shared, the insight is not**. Every module's project
+  has one anatomy (snapshot, name, identity chips, two figures, insight, freshness); what a module
+  *measures* is the only place the pattern may break. We held Yield and Scan apart on that ground —
+  `stage` an ordinal progress, `crops` a proportional spread — and **the reading of Yield was
+  wrong**: a parcel is never *at* a phenological stage, its hectares are spread across several at
+  once. So both are spreads, both draw **one geometry**, and the props stay separate only because a
+  stage and a crop are not the same thing to a caller (`stageLabel` decides which). What did not
+  fall is the rule: the block is **derived from the data**, never a `module` prop (ADR-0028). The
+  order is the component's — **biggest share first**, so the dominant series takes the most
+  distinguishable hue (ADR-0016) and the `+N` tail is always the small change. `state` carries `loading` and `error`, which are not
+  project states: they are what a consumer must render, and the pill's tone falls out of the same
+  value. **`error` is the snapshot's failure, not the project's** — the pill stays. **The wait says
+  nothing** (Fabric, Cosmos, Midday: loading is the same grey as the skeleton, no glyph — and it
+  carries neither pill nor menu) while **the absence speaks** (Bloom, Descript: glyph, word, action);
+  the kinds of absence sort by *whose move it is*. The snapshot is **generated, never chosen**
+  (Felt): frame the union of every geometry, bound the zoom both ways, frame to the tile's ratio.
+  **Nothing wraps** — the legend's tail becomes `+N`, because a card that grows breaks its grid.
+  Spreads take `--ds-chart-categorical-*` and **not** the drawing's greens; a series the legend does
+  not name takes the neutral tail instead, so bar and legend always agree on how many things have
+  names. `chart/categorical-*` has **no Figma variables**, which is why the file reached for raw hex.
+  The card is clickable through its **title**, not its container: the `<h3>` holds a real
+  `<button>` (or `<a>` with `href`) whose `::after` covers the card, because a `<div>` that emits
+  `click` is unreachable by keyboard (ADR-0014). The menu is **last in the DOM** so the project comes
+  before its own menu in the tab order, and the card stopped clipping so the focus ring is not cut.
 
 ## Architecture
 
