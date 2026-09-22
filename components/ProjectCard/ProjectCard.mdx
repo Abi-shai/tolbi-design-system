@@ -1,0 +1,133 @@
+import { Canvas, Controls, ArgTypes } from '@storybook/blocks'
+import * as Stories from './ProjectCard.stories'
+
+# ProjectCard
+
+Un projet d'un module, en tuile : un aperçu cartographique, un nom, une ligne
+d'identité, deux chiffres, un bloc d'aperçu et une ligne de fraîcheur.
+
+<Canvas of={Stories.Yield} />
+
+<Controls of={Stories.Yield} />
+
+---
+
+## La coque est partagée, l'aperçu l'était moins qu'on croyait
+
+Tous les modules ont la même anatomie, et c'est ce qui rend lisible une grille
+qui les mélange. **Ce qu'un module *mesure* est le seul endroit où le motif a le
+droit de casser** — mais encore faut-il que les données diffèrent vraiment.
+
+On avait séparé Yield et Scan sur ce terrain : `stage` était lu comme une
+progression ordinale (« 2 sur 4 »), `crops` comme une répartition. **La lecture
+de Yield était fausse.** Une parcelle n'est jamais *à* un stade phénologique :
+ses hectares sont étalés sur plusieurs à la fois, 62 % en floraison pendant que
+12 % lève encore. C'est une répartition, comme les cultures, et ça dessine la
+même barre.
+
+<Canvas of={Stories.Modules} />
+
+Ce qui n'est pas tombé, c'est la règle : le bloc découle **de la donnée**,
+jamais d'une prop `module` (ADR-0028). C'est notre classement d'un module qui
+était faux — une erreur différente, et bien moins chère (ADR-0038).
+
+---
+
+## Une seule géométrie, deux props
+
+`stage` et `crops` portent la même forme et rendent le même bloc. Ils restent
+séparés parce qu'un stade et une culture ne sont pas la même chose pour
+l'appelant : c'est `stageLabel` qui décide laquelle des deux répartitions la
+carte décrit.
+
+```ts
+// Yield
+stageLabel: 'Stades phénologiques'
+stage: [{ label: 'Floraison', share: 62 }, { label: 'Montaison', share: 21 }]
+
+// Scan
+cropsLabel: 'Répartition des cultures'
+crops: [{ label: 'Arachide', share: 46 }, { label: 'Mil', share: 27 }]
+```
+
+Une liste vide avec un `stageLabel` donne la forme planifiée : la ligne seule,
+sans barre dessous.
+
+---
+
+## Le composant ordonne, pas l'appelant
+
+Les segments sont triés **du plus gros au plus petit**. La palette catégorielle
+est ordonnée par ΔE mesuré (ADR-0016), donc la part dominante doit prendre la
+teinte la plus distinguable — et la queue `+N` est alors toujours la petite
+monnaie.
+
+<Canvas of={Stories.CropOverflow} />
+
+**Une couleur que la légende ne nomme pas est du bruit.** Ce qui bascule dans
+`+N` bascule dans le même neutre sur la barre, donc les deux lectures de la
+répartition s'accordent toujours sur le nombre de choses qui ont un nom. Rien ne
+passe à la ligne non plus : une carte qui grandit casse sa grille.
+
+---
+
+## Cinq états, dont deux qui n'en sont pas
+
+<Canvas of={Stories.States} />
+
+`loading` et `error` ne sont pas des phases d'un projet. Ils sont sur le même axe
+parce que c'est ce que le consommateur doit réellement choisir, et parce que la
+teinte de la pastille découle de la même valeur — les deux ne peuvent donc pas
+se contredire.
+
+**`error` est l'échec du snapshot, pas celui du projet** : la pastille reste, le
+projet tourne toujours, c'est son image qui manque.
+
+**L'attente ne dit rien.** Yield et Scan chargent à l'identique, parce qu'un
+placeholder qui devinerait se tromperait une fois sur deux. Ce qu'elle dit en
+revanche, c'est la *forme* : un nom au-dessus d'une légende, puis deux chiffres
+et une barre. Ni pastille ni menu — il n'y a encore rien à commander.
+
+---
+
+## La carte est cliquable par son titre
+
+Le `<h3>` contient un vrai contrôle — un `<button>`, ou un `<a>` si l'on passe
+`href` — et c'est son `::after` qui couvre la tuile. **Un conteneur qui émet
+`click` est inatteignable au clavier** (ADR-0014) ; ici la cible est le titre,
+donc elle a un nom, un rôle et une place dans l'ordre de tabulation.
+
+Le menu « … » est **dernier dans le DOM**, même s'il se dessine sur le snapshot :
+une grille qui ferait menu, projet, menu, projet mettrait l'accessoire avant la
+chose. Et la carte a cessé de clipper — c'est le média qui clippe désormais —
+pour que l'anneau de focus, qui déborde de 4px, ne soit pas coupé.
+
+Le compromis assumé : la surcouche empêche de sélectionner le texte de la carte.
+C'est le prix d'une tuile entièrement cliquable.
+
+---
+
+## Le survol
+
+Deux choses bougent d'un même geste. La carte se soulève — `elevation-control`
+→ `elevation-surface`, plus 2px — et le menu apparaît en fondu.
+
+Les deux tiennent la même durée, `quick` (100ms), et ce n'est pas un choix
+libre : **deux durées sur un même geste se déchirent** (ADR-0037). Le menu porte
+la contrainte réelle, puisque le pointeur file déjà vers lui quand la carte
+s'allume, donc c'est lui qui donne le tempo. Seul, le soulèvement aurait pris
+`moderate`, comme tout autre survol du catalogue.
+
+En sombre, ce ne sont pas l'ombre mais **les deux pixels** qui portent l'état :
+l'ombre la plus noire que `gray-forest/900` peut tenir ne fait que 1,262:1
+(ADR-0030), là où la géométrie se moque de la noirceur du fond.
+
+Tout cela est enveloppé dans `@media (hover: hover)` : un écran tactile n'a pas
+de pointeur à poser, donc un menu qui en attend un est un menu qui n'existe
+jamais. Là-bas il reste affiché.
+
+---
+
+## Props
+
+<ArgTypes of={Stories.Yield} />

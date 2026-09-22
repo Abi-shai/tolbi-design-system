@@ -316,6 +316,21 @@ Before working on any component, read:
   `<button>` (or `<a>` with `href`) whose `::after` covers the card, because a `<div>` that emits
   `click` is unreachable by keyboard (ADR-0014). The menu is **last in the DOM** so the project comes
   before its own menu in the tab order, and the card stopped clipping so the focus ring is not cut.
+- **ADR-0039**: three defects that **passed every check we own**, because each one's declaration was
+  right and only its rendering was wrong. `Skeleton`'s shimmer ran between `bg-neutral-subtle` and
+  `bg-hover` — two legitimate tokens that **alias one primitive** — so the animation ran from a
+  colour to itself; it now has two stops, and a **weight axis** (`emphasis`), because Figma draws
+  placeholders in two greys and *a skeleton previews the weight of what is coming*, not only its box.
+  `IconButton` **derived** its size from padding, so a consumer's border made a 32px control 34px —
+  a box is **declared**, in `border-box`, like `Button --icon-only` and `CloseButton` already did.
+  36px is the catalogue's floor for a round control; `xs` (32px) goes below it and **the glyph
+  gives, not the padding**, because the ramp turns over at the floor. A loop's `1.6s` is a
+  **period, not a duration** (ADR-0032's marquee exemption, restated), and both loops run `linear` —
+  the shimmer said `ease-in-out`, the CSS keyword, which is **not** the curve the token of that name
+  carries. `--ds-bg-pending` is named by **role, not prominence**: the emphasis words were spent, and
+  three places wanted `gray-light/200`. Still open: **nothing in the linter reads a duration or a
+  curve**, and the method that found all three is to **read the rendered pixel, not the property you
+  just wrote**.
 
 ## Architecture
 

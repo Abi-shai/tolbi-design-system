@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import ProjectCard from './ProjectCard.vue'
+import Docs from './ProjectCard.mdx'
 
 /**
  * A stand-in for the map snapshot. Inline so the stories never depend on a
@@ -21,10 +22,11 @@ const SNAPSHOT =
 const meta: Meta<typeof ProjectCard> = {
   title: 'Données/ProjectCard',
   component: ProjectCard,
-  tags: ['wip'],
+  tags: ['autodocs', 'stable'],
   parameters: {
     layout: 'centered',
     docs: {
+      page: Docs,
       description: {
         component:
           "Un projet d'un module, en tuile. **La coque est partagée, l'aperçu ne l'est pas** : " +
@@ -106,7 +108,7 @@ const frame = (inner: string) =>
 
 /** Yield : le bloc du bas est une progression — 2 stades sur 4, de gauche à droite. */
 export const Yield: Story = {
-  name: 'Yield — progression',
+  name: 'Yield — stades phénologiques',
   render: () => ({
     components: { ProjectCard },
     setup: () => ({ args: YIELD }),
