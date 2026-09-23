@@ -660,7 +660,7 @@ function shareColour(i: number) {
   align-items: center;
   gap: var(--ds-spacing-xxs);
   white-space: nowrap;
-  font: var(--ds-font-label-md);
+  font: var(--ds-font-label-lg);
   color: var(--ds-text-subtle);
 }
 
@@ -708,7 +708,7 @@ function shareColour(i: number) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font: var(--ds-font-body-sm);
+  font: var(--ds-font-body-md);
   color: var(--ds-text-subtlest);
 }
 
@@ -760,7 +760,7 @@ function shareColour(i: number) {
   align-items: center;
   justify-content: space-between;
   gap: var(--ds-spacing-sm);
-  font: var(--ds-font-label-md);
+  font: var(--ds-font-label-lg);
   color: var(--ds-text-default);
 }
 
@@ -858,6 +858,12 @@ function shareColour(i: number) {
   align-items: center;
   gap: var(--ds-spacing-sm);
   font: var(--ds-font-body-sm);
+  /* The `font:` shorthand resets `font-style`, so the slant has to come after
+     it — the same ordering trap ADR-0011 records for `tabular-nums`. There is
+     no italic role: the scale has 20 and none of them is a slant, so this is a
+     single-axis override on a whole role, which the completeness rule permits
+     because `font-style` is not one of its four axes. */
+  font-style: italic;
   color: var(--ds-text-subtlest);
 }
 </style>
