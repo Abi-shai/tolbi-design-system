@@ -332,6 +332,22 @@ Before working on any component, read:
   curve**, and the method that found all three is to **read the rendered pixel, not the property you
   just wrote**.
 
+- **ADR-0040**: three questions about `ProjectCard` turned out to be one — **where does the card
+  stop and the product start?** 280px is a **ceiling** (ADR-0031 again), and it never reached the
+  component because the number lived in the *stories*: every story looked right while the card
+  stretched to any column. `max-width: 17.5em`, so the shell follows the type size — and the `em`
+  reads the **inherited** size, so the cap is a ratio, not a constant (`17.5rem` is the constant,
+  and is what `EmptyState` and `ChartTooltip` use). The banner gains a `#snapshot` **slot with the
+  `snapshot` prop as its fallback content** — `Table`'s `emptyText`/`#empty` shape — because a
+  string carries no `srcset`, no format negotiation, no `loading="lazy"` and no `<canvas>`. ADR-0038
+  settles **which image**, never **how it is referenced**; the two had been fused. The frame does
+  not move (ratio, clip, radius, pill, menu — ADR-0006), so the CSS is in two parts: `object-fit` on
+  a `<picture>` does nothing, and both selectors are `:deep()` because slotted content carries the
+  *consumer's* scope id — ADR-0021's silent failure, second occurrence. A frame that renders an
+  `<img>` **owns its failure**: `@error` lands on the same empty state, the pill does not move
+  (ADR-0038's rule becomes load-bearing), and the flag resets on `snapshot` change. Fill the slot
+  and the failure is yours — we do not own that element and cannot hear it.
+
 ## Architecture
 
 - Components live in `components/<Name>/` — each has `<Name>.vue`, `<Name>.stories.ts`, and `index.ts`
