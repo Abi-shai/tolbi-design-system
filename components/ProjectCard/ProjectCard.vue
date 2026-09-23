@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch, useSlots } from 'vue'
 import { Badge } from '../Badge'
 import { Icon, type IconName } from '../Icon'
 import { IconButton } from '../IconButton'
@@ -90,8 +90,26 @@ interface Props {
   /** The "Projet démo" badge. A condition of the account, not of the project. */
   demo?:       boolean
   demoLabel?:  string
-  /** The map snapshot. Framed on every geometry the project holds. */
+  /**
+   * The map snapshot, as a URL. The simple path, and the one the product will
+   * use for a rendered tile it already has a link to.
+   *
+   * A URL is not the only shape a reference comes in, so it is the **fallback
+   * of the `snapshot` slot**, not the only way in — `Table` does the same with
+   * `emptyText` behind `#empty`. A product that needs `srcset`, an AVIF source
+   * with a JPEG behind it, `loading="lazy"` across a grid of twenty, or a
+   * `<canvas>` the map renders into, fills the slot instead. The frame stays
+   * the design system's either way: ratio, clip, radius and the two controls
+   * that sit on top are declared here and are not negotiable.
+   */
   snapshot?:   string
+  /**
+   * The snapshot's alternative text. Empty by default, which is the honest
+   * value while the tile is a render of data the card already states in words.
+   * A product that puts something *else* in the frame has to be able to name
+   * it — `Avatar` and `Tag` both take one for the same reason.
+   */
+  snapshotAlt?: string
   meta?:       ProjectCardMeta[]
   metrics?:    ProjectCardMetric[]
   /**
@@ -126,7 +144,8 @@ const props = withDefaults(defineProps<Props>(), {
   status:     undefined,
   demo:       false,
   demoLabel:  'Projet démo',
-  snapshot:   undefined,
+  snapshot:    undefined,
+  snapshotAlt: '',
   meta:       () => [],
   metrics:    () => [],
   stage:      () => [],
@@ -147,7 +166,32 @@ const emit = defineEmits<{
 }>()
 
 const isLoading = computed(() => props.state === 'loading')
-const isError   = computed(() => props.state === 'error')
+
+/**
+ * **A snapshot can fail after the card has already decided it has one**, and
+ * the card is the only thing that finds out. `state="error"` is a prop, so
+ * reaching it means the product preflighted the URL — which it cannot do
+ * without fetching the image twice. So the frame listens to its own `<img>`
+ * instead, and a 404 lands on the same empty state the prop reaches.
+ *
+ * **Only the `<img>` the frame renders itself.** Fill the `snapshot` slot and
+ * the failure is yours: we do not own that element and cannot hear it. The
+ * prop is still there to reach this rendering by hand.
+ *
+ * It resets when the reference changes, or a card recycled through a list
+ * would stay broken on an address that was never tried.
+ */
+const snapshotFailed = ref(false)
+watch(() => props.snapshot, () => { snapshotFailed.value = false })
+
+/*
+  The union, and it stops here: `statusLabel` and `statusTone` read `state`
+  directly, so a broken image never moves the pill. ADR-0038's rule — the error
+  is the snapshot's, not the project's — is load-bearing now rather than
+  descriptive, because this is the path that reaches it without the product
+  saying so.
+*/
+const isError = computed(() => props.state === 'error' || snapshotFailed.value)
 
 /** The pill's tone is the state's, so the two can never disagree. */
 const STATUS = {
@@ -161,8 +205,14 @@ const STATUS = {
 const statusLabel = computed(() => props.status ?? STATUS[props.state].label)
 const statusTone  = computed(() => STATUS[props.state].tone)
 
-/** The snapshot shows only when there is one and nothing has gone wrong. */
-const showSnapshot = computed(() => !!props.snapshot && !isLoading.value && !isError.value)
+const slots = useSlots()
+
+/**
+ * The snapshot shows only when there is one and nothing has gone wrong — and
+ * "there is one" now means a URL **or** a filled slot, or a product that only
+ * ever fills the slot would render an empty frame forever.
+ */
+const showSnapshot = computed(() => (!!props.snapshot || !!slots.snapshot) && !isLoading.value && !isError.value)
 
 /**
  * **One block, two props.** `stage` and `crops` carry the same shape and render
@@ -216,12 +266,13 @@ function shareColour(i: number) {
          Loading carries neither pill nor menu: there is nothing to
          command yet, and a glyph here would read as a final state. -->
     <div class="ds-project-card__media">
-      <img
-        v-if="showSnapshot"
-        :src="snapshot"
-        alt=""
-        class="ds-project-card__snapshot"
-      />
+      <!-- The frame is the design system's, what fills it is the product's.
+           Fallback content, so `snapshot` alone keeps working untouched. -->
+      <div v-if="showSnapshot" class="ds-project-card__snapshot">
+        <slot name="snapshot">
+          <img :src="snapshot" :alt="snapshotAlt" @error="snapshotFailed = true" />
+        </slot>
+      </div>
 
       <!-- The word, and nothing else. Both error variants hide the glyph and
            the frame was re-centred on the line alone, so this is a state and
@@ -385,6 +436,23 @@ function shareColour(i: number) {
   ADR-0013's exemption does not cover it: either it becomes a step or it snaps
   to `spacing-md`.
 */
+/*
+  **280px is a ceiling, not a size** — ADR-0031's rule, and ADR-0035's after it.
+  The card fills the column it is given and stops there; the grid decides how
+  many fit, the card decides how wide it is willing to get. Without the cap it
+  took whatever the container offered, and the media's `280 / 128` grew with it:
+  a snapshot framed on the union of the project's geometries turning into a
+  banner. `max-width`, not `width`, so a narrower column still gets a card.
+
+  **`17.5em`, not `280px`.** The cap is expressed in the card's own type size,
+  so a consumer that shrinks the text shrinks the shell with it rather than
+  leaving the same box around smaller words. Worth knowing which way this
+  resolves: `.ds-project-card` declares no `font:` of its own — every role in
+  this file sits on a child — so the `em` reads the *inherited* size, i.e. the
+  consumer's. That is the point, but it also means the ceiling is not a constant;
+  `17.5rem` is the version that is (and is what `EmptyState` and `ChartTooltip`
+  use for their own caps).
+*/
 .ds-project-card {
   --project-card-gap: 10px;
   --project-card-share-rest: var(--ds-bg-neutral-strong);
@@ -394,6 +462,7 @@ function shareColour(i: number) {
   flex-direction: column;
   gap: var(--project-card-gap);
   box-sizing: border-box;
+  max-width: 17.5em;
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
   background-color: var(--ds-bg-default);
@@ -451,7 +520,33 @@ function shareColour(i: number) {
   background-color: var(--ds-bg-neutral);
 }
 
+/*
+  **The media dictates its child's geometry, whatever that child is.** The
+  slot's whole point is that the product brings the reference format, so the
+  frame cannot assume it got an `<img>`: a `<picture>` is a wrapper whose own
+  box means nothing, a `<canvas>` has intrinsic pixels, an inline `<svg>` has a
+  viewBox. So the rule is in two parts — the direct child fills the box, and the
+  thing that actually carries pixels covers it, at whatever depth it sits. That
+  second selector is what makes `<picture><img></picture>` behave, since
+  `object-fit` on the wrapper does nothing.
+
+  `:deep()`, because slotted content carries the *consumer's* scope id and a
+  plain scoped rule would miss it silently — the trap ADR-0021 already recorded
+  against `SurfaceTransition`.
+*/
 .ds-project-card__snapshot {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ds-project-card__snapshot > :deep(*) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ds-project-card__snapshot :deep(:is(img, canvas, video, svg)) {
   display: block;
   width: 100%;
   height: 100%;

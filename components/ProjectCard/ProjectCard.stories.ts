@@ -197,3 +197,37 @@ export const Modules: Story = {
     `,
   }),
 }
+
+/**
+ * La référence de la bannière n'est pas limitée à une URL. `snapshot` reste le
+ * chemin simple ; le slot `#snapshot` est là pour tout ce qu'une chaîne ne sait
+ * pas porter — `srcset`, une source AVIF avec un JPEG derrière, `loading="lazy"`
+ * sur une grille de vingt cartes, ou un `<canvas>` dans lequel le produit rend
+ * la carte lui-même.
+ *
+ * Le cadre, lui, ne bouge pas : ratio, découpe, rayon, pill et bouton de menu
+ * restent au design system. Les deux cartes ci-dessous sont strictement
+ * identiques à l'œil — c'est le but.
+ */
+export const SnapshotSlot: Story = {
+  name: 'Bannière — la référence vient du produit',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { ProjectCard },
+    setup: () => ({ args: SCAN, snapshot: SNAPSHOT }),
+    template: `
+      <div style="display: grid; grid-template-columns: repeat(2, 280px); gap: 24px;">
+        <ProjectCard v-bind="args" />
+
+        <ProjectCard v-bind="args" :snapshot="undefined">
+          <template #snapshot>
+            <picture>
+              <source :srcset="snapshot" type="image/svg+xml" />
+              <img :src="snapshot" alt="Parcelles détectées" loading="lazy" />
+            </picture>
+          </template>
+        </ProjectCard>
+      </div>
+    `,
+  }),
+}
