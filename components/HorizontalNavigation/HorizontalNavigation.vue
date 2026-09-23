@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { Logo } from '../Logo'
-import { Icon } from '../Icon'
+import { Breadcrumbs } from '../Breadcrumbs'
 import { Avatar } from '../Avatar'
 import { CreditsChip } from '../CreditsChip'
 import { Button } from '../Button'
@@ -11,19 +11,24 @@ import { ModulesList } from '../ModulesList'
 import { SurfaceTransition } from '../SurfaceTransition'
 import type { ModulesListItem } from '../ModulesList'
 import type { CreditsChipTone } from '../CreditsChip'
+import type { BreadcrumbsItem } from '../Breadcrumbs'
 
-export type NavState = 'Accueil' | 'Module' | 'Project' | 'tabs'
-
-export interface BreadcrumbItem {
-  label:   string
-  active?: boolean
-}
+/**
+ * A crumb is what `Breadcrumbs` calls a crumb. `active` is gone: the current
+ * segment is the **last** one, by position — a per-item flag let a trail have
+ * zero or two current segments and meant nothing knew where the end was
+ * (ADR-0024, the same call `ButtonGroupItem.active` got).
+ */
+export type BreadcrumbItem = BreadcrumbsItem
 
 export type NavModule = ModulesListItem
 
 interface Props {
-  state?:           NavState
   breadcrumbs?:     BreadcrumbItem[]
+  /** Où mène la maison du fil. Avec, c'est une ancre ; sans, un bouton. */
+  homeHref?:        string
+  /** Le nom accessible de la maison — une chaîne appartient au produit. */
+  homeLabel?:       string
   credits?:         number
   /** Expiry reminder shown in the credits chip, e.g. `Expirent dans 14 jours`. */
   creditsReminder?: string
@@ -35,7 +40,6 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  state:           'Accueil',
   credits:         0,
   userInitials:    'TD',
   hasNotification: false,
@@ -43,6 +47,15 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
+  /**
+   * La maison du fil. **Distinct de `learn`** : elle émettait le même
+   * évènement que « Apprendre », donc cliquer sur l'accueil ouvrait le centre
+   * d'aide.
+   */
+  home:            [event: MouseEvent]
+  /** Un maillon du fil a été activé — émis même sur une ancre, pour qu'un
+      routeur puisse `preventDefault()` et naviguer côté client. */
+  'breadcrumb-select': [item: BreadcrumbItem, event: MouseEvent]
   learn:           []
   settings:        []
   notifications:   []
@@ -50,10 +63,6 @@ const emit = defineEmits<{
   credits:         []
   'module-select': [module: NavModule]
 }>()
-
-const hasBreadcrumbs = computed(
-  () => props.state !== 'Accueil' && !!props.breadcrumbs?.length
-)
 
 const activeTooltip = ref<string | null>(null)
 function showTooltip(name: string) {
@@ -91,25 +100,22 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   <header class="ds-hnav">
 
     <!-- ── Gauche : logo + breadcrumbs ────────────────────────────────── -->
-    <div class="ds-hnav__left" :class="{ 'ds-hnav__left--spaced': hasBreadcrumbs }">
+    <div class="ds-hnav__left">
       <!-- The coloured lockup at Figma's tightened `sm` size. -->
       <Logo variant="default" size="sm" alt="Tolbi" />
 
-      <nav v-if="hasBreadcrumbs" class="ds-hnav__breadcrumbs" aria-label="Navigation">
-        <button class="ds-hnav__crumb-btn" @click="emit('learn')" aria-label="Accueil">
-          <Icon name="house" :size="20" />
-        </button>
-
-        <template v-for="(crumb, i) in breadcrumbs" :key="i">
-          <Icon name="chevron-right" :size="16" class="ds-hnav__chevron" aria-hidden="true" />
-          <button
-            class="ds-hnav__crumb-btn"
-            :class="{ 'ds-hnav__crumb-btn--active': crumb.active }"
-          >
-            {{ crumb.label }}
-          </button>
-        </template>
-      </nav>
+      <!--
+        The catalogue's Breadcrumbs, not a second drawing of it (ADR-0001).
+        It renders at every state including `Accueil`, where the trail is the
+        house alone: the home page is a depth, not the absence of one.
+      -->
+      <Breadcrumbs
+        :items="breadcrumbs ?? []"
+        :home-href="homeHref"
+        :home-label="homeLabel"
+        @home="emit('home', $event)"
+        @select="(item, event) => emit('breadcrumb-select', item, event)"
+      />
     </div>
 
     <!-- ── Droite : crédits + actions + avatar ────────────────────────── -->
@@ -230,48 +236,9 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 .ds-hnav__left {
   display: flex;
   align-items: center;
-}
-
-.ds-hnav__left--spaced {
+  /* 32px between the lockup and the trail, at every depth — Figma's `left`
+     frame carries the same gap in all four views. */
   gap: var(--ds-spacing-4xl);
-}
-
-/* ── Breadcrumbs ──────────────────────────────────────────────────── */
-.ds-hnav__breadcrumbs {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-md);
-}
-
-.ds-hnav__chevron {
-  color: var(--ds-text-subtlest);
-  flex-shrink: 0;
-}
-
-.ds-hnav__crumb-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--ds-spacing-xs) var(--ds-spacing-md);
-  border-radius: var(--ds-radius-inner);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--ds-text-subtle);
-  font: var(--ds-font-label-lg);
-  white-space: nowrap;
-  transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
-}
-
-.ds-hnav__crumb-btn:hover {
-  background: var(--ds-bg-hover);
-}
-
-.ds-hnav__crumb-btn--active {
-  background: var(--ds-bg-neutral-subtle);
-  color: var(--ds-text-strong);
-  font-family: var(--ds-typography-font-family-poppins);
-  font-weight: var(--ds-font-weight-label-lg-strong);
 }
 
 /* ── Droite ───────────────────────────────────────────────────────── */

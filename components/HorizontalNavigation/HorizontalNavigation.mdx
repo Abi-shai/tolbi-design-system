@@ -11,16 +11,21 @@ Barre de navigation principale de l'app Tolbi. Fond vert foncé semi-transparent
 
 ---
 
-## États
+## Profondeur
 
-Le composant adapte son contenu selon la profondeur de navigation via la prop `state`.
+Le fil est rendu à **toutes** les profondeurs, y compris sur l'accueil : la page d'accueil est une
+profondeur, pas l'absence de fil. Il n'y a plus de prop `state` — c'est la longueur de
+`breadcrumbs` qui fait la profondeur, et rien d'autre.
 
-| État | Breadcrumbs | Usage |
+| Scénario | Fil | Nœuds |
 |---|---|---|
-| `Accueil` | Aucun | Page d'accueil de la plateforme |
-| `Module` | 1 niveau | Vue principale d'un module (ex: Carbone) |
-| `Project` | 2 niveaux | Vue d'un projet dans un module |
-| `tabs` | 3 niveaux | Vue d'un onglet dans un projet |
+| Accueil | 🏠 | 1 |
+| ID | 🏠 › ID › Statistiques | 3 |
+| Yield | 🏠 › Yield › Projets › Campagne maïs › Dashboard | 5 |
+| Data OS | 🏠 › Data OS › Projets › Forums › Forum 123 › Assurance | 6, **replié** |
+
+Au-delà de cinq nœuds le milieu se replie derrière une ellipse. Voir `Navigation/Breadcrumbs`
+pour les deux troncatures et leurs seuils.
 
 <Canvas of={HorizontalNavigationStories.Accueil} />
 <Canvas of={HorizontalNavigationStories.Module} />
@@ -39,7 +44,16 @@ Le point rouge sur la cloche s'affiche via `hasNotification`.
 
 ## Breadcrumbs
 
-La prop `breadcrumbs` est un tableau d'objets `{ label, active? }`. Le dernier élément actif (`active: true`) reçoit un style en surbrillance (fond vert sombre, Poppins SemiBold). Les éléments inactifs sont en Poppins Medium grisé.
+La barre rend le composant `Breadcrumbs` du catalogue, pas une seconde version dessinée à la
+main (ADR-0001). La prop `breadcrumbs` est un tableau d'objets `{ label, href? }`.
+
+Le **dernier** segment est le segment courant, par position. `active` a disparu — un drapeau par
+élément permettait à un fil d'avoir zéro ou deux segments courants (ADR-0024).
+
+Il n'y a **qu'un traitement** pour dire « tu es ici » : fond `bg-neutral`, encre `text-strong`,
+plus Poppins SemiBold quand c'est un libellé. Sur `Accueil` le courant est **la maison**, et elle
+prend le même. C'est d'ailleurs elle qui impose le fond : seule, elle n'a aucun voisin contre
+lequel un poids ou une couleur contrasterait.
 
 La maison (icône `house`) est toujours présente comme racine et émet l'événement `learn` au clic.
 

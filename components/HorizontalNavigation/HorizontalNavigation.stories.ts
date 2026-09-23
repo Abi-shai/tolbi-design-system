@@ -25,11 +25,6 @@ const meta: Meta<typeof HorizontalNavigation> = {
     docs: { page: HorizontalNavigationDocs },
   },
   argTypes: {
-    state: {
-      control: 'select',
-      options: ['Accueil', 'Module', 'Project', 'tabs'],
-      table: { category: 'État', defaultValue: { summary: "'Accueil'" } },
-    },
     creditsReminder: {
       control: 'text',
       table: { category: 'Contenu' },
@@ -48,7 +43,6 @@ const meta: Meta<typeof HorizontalNavigation> = {
     },
   },
   args: {
-    state: 'Accueil',
     credits: 250,
     userInitials: 'MD',
     hasNotification: false,
@@ -60,38 +54,37 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Accueil: Story = {
-  args: { state: 'Accueil' },
+  args: { breadcrumbs: [] },
 }
 
 export const Module: Story = {
+  name: 'ID — 3 nœuds',
   args: {
-    state: 'Module',
-    breadcrumbs: [
-      { label: 'Analyses', active: true },
-    ],
+    breadcrumbs: [{ label: 'ID' }, { label: 'Statistiques' }],
   },
 }
 
 export const Project: Story = {
+  name: 'Yield — 5 nœuds, le seuil',
   args: {
-    state: 'Project',
     breadcrumbs: [
-      { label: 'Carbone' },
-      { label: 'Analyses' },
-      { label: 'Tolbi', active: true },
+      { label: 'Yield' },
+      { label: 'Projets' },
+      { label: 'Campagne maïs' },
+      { label: 'Dashboard' },
     ],
   },
 }
 
 export const Tabs: Story = {
-  name: 'Tabs (profondeur max)',
+  name: 'Data OS — 6 nœuds, replié',
   args: {
-    state: 'tabs',
     breadcrumbs: [
-      { label: 'Carbone' },
-      { label: 'Analyses' },
-      { label: 'Tolbi' },
-      { label: 'Dashboard', active: true },
+      { label: 'Data OS' },
+      { label: 'Projets' },
+      { label: 'Forums' },
+      { label: 'Forum 123' },
+      { label: 'Assurance' },
     ],
   },
 }
@@ -99,25 +92,22 @@ export const Tabs: Story = {
 export const WithNotification: Story = {
   name: 'Avec notification non lue',
   args: {
-    state: 'Module',
     hasNotification: true,
-    breadcrumbs: [{ label: 'Analyses', active: true }],
+    breadcrumbs: [{ label: 'ID' }, { label: 'Statistiques' }],
   },
 }
 
 export const WithActiveModule: Story = {
   name: 'Module actif dans le dropdown',
   args: {
-    state: 'Module',
-    breadcrumbs: [{ label: 'Analyses', active: true }],
-    modules: ALL_MODULES.map(m => ({ ...m, active: m.name === 'Carbone' })),
+    breadcrumbs: [{ label: 'Yield' }, { label: 'Projets' }],
+    modules: ALL_MODULES.map(m => ({ ...m, active: m.name === 'Yield' })),
   },
 }
 
 export const WithCreditsReminder: Story = {
-  name: 'Avec rappel d’échéance',
+  name: 'Avec rappel d\u2019\u00e9ch\u00e9ance',
   args: {
-    state: 'Accueil',
     credits: 250,
     creditsReminder: 'Expire dans 14 jours',
     creditsTone: 'warning',
@@ -127,9 +117,8 @@ export const WithCreditsReminder: Story = {
 export const CreditsExpired: Story = {
   name: 'Crédits expirés',
   args: {
-    state: 'Accueil',
-    credits: 250,
-    creditsReminder: 'Vos crédits ont expiré',
+    credits: 0,
+    creditsReminder: 'Crédits expirés',
     creditsTone: 'error',
   },
 }
