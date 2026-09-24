@@ -33,6 +33,65 @@ jamais d'une prop `module` (ADR-0028). C'est notre classement d'un module qui
 
 ---
 
+## Le module se voit, il ne s'écrit pas
+
+Il y a maintenant une prop `module`, et **elle ne décide rien.** La règle
+ci-dessus porte sur ce que la carte *dessine* ; celle-ci porte le seul fait
+qu'aucune autre prop ne porte et qu'aucune donnée de la carte ne permet de
+déduire : à qui appartient le projet. Une grille qui mélange les modules n'avait
+aucun moyen de le dire.
+
+<Canvas of={Stories.ModuleMark} />
+
+C'est **l'illustration, pas le logo** (ADR-0005) : la carte est déjà la surface,
+une tuile dans une tuile se battrait avec son rayon — le même arbitrage que
+`ModulesList` et `ModuleCapsule`.
+
+Elle tient sur **la ligne du titre**, et pas dans le coin du média : la pastille
+d'état y est déjà posée sur une photographie sans fond garanti (ADR-0038), et
+c'est un risque qu'on tient à un, pas à deux.
+
+**Il y avait une taille gratuite et on ne l'a pas prise.** 24px, c'est exactement
+une boîte de ligne de `label-xl-strong` (16/24 dans les deux échelles typo) :
+le repère fait la hauteur du nom et la ligne ne grandit pas d'un pixel. Mais à
+24px les onze dessins sont des taches colorées — distinguables les unes des
+autres, ce qui est la moitié du travail, pas identifiables comme le module
+qu'elles nomment, ce qui est l'autre moitié. Donc **32px**.
+
+Ce que ça coûte, ce ne sont pas les 8px : c'est que la présence du repère
+deviendrait une décision de hauteur — une carte avec module dépasserait de 8px
+une carte dont le module n'a pas de dessin, et une grille à deux hauteurs est ce
+que la carte passe le plus de règles à éviter. Donc `--project-card-mark` est lu
+**deux fois**, comme boîte du dessin *et* comme `min-height` de la ligne : toutes
+les cartes paient les 8px, aucune ne les paie deux fois.
+
+Deux écarts sur la ligne, parce que ce sont deux voisinages différents :
+`spacing-xs` vers le nom — *ce projet, de ce module*, une seule unité — et
+`spacing-md` vers la pastille, qui parle du compte et pas du projet.
+
+Et ce n'est **pas le repère qui coupe le titre, c'est la pastille démo** :
+mesuré sur la carte Yield à 280px, « Rendement Arachide Nord » demande 218px et
+les obtient — repère compris, sans pastille, le nom n'est pas coupé du tout.
+Avec « Projet démo » il tombe à 102px.
+
+Le repère est **nommé**, là où `ModulesList` et `ModuleCapsule` passent
+`aria-label="null"` : chez eux le nom du module est écrit à côté, ici rien
+d'autre sur la carte ne le dit. Il est posé *dans* le `<h3>`, donc le titre se
+lit « Yield Rendement Arachide Nord » — le module qualifie le nom. Le contrôle,
+lui, garde le titre seul : le module n'est pas là où va le clic.
+
+**Le type est la couverture.** `ModuleName` ne nomme que les 11 modules dont le
+système a le dessin ; `Eudr`, `ina` et `conformite` n'en ont pas (ADR-0005,
+ADR-0031), donc un projet d'un de ceux-là laisse la prop vide et n'a pas de
+repère. Un repère faux est pire que pas de repère.
+
+Le squelette de chargement, lui, n'en réserve pas la place : il prévisualise les
+**blocs** de la carte, pas ses ornements — il laisse déjà de côté la pastille
+démo, les glyphes de la ligne d'identité et la pastille du chiffre. Ça ne coûte
+rien, puisque c'est la ligne qui déclare sa hauteur.
+
+---
+
 ## Une seule géométrie, deux props
 
 `stage` et `crops` portent la même forme et rendent le même bloc. Ils restent

@@ -3,6 +3,7 @@ import { computed, ref, watch, useSlots } from 'vue'
 import { Badge } from '../Badge'
 import { Icon, type IconName } from '../Icon'
 import { IconButton } from '../IconButton'
+import { ModuleIcon, type ModuleName } from '../ModuleIcon'
 import { Skeleton } from '../Skeleton'
 
 /**
@@ -28,6 +29,12 @@ import { Skeleton } from '../Skeleton'
  * what changed is that the data was misread, not the rule. The props stay
  * separate (`stage`, `crops`) because a stage and a crop are not the same thing
  * to a caller; `stageLabel` is what decides which one a card is describing.
+ *
+ * **There is now a `module` prop, and it decides nothing.** It is the mark on
+ * the title's line, and nothing in this file branches on it — the rule above is
+ * about what the card *draws*, which stays derived. What the mark carries is
+ * the one fact no other prop holds: whose project this is. A grid that mixes
+ * modules had no way at all to say so.
  *
  * Segments are ordered **biggest first**, by the component and not the caller:
  * the categorical palette is ordered by measured ΔE (ADR-0016), so the dominant
@@ -56,12 +63,36 @@ export interface ProjectCardMeta {
   label: string
 }
 
+/**
+ * **The two words a figure is read with, and the card picks between them.**
+ *
+ * A forecast stops being a forecast when the campaign closes — Figma's own
+ * component description says the pair never diverges from the status, which is
+ * why ADR-0031 recorded it as one axis rather than two ("Rendement prévu" while
+ * running, "Rendement estimé" once closed).
+ *
+ * The card cannot supply the words: they are a module's vocabulary, and reading
+ * `module` to choose them is the branch ADR-0038 and ADR-0041 both forbid. So
+ * the caller declares the pair and the card picks with `state` — the same value
+ * that already picks the tone, so the two can no longer disagree.
+ */
+export interface ProjectCardMetricBadge {
+  /** Before the period has passed — `Prévu`. Also what `planned` and `error` read. */
+  running: string
+  /** Once it has — `Estimé`. */
+  done:    string
+}
+
 /** One of the two figures. `badge` is a second reading of the same number. */
 export interface ProjectCardMetric {
   label:  string
   value:  string | number
   unit?:  string
-  badge?: string
+  /**
+   * A plain string is the same word in every state, which is right for a
+   * reading that does not change nature. A pair re-words when the period does.
+   */
+  badge?: string | ProjectCardMetricBadge
 }
 
 /**
@@ -85,6 +116,21 @@ interface Props {
   /** Where the project is, plus the two render conditions. */
   state?:      ProjectCardState
   title:       string
+  /**
+   * Whose project this is — the mark on the title's line.
+   *
+   * **Content, not a switch.** ADR-0038 recorded that there is no `module`
+   * prop, and the rule it protects is intact: what the insight block draws is
+   * derived from the data (ADR-0028), never declared. Nothing branches on this.
+   * It renders the module's artwork, which is a fact about the project that no
+   * other prop carries and no data on the card can derive.
+   *
+   * **The type is the coverage.** `ModuleName` spells only the 11 modules the
+   * system has artwork for, so a project of any other one leaves the prop out
+   * and gets no mark — the same call ADR-0005 and ADR-0031 made for `Eudr`,
+   * `ina` and `conformite`. A wrong mark is worse than no mark.
+   */
+  module?:     ModuleName
   /** The pill over the snapshot. Defaults to a label read off `state`. */
   status?:     string
   /** The "Projet démo" badge. A condition of the account, not of the project. */
@@ -141,6 +187,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   state:      'running',
+  module:     undefined,
   status:     undefined,
   demo:       false,
   demoLabel:  'Projet démo',
@@ -204,6 +251,25 @@ const STATUS = {
 
 const statusLabel = computed(() => props.status ?? STATUS[props.state].label)
 const statusTone  = computed(() => STATUS[props.state].tone)
+
+/**
+ * **One computed owns both halves of the badge.** The tone was derived from
+ * `state` while the word came from the caller, so a card could render a green
+ * `Prévu` — the right colour on the wrong word, which is the failure ADR-0031
+ * closed for `ModuleCapsule` and this component only half-applied.
+ *
+ * `done` is the only state that re-words: `planned` and `error` are still
+ * before the period has passed, and `loading` renders no badge at all.
+ */
+const metricBadge = computed(() => {
+  const badge = props.metrics.find((m) => m.badge)?.badge
+  if (!badge) return null
+  const done = props.state === 'done'
+  return {
+    label: typeof badge === 'string' ? badge : done ? badge.done : badge.running,
+    tone:  done ? 'success' : 'warning',
+  } as const
+})
 
 const slots = useSlots()
 
@@ -296,7 +362,15 @@ function shareColour(i: number) {
       <!-- Yield and Scan load **identically** — the wait says nothing about
            which module is coming, because a placeholder that guessed would be
            wrong half the time. What it does say is the card's *shape*: a name
-           over a caption, then two figures and a bar inside the insight. -->
+           over a caption, then two figures and a bar inside the insight.
+
+           **No square for the module mark**, and not because the mark is
+           secret: the skeleton previews the card's blocks, not its ornaments.
+           It already leaves out the demo badge, the meta glyphs and the metric
+           pill, and the mark is optional besides — a placeholder for something
+           that may never arrive is a 28px jump on arrival, which is exactly
+           what the loading rhythm below is tuned to avoid. -->
+
       <div v-if="isLoading" class="ds-project-card__content ds-project-card__content--loading">
         <div class="ds-project-card__identity-bars">
           <Skeleton variant="rect" emphasis="strong" :height="24" :width="168" />
@@ -321,6 +395,27 @@ function shareColour(i: number) {
                whole card clickable (ADR-0014: a container that emits `click` is
                unreachable by keyboard). The menu rides above that overlay. -->
           <h3 class="ds-project-card__title">
+            <!-- The **illustration, not the logo** (ADR-0005): the card is
+                 already the surface, so the logo's tile would be a tile inside
+                 a tile — the same call `ModulesList` and `ModuleCapsule` made.
+
+                 **Named**, where those two pass `aria-label="null"`. There, the
+                 module's name is visible text right beside the artwork; here
+                 nothing on the card says which module this is, so the mark is
+                 the only carrier of the fact and has to carry it for assistive
+                 technology too. `ModuleIcon` defaults its name to the module's,
+                 which is exactly the string wanted.
+
+                 Inside the `<h3>` rather than beside it, so the heading reads
+                 "Yield Rendement Arachide Nord" — the module qualifies the name.
+                 The control keeps the title alone, which is right: the module is
+                 not where the click goes. -->
+            <ModuleIcon
+              v-if="module"
+              :module="module"
+              variant="illustration"
+              size="var(--project-card-mark)"
+            />
             <component
               :is="href ? 'a' : 'button'"
               class="ds-project-card__link"
@@ -349,10 +444,10 @@ function shareColour(i: number) {
               </span>
             </div>
             <Badge
-              v-if="metrics.find((m) => m.badge)"
+              v-if="metricBadge"
               class="ds-project-card__metric-badge"
-              :label="metrics.find((m) => m.badge)!.badge"
-              :tone="state === 'done' ? 'success' : 'warning'"
+              :label="metricBadge.label"
+              :tone="metricBadge.tone"
               variant="pill-outline"
               size="sm"
             />
@@ -455,6 +550,13 @@ function shareColour(i: number) {
 */
 .ds-project-card {
   --project-card-gap: 10px;
+  /*
+    The module mark's box, and the identity row's floor — one value, because the
+    two must never disagree (ADR-0034's `--side-nav-rail-row`, same reason). A
+    variant switch, not a token (ADR-0010): it carries an own-value, it is
+    component-scoped, and it stays private.
+  */
+  --project-card-mark: 32px;
   --project-card-share-rest: var(--ds-bg-neutral-strong);
 
   position: relative;
@@ -657,10 +759,24 @@ function shareColour(i: number) {
   gap: var(--project-card-gap);
 }
 
+/*
+  **The row declares its height**, which is the whole job of
+  `--project-card-mark`.
+
+  24px was the *free* size: exactly one `label-xl-strong` line box (16/24 in both
+  type scales), so the row measured the same with the mark and without. 32px is
+  not free, and the cost is not the 8px — it is that a card carrying a module
+  would stand 8px taller than one whose module the system has no artwork for,
+  and **a grid of two card heights is the thing ADR-0038 spends the most rules
+  avoiding**. So the floor is the mark's own size, read from one value by both
+  the row and the artwork, and whether a card has a mark stops being a height
+  decision. Every card pays the 8px; none pays it twice.
+*/
 .ds-project-card__identity {
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-md);
+  min-height: var(--project-card-mark);
 }
 
 /*
@@ -686,21 +802,44 @@ function shareColour(i: number) {
    states a width, it does not measure one. */
 .ds-project-card__metric-bars   { gap: var(--ds-spacing-sm); }
 
+/*
+  The heading is the row that holds the module mark, so it is the flex box.
+
+  **32px is a size that was chosen; 24px was the one that was free.** At 24 the
+  mark is exactly the `label-xl-strong` line box and costs nothing; at 32 it
+  overhangs the name by 4px top and bottom and the row grows to meet it. That is
+  a trade — legibility of an eleven-way mark against 8px of card height — and it
+  is paid uniformly, which is the condition (see `__identity`). The demo badge
+  is still 24px and simply centres in the taller row.
+
+  **`spacing-xs` here against `spacing-md` to the badge.** The mark and the name
+  are one unit — *this project, of this module* — where the badge is a separate
+  statement, about the account rather than the project. Two gaps, because they
+  are two kinds of adjacency.
+*/
 .ds-project-card__title {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-xs);
   flex: 1 1 auto;
   min-width: 1px;
   margin: 0;
-  font: var(--ds-font-label-xl-strong);
+  font: var(--ds-font-heading-lg);
   color: var(--ds-text-strong);
 }
 
 /*
   A `<button>` unless there is an `href`, and it inherits everything so the
   heading still looks like a heading. The truncation lives here rather than on
-  the `<h3>`, because the box that overflows has to be the one that clips.
+  the `<h3>`, because the box that overflows has to be the one that clips —
+  which now means the flex pair as well: a flex item will not shrink below its
+  content without `min-width`, so without it the mark would be pushed out of
+  the card instead of the name being cut.
 */
 .ds-project-card__link {
   display: block;
+  flex: 1 1 auto;
+  min-width: 1px;
   max-width: 100%;
   margin: 0;
   padding: 0;

@@ -3,6 +3,7 @@ export type {
   ProjectCardState,
   ProjectCardMeta,
   ProjectCardMetric,
+  ProjectCardMetricBadge,
   ProjectCardShare,
   ProjectCardStage,
   ProjectCardCrop,

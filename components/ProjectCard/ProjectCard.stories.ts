@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import ProjectCard from './ProjectCard.vue'
 import Docs from './ProjectCard.mdx'
+import { moduleNames } from '../ModuleIcon'
 
 /**
  * A stand-in for the map snapshot. Inline so the stories never depend on a
@@ -40,7 +41,10 @@ const meta: Meta<typeof ProjectCard> = {
           'séparées parce qu’un stade et une culture ne sont pas la même chose pour l’appelant.\n\n' +
           'Les segments sont ordonnés **du plus gros au plus petit**, par le composant : la palette ' +
           'catégorielle est ordonnée par ΔE mesuré (ADR-0016), donc la part dominante prend toujours ' +
-          'la teinte la plus distinguable.',
+          'la teinte la plus distinguable.\n\n' +
+          '`module` pose le **repère du module** sur la ligne du titre — la seule chose de la carte ' +
+          'qui dise à qui appartient le projet. Elle ne décide rien : le bloc du bas découle ' +
+          'toujours de la donnée.',
       },
     },
   },
@@ -51,6 +55,15 @@ const meta: Meta<typeof ProjectCard> = {
       table: { category: 'État' },
     },
     demo: { control: 'boolean', table: { category: 'État' } },
+    module: {
+      control: 'select',
+      options: [undefined, ...moduleNames],
+      description:
+        'Le module auquel appartient le projet — son illustration se pose devant le titre. ' +
+        '`ModuleName` ne couvre que les 11 modules dont le système a le dessin ; pour les autres, ' +
+        'laisser vide.',
+      table: { category: 'Contenu', type: { summary: 'ModuleName' } },
+    },
   },
 }
 
@@ -59,6 +72,7 @@ type Story = StoryObj<typeof meta>
 
 const YIELD = {
   title: 'Rendement Arachide Nord',
+  module: 'Yield' as const,
   snapshot: SNAPSHOT,
   demo: true,
   // Pas de surface : la carte ne la porte plus. Le rendement est en t/ha et la
@@ -69,7 +83,7 @@ const YIELD = {
     { icon: 'map-pin', label: 'Kaolack' },
   ],
   metrics: [
-    { label: 'Rendement', value: '2,6', unit: 't/ha', badge: 'Prévu' },
+    { label: 'Rendement', value: '2,6', unit: 't/ha', badge: { running: 'Prévu', done: 'Estimé' } },
     { label: 'Production', value: '2 000', unit: 't' },
   ],
   stageLabel: 'Stades phénologiques',
@@ -84,6 +98,7 @@ const YIELD = {
 
 const SCAN = {
   title: 'Cartographie Casamance',
+  module: 'Scan' as const,
   snapshot: SNAPSHOT,
   demo: true,
   meta: [
@@ -182,7 +197,11 @@ export const States: Story = {
   }),
 }
 
-/** Les deux modules côte à côte : même coque, aperçus différents. */
+/**
+ * Les deux modules côte à côte : même coque, aperçus différents — et, depuis
+ * `module`, un repère qui dit lequel est lequel sans attendre qu'on lise la
+ * barre du bas.
+ */
 export const Modules: Story = {
   name: 'Les deux modules',
   parameters: { layout: 'padded' },
@@ -193,6 +212,40 @@ export const Modules: Story = {
       <div style="display: grid; grid-template-columns: repeat(2, 280px); gap: var(--ds-spacing-xl);">
         <ProjectCard v-bind="y" />
         <ProjectCard v-bind="s" />
+      </div>
+    `,
+  }),
+}
+
+/**
+ * **Le module se voit, il ne s'écrit pas.** Le repère est l'illustration du
+ * module (ADR-0005) — pas le logo : la carte est déjà la surface, une tuile
+ * dans une tuile se battrait avec son rayon.
+ *
+ * **Il y avait une taille gratuite et on ne l'a pas prise.** 24px est exactement
+ * une boîte de ligne de `label-xl-strong` (16/24 dans les deux échelles typo) et
+ * ne coûte aucune hauteur — mais à cette taille les onze dessins sont des taches
+ * colorées, distinguables sans être identifiables. Donc **32px**, et la ligne
+ * déclare son plancher (`--project-card-mark`, lu comme boîte du dessin *et*
+ * comme `min-height`) : les trois cartes ci-dessous font la même hauteur, avec
+ * repère comme sans.
+ *
+ * La troisième carte n'en porte pas. `ModuleName` ne nomme que les 11 modules
+ * dont le système a le dessin (`Eudr`, `ina` et `conformite` n'en ont pas —
+ * ADR-0005, ADR-0031), donc un projet d'un de ceux-là laisse la prop vide :
+ * **un repère faux est pire que pas de repère.**
+ */
+export const ModuleMark: Story = {
+  name: 'Le repère de module',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { ProjectCard },
+    setup: () => ({ y: YIELD, s: SCAN }),
+    template: `
+      <div style="display: grid; grid-template-columns: repeat(3, 280px); gap: var(--ds-spacing-xl);">
+        <ProjectCard v-bind="y" />
+        <ProjectCard v-bind="s" />
+        <ProjectCard v-bind="y" :module="undefined" title="Rendement Arachide Nord" />
       </div>
     `,
   }),
