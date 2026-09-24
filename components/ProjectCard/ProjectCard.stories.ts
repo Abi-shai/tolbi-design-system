@@ -168,7 +168,7 @@ export const States: Story = {
     components: { ProjectCard },
     setup: () => ({ args: YIELD }),
     template: `
-      <div style="display: grid; grid-template-columns: repeat(5, 280px); gap: 24px;">
+      <div style="display: grid; grid-template-columns: repeat(5, 280px); gap: var(--ds-spacing-xl);">
         <ProjectCard v-bind="args" state="planned"
           :metrics="[{ label: 'Rendement', value: '—' }, { label: 'Production', value: '—' }]"
           stageLabel="Démarre le 15 juin 2026" :stage="[]" />
@@ -190,7 +190,7 @@ export const Modules: Story = {
     components: { ProjectCard },
     setup: () => ({ y: YIELD, s: SCAN }),
     template: `
-      <div style="display: grid; grid-template-columns: repeat(2, 280px); gap: 24px;">
+      <div style="display: grid; grid-template-columns: repeat(2, 280px); gap: var(--ds-spacing-xl);">
         <ProjectCard v-bind="y" />
         <ProjectCard v-bind="s" />
       </div>
@@ -216,7 +216,7 @@ export const SnapshotSlot: Story = {
     components: { ProjectCard },
     setup: () => ({ args: SCAN, snapshot: SNAPSHOT }),
     template: `
-      <div style="display: grid; grid-template-columns: repeat(2, 280px); gap: 24px;">
+      <div style="display: grid; grid-template-columns: repeat(2, 280px); gap: var(--ds-spacing-xl);">
         <ProjectCard v-bind="args" />
 
         <ProjectCard v-bind="args" :snapshot="undefined">
