@@ -446,6 +446,40 @@ Before working on any component, read:
   the drawings, not in a third size vocabulary. What the ladder buys is that "one rung up" is finally
   a **checkable** statement (the nav bar: `Logo` 24, `ModuleIcon` 48 — the rung where the eleven
   average 28.5px of ink against the brand's 24).
+- **ADR-0044**: `WorkspaceSelector`'s resting state becomes **a raised white pill** — a third
+  `DropdownTrigger` chrome, `surface` — and that **spends the escalation's fill axis**: on the pill
+  every neutral tint is ≤ 1.474:1, `bg-hover` is **1.045:1** and `bg-selected` **1.165:1**. ADR-0036's
+  sentence from the other end — *a `bg-*` token is solved against `bg-default`* — with the rest state
+  now **being** `bg-default`. What it replaced was no better: `quiet`'s hover measured 1.054:1 and its
+  open state 1.102:1 on `bg-neutral`, so the surface was never carrying those states. The ladder is
+  therefore the **contour and the ink**, and the contour's two steps are different *kinds* of step —
+  absent → `border-default` is a **mechanism** (which is why 1.474:1 is allowed to read), then
+  neutral → `border-brand` is a **register**. `border-brand` is the one brand value over 3:1 in
+  **both** modes (3.289 / 5.058), because the dark file keeps `brand/300`; `bg-brand-solid` is the
+  obvious pick and measures **2.445:1** in dark. Elevation was the first drawing and lost twice:
+  `surface → raised → overlay` is indistinguishable at 48px and *identical* in dark (ADR-0030).
+  **Focus is hover plus the ring** — the same state by the other input — and **disabled takes the
+  surface away** rather than fading it. The contour is a `--dropdown-trigger-contour` variant switch
+  inside the elevation's own `box-shadow`, so a state moves a colour, and `:focus-visible` **reads**
+  it rather than restating it — which is what lets open+focused keep brand. Collapsed the box is
+  **36px, not Figma's 40**: it is `--side-nav-rail-row`, so the 2px around the mark is a **remainder,
+  not a value**, and it has a box at all because a switcher that is a surface when the column is open
+  and nothing when it is closed is two controls. The rail goes **52 → 60px**: collapsed, the column's
+  padding goes **symmetric** (12 all round against 12/16), ADR-0036's square-control rule applied to
+  the column. The head's two 4px gaps become `spacing-md`, which **deletes a reason** — ADR-0034's
+  "4px binds the head into one object" was true while the gap was the only thing saying so, and the
+  rule plus the 24px say it twice over. The toggle moves **above** the mark in CSS
+  (`column-reverse`), never a DOM swap: a swap unmounts the button that *causes* the collapse and
+  drops focus mid-gesture (measured: `activeElement` survives). Both forms open the panel the same
+  way — collapsed overrides **one** declaration, `width`, because 100% of 36px is 36px. Four defects,
+  all found by rendering (ADR-0039 again): the collapsed panel opened **on top of its own trigger**
+  (equal specificity, wrong order); `:hover:not(:disabled)` **outweighed** `[aria-expanded]` because
+  `:not()` counts its argument; in Figma `setBoundVariableForPaint` left the fallback **white**, so
+  half a board was white text on a white pill while `boundTo` read `text/default`; and the chevron
+  **double-negated** when a rotation that *had* applied met an icon swap. Figma's `border/brand` in
+  *Sombre* was corrected (1.549:1 → `brand/300`), and the component set gained a `Forme` axis.
+  **Three tracks were drawn in both forms, on the real ground, with a dark strip, before one was
+  chosen** — and the chosen one was then revised from its own render.
 
 ## Architecture
 
