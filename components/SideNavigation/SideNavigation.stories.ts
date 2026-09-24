@@ -15,7 +15,7 @@ const meta: Meta = {
           "Colonne de navigation principale du produit. La sélection appartient au groupe (`v-model`), " +
           "pas à l'item : une pastille unique glisse d'une ligne à l'autre. Le fond récessé fait partie " +
           "du composant — la pastille est `bg-default`, elle n'est lisible que posée dessus. " +
-          '`v-model:collapsed` la réduit à un rail de 52px où le libellé passe dans un tooltip.',
+          '`v-model:collapsed` la réduit à un rail de 60px où le libellé passe dans un tooltip.',
       },
     },
   },

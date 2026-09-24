@@ -30,9 +30,11 @@ import { SIDE_NAVIGATION_KEY, type SideNavigationContext } from './context'
  * a free choice, so the component ships it and `toggle` turns it off for a shell
  * that places its own.
  *
- * The rail's width is the row (36px) plus `spacing-md` each side, so the pill's
- * height never changes: collapsing moves and narrows it, it does not resize it
- * vertically.
+ * The rail's width is the row (36px) plus `spacing-lg` each side — 60px — so the
+ * pill's height never changes: collapsing moves and narrows it, it does not
+ * resize it vertically. Collapsed the column's padding is symmetric, which is
+ * the whole derivation: expanded it is 12/16, and a rail is a square control's
+ * worth of column.
  */
 interface Props {
   /** The selected item's value. */
@@ -66,7 +68,10 @@ const hasHeader = computed(() => !!slots.header || props.toggle)
 const values = ref<string[]>([])
 const activeIndex = computed(() => values.value.indexOf(props.modelValue ?? ''))
 
-const { containerRef, itemRefs, style, ready, measure } = useSlidingIndicator(activeIndex)
+const { containerRef, itemRefs, style, ready, measure, reducedMotion } = useSlidingIndicator(activeIndex)
+
+/** The row that restacks. Its two children are what the collapse has to carry. */
+const headerEl = ref<HTMLElement>()
 
 const context: SideNavigationContext = {
   register(value, el) {
@@ -121,18 +126,86 @@ function travelMs() {
   return v.endsWith('ms') ? n : n * 1000
 }
 
+/** The curve, off the cascade for the same reason as the length above. */
+function travelEasing() {
+  const el = containerRef.value
+  return el
+    ? getComputedStyle(el).getPropertyValue('--ds-motion-easing-in-out').trim()
+    : ''
+}
+
+/**
+ * The header restacks — a row becomes a column — and `flex-direction` is not
+ * animatable, so both its children land somewhere new the instant `collapsed`
+ * flips. Filmed frame by frame, that cut measured **100px on the toggle
+ * collapsing and 9px expanding**, with the remainder of the travel arriving
+ * smoothly afterwards because the column's own width carries a centred child.
+ * Half a movement, and — ADR-0042's rule again — *it failed asymmetrically*, so
+ * watching the gesture expand certified it.
+ *
+ * FLIP cancels only that discontinuity: measure before the restack, translate
+ * back by the difference, release on the next frame. What it does **not** do is
+ * drive the whole journey, and that is the point — the second half still comes
+ * from the layout following the column's width. Both run `enter` on
+ * `easing-in-out`, so the two compose into one eased travel rather than two
+ * motions on one gesture (ADR-0037). The column owns the curve; this only stops
+ * the element from starting somewhere it never was.
+ */
+function flipHeader(kids: HTMLElement[], first: DOMRect[]) {
+  if (!kids.length || reducedMotion.value) return
+  const ms = travelMs()
+  const easing = travelEasing()
+  const moved: HTMLElement[] = []
+
+  kids.forEach((k, i) => {
+    const last = k.getBoundingClientRect()
+    const dx = first[i].left - last.left
+    const dy = first[i].top - last.top
+    if (!dx && !dy) return
+    k.style.transition = 'none'
+    k.style.transform = `translate(${dx}px, ${dy}px)`
+    moved.push(k)
+  })
+  if (!moved.length) return
+
+  // A single `requestAnimationFrame` fires *before* style recalculation, so the
+  // inverse transform would never become a start value and the element would
+  // simply appear in place (ADR-0032 found this in the product's reveal).
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    for (const k of moved) {
+      k.style.transition = `transform ${ms}ms ${easing}`
+      k.style.transform = ''
+    }
+  }))
+
+  // The inline styles are scaffolding, not state — they go once they are spent.
+  clearTimeout(flipTimer)
+  flipTimer = setTimeout(() => {
+    for (const k of moved) { k.style.transition = ''; k.style.transform = '' }
+  }, ms + 60)
+}
+let flipTimer: ReturnType<typeof setTimeout> | undefined
+
 // Collapsing changes every row's width, so the indicator has to re-measure. The
 // ResizeObserver watches the container, whose width is set by the consumer and
 // may not change at all — so this cannot be left to it.
 watch(() => props.collapsed, async () => {
   travelling.value = true
   clearTimeout(travelTimer)
+
+  // Read before `nextTick`: a pre-flush watcher still sees the old layout, and
+  // that is the only moment the header's *previous* geometry exists.
+  const kids = headerEl.value ? (Array.from(headerEl.value.children) as HTMLElement[]) : []
+  const first = kids.map((k) => k.getBoundingClientRect())
+
   await nextTick()
   measure()
+  flipHeader(kids, first)
+
   travelTimer = setTimeout(() => { travelling.value = false }, travelMs())
 })
 
-onBeforeUnmount(() => clearTimeout(travelTimer))
+onBeforeUnmount(() => { clearTimeout(travelTimer); clearTimeout(flipTimer) })
 </script>
 
 <template>
@@ -145,7 +218,7 @@ onBeforeUnmount(() => clearTimeout(travelTimer))
     <!-- The workspace mark and the collapse control share a row, and stack
          once the rail is one column wide. -->
     <div v-if="hasHeader" class="ds-side-nav__head">
-      <div class="ds-side-nav__header">
+      <div ref="headerEl" class="ds-side-nav__header">
         <div v-if="slots.header" class="ds-side-nav__header-slot">
           <slot name="header" />
         </div>
@@ -227,11 +300,18 @@ onBeforeUnmount(() => clearTimeout(travelTimer))
     padding   var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
 }
 
-/* The rail is *derived*, not asserted: a square row plus `spacing-md` each
+/* The rail is *derived*, not asserted: a square row plus `spacing-lg` each
    side. Both halves have to agree or the rows sit off-centre, so the row size
    is a private component token (ADR-0010 — an own-value, not an alias) that
-   `SideNavItem` reads off the cascade. 52px lands where every icon-only rail in
+   `SideNavItem` reads off the cascade. 60px lands where every icon-only rail in
    the survey sits.
+
+   **The padding goes symmetric, and that is the whole derivation.** Expanded
+   the column is 12/16; collapsed it is 12 all round, which is ADR-0036's rule
+   for a square icon-only control — symmetric padding — applied to the column
+   instead of to something inside it. It was `spacing-md` here, two ramp steps
+   down from the expanded 16 instead of one, and the rail came out 52px: a
+   column that squeezed its own edges harder than it squeezed anything else.
 
    `max-width` as well as `width`, and the second one is what actually holds:
    a shell sets the column's width on the element — `width: 100%` in a grid,
@@ -241,13 +321,24 @@ onBeforeUnmount(() => clearTimeout(travelTimer))
    shape from the other direction: a width you are handed is a ceiling, not a
    size. Collapsing must narrow the column even when the consumer asked it to
    fill, or the rail is icons floating in the middle of the old width. */
+/* The header's row in the expanded form, and the second half of a pair: a
+   height that travels needs two lengths, because `height: auto` is not
+   animatable (ADR-0025) and the mark's box was snapping 48 → 36 at frame 0
+   while everything around it travelled. An own-value, so a component token
+   (ADR-0010) — 48 is the control's own height (8 + Avatar sm + 8) and not a
+   step of layout rhythm, which is ADR-0013's argument for why control padding
+   is its own scale. */
+.ds-side-nav {
+  --side-nav-header-row: 48px;
+}
+
 .ds-side-nav--collapsed {
   --side-nav-rail-row: 36px;
 
-  width: calc(var(--side-nav-rail-row) + 2 * var(--ds-spacing-md));
-  max-width: calc(var(--side-nav-rail-row) + 2 * var(--ds-spacing-md));
+  width: calc(var(--side-nav-rail-row) + 2 * var(--ds-spacing-lg));
+  max-width: calc(var(--side-nav-rail-row) + 2 * var(--ds-spacing-lg));
   flex: none;
-  padding: var(--ds-spacing-lg) var(--ds-spacing-md);
+  padding: var(--ds-spacing-lg);
 }
 
 /* No `align-items: center` here any more. Centring the *items* was how the rail
@@ -257,10 +348,17 @@ onBeforeUnmount(() => clearTimeout(travelTimer))
    a transition rather than a cut. */
 
 /* ── Header ───────────────────────────────────────────────────────── */
+/* `spacing-md`, the same gap the destinations use. ADR-0034 set 4px here on the
+   argument that a tighter gap *binds* the mark, the toggle and the rule into
+   one object — which was true while the gap was the only thing saying so. The
+   rule below it says it now, and the 24px to the navigation says it again, so
+   the gap was doing a third time what two other things already did. One rhythm
+   runs the column instead: 8px between anything adjacent, 24px between the two
+   blocks. */
 .ds-side-nav__head {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-xs);
+  gap: var(--ds-spacing-md);
   width: 100%;
 }
 
@@ -274,7 +372,7 @@ onBeforeUnmount(() => clearTimeout(travelTimer))
   the selector is bare at rest now too — but the ambiguity the rule answers is
   *vertical stacking*, which the expanded header does not have: its two controls
   share a row. Figma reaches the same place from the other side, drawing a
-  `Filet` in the 52px rail and none in either expanded frame.
+  `Filet` in the rail and none in either expanded frame.
 
   `border-default`, not `border-subtle` — which is what `DropdownDivider` uses
   and is the semantically right one, a divider being decorative rather than
@@ -300,11 +398,46 @@ onBeforeUnmount(() => clearTimeout(travelTimer))
   min-width: 1px;
 }
 
-/* One column wide: the toggle drops below the mark rather than beside it. */
+/* Measured at **32×36** in the expanded form: the slot beside it is
+   `flex: 1 1 auto` and this had no `flex` of its own, so the default
+   `flex-shrink: 1` let a 36px control be squeezed 4px — and with `radius-pill`
+   a 32×36 box is an ellipse, not a round button. ADR-0039's family: a box that
+   is derived where it should be declared. It also meant the collapse had 4px of
+   *growth* folded into its cut. */
+.ds-side-nav__toggle {
+  flex: none;
+}
+
+/*
+  One column wide: the toggle leaves the mark's side and goes **above** it.
+
+  The two forms want opposite orders — expanded is mark-then-toggle across a
+  row, collapsed is toggle-then-mark down a column — so one of them is going to
+  read against the DOM whatever we do. `column-reverse` rather than a `v-if`
+  pair puts that cost where it is cheapest.
+
+  A DOM swap would unmount and remount the `IconButton`, and that button is what
+  *causes* the collapse: activated from the keyboard it would destroy the
+  element holding focus, dropping the user to `<body>` mid-gesture. Against
+  that, the reversed pair here is two controls that neither depend on nor
+  explain each other — a switcher and a panel toggle — so the sequence carries
+  no meaning to preserve (WCAG 1.3.2), and either order is operable (2.4.3).
+  The DOM keeps identity first, which is the better sentence to hear anyway.
+*/
 .ds-side-nav--collapsed .ds-side-nav__header {
-  flex-direction: column;
-  align-items: center;
-  gap: var(--ds-spacing-xs);
+  flex-direction: column-reverse;
+  /*
+    `stretch`, not `center`, and it is a motion decision rather than a layout
+    one. Centred, a child's x is `padding + (header − child) / 2`, so any
+    disagreement between the two widths is *amplified* on the way down —
+    measured, the mark's x ran 16 → 12.30, reversed to 13.81 and then snapped
+    1.8px to 12 on the last frame, because it was resolving its own
+    `width: 36px` against a header still following the column. Stretched, every
+    child is the header's width and x is just the padding: one curve, and
+    nothing left to disagree.
+  */
+  align-items: stretch;
+  gap: var(--ds-spacing-md);
 }
 
 .ds-side-nav--collapsed .ds-side-nav__header-slot {
@@ -312,10 +445,10 @@ onBeforeUnmount(() => clearTimeout(travelTimer))
 }
 
 /* ── Items ────────────────────────────────────────────────────────── */
-/* `spacing-md`, one ramp step up from the `spacing-xs` the head uses. The two
-   gaps are not the same decision: 4px inside the head binds the mark, the
-   toggle and the rule into one object, where 8px between destinations is what
-   keeps five of them from reading as a single block. */
+/* `spacing-md`, the same gap the head uses — they are one decision now, not
+   two. What keeps five destinations from reading as a single block is that
+   each one is a surface; what separates them from the head is the rule and the
+   `spacing-3xl` above, neither of which is a gap between siblings. */
 .ds-side-nav__items {
   display: flex;
   flex-direction: column;
