@@ -71,3 +71,53 @@ test('both modes carry the same pairings', () => {
     pairs(MODES.dark).map(([f, b]) => `${f}|${b}`).sort(),
   )
 })
+
+/**
+ * `DropdownTrigger`'s `surface` chrome marks the open state with a `border-brand`
+ * contour, and that is the *only* thing marking it: the fill axis is spent by
+ * the resting state, so there is no tint underneath to fall back on.
+ *
+ * `border-brand` was not a taste. It is the one brand value over 3:1 on a
+ * `bg-default` pill in **both** modes, because the dark file keeps brand.300
+ * where every other brand token travels. `bg-brand-solid` drops to brand.500 in
+ * dark and measures 2.4:1 — it would pass the linter, pass the pairing loop
+ * above, look right in light, and vanish in dark. The Figma file had made
+ * exactly that mistake on this token (it pointed at brand/dark-border, 1.55:1),
+ * which is what the measurement caught. So the choice is measured here rather
+ * than described in a comment — ADR-0030's rule.
+ */
+const UI = 3
+test('DropdownTrigger surface: the open contour clears 3:1 on the pill, both modes', () => {
+  for (const [mode, tokens] of Object.entries(MODES)) {
+    const [contour, pill] = [hex(tokens.border.brand.$value), hex(tokens.bg.default.$value)]
+    assert.ok(contour && pill, `${mode}: border-brand or bg-default no longer resolves to a single value`)
+    const r = ratio(contour, pill)
+    assert.ok(r >= UI, `${mode}: border-brand on bg-default is ${r.toFixed(2)}:1, below ${UI}`)
+  }
+})
+
+/** The hover step is the ink, and it is the only carrier on the expanded form —
+    so the promotion has to be a real one, not a rounding error. */
+test('DropdownTrigger surface: the hover ink outruns the resting ink, both modes', () => {
+  for (const [mode, tokens] of Object.entries(MODES)) {
+    const pill = hex(tokens.bg.default.$value)
+    const rest = ratio(hex(tokens.text.default.$value), pill)
+    const hover = ratio(hex(tokens.text.strong.$value), pill)
+    assert.ok(hover > rest * 1.15, `${mode}: text-strong (${hover.toFixed(2)}:1) is not a promotion over text-default (${rest.toFixed(2)}:1)`)
+  }
+})
+
+/**
+ * The contour is now the whole escalation — absent, `border-default`,
+ * `border-brand` — so the two steps have to stay in that order. They are
+ * different token families and nothing else couples them: repoint either one
+ * and hover and open swap weight without a single test failing.
+ */
+test('DropdownTrigger surface: the open contour outranks the hover contour, both modes', () => {
+  for (const [mode, tokens] of Object.entries(MODES)) {
+    const pill = hex(tokens.bg.default.$value)
+    const hover = ratio(hex(tokens.border.default.$value), pill)
+    const open = ratio(hex(tokens.border.brand.$value), pill)
+    assert.ok(open > hover, `${mode}: border-brand (${open.toFixed(2)}:1) does not outrank border-default (${hover.toFixed(2)}:1) on the pill`)
+  }
+})
