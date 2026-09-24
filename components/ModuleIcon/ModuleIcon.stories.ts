@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import ModuleIcon from './ModuleIcon.vue'
+import { ARTWORK_SIZES } from '../artwork-size'
 import ModuleIconDocs from './ModuleIcon.mdx'
 import { moduleNames } from './registry'
 
@@ -35,11 +36,16 @@ const meta: Meta<typeof ModuleIcon> = {
       },
     },
     size: {
-      control: { type: 'range', min: 16, max: 128, step: 8 },
-      description: 'Côté de la boîte rendue. L\'artwork est un carré de 48px.',
+      control: 'inline-radio',
+      options: ARTWORK_SIZES,
+      description:
+        'Côté de la boîte rendue, sur l\'échelle d\'artwork partagée avec ' +
+        '`Logo`. Le dessin est un `viewBox="0 0 48 48"`, donc 48 est sa ' +
+        'grille native. Hors échelle reste permis (nombre ou longueur CSS) — ' +
+        'voir la prop.',
       table: {
         category: 'Apparence',
-        type: { summary: 'number | string' },
+        type: { summary: 'ArtworkSize | number | string' },
         defaultValue: { summary: '48' },
       },
     },
@@ -162,7 +168,7 @@ export const Sizes: Story = {
   render: () => ({
     components: { ModuleIcon },
     setup: () => ({
-      sizes: [24, 32, 48, 64, 96],
+      sizes: ARTWORK_SIZES,
       rows: [
         { variant: 'illustration' as const, label: 'illustration — primitive' },
         { variant: 'logo' as const, label: 'logo — sémantique' },

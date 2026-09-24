@@ -1,37 +1,51 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import type { ArtworkSize } from '../artwork-size'
 import logoNavSrc    from './logo-nav.svg'
 import logoIconInner from './logo-icon-inner.svg'
 import logoIconOuter from './logo-icon-outer.svg'
 import logoWordmark  from './logo-wordmark.svg'
 
 export type LogoVariant = 'default' | 'nav'
-/**
- * `md` is the full lockup. `sm` is Figma's tightened lockup for constrained
- * spaces — the bar chrome. It is not a uniform scale of `md`: the mark shrinks
- * to 75% and the wordmark to 71.4%, which is the tightening.
- */
-export type LogoSize = 'sm' | 'md'
 
 interface Props {
   alt?:     string
   variant?: LogoVariant
-  size?:    LogoSize
+  /**
+   * **The mark's height in px**, on the shared artwork ladder — the same one
+   * `ModuleIcon` takes, so the brand mark and a module mark at the same step
+   * are the same height. That is the whole reason the ladder is shared: this
+   * component used to say `sm | md` and the other a free number, so "both at
+   * the same size" was not expressible.
+   *
+   * No escape hatch, unlike `Icon` and `ModuleIcon`. A glyph inside a control
+   * is an ornament and may go off-scale (ADR-0004); a brand lockup never is.
+   */
+  size?:    ArtworkSize
 }
 
-withDefaults(defineProps<Props>(), { alt: 'Tolbi', variant: 'default', size: 'md' })
+const props = withDefaults(defineProps<Props>(), {
+  alt: 'Tolbi',
+  variant: 'default',
+  size: 32,
+})
+
+/** One value in, every dimension out — the ratios live in the stylesheet. */
+const sizeVar = computed(() => ({ '--logo-size': `${props.size}px` }))
 </script>
 
 <template>
-  <!-- Variante nav : wordmark compact sur fond sombre (46.578×20px) -->
+  <!-- Variante nav : wordmark compact sur fond sombre -->
   <img
     v-if="variant === 'nav'"
     class="ds-logo ds-logo--nav"
+    :style="sizeVar"
     :src="logoNavSrc"
     :alt="alt"
   />
 
   <!-- Variante default : icon + wordmark -->
-  <div v-else class="ds-logo" :class="`ds-logo--${size}`">
+  <div v-else class="ds-logo" :style="sizeVar">
     <div class="ds-logo__icon">
       <img class="ds-logo__icon-inner" :src="logoIconInner" alt="" />
       <img class="ds-logo__icon-outer" :src="logoIconOuter" alt="" />
@@ -41,51 +55,48 @@ withDefaults(defineProps<Props>(), { alt: 'Tolbi', variant: 'default', size: 'md
 </template>
 
 <style scoped>
-/* Variante nav */
-.ds-logo--nav {
-  display: block;
-  width: 46.578px;
-  height: 20px;
-  flex-shrink: 0;
-}
-
 .ds-logo {
+  /*
+    The lockup is **one drawing**, so every dimension is a ratio of the one
+    number the prop carries — the mark's height. Measured off Figma's 32px
+    lockup, which is the one the file draws; at `size="32"` each line below
+    resolves to within 0.002px of the hand-written value it replaces.
+
+    The ratios stay in local custom properties because the geometry is artwork,
+    not layout rhythm — one block to read and one to change (ADR-0010, a local
+    property that switches a variant is not a token).
+
+    What is gone is the old `sm` rung. Its **mark** was already a uniform 75% of
+    `md`, but its wordmark was tightened a further 4.8% for a constrained bar —
+    46.578×20 where the ratio gives 48.91×21. A ladder with one hand-tuned rung
+    is not a ladder, and the tightening had no consumer left: the bar moved to
+    the 32px lockup (ADR-0042) and `sm` was the only caller it ever had.
+  */
+  --logo-icon-w:     calc(var(--logo-size) * 0.9516);
+  --logo-inner-top:  calc(var(--logo-size) * 0.2256);
+  --logo-inner-left: calc(var(--logo-size) * 0.2269);
+  --logo-inner-w:    calc(var(--logo-size) * 0.6047);
+  --logo-inner-h:    calc(var(--logo-size) * 0.6788);
+  --logo-wordmark-h: calc(var(--logo-size) * 0.875);
+  --logo-wordmark-w: calc(var(--logo-size) * 2.0378);
+
+  /*
+    The gap scales with the lockup and leaves the spacing ramp doing it (5px at
+    `size="20"`). That is right rather than sloppy: this is the lockup's own
+    proportion — artwork, not rhythm — and at 32 it still computes to exactly
+    the 8px `spacing-md` it has always been.
+  */
+  --logo-gap:        calc(var(--logo-size) * 0.25);
+
   display: inline-flex;
   align-items: center;
-  gap: var(--ds-spacing-md);
-}
-
-/*
-  The lockup geometry is artwork, not layout rhythm, so it stays in local
-  custom properties: a size is one block to read and one block to change
-  (ADR-0010 — a local property that switches a variant is not a token).
-*/
-.ds-logo--md {
-  --logo-icon-w:       30.45px;
-  --logo-icon-h:       32px;
-  --logo-inner-top:    7.22px;
-  --logo-inner-left:   7.26px;
-  --logo-inner-w:      19.349px;
-  --logo-inner-h:      21.722px;
-  --logo-wordmark-w:   65.209px;
-  --logo-wordmark-h:   28px;
-}
-
-.ds-logo--sm {
-  --logo-icon-w:       22.837px;
-  --logo-icon-h:       24px;
-  --logo-inner-top:    5.42px;
-  --logo-inner-left:   5.45px;
-  --logo-inner-w:      14.512px;
-  --logo-inner-h:      16.291px;
-  --logo-wordmark-w:   46.578px;
-  --logo-wordmark-h:   20px;
+  gap: var(--logo-gap);
 }
 
 .ds-logo__icon {
   position: relative;
   width: var(--logo-icon-w);
-  height: var(--logo-icon-h);
+  height: var(--logo-size);
   flex-shrink: 0;
 }
 
@@ -111,5 +122,20 @@ withDefaults(defineProps<Props>(), { alt: 'Tolbi', variant: 'default', size: 'md
   flex-shrink: 0;
   width: var(--logo-wordmark-w);
   height: var(--logo-wordmark-h);
+}
+
+/*
+  The wordmark alone. It has no mark, so `size` cannot be a mark height here —
+  it takes the height the lockup would have given the wordmark at that step,
+  which makes `nav` at 32 pixel-identical to `default`'s wordmark at 32.
+
+  Last, so `display: block` beats `.ds-logo`'s `inline-flex` — the two classes
+  are the same specificity and this element carries both.
+*/
+.ds-logo--nav {
+  display: block;
+  height: var(--logo-wordmark-h);
+  width: calc(var(--logo-wordmark-h) * 2.3289);
+  flex-shrink: 0;
 }
 </style>

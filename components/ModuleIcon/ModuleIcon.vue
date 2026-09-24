@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { ArtworkSize } from '../artwork-size'
 import { illustrations, logos, type ModuleName, type ModuleVariant } from './registry'
 
 interface Props {
@@ -14,8 +15,22 @@ interface Props {
    * used to define a semantic one.
    */
   variant?: ModuleVariant
-  /** Rendered box in px, or any CSS length. Artwork is a 48px square. */
-  size?: number | string
+  /**
+   * **The artwork's box in px**, on the shared ladder — the same one `Logo`
+   * takes, so the brand mark and a module mark at the same step are the same
+   * height. The drawing is a `viewBox="0 0 48 48"`, so 48 is its native grid
+   * and every other step is a clean scale of it.
+   *
+   * Off-ladder values stay allowed, the way `Icon`'s do and for the same kind
+   * of reason — the union would collapse to `number` without the `& {}`:
+   *
+   * - a **number**, where a surface draws at a size Figma drew and the ladder
+   *   does not carry (`ModuleCapsule` at 44 — ADR-0031);
+   * - a **CSS length**, where the value must also live in the stylesheet
+   *   because a second box has to match it (`ProjectCard`'s
+   *   `--project-card-mark`, ADR-0041; `HorizontalNavigation`'s `--hnav-mark`).
+   */
+  size?: ArtworkSize | (number & {}) | string
   /**
    * Accessible name. Defaults to the module name; pass `null` for artwork that
    * is decorative next to a visible label, which hides it from assistive tech.

@@ -1,8 +1,10 @@
 export { Button } from './Button'
 export type { ButtonVariant, ButtonSize } from './Button'
 
+export type { ArtworkSize } from './artwork-size'
+export { ARTWORK_SIZES } from './artwork-size'
 export { Logo } from './Logo'
-export type { LogoVariant, LogoSize } from './Logo'
+export type { LogoVariant } from './Logo'
 
 export { BrandPattern } from './BrandPattern'
 export type {
@@ -98,6 +100,7 @@ export type {
   ProjectCardState,
   ProjectCardMeta,
   ProjectCardMetric,
+  ProjectCardMetricBadge,
   ProjectCardShare,
   ProjectCardStage,
   ProjectCardCrop,

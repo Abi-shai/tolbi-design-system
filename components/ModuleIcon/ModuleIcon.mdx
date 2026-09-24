@@ -71,8 +71,19 @@ Sources : `Module illustration` (nœud 9945:197) et `Modules logos` (nœud 9892:
 
 <Canvas of={ModuleIconStories.Sizes} />
 
-`size` accepte un nombre (px) ou une longueur CSS (`"2rem"`, `"100%"`). L'artwork est un carré
-de 48px.
+`size` est un cran de l'**échelle d'artwork partagée** — `16 | 20 | 24 | 32 | 48 | 64`, celle de
+Figma, et celle que prend aussi `Logo`. Le nombre est la hauteur du dessin, donc à cran égal la
+marque de la brand et celle d'un module font la même hauteur de boîte. 48 est la grille native.
+
+Hors échelle reste permis, comme sur `Icon` : un **nombre** là où une surface dessine une taille
+que l'échelle ne porte pas (`ModuleCapsule` à 44, ADR-0031), une **longueur CSS** là où la valeur
+doit aussi vivre dans la feuille de style parce qu'une seconde boîte doit s'y aligner
+(`--project-card-mark`, `--hnav-mark`).
+
+> L'échelle égalise la **boîte**, pas l'**encre** : mesuré, le dessin d'un module occupe
+> 36,35 × 41,8 de sa grille de 48 (il est dessiné avec sa marge), là où la marque Tolbi remplit la
+> sienne. Deux marques au même cran n'ont donc pas le même poids optique — c'est pourquoi la barre
+> de navigation fait tourner `Logo` à 32 et `ModuleIcon` à 48.
 
 **La taille ne dépend pas de la variante.** Les deux jeux partagent le même `viewBox` `0 0 48 48`
 et n'ont aucune dimension intrinsèque : `size` pose la boîte, le dessin suit. Et comme le logo
