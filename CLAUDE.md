@@ -480,6 +480,36 @@ Before working on any component, read:
   *Sombre* was corrected (1.549:1 → `brand/300`), and the component set gained a `Forme` axis.
   **Three tracks were drawn in both forms, on the real ground, with a dark strip, before one was
   chosen** — and the chosen one was then revised from its own render.
+- **ADR-0045**: ADR-0037 left the header's restack a **cut** and surveyed two options where there
+  were three. Filmed, it was **half of each**: `flex-direction` is not animatable, so both children
+  land somewhere new at frame 0 — **100px on the toggle collapsing, 9px expanding** — and then the
+  column's own width transition carries a centred child the rest of the way *for free*. An element
+  that lurches and then glides reads worse than one that jumps, because the glide promises a
+  continuity the lurch already broke; and it **failed asymmetrically**, so watching it expand
+  certified it (ADR-0042 again). Ten products had no answer to copy — Stripe and Evernote put the
+  toggle on the **edge** where it never moves, Perplexity **relocates** it to the bottom; stacking it
+  above the mark is the only arrangement that creates a trip. **FLIP, not a DOM swap**, because a
+  `<TransitionGroup>` or a `v-if` pair would move or remount **the very button the user just
+  pressed**, taking focus with it (measured: `activeElement` survives `column-reverse`). The part
+  worth keeping: the FLIP cancels **the discontinuity and nothing else** — the layout still carries
+  the rest on the *same* curve, so `112 − 100·f(t)` plus `100·(1 − f(t))` **sums to one eased trip**
+  rather than two motions on one gesture. That is ADR-0037's own rule — *the column owns the easing
+  and the indicator inherits it through the measurement* — extended to an element that inherits it
+  for only part of its path. The double `requestAnimationFrame` is mandatory, not cautious
+  (ADR-0032). `align-items: stretch` on the collapsed header is a **motion** decision: centred, a
+  child's x is `padding + (header − child)/2`, so two disagreeing widths are *amplified* — measured,
+  x ran 16 → 12.30, **reversed to 13.81** and snapped 1.8px. `--side-nav-header-row` joins
+  `--side-nav-rail-row` because a height that travels needs **two lengths** (`height: auto` is not
+  animatable, ADR-0025). A collapsing track must stop **growing**, not just stop showing —
+  `flex-grow: 0` and not `flex: none`, whose base size resolves from a `1fr` column still reporting
+  max-content. **The verification is a reversal count**, new here: sampling the rectangle every
+  animation frame at full precision and counting sign changes in consecutive deltas. A screenshot
+  cannot show a 1.5px wobble; that number found the centring amplification and the 4px a track was
+  eating. What it did *not* catch is the regression it caused — the collapsed box lost its declared
+  width on the theory that the header's `stretch` would supply it, which it does **and only there**
+  (measured 143px standalone): *a component that only renders correctly inside one parent*, shipped
+  because the check ran on the story where the motion shows and the two form stories were never
+  reopened.
 
 ## Architecture
 
