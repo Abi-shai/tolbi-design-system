@@ -3,7 +3,9 @@ import * as HorizontalNavigationStories from './HorizontalNavigation.stories'
 
 # HorizontalNavigation
 
-Barre de navigation principale de l'app Tolbi. Fond vert foncé semi-transparent, présente le logo, un fil d'Ariane contextuel, les actions rapides et l'avatar utilisateur.
+Barre de navigation principale de l'app Tolbi. Elle porte l'identité (marque Tolbi, ou module
+courant), un fil d'Ariane contextuel, les actions rapides et l'avatar utilisateur. Elle ne pose
+aucun fond : elle prend la surface qui se trouve derrière (ADR-0028).
 
 <Canvas of={HorizontalNavigationStories.Accueil} />
 
@@ -11,15 +13,169 @@ Barre de navigation principale de l'app Tolbi. Fond vert foncé semi-transparent
 
 ---
 
+## La gauche de la barre — deux blocs
+
+| | |
+|---|---|
+| **bloc d'identité** | la marque, `spacing-lg` (12px), le retour à l'accueil |
+| | `spacing-4xl` (32px) |
+| **le fil** | le chemin **à l'intérieur** de ce module |
+
+*Où tu es et comment en sortir* est une phrase ; *comment tu es arrivé sur cette page* en est une
+autre. C'est l'écart qui le dit — 12px lie, 32px sépare — et c'est lui qui rend le fil lisible comme
+un chemin dans le module plutôt qu'un chemin depuis la racine.
+
+Mesuré à 1440px : le bloc fait 77,7px à l'accueil et 162,6px dans un module, l'écart interne **12px**
+et l'écart au fil **32px** à toutes les profondeurs.
+
+Le fil ne commence donc plus par le module : la marque à sa gauche est son point de départ. Et il
+n'a plus de maison — `Breadcrumbs` reçoit `:home="false"`, ce qui retire aussi le chevron devant le
+premier nœud et fait compter le plafond de cinq nœuds sur les items seuls.
+
+Le retour à l'accueil est un **vrai `Button`** (ADR-0001), pas une miette redessinée : il a cessé
+d'être un nœud d'un chemin au moment où il a quitté le chemin — et il est dessiné comme une action.
+
+`variant="secondary-gray"`, pas le `ghost` qu'était la maison : un ghost n'est **rien au repos**, il
+ne répond qu'à un pointeur qui l'a déjà trouvé — mauvais contrat pour la seule sortie d'un module.
+Une boîte déclarée **borne aussi le bloc**, donc les 12px se lisent comme un lien entre deux objets
+plutôt que comme du vide à côté de la marque. `href` en fait une ancre (ADR-0014), et `size="sm"` est
+**la plus petite taille du catalogue**, prise telle quelle — `label-lg-strong`,
+`control-padding-sm`, aucun override local. Mesuré **209,4 × 38px** : 38 et non 36, parce qu'un
+contrôle bordé est 2px plus haut que ne le dit son token de padding (ADR-0033).
+
+Le mot par défaut est un **impératif** ici — `Retourner sur l'accueil` — là où `Breadcrumbs` garde un
+**lieu** (`Accueil`). Ce ne sont pas deux avis sur la formulation : `Breadcrumbs` garde son état
+profondeur 0 où la maison *est* la page, la barre ne l'a plus.
+
+## Identité — la marque, ou le module
+
+<Canvas of={HorizontalNavigationStories.IdentitySwap} />
+
+`module` est le **seul** endroit où la barre dit où l'on est. L'item courant du sélecteur de
+modules en est **dérivé** — `ModulesListItem.active` est ignoré ici, parce qu'un drapeau par
+élément laissait zéro ou deux modules courants et que rien ne savait lequel (ADR-0024).
+
+| | |
+|---|---|
+| `module` | `ModuleName` — les 11 modules dont le système a le dessin. Un module qu'il ne sait pas dessiner ne peut pas être demandé : le compilateur refuse la chaîne (ADR-0041) |
+| `moduleLabel` | Le mot à côté de la marque. Par défaut `module` — `Data` s'affiche « Data OS » dans le produit |
+
+La marque est l'**illustration**, pas le logo : les deux formes alternent dans la même fente, donc
+elles doivent être le même genre d'objet, et la marque Tolbi est un dessin sans tuile.
+
+**La marque du module est à 48, le lockup Tolbi à 24 — deux crans d'écart, volontaire.** Cette
+phrase n'est écrivable que depuis l'ADR-0043 : avant, l'un disait `md` et l'autre un nombre.
+
+La raison est mesurée. **L'échelle égalise la boîte, pas l'encre.** La marque Tolbi remplit sa boîte
+bord à bord ; les onze dessins de module vivent dans leur grille de 48 avec leur propre marge, et
+cette marge n'est pas constante — l'encre va de **8,53** unités de haut (`Trace`) à **41,8**
+(`Carbone`), un facteur 4,9. À cran égal le module se lit plus petit que la brand : 14,2px d'encre
+en moyenne contre 24. À 48 la moyenne atteint **28,5** — le premier cran où la marque du module pèse
+autant à l'œil que celle de la brand. C'est aussi la **grille native** du dessin, donc le seul cran
+sans réduction.
+
+**Ce que ça coûte, c'est la hauteur : 72px au lieu des 64 de l'ADR-0028.** 48 est la seule chose de
+la barre plus haute que l'avatar de 40px, donc l'identité commande la hauteur — sur **toutes** les
+pages, y compris celles sans module, puisque le plancher de la fente vaut 48 dans les deux formes.
+Ce n'est pas du gâchis : une barre qui changerait de hauteur en naviguant, ça, ce serait le vrai
+défaut.
+
+24 et 32 ont été construits et mesurés en chemin. À 24 le trait de Yield tombe à **0,89px** —
+sous-pixel, ce que l'ADR-0041 avait écarté. À 32 il rend 1,19px et la barre reste à 64.
+
+**Et pas de nom.** La première miette du fil nomme déjà le module : un mot ici l'écrivait deux fois à
+32px d'écart. Ce qui déplace le nom accessible **sur la marque** — c'est la règle de l'ADR-0041 avec
+l'entrée inverse : là, du texte visible à côté du dessin rendait l'`aria-label` bruyant ; ici rien
+d'autre dans la fente ne nomme le module. `moduleLabel` ne sert plus qu'à ça.
+
+Pas d'infobulle non plus, alors que le rail replié de l'ADR-0034 en a une : là, les glyphes sont des
+**destinations** qu'il faut identifier avant de cliquer ; ici c'est un **constat** — on y est déjà,
+et le fil le dit en toutes lettres 32px à droite.
+
+Mesuré à 1440px : Tolbi **77,73px** de large, les onze modules **48px** — une seule géométrie, donc
+le départ du fil est identique partout dans le produit et ne bouge qu'une fois, entre l'accueil et un
+module.
+
+<Canvas of={HorizontalNavigationStories.EveryModule} />
+
+### Le passage — un roulement
+
+L'identité qui part monte et sort de la fente ; celle qui arrive vient du bas et se pose. Un tableau
+d'affichage, pas un fondu.
+
+La première version était un fondu croisé, et elle disait la mauvaise chose : **un fondu dit que la
+chose a changé, un roulement dit qu'une chose est partie et qu'une autre est arrivée.** C'est la
+seconde phrase que la barre doit tenir à ce moment-là — *tu étais à l'accueil, tu es dans Yield*.
+C'est une séquence, et une séquence a un sens. C'est aussi ce qui la sépare de `SwapTransition`, qui
+fond sur place justement parce qu'un skeleton et son contenu sont **une seule chose** en deux états.
+
+**La fente est la fenêtre.** `overflow: hidden` est ce qui donne un sens à « hors champ », et c'est
+pourquoi le déplacement vaut `100%` de la **fente** et non de la marque : le lockup Tolbi fait 24px
+dans une fente de 48, donc le translater de sa propre hauteur en laisserait la moitié visible. Le
+plancher et la distance parcourue sont donc le même nombre par construction.
+
+**Le même sens dans les deux directions.** Monter-sortir / entrer-par-le-bas, c'est un **odomètre** :
+une valeur qui change sur place. L'inverser au retour en ferait un *lieu* qui change — une affirmation
+sur la hiérarchie que la barre ne porte pas : un module n'est pas sous l'accueil, il est à côté.
+
+| | |
+|---|---|
+| durée | `--ds-motion-duration-enter` (200 ms), **des deux côtés** |
+| courbe | `--ds-motion-easing-in-out`, **des deux côtés** |
+
+La courbe n'est pas un goût : sa description nomme exactement ce cas — *« spatial : une chose qui
+voyage, plutôt qu'un état qui change »*, et cite l'indicateur d'onglet et le glissement de tiroir.
+
+Les deux moitiés partagent une durée parce qu'elles sont mécaniquement **un seul mouvement** —
+l'ADR-0037 a tranché pareil quand la colonne de la barre latérale et son indicateur devaient voyager
+ensemble : *deux durées sur un même geste se déchirent*. C'est aussi pourquoi « la sortie est plus
+rapide que l'entrée » (ADR-0021) ne s'applique pas ici : cette règle vise une surface flottante qui
+s'écarte, pas une bande dont les deux moitiés sont solidaires.
+
+**Et pas de fondu par-dessus.** Un mouvement doit expliquer quelque chose (ADR-0023) ; celui-ci dit
+*c'est parti, le suivant est arrivé*. Un fondu simultané dirait *ça s'est dissous*, une seconde
+histoire contradictoire.
+
+Les deux formes occupent **la même cellule de grille** (ADR-0027), donc la fente n'est jamais vide —
+et ici c'est structurel, pas prudent : elles se croisent, donc elles doivent y être toutes les deux.
+La forme qui part **reste dans le flux** : aucune des deux largeurs n'est animée, donc la piste vaut
+`max()` de deux constantes — une marche, jamais un creux. La sortir du flux ne faisait que produire
+un **chevauchement**, dans un seul sens : filmé, à l'aller le lockup Tolbi de 77,73px débordait d'une
+fente de 48 pendant toute la sortie, la maison du fil posée sur le mot.
+
+**Le fil est le second mouvement, et il attend le premier.** Le roulement se termine par la fente qui
+rétrécit — ce qui déplace le fil. Un fil qui apparaîtrait *pendant* le roulement arriverait à une
+position puis serait poussé à une autre. Il est donc décalé d'un `enter` et apparaît là où il va
+rester. Ce décalage est celui de `RevealTransition` (ADR-0032), et le délai aussi : *un délai est une
+durée dans un autre emplacement*, d'où la lecture de `--ds-motion-duration-enter` deux fois.
+Asymétrique volontairement — **rien n'attend pour partir**.
+
+Mesuré sur 410 frames (ralenti 20×) : deux largeurs (77,73 → 48), aucun intermédiaire, jamais zéro
+forme, deux formes au milieu. Filmé dans les deux sens à 10×, échantillonné à
+0 / 80 / 160 / 200 / 280 / 400 ms réels : à 80 ms les deux marques sont dans la fenêtre, l'une sort
+par le haut et l'autre monte par le bas ; le fil n'apparaît qu'à partir de 200 ms, déjà à sa place
+définitive.
+
+En `prefers-reduced-motion`, l'identité bascule quand même, d'un coup — et la transformation est
+remise à zéro en même temps que la transition, sinon la forme entrante resterait garée une hauteur de
+fente plus bas puis sauterait. Couper le trajet ne cache rien (ADR-0033).
+
+---
+
 ## Profondeur
 
-Le fil est rendu à **toutes** les profondeurs, y compris sur l'accueil : la page d'accueil est une
-profondeur, pas l'absence de fil. Il n'y a plus de prop `state` — c'est la longueur de
-`breadcrumbs` qui fait la profondeur, et rien d'autre.
+C'est la longueur de `breadcrumbs` qui fait la profondeur, et rien d'autre — il n'y a pas de prop
+`state`. **À la profondeur 0, le fil n'est pas rendu du tout.**
+
+`Breadcrumbs` garde sa propre règle (vide est une profondeur, la maison seule *est* l'accueil) ;
+elle a été écrite quand la maison était la seule chose de la barre à le dire. Ce n'est plus le cas :
+le lockup Tolbi apparaît exactement quand le fil n'aurait qu'une maison, et les deux disaient la même
+chose à 32px d'écart. La condition est **le fil vide**, pas l'absence de `module` — une page hors
+module a un chemin à montrer.
 
 | Scénario | Fil | Nœuds |
 |---|---|---|
-| Accueil | 🏠 | 1 |
+| Accueil | *(rien)* | 0 |
 | ID | 🏠 › ID › Statistiques | 3 |
 | Yield | 🏠 › Yield › Projets › Campagne maïs › Dashboard | 5 |
 | Data OS | 🏠 › Data OS › Projets › Forums › Forum 123 › Assurance | 6, **replié** |
@@ -55,7 +211,22 @@ plus Poppins SemiBold quand c'est un libellé. Sur `Accueil` le courant est **la
 prend le même. C'est d'ailleurs elle qui impose le fond : seule, elle n'a aucun voisin contre
 lequel un poids ou une couleur contrasterait.
 
-La maison (icône `house`) est toujours présente comme racine et émet l'événement `learn` au clic.
+La maison (icône `house`) est la racine dès qu'il y a un fil, et émet `home` au clic — **pas**
+`learn` : les deux partageaient le même évènement, donc cliquer sur l'accueil ouvrait le centre
+d'aide.
+
+Elle **porte son mot** désormais. En retirant le fil de l'accueil, la maison est devenue la seule
+sortie, et c'était un glyphe de 20px sans nom visible dans une rangée de mots. `homeLabel` existait
+déjà, en `aria-label` ; il est à l'écran, et l'`aria-label` a disparu avec — un contrôle dont le mot
+est visible ne doit pas porter un second nom qui peut le contredire.
+
+Dans la barre la maison n'est **jamais** la page courante (plus de fil à la profondeur 0), donc un
+impératif y est juste. `Breadcrumbs` seul garde son état profondeur 0 où la maison *est* la page :
+d'où un défaut qui est un **lieu**. Mesuré à 1440px, `Accueil` fait **91,69px** et
+`Revenir sur l'accueil` **180,06px** — 88px de fil poussés à droite, et l'impératif se lit
+bizarrement *dans* un chemin (`Revenir sur l'accueil › Projets › Campagne maïs`).
+
+<Canvas of={HorizontalNavigationStories.HomeLabel} />
 
 ---
 
@@ -63,10 +234,13 @@ La maison (icône `house`) est toujours présente comme racine et émet l'évén
 
 | Événement | Déclencheur |
 |---|---|
-| `learn` | Clic sur le bouton "Apprendre" ou l'icône maison |
+| `home` | Clic sur la maison du fil — **distinct de `learn`** |
+| `breadcrumb-select` | Clic sur un maillon ; émis même sur une ancre, pour qu'un routeur puisse `preventDefault()` |
+| `learn` | Clic sur le bouton « Apprendre » |
 | `settings` | Clic sur l'icône paramètres |
 | `notifications` | Clic sur la cloche |
-| `apps` | Clic sur la grille d'apps |
+| `module-select` | Choix d'un module dans la grille — c'est au produit de reposer `module` |
+| `credits` | Clic sur la pastille de crédits |
 | `user` | Clic sur l'avatar |
 
 ---
@@ -74,9 +248,11 @@ La maison (icône `house`) est toujours présente comme racine et émet l'évén
 ## Réutilisation DS
 
 Ce composant utilise en interne :
-- `<Logo>` — logo Tolbi
-- `<Icon name="house">`, `<Icon name="chevron-right">` — breadcrumbs
-- `<Icon name="book-open">`, `<Icon name="settings">`, `<Icon name="bell">`, `<Icon name="layout-grid">` — actions
+- `<Logo>` — l'identité à l'accueil
+- `<ModuleIcon variant="illustration">` — l'identité dans un module
+- `<Breadcrumbs>` — le fil, pas une seconde version dessinée à la main (ADR-0001)
+- `<CreditsChip>`, `<Button size="lg-compact">`, `<IconButton>`, `<Tooltip>`, `<Avatar>`
+- `<ModulesList>` dans une `<SurfaceTransition>` — le sélecteur de modules
 
 ---
 

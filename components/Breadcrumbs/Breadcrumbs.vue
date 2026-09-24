@@ -26,16 +26,42 @@ interface Props {
    */
   homeHref?: string
   /**
-   * The house's accessible name. It is the only word this component says, and
-   * a word belongs to the product — the glyph is a drawing and stays ours, the
-   * string is not. Defaulted rather than required so the common case costs
-   * nothing.
+   * Whether the trail posts its own house. `false` when the **surface** posts
+   * the way home somewhere else — `HorizontalNavigation` moved it into the
+   * identity block beside the module's mark, so the trail there shows only the
+   * path *inside* that module (ADR-0042).
+   *
+   * Named after the thing it removes, like `SideNavigation.toggle` (ADR-0034).
+   * With it off the first item takes no leading chevron: a trail that starts at
+   * its first node does not trail from anything.
+   */
+  home?: boolean
+  /**
+   * The house's name — **visible**, beside the glyph, and the accessible name
+   * by virtue of being on screen rather than by an `aria-label`.
+   *
+   * It used to be invisible, and the house was the one node in a row of words
+   * that had none. Two things changed: `HorizontalNavigation` stopped rendering
+   * the trail at depth 0 (ADR-0042), so in the bar the house is *always* an
+   * ancestor and never the page you are on, and the identity beside it now
+   * names the module — which leaves the way back as the one thing in the trail
+   * that was still a bare glyph.
+   *
+   * Still the only word this component says, and still the product's: the glyph
+   * is a drawing and stays ours, the string is not. Defaulted to a **location**
+   * (`Accueil`) because at depth 0 the house *is* the page, and an imperative
+   * would be wrong there. A surface where the house is never current — the bar
+   * — can pass one: `Revenir sur l'accueil`.
+   *
+   * Not truncated, unlike a crumb. It is the escape hatch, and
+   * `Revenir sur l'acc…` is worse than the width.
    */
   homeLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   items: () => [],
+  home: true,
   homeLabel: 'Accueil',
 })
 
@@ -64,12 +90,15 @@ function onSelect(item: BreadcrumbsItem, event: MouseEvent): void {
 const MAX_NODES = 5
 
 /** Depth 0: there is no trail, so the house *is* the page you are on. */
-const homeIsCurrent = computed(() => props.items.length === 0)
+const homeIsCurrent = computed(() => props.home && props.items.length === 0)
+
+/** The house counts as a node when it is posted, and not when it is not. */
+const nodeCount = computed(() => props.items.length + (props.home ? 1 : 0))
 
 /** The ellipsis opens the trail in place rather than into a menu (Spectrum). */
 const expanded = ref(false)
 const isCollapsed = computed(
-  () => !expanded.value && props.items.length + 1 > MAX_NODES,
+  () => !expanded.value && nodeCount.value > MAX_NODES,
 )
 
 interface TrailNode {
@@ -134,23 +163,26 @@ function leave(): void {
   <nav class="ds-breadcrumbs" aria-label="Fil d'Ariane">
     <ol class="ds-breadcrumbs__list">
       <!-- Racine -->
-      <li class="ds-breadcrumbs__item">
+      <li v-if="home" class="ds-breadcrumbs__item">
         <component
           :is="homeHref ? 'a' : 'button'"
           :type="homeHref ? undefined : 'button'"
           :href="homeHref"
           class="ds-breadcrumbs__home"
           :class="{ 'ds-breadcrumbs__home--current': homeIsCurrent }"
-          :aria-label="homeLabel"
           :aria-current="homeIsCurrent ? 'page' : undefined"
           @click="emit('home', $event)"
         >
           <Icon name="house" :size="20" />
+          <!-- No `aria-label`: the word is on screen, so adding one would give
+               the control a name that can disagree with what it says. -->
+          <span class="ds-breadcrumbs__home-label">{{ homeLabel }}</span>
         </component>
       </li>
 
-      <template v-for="node in trail" :key="node.key">
-        <li class="ds-breadcrumbs__separator" aria-hidden="true">
+      <template v-for="(node, i) in trail" :key="node.key">
+        <!-- No chevron before the first node when the house is not posted. -->
+        <li v-if="home || i > 0" class="ds-breadcrumbs__separator" aria-hidden="true">
           <Icon name="chevron-right" :size="16" />
         </li>
 
@@ -227,8 +259,12 @@ function leave(): void {
 .ds-breadcrumbs__home {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: var(--ds-spacing-xs, 4px);
+  /* The glyph and its word are one unit; the padding is a crumb's, so the row
+     is even from the first node to the last. */
+  gap: var(--ds-spacing-xs, 4px);
+  padding: var(--ds-spacing-xs, 4px) var(--ds-spacing-md, 8px);
+  font: var(--ds-font-label-lg);
+  white-space: nowrap;
   background: transparent;
   border: none;
   border-radius: var(--ds-radius-inner);
@@ -342,6 +378,13 @@ function leave(): void {
   color: var(--ds-text-strong);
 }
 
+/*
+  The weight now reaches the house too. The note above says "the icon takes the
+  colour only; a glyph has no weight to give" — true of a glyph, and the house
+  has a word beside it now. The fill stays regardless: at depth 0 the house has
+  no sibling, so weight and colour would distinguish it from nothing.
+*/
+.ds-breadcrumbs__home--current,
 .ds-breadcrumbs__crumb--current {
   font: var(--ds-font-label-lg-strong);
 }

@@ -203,3 +203,21 @@ export const AsLinks: Story = {
     },
   },
 }
+
+/**
+ * Sans maison. La surface poste la sortie ailleurs — `HorizontalNavigation` la
+ * met dans son bloc d'identité, à côté de la marque du module — et le fil ne
+ * montre plus que le chemin *dans* ce module. Le premier nœud ne prend pas de
+ * chevron : un fil qui commence à son premier nœud ne traîne de rien.
+ */
+export const SansMaison: Story = {
+  name: 'Sans maison — la surface poste la sortie ailleurs',
+  args: {
+    home: false,
+    items: [
+      { label: 'Projets' },
+      { label: 'Campagne maïs' },
+      { label: 'Dashboard' },
+    ],
+  },
+}

@@ -347,6 +347,105 @@ Before working on any component, read:
   `<img>` **owns its failure**: `@error` lands on the same empty state, the pill does not move
   (ADR-0038's rule becomes load-bearing), and the flag resets on `snapshot` change. Fill the slot
   and the failure is yours — we do not own that element and cannot hear it.
+- **ADR-0041**: `ProjectCard` gains a `module` prop and **it decides nothing**. ADR-0038's "there is
+  no `module` prop" protected *derivation* — what the card draws comes from the data — and that
+  holds: nothing branches on it, and if anything ever reads `module` in a condition the decision has
+  been broken. The prop is **content**, the one fact no other prop carries and no data can derive
+  (`stageLabel` correlates with Yield by accident; `loading` has no data at all). It goes on the
+  **title's line** — the media corner was declined, the pill already sits on an unguaranteed ground
+  and that is a risk to hold at one. **There was a free size and we did not take it**: 24px is
+  exactly one `label-xl-strong` line box (16/24 in *both* type scales) and costs no height, but at 24
+  the eleven drawings are coloured blobs — distinguishable, not identifiable. So **32px**, and the
+  cost is not the 8px: it is that the mark's presence would become a height decision, a card with a
+  module standing taller than one without. `--project-card-mark` is therefore read **twice** — the
+  artwork's box *and* the identity row's `min-height` (ADR-0034's `--side-nav-rail-row`, a variant
+  switch under ADR-0010) — so every card pays the 8px and the grid stays on one height. It is
+  `variant="illustration"`, the third consumer to make that call, which states ADR-0005's implied
+  rule — **the primitive is what a component reaches for when the component is already the surface**.
+  And it is **named**, where `ModulesList` and `ModuleCapsule` pass `null`: *the artwork's accessible
+  name is decided by what else is on the surface, never by the component.* Inside the `<h3>`, so the
+  heading is "Yield Rendement Arachide Nord" while the control keeps the title alone. **The type is
+  the coverage** — `ModuleName` cannot spell `Eudr`/`ina`/`conformite`, so a wrong mark is
+  unwritable, and no `moduleLabel` here because the title already names the project. The skeleton
+  reserves **nothing**: it previews blocks, not ornaments, and the row's floor makes that free. **The
+  mark is not what truncates the title — the demo badge is**: measured, the name needs 218px and gets
+  218px with the mark and no badge, and 102px with it. Figma's `ModuleIllustration` is ADR-0028's
+  finding in a **third variety** — the component exists and is *incomplete*, 2 modules × 6 `Size`
+  variants against code's 11 at any size, because a `viewBox` makes every size the same drawing
+  (ADR-0031). The two sides disagree on **what a size is**: an enum there, a number here.
+- **ADR-0042**: The bar had **two** places saying the user was in a module — `modules[].active` and
+  `breadcrumbs[0]` — and the lockup, the one element that is *about* identity, was neither. One
+  `module` prop owns it and the switcher's current item is **derived** (ADR-0024 again). The module's
+  form is the **mark alone**: a word here wrote the module's name twice, 32px from the first crumb,
+  and dropping it makes all eleven **one geometry** (48px), so the trail's start only moves between
+  home and a module. `variant="illustration"` for a narrower reason than ADR-0041's — **the two forms
+  alternate in one slot, so they must be the same kind of object**, and the Tolbi mark is untiled.
+  **The module mark is 48 and the Tolbi lockup 24 — two rungs apart, deliberately**, a sentence only
+  ADR-0043's shared ladder makes writable. Because **the ladder equalises the box, not the ink**: the
+  brand mark fills its box, the eleven drawings do not, and their margins are not constant (ink 8.53
+  → 41.8 of 48, a 4.9× spread), so at equal rungs the module reads smaller — 14.2px of ink against
+  the brand's 24, 19.0 at rung 32, **28.5 at 48**. 48 is also the native grid, the one rung with no
+  downscale (closing ADR-0041's open item). It costs the height: **72px**, not ADR-0028's 64, on
+  every page — the floor is 48 in both forms, because a bar that changed height on navigation would
+  be the real defect. With
+  no visible word, `aria-label` goes back **on** the mark — ADR-0041's rule with the opposite input —
+  and there is **no tooltip**, because ADR-0034's rail glyphs are destinations and this is a
+  statement. The identity **rolls** — the outgoing one travels up out of the
+  slot, the incoming one arrives from below. A cross-fade shipped first and said the wrong thing:
+  **a dissolve says the thing changed, a roll says one left and another arrived**, and the bar's job
+  is the second sentence. That is also what separates it from `SwapTransition`, which fades in place
+  because a skeleton and its content are *one thing* in two states. The slot is the **window**
+  (`overflow: hidden`), so the travel is 100% of the *slot*, not of the mark — the floor and the
+  distance are the same number by construction. **Same direction both ways**: an odometer, a value
+  changing in place; reversing it would claim a hierarchy the bar does not have. `enter` (200ms) +
+  `easing-in-out`, **both halves** — the easing's own description is "spatial: a thing that travels",
+  and one gesture takes one duration or it tears (ADR-0037), which is why ADR-0021's faster-exit rule
+  yields here. One grid cell so the slot is never empty (ADR-0037) — structural here, they cross past
+  each other. The leaver stays **in flow**: taking it out (to dodge ADR-0026's wobble) was wrong,
+  because neither width is animated so the track is `max()` of two constants, a step and never a dip;
+  what it bought was an **overlap in one direction only**, found by **filming the swap frame by
+  frame**. **The trail is gone from the home page** — `Breadcrumbs`' own rule (empty is a depth, the house alone
+  *is* home) was written when the house was the only thing saying so, and the lockup now says it 32px
+  away; the condition is the **trail being empty**, not `module` being absent, so the two props stay
+  independent. **The left side is two blocks**: *where you are and how to leave* (mark + the way back,
+  `spacing-lg` apart) is one statement, *how you got to this page* (the trail) is another,
+  `spacing-4xl` away — and the gap is what makes the trail read as a path **inside** the module
+  rather than from the root. So `Breadcrumbs` gains `home?: boolean` (ADR-0034's `toggle` naming):
+  off, the first item takes **no chevron** and the five-node ceiling counts items alone. The way home
+  is a **real `Button`**, `secondary-gray` and not `ghost` — **a ghost is nothing at rest**, the wrong
+  contract for the single way out of a module, and a declared box *bounds the block* so the 12px
+  reads as binding rather than as loose space. `href` makes it an `<a>` (ADR-0014); `sm` is the
+  smallest size and is taken **as it comes** (a component that is 90% the real one is the defect
+  ADR-0001 exists to stop); measured 209.4 × **38**px, a bordered control being 2px taller than its
+  padding token says (ADR-0033). It carries its **word**: `homeLabel` moves from `aria-label` to the
+  screen (or the control has two names). **The two defaults differ on purpose** — the bar is an
+  imperative (`Retourner sur l'accueil`) because it has no depth-0 state left, `Breadcrumbs` stays a
+  location (`Accueil`) because it does. Same rule, two facts. It is the **second movement**,
+  delayed one `enter` so it fades in where the narrowing
+  slot leaves it (ADR-0032's offset, and its "a delay is a duration in another slot") — asymmetric,
+  nothing waits to leave. The defect: **`<Logo>` fades in and is cut out** — its own root is a `v-if`/`v-else` pair
+  and only the `v-if` branch carries the leave hooks, so the `<Transition>` gets plain elements on
+  both branches. A fourth of ADR-0039's family, with a new wrinkle: **it fails asymmetrically**, so
+  watching the swap in the direction that works certifies it.
+- **ADR-0043**: Three components had three answers to what a **size** is — `Icon` a typed number,
+  `Logo` `sm | md`, `ModuleIcon` a free number — so "the brand mark and the module mark, the same
+  size" was **not expressible**. One ladder now: `ArtworkSize = 16 | 20 | 24 | 32 | 48 | 64`, which
+  is Figma's `Size` enum *and* `Icon`'s existing ramp with two rungs added — nothing invented.
+  Numeric because that is what Figma names and what `Icon` already does: **a control's size is a role
+  (t-shirt), a drawing's size is a measurement (number)**. **The number is the artwork's height**, so
+  a step means the same thing in both. `Logo` becomes **one ratio family** instead of two hand-written
+  blocks (0.012px off at 32) — which costs `sm`'s wordmark tightening, because **a ladder with one
+  hand-tuned rung is not a ladder** — six rungs from one ratio plus a seventh nudged by hand is two
+  systems wearing one name (the bar sits on rung 24 and pays 2.33px for it). The gap scales too and **leaves the
+  spacing ramp** (5px at 20): a lockup's internal gap is artwork, not rhythm (ADR-0010). `Logo` is
+  **strict**, `ModuleIcon` keeps `Icon`'s `(number & {})` hatch — the asymmetry is the decision: a
+  module mark has two live off-ladder callers (`ModuleCapsule`'s 44, and a CSS length where the value
+  is read twice), a brand lockup has none. **The ladder equalises the box, not the ink** — measured,
+  the ink inside the 48-grid runs **8.53 → 41.8** across the eleven (a 4.9× spread) where the Tolbi
+  mark fills its box — so there is no rung at which the two weigh the same, and the fix belongs in
+  the drawings, not in a third size vocabulary. What the ladder buys is that "one rung up" is finally
+  a **checkable** statement (the nav bar: `Logo` 24, `ModuleIcon` 48 — the rung where the eleven
+  average 28.5px of ink against the brand's 24).
 
 ## Architecture
 
