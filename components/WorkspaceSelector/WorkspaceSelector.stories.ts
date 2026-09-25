@@ -161,7 +161,7 @@ export const Collapsed: Story = {
     setup: () => ({ current: ref('kaolack'), workspaces }),
     components: { WorkspaceSelector },
     template: `
-      <div style="width: 60px; padding: 12px; background: var(--ds-bg-neutral); box-sizing: border-box;">
+      <div style="width: 68px; padding: 16px; background: var(--ds-bg-neutral); box-sizing: border-box;">
         <WorkspaceSelector v-model="current" :workspaces="workspaces" collapsed />
       </div>
     `,

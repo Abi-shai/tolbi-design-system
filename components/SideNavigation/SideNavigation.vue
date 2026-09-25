@@ -30,11 +30,11 @@ import { SIDE_NAVIGATION_KEY, type SideNavigationContext } from './context'
  * a free choice, so the component ships it and `toggle` turns it off for a shell
  * that places its own.
  *
- * The rail's width is the row (36px) plus `spacing-lg` each side — 60px — so the
+ * The rail's width is the row (36px) plus `spacing-xl` each side — 68px — so the
  * pill's height never changes: collapsing moves and narrows it, it does not
- * resize it vertically. Collapsed the column's padding is symmetric, which is
- * the whole derivation: expanded it is 12/16, and a rail is a square control's
- * worth of column.
+ * resize it vertically. The column's edge padding is the same in both forms
+ * (12/16): what a collapse narrows is the panel, not the margin its contents
+ * are hung on.
  */
 interface Props {
   /** The selected item's value. */
@@ -251,8 +251,10 @@ onBeforeUnmount(() => { clearTimeout(travelTimer); clearTimeout(flipTimer) })
 <style scoped>
 /*
   The collapse is **one movement with two carriers**: the column's own box
-  (width, its ceiling, and the padding that tightens with it), and — one step
-  later — the labels. `easing-in-out` is not a taste here, its description names
+  (its width and its ceiling), and — one step later — the labels. The padding
+  is not one of them any more — see the derivation below.
+
+  `easing-in-out` is not a taste here, its description names
   this case: "a thing that travels, rather than a state that changes. Lateral
   movement (tab indicator, drawer slide)". `easing-default` is a pronounced
   ease-out that leaves flat out, which ADR-0032 measured as a snap on a large
@@ -296,22 +298,27 @@ onBeforeUnmount(() => { clearTimeout(travelTimer); clearTimeout(flipTimer) })
   background-color: var(--ds-bg-neutral);
   transition:
     width     var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
-    max-width var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
-    padding   var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
+    max-width var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
 }
 
-/* The rail is *derived*, not asserted: a square row plus `spacing-lg` each
+/* The rail is *derived*, not asserted: a square row plus `spacing-xl` each
    side. Both halves have to agree or the rows sit off-centre, so the row size
    is a private component token (ADR-0010 — an own-value, not an alias) that
-   `SideNavItem` reads off the cascade. 60px lands where every icon-only rail in
-   the survey sits.
+   `SideNavItem` reads off the cascade.
 
-   **The padding goes symmetric, and that is the whole derivation.** Expanded
-   the column is 12/16; collapsed it is 12 all round, which is ADR-0036's rule
-   for a square icon-only control — symmetric padding — applied to the column
-   instead of to something inside it. It was `spacing-md` here, two ramp steps
-   down from the expanded 16 instead of one, and the rail came out 52px: a
-   column that squeezed its own edges harder than it squeezed anything else.
+   **The edge padding does not change, and that is the whole derivation.**
+   16px each side in both forms, so the rail is 68px and the collapse has one
+   carrier fewer: the column narrows, its margin holds still. It also shortens
+   the glyph's trip — measured, the icon's left edge sits at 28px expanded and
+   23.5px collapsed, four and a half pixels apart where the 60px rail put them
+   eight and a half. (The row's own padding is what remains of the difference:
+   `control-padding-sm` expanded, `spacing-md` collapsed.)
+
+   ADR-0044 had it go symmetric — 12 all round, a 60px rail — reading ADR-0036's
+   rule for a square icon-only control onto the column. What that rule governs
+   is a *control's* box, where the padding is the glyph's own surround. A
+   column's edge padding is not that: it is where the panel's contents hang,
+   and the two forms are the same panel.
 
    `max-width` as well as `width`, and the second one is what actually holds:
    a shell sets the column's width on the element — `width: 100%` in a grid,
@@ -335,10 +342,10 @@ onBeforeUnmount(() => { clearTimeout(travelTimer); clearTimeout(flipTimer) })
 .ds-side-nav--collapsed {
   --side-nav-rail-row: 36px;
 
-  width: calc(var(--side-nav-rail-row) + 2 * var(--ds-spacing-lg));
-  max-width: calc(var(--side-nav-rail-row) + 2 * var(--ds-spacing-lg));
+  width: calc(var(--side-nav-rail-row) + 2 * var(--ds-spacing-xl));
+  max-width: calc(var(--side-nav-rail-row) + 2 * var(--ds-spacing-xl));
   flex: none;
-  padding: var(--ds-spacing-lg);
+  /* No `padding` here on purpose: it is the base rule's, unchanged. */
 }
 
 /* No `align-items: center` here any more. Centring the *items* was how the rail
