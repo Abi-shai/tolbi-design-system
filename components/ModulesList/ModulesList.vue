@@ -84,6 +84,17 @@ function onSelect(item: ModulesListItem) {
   background: var(--ds-bg-neutral-subtle);
   border-radius: var(--ds-radius-surface);
   padding: var(--ds-spacing-sm);
+  /*
+    The panel carries its own elevation (ADR-0006 — a component owns its
+    chrome). It used to be the bar's: `.ds-hnav__modules-dropdown` declared the
+    same `box-shadow` on this very element, under a comment reading
+    "positionnement uniquement". Two scopes writing one property on one box, and
+    a panel that was flat everywhere else.
+
+    `elevation-overlay` is what every floating surface in the catalogue takes —
+    Dropdown, InputDropdown, Toast, ChartTooltip.
+  */
+  box-shadow: var(--ds-elevation-overlay);
   display: inline-flex;
   align-items: flex-start;
   flex-shrink: 0;

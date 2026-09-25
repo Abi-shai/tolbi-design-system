@@ -659,7 +659,8 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
     for — and what the other three floating panels in the catalogue use.
   */
   z-index: var(--ds-z-popover);
-  box-shadow: var(--ds-elevation-overlay);
+  /* The elevation is ModulesList's own now — the bar places the panel, it does
+     not dress it. */
   /* The anchor is the button above-right of the panel (ADR-0021: the surface grows from it). */
   transform-origin: top right;
 }
