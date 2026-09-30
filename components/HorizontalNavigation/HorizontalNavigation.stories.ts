@@ -27,13 +27,14 @@ const meta: Meta<typeof HorizontalNavigation> = {
     layout: 'fullscreen',
     docs: { page: HorizontalNavigationDocs },
   },
-  // The page's column, not the bar's: the bar carries no margins of its own
-  // (ADR-0047). These are the ones Figma's shell gives it — 12 above and to
-  // the right, 8 on the sidebar's side, 12 to what follows.
+  // The page's column, not the bar's: the bar carries no margins and no ground
+  // of its own (ADR-0047). These are the ones Figma's shell gives it — 12 above
+  // and to the right, 8 on the sidebar's side, 12 to what follows — on the
+  // page's `bg-neutral`, which the current crumb rises off.
   decorators: [
     () => ({
       template: `
-        <div style="padding: var(--ds-spacing-lg) var(--ds-spacing-lg) var(--ds-spacing-lg) var(--ds-spacing-md);">
+        <div style="padding: var(--ds-spacing-lg) var(--ds-spacing-lg) var(--ds-spacing-lg) var(--ds-spacing-md); background: var(--ds-bg-neutral);">
           <story />
         </div>
       `,

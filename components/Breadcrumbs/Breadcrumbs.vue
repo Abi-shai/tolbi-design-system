@@ -365,16 +365,23 @@ function leave(): void {
   is interactive affordance (ADR-0009) and the current crumb is the one crumb
   that is not actionable — a `<span>`, not a control.
 
-  `bg-neutral` and not `bg-neutral-subtle`: hover is `bg-hover`, which aliases
-  the *same* primitive as `bg-neutral-subtle` (ADR-0033 found that collision on
-  `SideNavigation`). One step deeper keeps the two apart and puts them in the
-  right order — where you are sits lower than where you might go.
+  It is **`bg-default`, rising off the page's ground** — `SideNavigation`'s
+  pill, on the same `bg-neutral` (ADR-0033): 1.102:1 light, 1.644:1 dark, with
+  hover (`bg-hover`) between the two at 1.054 / 1.333, so ground → hover →
+  current runs one way, as in the sidebar. It was `bg-neutral`, a step *below*
+  hover, which was right on white and is the page itself in the product: the
+  bar sits on `bg-neutral` (ADR-0047), so the fill measured 1.000:1 and the
+  crumb said "you are here" with its weight alone.
+
+  That makes the ground part of the pairing, and the component supports that
+  one surface (ADR-0006): on `bg-default` a white fill vanishes. Its only
+  consumer is the bar, and the bar sits on the page.
 
   The icon takes the colour only; a glyph has no weight to give.
 */
 .ds-breadcrumbs__home--current,
 .ds-breadcrumbs__crumb--current {
-  background-color: var(--ds-bg-neutral);
+  background-color: var(--ds-bg-default);
   color: var(--ds-text-strong);
 }
 

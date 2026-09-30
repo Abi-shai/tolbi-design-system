@@ -63,12 +63,25 @@ const meta: Meta<typeof Breadcrumbs> = {
           '### L’état courant',
           '',
           'Le dernier segment est la page courante et **n’est jamais un lien**. Il n’y a qu’un',
-          'traitement pour le dire : fond `bg-neutral`, encre `text-strong` — sur la maison comme',
-          'sur un libellé.',
+          'traitement pour le dire : fond `bg-default`, encre `text-strong` — sur la maison comme',
+          'sur un libellé. Le fond **se lève du sol de la page**, `bg-neutral`, comme la pastille de',
+          '`SideNavigation` : 1,102:1 en clair, 1,644:1 en sombre. Sur du blanc il disparaîtrait,',
+          'donc le fil ne se pose que sur ce sol — les exemples ci-dessous aussi.',
         ].join('\n'),
       },
     },
   },
+  // The page's ground: the current crumb rises off it, and on white it would
+  // vanish — the one surface the component supports (ADR-0006, ADR-0047).
+  decorators: [
+    () => ({
+      template: `
+        <div style="padding: var(--ds-spacing-lg); background: var(--ds-bg-neutral); border-radius: var(--ds-radius-surface);">
+          <story />
+        </div>
+      `,
+    }),
+  ],
   argTypes: {
     items: {
       control: 'object',

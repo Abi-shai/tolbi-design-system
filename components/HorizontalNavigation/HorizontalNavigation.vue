@@ -392,7 +392,9 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   /*
     No ground and no rule, deliberately: the bar takes whatever surface sits
     behind it. The Figma frame carries no fill for the same reason — that is a
-    decision, not an omission.
+    decision, not an omission. What sits behind it is the page's `bg-neutral`,
+    and the trail is drawn for that ground: its current crumb rises off it to
+    `bg-default` (Breadcrumbs, ADR-0047).
 
     **And no padding**, for the same reason one level up: the bar sits in
     whatever margins the page gives it. The bar, the band under it and the
