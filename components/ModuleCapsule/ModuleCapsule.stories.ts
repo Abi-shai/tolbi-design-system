@@ -15,13 +15,12 @@ const meta: Meta<typeof ModuleCapsule> = {
   // Drawn in dark (ADR-0029/0031), so it opens in dark. Both modes work —
   // flip the Mode toolbar — but light is not the design this came from.
   globals: { theme: 'dark' },
-  // A capsule is bg-default and so is the page, so on its own it has no edge.
-  // Figma always sets it in the band, which is bg-neutral-subtle — these stories
-  // do the same rather than showing a capsule that cannot be seen.
+  // Set in the band, as Figma always draws it: `bg-default` with an 8px inset,
+  // the level below the capsule's own `bg-neutral-subtle` (ADR-0048).
   decorators: [
     () => ({
       template:
-        '<div style="background: var(--ds-bg-neutral-subtle); padding: var(--ds-spacing-sm);">' +
+        '<div style="background: var(--ds-bg-default); padding: var(--ds-spacing-md); border-radius: var(--ds-radius-control);">' +
         '<story /></div>',
     }),
   ],

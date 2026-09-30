@@ -14,8 +14,16 @@ import { ProgressBar } from '../ProgressBar'
  *
  * It is the first surface designed against the dark mode (ADR-0029) rather than
  * ported into it, which is why every value here is a semantic token and none is
- * a literal: `bg-neutral-subtle` for the tile, `text-subtlest` for the labels
- * that recede, `border-default` for the rules.
+ * a literal: `bg-neutral` for the tile, `text-subtle` for the labels that recede,
+ * `border-default` for the rules.
+ *
+ * **Each level is one step along the neutral ramp** (ADR-0048, Figma
+ * `1982:59871`): the band is `bg-default`, the capsule `bg-neutral-subtle`, its
+ * tile `bg-neutral`. In dark a layer rises (ADR-0029), so every surface sits
+ * above the one that holds it — 900 → 800 → 700 — and none repeats its
+ * container's container. It used to run the other way, the capsule recessed at
+ * 900 into an 800 tray and the tile back at 800: a hole punched through to the
+ * band rather than a surface on the capsule.
  */
 export type CapsuleTone = 'success' | 'error' | 'warning' | 'neutral'
 
@@ -134,7 +142,8 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
   <article class="ds-module-capsule" :aria-label="title">
     <!-- ADR-0005: the illustration is the primitive — the artwork with no tile
          of its own — and it is the right one here precisely because the capsule
-         frames it. The tile is bg-neutral-subtle, a surface of this component. -->
+         frames it. The tile is bg-neutral, a surface of this component: one step
+         up from the capsule it sits on (ADR-0048). -->
     <div class="ds-module-capsule__tile">
       <ModuleIcon :module="module" variant="illustration" :size="44" :aria-label="null" />
     </div>
@@ -260,8 +269,11 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
   width: fit-content;
   max-width: 100%;
   padding: var(--ds-spacing-md) var(--ds-spacing-lg);
-  background-color: var(--ds-bg-default);
-  border-radius: var(--ds-radius-control);
+  /* The capsule carries its own ground now, one step above the band's
+     `bg-default` — so it has an edge on the page as well as in the band. And it
+     is a surface, so it takes the surface radius, the same 12 as its tile. */
+  background-color: var(--ds-bg-neutral-subtle);
+  border-radius: var(--ds-radius-surface);
   overflow: hidden;
 }
 
@@ -272,7 +284,7 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
   height: var(--capsule-tile);
   display: grid;
   place-items: center;
-  background-color: var(--ds-bg-neutral-subtle);
+  background-color: var(--ds-bg-neutral);
   border-radius: var(--ds-radius-surface);
   overflow: hidden;
 }
@@ -305,9 +317,16 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
   width: 100%;
 }
 
+/*
+  The labels that recede take `text-subtle`, not `text-subtlest`, and the ground
+  chose it. `text-subtlest` is solved against `bg-default`: on the capsule's
+  `bg-neutral-subtle` it measures 4.76:1 in light and **4.18:1 in dark** — under
+  AA for 14px copy, in the mode the band is drawn in. `text-subtle` is 7.36 and
+  6.01. `SideNavGroup` made the same call on the same kind of ground (ADR-0046).
+*/
 .ds-module-capsule__module {
   font: var(--ds-font-body-md);
-  color: var(--ds-text-subtlest);
+  color: var(--ds-text-subtle);
   white-space: nowrap;
 }
 
@@ -332,7 +351,7 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
 
 .ds-module-capsule__attribute-label {
   font: var(--ds-font-label-lg);
-  color: var(--ds-text-subtlest);
+  color: var(--ds-text-subtle);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -387,7 +406,7 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
 }
 
 .ds-module-capsule__unit {
-  color: var(--ds-text-subtlest);
+  color: var(--ds-text-subtle);
 }
 
 .ds-module-capsule__unit--text {
@@ -431,7 +450,7 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
   flex: 1 0 0;
   min-width: 0;
   font: var(--ds-font-body-md);
-  color: var(--ds-text-subtlest);
+  color: var(--ds-text-subtle);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -473,7 +492,7 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
 .ds-module-capsule__context {
   margin: 0;
   font: var(--ds-font-body-md);
-  color: var(--ds-text-subtlest);
+  color: var(--ds-text-subtle);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -517,7 +536,7 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
 .ds-module-capsule__freshness {
   margin: 0;
   font: var(--ds-font-body-md);
-  color: var(--ds-text-subtlest);
+  color: var(--ds-text-subtle);
   white-space: nowrap;
 }
 

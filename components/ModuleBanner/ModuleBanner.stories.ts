@@ -8,12 +8,11 @@ import { Button } from '../Button'
 /**
  * Figma *Sprint 18* `1308:5261` — the band that carries the capsules.
  *
- * The band is the half of the design that is pure colour: it is
- * `bg-neutral-subtle`, every capsule inside it is `bg-default`, and that pair is
- * what gives a capsule an edge. Sampled off the Figma render, the band is
- * `#26312B` (`gray-forest/800`) and the capsules `#18201C` (`gray-forest/900`) —
- * so in dark the capsules are **recessed** into a raised tray, and in light the
- * same two tokens read as white cards in a grey one.
+ * The band is the bottom of a ramp: it is `bg-default`, every capsule inside it
+ * `bg-neutral-subtle`, every tile inside those `bg-neutral` — one step per level
+ * (ADR-0048, Figma `1982:59871`). In dark a layer rises, so the capsules sit
+ * above the band at `gray-forest/800` on `900`, their tiles at `700`; in light
+ * each level recesses by the same step.
  *
  * Switch the **Mode** toolbar to see both.
  *

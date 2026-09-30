@@ -2,17 +2,21 @@
 import { useMarquee } from '../../composables/useMarquee'
 
 /**
- * The band that carries the module capsules — Figma *Sprint 18* `1308:5261`.
+ * The band that carries the module capsules — Figma *Sprint 18* `1308:5261`,
+ * redrawn in `1982:59871`.
  *
- * It is the half of the design that is pure colour. The band is
- * `bg-neutral-subtle` and every capsule inside it is `bg-default`, so in dark the
- * tray sits at `gray-forest/800` and the capsules are **recessed** into it at
- * `900`; in light the same pair reads as white cards in a grey tray. Without the
- * band a capsule is `bg-default` on `bg-default` and has no edge at all — which
- * is exactly what a capsule rendered on its own looks like.
+ * It is the half of the design that is pure colour, and it is the bottom of a
+ * ramp: the band is `bg-default`, every capsule inside it `bg-neutral-subtle`,
+ * every tile inside those `bg-neutral` — one step per level (ADR-0048). In dark
+ * a layer rises, so the capsules sit **above** the band (900 → 800 → 700); in
+ * light each level recesses by the same step. It used to be the inverse — an
+ * 800 tray with the capsules recessed into it at 900 — and a capsule had no edge
+ * outside it.
  *
- * Square corners on purpose: sampled at every corner of the Figma render, the
- * fill runs to the pixel. It is a full-bleed band across the page, not a card.
+ * Corners and an 8px inset now, where it was square and 6px: the band no longer
+ * runs across the page. It sits in the page's column, whose margins it shares
+ * with the bar above it (ADR-0047), so it is a surface in that column — and the
+ * inset matches the 8px the capsules keep between themselves.
  *
  * Pair it with `RevealTransition` for the entrance the product gives it: the
  * band opens its own height once the data arrives.
@@ -75,10 +79,11 @@ const { container, content, pause, resume, startDrag, drag, endDrag, isDragging,
 .ds-module-banner {
   display: flex;
   align-items: stretch;
-  /* 6px, both — the band's only geometry. */
-  gap: var(--ds-spacing-sm);
-  padding: var(--ds-spacing-sm);
-  background-color: var(--ds-bg-neutral-subtle);
+  /* 8px, both — the band's only geometry. */
+  gap: var(--ds-spacing-md);
+  padding: var(--ds-spacing-md);
+  background-color: var(--ds-bg-default);
+  border-radius: var(--ds-radius-control);
 }
 
 .ds-module-banner--scroll {
@@ -123,14 +128,17 @@ const { container, content, pause, resume, startDrag, drag, endDrag, isDragging,
 .ds-module-banner__track {
   display: flex;
   align-items: stretch;
-  gap: var(--ds-spacing-sm);
+  gap: var(--ds-spacing-md);
   width: max-content;
 }
 
+/* The same gap as the band's, between capsules and between the two runs: the
+   loop wraps by subtracting half the track, so a seam wider or narrower than
+   the rhythm shows up as a jump. */
 .ds-module-banner__run {
   display: flex;
   align-items: stretch;
-  gap: var(--ds-spacing-sm);
+  gap: var(--ds-spacing-md);
 }
 
 .ds-module-banner__run > :deep(*) {
