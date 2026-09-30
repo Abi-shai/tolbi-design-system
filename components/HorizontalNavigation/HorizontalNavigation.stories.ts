@@ -27,6 +27,18 @@ const meta: Meta<typeof HorizontalNavigation> = {
     layout: 'fullscreen',
     docs: { page: HorizontalNavigationDocs },
   },
+  // The page's column, not the bar's: the bar carries no margins of its own
+  // (ADR-0047). These are the ones Figma's shell gives it — 12 above and to
+  // the right, 8 on the sidebar's side, 12 to what follows.
+  decorators: [
+    () => ({
+      template: `
+        <div style="padding: var(--ds-spacing-lg) var(--ds-spacing-lg) var(--ds-spacing-lg) var(--ds-spacing-md);">
+          <story />
+        </div>
+      `,
+    }),
+  ],
   argTypes: {
     module: {
       control: 'select',
@@ -212,7 +224,7 @@ export const EveryModule: Story = {
     components: { HorizontalNavigation },
     setup: () => ({ args, all: ALL_MODULES }),
     template: `
-      <div>
+      <div style="display: flex; flex-direction: column; gap: var(--ds-spacing-lg);">
         <HorizontalNavigation v-bind="args" :breadcrumbs="[]" />
         <HorizontalNavigation
           v-for="m in all"
@@ -238,7 +250,7 @@ export const HomeLabel: Story = {
     components: { HorizontalNavigation },
     setup: () => ({ args, labels: [undefined, 'Accueil', 'Revenir sur l\u2019accueil'] }),
     template: `
-      <div>
+      <div style="display: flex; flex-direction: column; gap: var(--ds-spacing-lg);">
         <HorizontalNavigation
           v-for="(l, i) in labels"
           :key="i"

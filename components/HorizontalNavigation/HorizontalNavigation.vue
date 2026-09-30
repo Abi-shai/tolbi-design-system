@@ -280,7 +280,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
       </Transition>
     </div>
 
-    <!-- ── Droite : crédits + actions + avatar ────────────────────────── -->
+    <!-- ── Droite : crédits + actions (l'avatar compris) ──────────────── -->
     <div class="ds-hnav__right">
 
       <!-- Crédits -->
@@ -291,7 +291,11 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
         @click="emit('credits')"
       />
 
-      <!-- Actions -->
+      <!--
+        Actions — **one** block, the avatar included. It stood 16px apart, a
+        third block of one element; Figma closes the actions with it
+        (1982:57462), on the 8px the four controls before it already keep.
+      -->
       <div class="ds-hnav__actions">
 
         <!-- The real Button, not a re-implementation (ADR-0001). `lg-compact`
@@ -367,12 +371,12 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
             />
           </SurfaceTransition>
         </div>
-      </div>
 
-      <!-- Avatar utilisateur -->
-      <button class="ds-hnav__user" @click="emit('user')" :aria-label="`Profil ${userInitials}`">
-        <Avatar size="md" :initials="userInitials" />
-      </button>
+        <!-- Avatar utilisateur — the last of the controls, not a block of its own -->
+        <button class="ds-hnav__user" @click="emit('user')" :aria-label="`Profil ${userInitials}`">
+          <Avatar size="md" :initials="userInitials" />
+        </button>
+      </div>
     </div>
   </header>
 </template>
@@ -389,8 +393,15 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
     No ground and no rule, deliberately: the bar takes whatever surface sits
     behind it. The Figma frame carries no fill for the same reason — that is a
     decision, not an omission.
+
+    **And no padding**, for the same reason one level up: the bar sits in
+    whatever margins the page gives it. The bar, the band under it and the
+    page's content share one left edge and one right edge, so the margins are
+    the column's — the product's shell holds all three — and not one of its
+    rows'. With its own 16px, the bar's edges sat 16px inside everyone else's.
+    Figma draws it that way (1982:57462): the bar is 0 all round, in a column of
+    12 / 12 / 0 / 8 with a 12px gap (ADR-0047).
   */
-  padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
   overflow: visible;
 }
 
@@ -439,10 +450,13 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
     downscale at all, so it is where the drawings are sharpest.
 
     What it costs is the bar's height. 48 is the one thing here taller than the
-    40px avatar, so the bar is **72px** rather than ADR-0028's 64 — on every
-    page, including pages with no module, because the slot's floor is 48 in both
-    forms. That is deliberate: a bar that changed height on navigation would be
-    the real defect.
+    40px avatar, so the bar is **48px** — a 72px row once its column's 12 above
+    and 12 below are counted, where ADR-0028's was 64 — on every page, including
+    pages with no module, because the slot's floor is 48 in both forms. That is
+    deliberate: a bar that changed height on navigation would be the real
+    defect. It is also the side navigation's header row (`--side-nav-header-row`),
+    so a shell that starts both columns at the same height puts the two on one
+    line (ADR-0047).
   */
   --hnav-mark: 48px;
 
@@ -584,6 +598,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 }
 
 /* ── Droite ───────────────────────────────────────────────────────── */
+/* `spacing-xl` between the two blocks — the credits, and the controls. */
 .ds-hnav__right {
   display: flex;
   align-items: center;
@@ -592,6 +607,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 }
 
 /* ── Actions ──────────────────────────────────────────────────────── */
+/* `spacing-md` from the CTA to the avatar: one rhythm for every control. */
 .ds-hnav__actions {
   display: flex;
   align-items: center;

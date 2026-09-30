@@ -82,15 +82,18 @@ const forecast = [
     </ol>
 
     <!-- ── Top bar — HorizontalNavigation, straight from the system ────── -->
-    <HorizontalNavigation
-      state="Project"
-      :breadcrumbs="[{ label: 'Projets' }, { label: 'hefd', active: true }]"
-      :credits="0"
-      credit-state="empty"
-      credit-context="project"
-      user-initials="MD"
-      has-notification
-    />
+    <!-- The screen's margins, which the bar no longer carries (ADR-0047). -->
+    <div class="screen__bar">
+      <HorizontalNavigation
+        state="Project"
+        :breadcrumbs="[{ label: 'Projets' }, { label: 'hefd', active: true }]"
+        :credits="0"
+        credit-state="empty"
+        credit-context="project"
+        user-initials="MD"
+        has-notification
+      />
+    </div>
 
     <div class="screen__body">
       <!-- ── Left rail ─────────────────────────────────────────────────── -->
@@ -264,6 +267,8 @@ const forecast = [
   background-color: var(--ds-bg-neutral-subtle);
   font-family: var(--ds-typography-font-family-poppins);
 }
+
+.screen__bar { padding: var(--ds-spacing-lg) var(--ds-spacing-xl); }
 
 .screen__body { display: flex; flex: 1 1 auto; min-height: 0; }
 
