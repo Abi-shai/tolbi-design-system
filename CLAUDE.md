@@ -545,7 +545,10 @@ Before working on any component, read:
   **last of the controls** on one `spacing-md` rhythm, no longer a block of one; the credits chip stays
   `spacing-xl` before them — the frame hides it, and a hidden layer is not a deletion. The bar is
   **48**, not the frame's 40: ADR-0042's floor, and `SideNavigation`'s header row, so both columns
-  starting 12px down share one line (12 → 60) and the row is still 72.
+  starting 12px down share one line (12 → 60) and the row is still 72. **Amended**: the current crumb
+  is `bg-default` — the page is `bg-neutral`, so the old `bg-neutral` fill measured 1.000:1; it is
+  `SideNavigation`'s pill on the same ground (1.102 / 1.644:1), and `Breadcrumbs` supports that one
+  surface (ADR-0006) — its stories and the bar's draw on it.
 
 ## Architecture
 

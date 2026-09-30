@@ -250,10 +250,15 @@ main (ADR-0001). La prop `breadcrumbs` est un tableau d'objets `{ label, href? }
 Le **dernier** segment est le segment courant, par position. `active` a disparu — un drapeau par
 élément permettait à un fil d'avoir zéro ou deux segments courants (ADR-0024).
 
-Il n'y a **qu'un traitement** pour dire « tu es ici » : fond `bg-neutral`, encre `text-strong`,
+Il n'y a **qu'un traitement** pour dire « tu es ici » : fond `bg-default`, encre `text-strong`,
 plus Poppins SemiBold quand c'est un libellé. Sur `Accueil` le courant est **la maison**, et elle
 prend le même. C'est d'ailleurs elle qui impose le fond : seule, elle n'a aucun voisin contre
 lequel un poids ou une couleur contrasterait.
+
+Le fond **se lève du sol de la page** — la pastille de `SideNavigation`, sur le même `bg-neutral` :
+1,102:1 en clair, 1,644:1 en sombre, et le survol reste entre les deux. Il était `bg-neutral`, juste
+sous le survol : juste sur du blanc, et dans le produit c'était la page elle-même — 1,000:1, le
+maillon courant ne se distinguait plus que par son poids (ADR-0047).
 
 La maison (icône `house`) est la racine dès qu'il y a un fil, et émet `home` au clic — **pas**
 `learn` : les deux partageaient le même évènement, donc cliquer sur l'accueil ouvrait le centre

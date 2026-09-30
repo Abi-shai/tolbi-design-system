@@ -88,6 +88,27 @@ Chromium, `Navigation/HorizontalNavigation` → *Accueil*, 1180px wide (the fram
   avatar centred at 36.
 - At 1440px, in a module: the same geometry, the mark 48 × 48 at (8, 12).
 
+## Amended the same day: the current crumb rises off the page's ground
+
+Seen in the product, the trail's current crumb had **no fill at all**. It was `bg-neutral`, and so is
+the page the bar sits on: 1.000:1, with "you are here" said by the crumb's weight alone. The fill had
+been chosen on white, one step below hover so that *where you are sits lower than where you might
+go* — true in Storybook, whose stories drew on white, and false wherever the bar actually is.
+
+It is now **`bg-default`**, which is `SideNavigation`'s pill on the same ground (ADR-0033): 1.102:1
+light and 1.644:1 dark, with `bg-hover` between ground and fill (1.054 / 1.333). Ground → hover →
+current runs one way, as it does in the sidebar, and the page has one idiom for "you are here"
+instead of two. The ink stays `text-strong`, 17.75:1 on the fill and 12.58:1 in dark.
+
+That makes the ground part of the pairing, so `Breadcrumbs` supports **one surface** (ADR-0006): on
+`bg-default` the fill would vanish. Its only consumer is the bar, and the bar sits on the page. Both
+components' stories now draw on `bg-neutral` — the bar's decorator is the page's column with its
+ground, the trail's a `bg-neutral` panel. Drawing on white is also what hid the defect: the stories
+showed a grey pill the product never did.
+
+Measured, *Yield — 5 nœuds*: `Dashboard` 95.5 × 28, `rgb(255 255 255)` on `rgb(242 244 247)`, hover
+`rgb(249 250 251)`; dark `rgb(24 32 28)` on `rgb(54 69 61)`, hover `rgb(38 49 43)`.
+
 ## Still open
 
 - **The credits chip.** Hidden in the frame, kept in code. If the balance leaves the bar,
