@@ -528,7 +528,11 @@ Before working on any component, read:
   contexts, each load-bearing, found by switching them off: the panel at 0 keeps the rail's tooltips
   over its raised rows, the rail at `z-raised` keeps the toggle clickable over the panel's head.
   `SideNavGroup` titles a run of rows in `label-md` **`text-subtle`** — `text-subtlest` is 3.13:1 in
-  dark.
+  dark. **Amended the same day**, from a film at a tenth of the speed: the close snapped the page
+  **200px in one frame** because the open width was left to the content and `width: auto` → `68px`
+  does not interpolate — the width is now declared in both states; and the panel's contents are
+  **anchored to its right edge**, so they slide under the rail as a drawer instead of being wiped in
+  place while the toggle crossed the title (gap 119 → −81px, now a constant 119).
 
 ## Architecture
 

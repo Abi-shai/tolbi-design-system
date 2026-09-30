@@ -151,6 +151,23 @@ no selection and **no position**: its rows still register with the list above it
 unpositioned group keeps their `offsetTop` measured from that list. In a rail the title leaves the
 screen and stays announced.
 
+## Amended the same day: the column's width, and a drawer
+
+The close was "really off", and a film at a tenth of the speed said why, twice over:
+
+- **The page jumped 200px in one frame.** The two-level column declared only its *ceiling* and left
+  its open width to the content; closing then put `width: auto` → `68px` on it, and `auto` does not
+  interpolate — the box snapped to the rail on the first frame while the panel inside was still
+  closing, and the page slid over it. Opening never showed it: there the width goes back to `auto`
+  and the ceiling, which does travel, is what bounds it. The width is now declared in both states,
+  beside the ceiling: measured, the page's edge sits on the column's edge on every frame, and the
+  largest step of any edge is 24.6px — the width's own speed — where the page's was 200.
+- **The toggle crossed the title.** Wiped in place by the closing edge, the panel's contents stood
+  still while the toggle rode that edge across them — the gap between the toggle and the title ran
+  119 → −81px. The contents are now anchored to the panel's right edge, so they slide under the rail
+  with it, a drawer (`easing-in-out`'s own description): the gap holds at 118–119px, 0 reversals on
+  the page, the column, the panel, the toggle and the title.
+
 ## Measured
 
 Live, Chromium at 1280×800, `Navigation/SideNavigation` → *Deux niveaux*:
