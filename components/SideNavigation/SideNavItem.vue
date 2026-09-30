@@ -69,8 +69,30 @@ const current   = computed(() => group?.current.value ?? 'page')
 const isLink = computed(() => !!props.href && !props.disabled)
 const tag = computed(() => (isLink.value ? 'a' : 'button'))
 
-const hovered = ref(false)
-const showTip = computed(() => collapsed.value && hovered.value && !!props.label)
+/**
+ * Pointer and focus are kept apart because they no longer answer the same way.
+ * In the rail of a collapsed two-level column, pointing at a section floats its
+ * pages beside the row (ADR-0047) — and that panel carries the label as its
+ * title, so the tooltip would only stack on top of it. Focus still gets the
+ * tooltip: the floated pages are a pointer shortcut, and the keyboard's way to
+ * a page is the panel itself, one toggle away.
+ */
+const pointer = ref(false)
+const focused = ref(false)
+const floats = computed(() => group?.flyoutFor?.(key.value) ?? false)
+const peeked = computed(() => !!group?.peek?.value && group.peek.value === key.value)
+const showTip = computed(() =>
+  collapsed.value && !!props.label && (pointer.value ? !floats.value : focused.value),
+)
+
+function onEnter() {
+  pointer.value = true
+  if (el.value) group?.hover?.(key.value, el.value)
+}
+function onLeave() {
+  pointer.value = false
+  group?.hover?.(key.value, null)
+}
 
 function handleClick(event: MouseEvent) {
   if (props.disabled) { event.preventDefault(); return }
@@ -84,8 +106,8 @@ function handleClick(event: MouseEvent) {
     ref="el"
     class="ds-side-nav-item"
     :class="{ 'ds-side-nav-item--collapsed': collapsed }"
-    @mouseenter="hovered = true"
-    @mouseleave="hovered = false"
+    @mouseenter="onEnter"
+    @mouseleave="onLeave"
   >
     <component
       :is="tag"
@@ -99,10 +121,11 @@ function handleClick(event: MouseEvent) {
         'ds-side-nav-item__control',
         selected && 'ds-side-nav-item__control--selected',
         disabled && 'ds-side-nav-item__control--disabled',
+        peeked && 'ds-side-nav-item__control--peeked',
       ]"
       @click="handleClick"
-      @focus="hovered = true"
-      @blur="hovered = false"
+      @focus="focused = true"
+      @blur="focused = false"
     >
       <Icon
         v-if="icon"
@@ -230,7 +253,10 @@ function handleClick(event: MouseEvent) {
 }
 
 /* ── States ───────────────────────────────────────────────────────── */
-.ds-side-nav-item__control:hover:not(.ds-side-nav-item__control--selected):not(.ds-side-nav-item__control--disabled) {
+/* A row whose pages are floating keeps the hover it was opened from while the
+   pointer is over the panel — the same state, not a new one (ADR-0047). */
+.ds-side-nav-item__control:hover:not(.ds-side-nav-item__control--selected):not(.ds-side-nav-item__control--disabled),
+.ds-side-nav-item__control--peeked:not(.ds-side-nav-item__control--selected):not(.ds-side-nav-item__control--disabled) {
   background-color: var(--ds-bg-hover);
   color: var(--ds-text-strong);
 }

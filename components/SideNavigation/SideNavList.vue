@@ -19,6 +19,14 @@ export interface SideNavListProps {
    * (ADR-0037).
    */
   animate?: boolean
+  /**
+   * Whether pointing at an item floats its section's pages. Passed down by the
+   * rail of a collapsed two-level column; a query, so a prop rather than an
+   * event (ADR-0047).
+   */
+  flyoutFor?: (value: string) => boolean
+  /** The item whose section's pages are floating beside it. */
+  peek?: string | null
 }
 </script>
 
@@ -55,10 +63,14 @@ const props = withDefaults(defineProps<SideNavListProps>(), {
   collapsed: false,
   current: 'page',
   animate: true,
+  flyoutFor: undefined,
+  peek: null,
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
+  /** The pointer entered (`el`) or left (`null`) an item. */
+  hover: [value: string, el: HTMLElement | null]
 }>()
 
 const values = ref<string[]>([])
@@ -87,6 +99,9 @@ const context: SideNavigationContext = {
   isSelected: (value) => value === props.modelValue,
   collapsed: toRef(props, 'collapsed'),
   current: toRef(props, 'current'),
+  hover: (value, el) => emit('hover', value, el),
+  flyoutFor: (value) => props.flyoutFor?.(value) ?? false,
+  peek: toRef(props, 'peek'),
 }
 provide(SIDE_NAVIGATION_KEY, context)
 
@@ -95,7 +110,10 @@ watch(values, async () => { await nextTick(); measure() }, { deep: true })
 /** The selected item's label — what titles the panel beside the rail. */
 const activeLabel = computed(() => labels.value[activeIndex.value]?.())
 
-defineExpose({ measure, reducedMotion, activeLabel })
+/** Any item's label — what titles the pages floated beside it. */
+const labelOf = (value: string) => labels.value[values.value.indexOf(value)]?.()
+
+defineExpose({ measure, reducedMotion, activeLabel, labelOf })
 </script>
 
 <template>

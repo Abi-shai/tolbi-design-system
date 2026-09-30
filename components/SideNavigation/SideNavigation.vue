@@ -4,6 +4,7 @@ import {
   type VNode,
 } from 'vue'
 import { IconButton } from '../IconButton'
+import { SurfaceTransition } from '../SurfaceTransition'
 import SideNavList from './SideNavList.vue'
 
 /**
@@ -93,6 +94,7 @@ interface ListHandle {
   measure: () => void
   reducedMotion: boolean
   activeLabel: string | undefined
+  labelOf: (value: string) => string | undefined
 }
 
 /** The rail's list: its selection, its pill, and the label that titles the panel. */
@@ -121,11 +123,19 @@ function hasContent(nodes: VNode[] | undefined): boolean {
 }
 
 /**
- * The selected section has pages. Evaluated while rendering, so the slot's own
- * reads — the section the consumer switches on — are tracked by this computed
- * and it re-runs when they change.
+ * Whether a section has pages. The slot is **a function of the section**
+ * (`#panel="{ section }"`), because the rail can ask it about a section other
+ * than the selected one — the one the pointer is on (ADR-0047).
  */
-const hasPanel = computed(() => !!slots.panel && hasContent(slots.panel({})))
+function pagesOf(section: string | undefined): boolean {
+  return !!slots.panel && section !== undefined && hasContent(slots.panel({ section }))
+}
+
+/**
+ * The selected section has pages. Evaluated while rendering, so the slot's own
+ * reads are tracked by this computed and it re-runs when they change.
+ */
+const hasPanel = computed(() => pagesOf(props.modelValue))
 
 /**
  * The rail's form: icon-only when the column is collapsed, and always once
@@ -152,6 +162,132 @@ const hasHeader = computed(() => !!slots.header || showToggle.value)
  */
 const panelTitle = computed(() => railList.value?.activeLabel ?? '')
 const titleId = `${useId()}-panel`
+
+/* ── Pages beside the collapsed rail ───────────────────────────────── */
+
+/**
+ * The section whose pages float beside the collapsed rail, or none. Every
+ * two-level product that shows its collapse keeps the sections and hides the
+ * pages (Sentry, Intercom, HubSpot) — and HubSpot answers the obvious cost, a
+ * page two clicks away, by floating the section's pages beside the row the
+ * pointer is on. The rail's icons never change meaning (ADR-0047).
+ */
+const peek = ref<string | null>(null)
+const peekTop = ref(0)
+const peekOrigin = ref('0px 0px')
+const flyoutEl = ref<HTMLElement>()
+const flyoutTitleId = `${titleId}-flyout`
+let peekAnchor: HTMLElement | null = null
+let openTimer: ReturnType<typeof setTimeout> | undefined
+let closeTimer: ReturnType<typeof setTimeout> | undefined
+
+const flyoutEnabled = computed(() => tiered.value && props.collapsed)
+const flyoutFor = (value: string) => flyoutEnabled.value && pagesOf(value)
+const peekLabel = computed(() => (peek.value ? railList.value?.labelOf(peek.value) ?? '' : ''))
+
+/**
+ * A duration off the cascade, used as a **delay** — ADR-0032's "a delay is a
+ * duration in another slot", so no delay token. Read rather than repeated,
+ * like the column's travel.
+ */
+function durationMs(token: string) {
+  const el = navRef.value
+  if (!el) return 0
+  const v = getComputedStyle(el).getPropertyValue(token).trim()
+  const n = parseFloat(v)
+  if (Number.isNaN(n)) return 0
+  return v.endsWith('ms') ? n : n * 1000
+}
+
+/**
+ * Opening waits `quick` — "responds before you finish the gesture" is the
+ * scale's own words for it — so a pointer sweeping down the rail does not
+ * flash a panel at every row. Once one is open, the next row switches at once,
+ * the way a menu bar does: the intent was already shown.
+ *
+ * Closing waits `moderate`, the grace a pointer needs to cross the 8px between
+ * the row and the panel (the tooltip's own offset) without the panel leaving
+ * under it.
+ */
+function onItemHover(value: string, el: HTMLElement | null) {
+  if (!flyoutEnabled.value) return
+  clearTimeout(openTimer)
+  clearTimeout(closeTimer)
+  if (!el) {
+    closeTimer = setTimeout(closePeek, durationMs('--ds-motion-duration-moderate'))
+    return
+  }
+  // A section without pages keeps its tooltip, and closes any open panel at
+  // once — a panel lingering beside the wrong row would be a wrong answer.
+  if (!pagesOf(value)) { closePeek(); return }
+  if (peek.value) { void openPeek(value, el); return }
+  openTimer = setTimeout(() => { void openPeek(value, el) }, durationMs('--ds-motion-duration-quick'))
+}
+
+function onFlyoutEnter() { clearTimeout(closeTimer) }
+function onFlyoutLeave() {
+  closeTimer = setTimeout(closePeek, durationMs('--ds-motion-duration-moderate'))
+}
+
+async function openPeek(value: string, el: HTMLElement) {
+  peek.value = value
+  peekAnchor = el
+  await nextTick()
+  placePeek()
+}
+
+function closePeek() {
+  clearTimeout(openTimer)
+  clearTimeout(closeTimer)
+  peek.value = null
+  peekAnchor = null
+}
+
+/**
+ * Title row level with the row it floats from — the panel's padding above it,
+ * exactly where the docked panel's title sits beside the rail's first row —
+ * and kept inside the column when the row is near its foot. The origin is the
+ * row's centre, so the surface grows out of the icon (ADR-0021: the consuming
+ * surface sets its own `transform-origin`).
+ */
+function placePeek() {
+  const nav = navRef.value
+  const box = flyoutEl.value
+  if (!nav || !box || !peekAnchor) return
+  const navRect = nav.getBoundingClientRect()
+  const row = peekAnchor.getBoundingClientRect()
+  // The contour counts: measured, padding alone left the title 1px below the row.
+  const cs = getComputedStyle(box)
+  const pad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.borderTopWidth) || 0)
+  const ideal = row.top - navRect.top - pad
+  const top = Math.max(pad, Math.min(ideal, nav.clientHeight - box.offsetHeight - pad))
+  peekTop.value = top
+  peekOrigin.value = `0px ${row.top - navRect.top + row.height / 2 - top}px`
+}
+
+/** A page chosen from the floated panel is a section and a page at once. */
+function pickFromFlyout(page: string) {
+  if (!peek.value) return
+  emit('update:modelValue', peek.value)
+  emit('update:page', page)
+  closePeek()
+}
+
+function selectSection(value: string) {
+  emit('update:modelValue', value)
+  closePeek()
+}
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && peek.value) closePeek()
+}
+
+watch(peek, (open, was) => {
+  if (open && !was) document.addEventListener('keydown', onKeydown)
+  if (!open && was) document.removeEventListener('keydown', onKeydown)
+})
+
+watch(() => props.collapsed, () => closePeek())
 
 /**
  * True while the **column itself** is travelling, and the reason the indicator
@@ -261,7 +397,11 @@ watch(() => props.collapsed, async () => {
   travelTimer = setTimeout(() => { travelling.value = false }, travelMs())
 })
 
-onBeforeUnmount(() => { clearTimeout(travelTimer) })
+onBeforeUnmount(() => {
+  clearTimeout(travelTimer)
+  closePeek()
+  document.removeEventListener('keydown', onKeydown)
+})
 </script>
 
 <template>
@@ -303,7 +443,10 @@ onBeforeUnmount(() => { clearTimeout(travelTimer) })
         :collapsed="railForm"
         :current="tiered ? 'true' : 'page'"
         :animate="!travelling"
-        @update:model-value="emit('update:modelValue', $event)"
+        :flyout-for="flyoutFor"
+        :peek="peek"
+        @update:model-value="selectSection"
+        @hover="onItemHover"
       >
         <slot />
       </SideNavList>
@@ -331,11 +474,38 @@ onBeforeUnmount(() => { clearTimeout(travelTimer) })
             :model-value="page"
             @update:model-value="emit('update:page', $event)"
           >
-            <slot name="panel" />
+            <slot name="panel" :section="modelValue" />
           </SideNavList>
         </template>
       </div>
     </div>
+
+    <!-- The pages of the section under the pointer, floated beside the
+         collapsed rail. A surface that floats, so the house entrance
+         (ADR-0021): `enter` + `easing-out` from 96%, `exit` + `easing-in`. -->
+    <SurfaceTransition>
+      <div
+        v-if="peek"
+        ref="flyoutEl"
+        class="ds-side-nav__flyout"
+        :style="{ top: `${peekTop}px`, transformOrigin: peekOrigin }"
+        @mouseenter="onFlyoutEnter"
+        @mouseleave="onFlyoutLeave"
+      >
+        <div class="ds-side-nav__panel-head ds-side-nav__panel-head--flyout">
+          <span :id="flyoutTitleId" class="ds-side-nav__panel-title">{{ peekLabel }}</span>
+        </div>
+        <SideNavList
+          :key="peek"
+          role="group"
+          :aria-labelledby="flyoutTitleId"
+          :model-value="peek === modelValue ? page : undefined"
+          @update:model-value="pickFromFlyout"
+        >
+          <slot name="panel" :section="peek" />
+        </SideNavList>
+      </div>
+    </SurfaceTransition>
   </nav>
 </template>
 
@@ -722,6 +892,47 @@ onBeforeUnmount(() => { clearTimeout(travelTimer) })
   white-space: nowrap;
   font: var(--ds-font-heading-md);
   color: var(--ds-text-strong);
+}
+
+/* ── Pages beside the collapsed rail ──────────────────────────────── */
+/*
+  **The panel, lifted** — not a new surface. Same width, same padding, same
+  ground and the same rows, so the pill and the hover read exactly as they do
+  docked: on `bg-default` the white pill would vanish and `bg-hover` would be
+  1.04:1. What floats is the chrome every floating surface in the catalogue
+  carries — `elevation-overlay`, a contour, `z-popover` — with `radius-surface`,
+  the value `ModulesList`'s panel already takes for a panel of content.
+
+  The contour is `border-default`, where `Dropdown` takes `border-subtle`: on
+  `bg-neutral` the subtle step reads as nothing (ADR-0034), and in dark, where
+  elevation stops separating (ADR-0030), the contour is what is left.
+
+  It sits the tooltip's 8px beside the row — the rail's edge, less its padding,
+  plus `spacing-md`. `top` and the origin are placed from the row in JS; the
+  entrance's scale is SurfaceTransition's stylesheet `transform`, which nothing
+  here writes inline (HelpIcon's lesson).
+*/
+.ds-side-nav__flyout {
+  position: absolute;
+  left: calc(var(--side-nav-rail) - var(--ds-spacing-xl) + var(--ds-spacing-md));
+  z-index: var(--ds-z-popover);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-3xl);
+  width: var(--side-nav-panel);
+  max-height: calc(100% - 2 * var(--ds-spacing-lg));
+  padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
+  box-sizing: border-box;
+  overflow-y: auto;
+  background-color: var(--ds-bg-neutral);
+  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  border-radius: var(--ds-radius-surface);
+  box-shadow: var(--ds-elevation-overlay);
+}
+
+/* No toggle drawn over this title row, so no room held for one. */
+.ds-side-nav__panel-head--flyout {
+  padding-right: 0;
 }
 
 /* The rail is still the rail when it arrives without travelling, so nothing is
