@@ -549,6 +549,13 @@ Before working on any component, read:
   is `bg-default` — the page is `bg-neutral`, so the old `bg-neutral` fill measured 1.000:1; it is
   `SideNavigation`'s pill on the same ground (1.102 / 1.644:1), and `Breadcrumbs` supports that one
   surface (ADR-0006) — its stories and the bar's draw on it.
+- **ADR-0048**: the module band is a **ramp, one step per level** — band `bg-default` → capsule
+  `bg-neutral-subtle` (`radius-surface`) → tile `bg-neutral` (Figma `1982:59871`), reversing ADR-0031's
+  recessed capsules: in dark each surface now rises above its container (900 → 800 → 700) and none
+  repeats its container's container, so a capsule has an edge of its own. The band gains corners
+  (`radius-control`) and an 8px inset and gap — it sits in the page's column now (ADR-0047) — and the
+  marquee's runs keep that gap. On the raised ground `text-subtlest` is **4.18:1 in dark**, so the
+  capsule's receding ink is `text-subtle` (ADR-0046's call), where the frame kept subtlest.
 
 ## Architecture
 
