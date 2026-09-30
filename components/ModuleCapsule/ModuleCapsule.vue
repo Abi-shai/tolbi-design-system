@@ -255,10 +255,10 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
 /* The capsule is 90px tall and its content band is 74px — the 90 less the 8px
    padding twice. Every column centres inside that band and the rules span it,
    which is why the number is named once here rather than repeated six times.
+   The tile is the band too, square: everything on the row is one height.
    token-lint-disable no-literal-dimension-js — a derived geometry, not a scale value */
 .ds-module-capsule {
   --capsule-band: 74px;
-  --capsule-tile: 64px;
 
   display: flex;
   align-items: center;
@@ -268,7 +268,11 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
      caller's decision: set `width: 100%` on the instance. */
   width: fit-content;
   max-width: 100%;
-  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
+  /* `spacing-md` on all four sides: the tile is the band's height, so the inset
+     around it is the same 8px every way, where it was 12 at the sides — the
+     capsule's edge hugs its tile rather than holding it off (ADR-0048,
+     amended; Figma 1982:59956). */
+  padding: var(--ds-spacing-md);
   /* The capsule carries its own ground now, one step above the band's
      `bg-default` — so it has an edge on the page as well as in the band. And it
      is a surface, so it takes the surface radius, the same 12 as its tile. */
@@ -278,10 +282,13 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
 }
 
 /* ── The module ───────────────────────────────────────────────────── */
+/* 74 square — the band, where it was a 64px tile centred in it. The drawing
+   stays 44, so its margin grows from 10 to 15: the tile gives the art room,
+   the art does not grow to fill it. */
 .ds-module-capsule__tile {
   flex: none;
-  width: var(--capsule-tile);
-  height: var(--capsule-tile);
+  width: var(--capsule-band);
+  height: var(--capsule-band);
   display: grid;
   place-items: center;
   background-color: var(--ds-bg-neutral);
