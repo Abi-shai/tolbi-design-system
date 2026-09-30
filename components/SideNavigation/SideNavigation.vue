@@ -574,20 +574,26 @@ onBeforeUnmount(() => { clearTimeout(travelTimer) })
   keeps the 12/16 it always had, the panel takes the same, so both levels hang
   their contents on one margin.
 
-  The ceiling follows what is open — rail alone, or rail and panel — and it is
-  what holds against a shell that sets `width: 100%`, for the reason the base
-  rule gives. It travels with the panel on the same curve, so the column's edge
-  and the panel's edge are one edge.
+  The width follows what is open — rail alone, or rail and panel — and it is
+  **declared in both states**, with the ceiling beside it for the reason the
+  base rule gives. It was the ceiling alone at first, the open width left to
+  the content: filmed at a tenth of the speed, closing put `width: auto` →
+  `68px` on the column — `auto` does not interpolate — so the box snapped to
+  the rail on the first frame and the page slid over a panel still closing
+  underneath it. Two lengths travel; `auto` jumps. Declared, the column's edge
+  and the panel's edge move as one edge, on one curve.
 */
 .ds-side-nav--tiered {
   flex-direction: row;
   gap: 0;
   padding: 0;
   flex: none;
+  width: var(--side-nav-rail);
   max-width: var(--side-nav-rail);
 }
 
 .ds-side-nav--tiered.ds-side-nav--panel-open {
+  width: calc(var(--side-nav-rail) + var(--side-nav-panel));
   max-width: calc(var(--side-nav-rail) + var(--side-nav-panel));
 }
 
@@ -644,7 +650,12 @@ onBeforeUnmount(() => { clearTimeout(travelTimer) })
   exactly 167.
 
   **Opening and closing is a width that travels.** The inner box keeps the open
-  width throughout and is clipped, so no row reflows or re-truncates on the way;
+  width throughout and is clipped, so no row reflows or re-truncates on the way,
+  and it is **anchored to the panel's right edge** (`align-self: flex-end`
+  below), so it travels with that edge and slides under the rail — a drawer —
+  rather than being wiped in place. Wiped, the toggle riding the edge crossed
+  the fading title: measured, the gap between the two ran 119 → −81px. Anchored,
+  it holds at 119 the whole way;
   the border travels to zero with it, or a 1px line would outlive the panel at
   the rail's edge; and `visibility` lands at the end of the close — which is
   also what takes the closed panel's rows out of the tab order and the
@@ -688,6 +699,7 @@ onBeforeUnmount(() => { clearTimeout(travelTimer) })
   flex-direction: column;
   gap: var(--ds-spacing-3xl);
   flex: 1 1 auto;
+  align-self: flex-end;
   min-height: 0;
   width: calc(var(--side-nav-panel) - var(--ds-border-width-default));
   padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
