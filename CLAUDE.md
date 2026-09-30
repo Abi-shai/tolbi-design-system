@@ -518,8 +518,12 @@ Before working on any component, read:
   page on every section) with its own `v-model:page`. `collapsed` closes the panel and nothing else.
   Two selections need two `provide` scopes, so the list became an internal **`SideNavList`** both
   levels use (one owner of the pill), keyed by section so the pill never slides between two lists;
-  `aria-current` is **`true` on the section, `page` on the page**. The title is **read off the rail**,
-  never a prop (ADR-0042). The toggle is **drawn** in the panel's title row — still the rail header's
+  `aria-current` is **`true` on the section, `page` on the page**. The title is **read off the rail**
+  by default (ADR-0042) — **amended**: a declared title (`panelTitle`, `#panel-title` falling back to
+  it) is legitimate when it names **what the rail does not carry** (the project the pages belong to),
+  never when it repeats the section; the row — geometry, one-line truncation, the toggle over it, the
+  group's name — stays the component's. `panelTitleLoading` puts a `strong` skeleton there, because
+  `Skeleton`'s default base *is* the panel's ground and would not show. The toggle is **drawn** in the panel's title row — still the rail header's
   child, absolutely placed, so collapsing never remounts it — and rides the closing edge home. It
   trailed that edge by **two frames** (gap 52 → 31.5px, 4.5px overhanging the page) because a
   transition FLIP needs a double rAF; the FLIP now runs on **Web Animations**, 52 ± 1 all the way, and

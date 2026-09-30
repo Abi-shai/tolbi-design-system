@@ -79,11 +79,14 @@ The panel's selection is its own model, `v-model:page`, and `aria-current` says 
 **`true` on the rail's section** — the current one *of a set* — and **`page` on the panel's page**,
 the destination.
 
-### The title is read off the rail
+### The title is read off the rail — by default
 
 The panel's title is the selected rail item's label, registered as a getter so a renamed item
 renames its panel. Not a prop: a title that is a second prop is a title that can disagree with the
 pill beside it — ADR-0042's rule, the current item derived rather than declared twice.
+
+*Amended below:* that rule governs a title that **repeats the section**. A title that names what the
+rail does not carry — the object the pages belong to — is declared, and legitimately so.
 
 ### The toggle is drawn in the panel's title row, and rides its edge home
 
@@ -168,6 +171,47 @@ The close was "really off", and a film at a tenth of the speed said why, twice o
   with it, a drawer (`easing-in-out`'s own description): the gap holds at 118–119px, 0 reversals on
   the page, the column, the panel, the toggle and the title.
 
+## Amended: a declared title, when the pages belong to something the rail does not carry
+
+The first product to adopt the panel could not. In etolbi the second level lists the pages **of one
+project** — the rail's section is *Projets*, the pages belong to *Projet arachide Kaolack* — and the
+product drew them by hand under the project's name (`pageLinksHeader`, passed by 29 pages). Titled off
+the rail, the panel said *Projets* above the pages of a project: true of the section, wrong about the
+pages. The product declined to adopt it with that title.
+
+The rule above was right about what it was written for. Its reason is ADR-0042's — a title that is a
+second prop can contradict the pill beside it — and that holds when the title **repeats the
+section**. The project is not in the rail. Its name cannot contradict anything, because the rail never
+held it: it is information the rail does not carry, and the panel is the only place in the column
+that can carry it.
+
+So the rule becomes: **a declared title is legitimate when it names what the rail does not carry —
+the object the pages belong to; it is not when it repeats the section.** The API takes the
+catalogue's slot-with-a-fallback shape (`Table`'s `emptyText`/`#empty`, ADR-0040's `#snapshot`):
+
+- `panelTitle`, a string. Without it — or empty — the panel is titled off the rail exactly as
+  before: measured **pixel-identical** to 0.21.0 open, collapsed and in the single column.
+- `#panel-title`, a slot whose default content is that title (`panelTitle`, else the rail's label),
+  with the resolved title as a slot prop.
+- **The row stays the component's**: its geometry, the one-line truncation, the room held for the
+  toggle drawn over it, and the id that names the group. The slot replaces the text, not the row.
+
+The declared title is a prop and nothing else: changing section keeps it, removing it brings the
+rail's title back. Whether a section's pages belong to an object is the product's knowledge, so the
+product passes the title for those sections and not for the others.
+
+### A placeholder while the object loads
+
+etolbi wrote *Projet* in that row while the project loaded, then swapped it for the name — a word
+that changes, where ADR-0038 has the wait say nothing. `panelTitleLoading` puts a skeleton in the row
+instead: the title's line box, 24px, across the whole title width, because a project's name fills
+this row and truncates in it — the truthful preview of what is coming.
+
+It is the component's for a reason a slot would miss: **the obvious placeholder is invisible here.**
+`Skeleton`'s default base *is* `bg-neutral`, the panel's own ground; `emphasis="strong"`
+(`bg-pending`) is what reads. Meanwhile the group keeps a name — the section's, visually hidden,
+which is already true of these pages.
+
 ## Measured
 
 Live, Chromium at 1280×800, `Navigation/SideNavigation` → *Deux niveaux*:
@@ -187,6 +231,13 @@ Live, Chromium at 1280×800, `Navigation/SideNavigation` → *Deux niveaux*:
   on its first page is the shell's job, not the component's) `aria-current="page"`.
 - One level, unchanged: 260 and 68; header 228×48; rows 228×36 at y 84 and 36×36 at y 125; the
   glyph's left edge at 28 and 23.5 — ADR-0034's and b8f19c8's numbers.
+
+- Declared title, `Deux niveaux — titre déclaré`: *Projet arachide Kaolack* at x 97, 111px wide,
+  one line (24px), truncated, its right edge at 208 against the toggle's 216 — 8px clear. Kept on a
+  section change; removed, the row reads *Projets*. The group is named by the row in both cases
+  (`getByRole('group', { name })` finds one of each), and by *Projets* while loading.
+- Loading: the bar at the title's own box, 111 × 24 at (97, 18), `bg-pending` → `bg-neutral`,
+  `aria-hidden`.
 
 ## Still open
 
