@@ -529,6 +529,21 @@ Before working on any component, read:
   over its raised rows, the rail at `z-raised` keeps the toggle clickable over the panel's head.
   `SideNavGroup` titles a run of rows in `label-md` **`text-subtle`** — `text-subtlest` is 3.13:1 in
   dark.
+- **ADR-0047**: collapsed, the two-level column **keeps the sections** — asked whether the rail
+  should show the current section's pages instead, fifteen products said no: none puts pages in the
+  rail, and the three that record their collapse (Sentry, Intercom, HubSpot) hide the panel. Pages-
+  first exists only where level 1 is a **header switcher**, not a rail (Vercel, PlanetScale). The
+  cost — a page two clicks away — is answered HubSpot's way: **pointing at a section floats its
+  pages** beside the row. It is **the panel, lifted** (same width, ground, rows and pill — on
+  `bg-default` the pill would vanish), with `elevation-overlay`, a **`border-default`** contour (the
+  subtle step is nothing on `bg-neutral`), `radius-surface`, `z-popover`. Motion is
+  **`SurfaceTransition`** (ADR-0021): `enter`/`easing-out` from 0.96, `exit`/`easing-in`, origin the
+  **row's centre**. Delays are durations in another slot (ADR-0032): open after **`quick`**, close
+  after **`moderate`**; once open, the next row switches at once. `#panel` became **a function of the
+  section** (`#panel="{ section }"`) so the rail can ask about a section other than the selected one.
+  Pointer and focus split: the pointer floats the pages, **focus keeps the tooltip** — the keyboard's
+  way to a page is the panel, one toggle away. The anchor row keeps its hover while the pages float;
+  the title row sits level with it (1px low until the contour was counted).
 
 ## Architecture
 
