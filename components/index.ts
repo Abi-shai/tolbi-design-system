@@ -45,7 +45,7 @@ export type { IconButtonSize } from './IconButton'
 export { HorizontalNavigation } from './HorizontalNavigation'
 export type { BreadcrumbItem, NavModule } from './HorizontalNavigation'
 
-export { SideNavigation, SideNavItem } from './SideNavigation'
+export { SideNavigation, SideNavItem, SideNavGroup } from './SideNavigation'
 
 export { WorkspaceSelector } from './WorkspaceSelector'
 export type { Workspace } from './WorkspaceSelector'

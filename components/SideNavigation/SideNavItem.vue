@@ -27,6 +27,11 @@ import { SIDE_NAVIGATION_KEY } from './context'
  * The outer element exists for that tooltip. It anchors it, which makes it
  * `position: relative` — and it is therefore also what the group registers,
  * because a button inside a positioned wrapper reports `offsetTop: 0`.
+ *
+ * The same component is both levels of a two-level column (ADR-0046): an icon
+ * in the rail, a row in the panel. It learns which from the list it registers
+ * with, and so does `aria-current` — `true` for the rail's section, `page` for
+ * the destination.
  */
 interface Props {
   /** Identifies this row to the group's `v-model`. */
@@ -54,11 +59,12 @@ const group = inject(SIDE_NAVIGATION_KEY, null)
 const el = ref<HTMLElement>()
 const key = computed(() => props.value ?? props.label ?? '')
 
-onMounted(() => { if (group && el.value) group.register(key.value, el.value) })
+onMounted(() => { if (group && el.value) group.register(key.value, el.value, () => props.label) })
 onBeforeUnmount(() => group?.unregister(key.value))
 
 const selected  = computed(() => group?.isSelected(key.value) ?? false)
 const collapsed = computed(() => group?.collapsed.value ?? false)
+const current   = computed(() => group?.current.value ?? 'page')
 
 const isLink = computed(() => !!props.href && !props.disabled)
 const tag = computed(() => (isLink.value ? 'a' : 'button'))
@@ -87,7 +93,7 @@ function handleClick(event: MouseEvent) {
       :href="isLink ? href : undefined"
       :disabled="isLink ? undefined : disabled || undefined"
       :aria-disabled="isLink && disabled ? 'true' : undefined"
-      :aria-current="selected ? 'page' : undefined"
+      :aria-current="selected ? current : undefined"
       :aria-label="collapsed ? label : undefined"
       :class="[
         'ds-side-nav-item__control',

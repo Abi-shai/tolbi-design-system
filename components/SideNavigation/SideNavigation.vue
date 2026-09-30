@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, provide, ref, toRef, useSlots, watch, nextTick } from 'vue'
-import { useSlidingIndicator } from '../../composables/useSlidingIndicator'
+import {
+  Comment, Fragment, Text, computed, nextTick, onBeforeUnmount, ref, useId, useSlots, watch,
+  type VNode,
+} from 'vue'
 import { IconButton } from '../IconButton'
-import { SIDE_NAVIGATION_KEY, type SideNavigationContext } from './context'
+import SideNavList from './SideNavList.vue'
 
 /**
  * The product's left-hand navigation column.
@@ -35,11 +37,24 @@ import { SIDE_NAVIGATION_KEY, type SideNavigationContext } from './context'
  * resize it vertically. The column's edge padding is the same in both forms
  * (12/16): what a collapse narrows is the panel, not the margin its contents
  * are hung on.
+ *
+ * **A second level is a panel beside the rail** (ADR-0046). Fill `#panel` and
+ * the column becomes two: the rail — the collapsed form, always, because a
+ * section list that also carries a page list never needs its labels back — and
+ * a panel titled with the selected section, holding its pages under their own
+ * `v-model:page`. `collapsed` then closes the panel and nothing else; the rail
+ * is what is left, which is exactly the rail the single column collapses to.
+ * The toggle moves with the panel's edge, into its title row.
  */
 interface Props {
-  /** The selected item's value. */
+  /** The selected item's value — the section, once there is a panel. */
   modelValue?: string
-  /** Icon-only rail. Items move their label into a tooltip. */
+  /** The panel's selected page. Only read when `#panel` is filled. */
+  page?: string
+  /**
+   * Icon-only rail. Items move their label into a tooltip. With a panel, the
+   * rail is already icon-only and this closes the panel instead.
+   */
   collapsed?: boolean
   /** Renders the collapse control. Off for a shell that places its own. */
   toggle?: boolean
@@ -50,6 +65,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: undefined,
+  page: undefined,
   collapsed: false,
   toggle: true,
   collapseLabel: 'Réduire la navigation',
@@ -59,41 +75,83 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
+  'update:page': [value: string]
   'update:collapsed': [value: boolean]
 }>()
 
 const slots = useSlots()
-const hasHeader = computed(() => !!slots.header || props.toggle)
 
-const values = ref<string[]>([])
-const activeIndex = computed(() => values.value.indexOf(props.modelValue ?? ''))
+const navRef = ref<HTMLElement>()
 
-const { containerRef, itemRefs, style, ready, measure, reducedMotion } = useSlidingIndicator(activeIndex)
+/**
+ * What the rail's list exposes. Written out rather than taken as
+ * `InstanceType<typeof SideNavList>`, which would put the internal list's props
+ * into this component's published declaration — a type the package does not
+ * export and a consumer could not name.
+ */
+interface ListHandle {
+  measure: () => void
+  reducedMotion: boolean
+  activeLabel: string | undefined
+}
+
+/** The rail's list: its selection, its pill, and the label that titles the panel. */
+const railList = ref<ListHandle>()
 
 /** The row that restacks. Its two children are what the collapse has to carry. */
 const headerEl = ref<HTMLElement>()
 
-const context: SideNavigationContext = {
-  register(value, el) {
-    const existing = values.value.indexOf(value)
-    const i = existing === -1 ? values.value.length : existing
-    if (existing === -1) values.value.push(value)
-    itemRefs.value[i] = el
-    return i
-  },
-  unregister(value) {
-    const i = values.value.indexOf(value)
-    if (i === -1) return
-    values.value.splice(i, 1)
-    itemRefs.value.splice(i, 1)
-  },
-  select(value) { emit('update:modelValue', value) },
-  isSelected: (value) => value === props.modelValue,
-  collapsed: toRef(props, 'collapsed'),
-}
-provide(SIDE_NAVIGATION_KEY, context)
+/**
+ * Two levels as soon as `#panel` is *declared* — not as soon as it has
+ * content. A section with no pages renders nothing into the slot, and the
+ * column must stay a rail through it: if the slot's emptiness switched the
+ * column back to one level, walking from Parcelles to Accueil would give every
+ * rail item its label back and double the column's width for one page.
+ */
+const tiered = computed(() => !!slots.panel)
 
-watch(values, async () => { await nextTick(); measure() }, { deep: true })
+/** True when the slot renders something other than comments and whitespace. */
+function hasContent(nodes: VNode[] | undefined): boolean {
+  return !!nodes?.some((n) => {
+    if (n.type === Comment) return false
+    if (n.type === Fragment) return hasContent(n.children as VNode[])
+    if (n.type === Text) return String(n.children).trim().length > 0
+    return true
+  })
+}
+
+/**
+ * The selected section has pages. Evaluated while rendering, so the slot's own
+ * reads — the section the consumer switches on — are tracked by this computed
+ * and it re-runs when they change.
+ */
+const hasPanel = computed(() => !!slots.panel && hasContent(slots.panel({})))
+
+/**
+ * The rail's form: icon-only when the column is collapsed, and always once
+ * there is a panel. What the header slot is told, what the items are told, and
+ * what puts the rule under the header.
+ */
+const railForm = computed(() => props.collapsed || tiered.value)
+
+const panelOpen = computed(() => hasPanel.value && !props.collapsed)
+
+/**
+ * **The toggle is the panel's control, so no panel means no toggle.** A section
+ * without pages has nothing to show or hide; a control that stayed would flip a
+ * state nothing on screen reflects.
+ */
+const showToggle = computed(() => props.toggle && (!tiered.value || hasPanel.value))
+const hasHeader = computed(() => !!slots.header || showToggle.value)
+
+/**
+ * The panel is titled with the selected section's label, **read off the rail**
+ * rather than passed in: a title that is a second prop is a title that can
+ * disagree with the pill beside it (ADR-0042's rule — the current item is
+ * derived, never declared twice).
+ */
+const panelTitle = computed(() => railList.value?.activeLabel ?? '')
+const titleId = `${useId()}-panel`
 
 /**
  * True while the **column itself** is travelling, and the reason the indicator
@@ -118,7 +176,7 @@ let travelTimer: ReturnType<typeof setTimeout> | undefined
  * cannot serve, which this is not.
  */
 function travelMs() {
-  const el = containerRef.value
+  const el = navRef.value
   if (!el) return 0
   const v = getComputedStyle(el).getPropertyValue('--ds-motion-duration-enter').trim()
   const n = parseFloat(v)
@@ -128,7 +186,7 @@ function travelMs() {
 
 /** The curve, off the cascade for the same reason as the length above. */
 function travelEasing() {
-  const el = containerRef.value
+  const el = navRef.value
   return el
     ? getComputedStyle(el).getPropertyValue('--ds-motion-easing-in-out').trim()
     : ''
@@ -150,41 +208,39 @@ function travelEasing() {
  * `easing-in-out`, so the two compose into one eased travel rather than two
  * motions on one gesture (ADR-0037). The column owns the curve; this only stops
  * the element from starting somewhere it never was.
+ *
+ * **Web Animations, not a transition, and the reason is two frames.** A
+ * transition-driven FLIP needs a double `requestAnimationFrame` before its
+ * inverse transform counts as a start value (ADR-0032) — so the trip began two
+ * frames after the column's width, which begins on the flip. Invisible while
+ * the header only restacked; once the toggle rode the panel's edge it was
+ * measured: the gap to the closing edge fell from 52px to **31.5** mid-flight,
+ * the button overhanging the page by 4.5px (ADR-0046). `animate()` takes the
+ * start value as a keyframe, so the trip starts on the frame the width does,
+ * and the sum ADR-0045 wrote down — the FLIP plus the layout, one eased trip —
+ * holds frame by frame instead of on average. It also leaves nothing inline to
+ * clean up.
  */
 function flipHeader(kids: HTMLElement[], first: DOMRect[]) {
-  if (!kids.length || reducedMotion.value) return
-  const ms = travelMs()
-  const easing = travelEasing()
-  const moved: HTMLElement[] = []
+  if (!kids.length || railList.value?.reducedMotion) return
+  const duration = travelMs()
+  const easing = travelEasing() || 'ease-in-out'
 
   kids.forEach((k, i) => {
+    // A trip still in flight is part of `first` — that is where the element is
+    // on screen — but must not be part of `last`, or the new trip would be
+    // measured from a position the layout never gave it.
+    for (const a of k.getAnimations()) a.cancel()
     const last = k.getBoundingClientRect()
     const dx = first[i].left - last.left
     const dy = first[i].top - last.top
     if (!dx && !dy) return
-    k.style.transition = 'none'
-    k.style.transform = `translate(${dx}px, ${dy}px)`
-    moved.push(k)
+    k.animate(
+      [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }],
+      { duration, easing },
+    )
   })
-  if (!moved.length) return
-
-  // A single `requestAnimationFrame` fires *before* style recalculation, so the
-  // inverse transform would never become a start value and the element would
-  // simply appear in place (ADR-0032 found this in the product's reveal).
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    for (const k of moved) {
-      k.style.transition = `transform ${ms}ms ${easing}`
-      k.style.transform = ''
-    }
-  }))
-
-  // The inline styles are scaffolding, not state — they go once they are spent.
-  clearTimeout(flipTimer)
-  flipTimer = setTimeout(() => {
-    for (const k of moved) { k.style.transition = ''; k.style.transform = '' }
-  }, ms + 60)
 }
-let flipTimer: ReturnType<typeof setTimeout> | undefined
 
 // Collapsing changes every row's width, so the indicator has to re-measure. The
 // ResizeObserver watches the container, whose width is set by the consumer and
@@ -199,51 +255,86 @@ watch(() => props.collapsed, async () => {
   const first = kids.map((k) => k.getBoundingClientRect())
 
   await nextTick()
-  measure()
+  railList.value?.measure()
   flipHeader(kids, first)
 
   travelTimer = setTimeout(() => { travelling.value = false }, travelMs())
 })
 
-onBeforeUnmount(() => { clearTimeout(travelTimer); clearTimeout(flipTimer) })
+onBeforeUnmount(() => { clearTimeout(travelTimer) })
 </script>
 
 <template>
   <nav
-    ref="containerRef"
+    ref="navRef"
     class="ds-side-nav"
-    :class="{ 'ds-side-nav--collapsed': collapsed }"
+    :class="{
+      'ds-side-nav--collapsed': collapsed,
+      'ds-side-nav--tiered': tiered,
+      'ds-side-nav--panel-open': panelOpen,
+    }"
     :aria-label="ariaLabel"
   >
-    <!-- The workspace mark and the collapse control share a row, and stack
-         once the rail is one column wide. -->
-    <div v-if="hasHeader" class="ds-side-nav__head">
-      <div ref="headerEl" class="ds-side-nav__header">
-        <div v-if="slots.header" class="ds-side-nav__header-slot">
-          <slot name="header" />
+    <!-- The rail. One level, it IS the column (`display: contents`); two
+         levels, it is the column's first box and the panel is the second. -->
+    <div class="ds-side-nav__rail">
+      <!-- The workspace mark and the collapse control share a row, and stack
+           once the rail is one column wide. With a panel open, the control
+           is drawn in the panel's title row — see `--panel-open` below. -->
+      <div v-if="hasHeader" class="ds-side-nav__head">
+        <div ref="headerEl" class="ds-side-nav__header">
+          <div v-if="slots.header" class="ds-side-nav__header-slot">
+            <slot name="header" :collapsed="railForm" />
+          </div>
+          <IconButton
+            v-if="showToggle"
+            icon="panel-left"
+            :ariaLabel="collapsed ? expandLabel : collapseLabel"
+            class="ds-side-nav__toggle"
+            @click="emit('update:collapsed', !collapsed)"
+          />
         </div>
-        <IconButton
-          v-if="toggle"
-          icon="panel-left"
-          :ariaLabel="collapsed ? expandLabel : collapseLabel"
-          class="ds-side-nav__toggle"
-          @click="emit('update:collapsed', !collapsed)"
-        />
+        <div v-if="railForm" class="ds-side-nav__divider" aria-hidden="true" />
       </div>
-      <div v-if="collapsed" class="ds-side-nav__divider" aria-hidden="true" />
+
+      <SideNavList
+        ref="railList"
+        :model-value="modelValue"
+        :collapsed="railForm"
+        :current="tiered ? 'true' : 'page'"
+        :animate="!travelling"
+        @update:model-value="emit('update:modelValue', $event)"
+      >
+        <slot />
+      </SideNavList>
     </div>
 
-    <!-- Sliding selection — behind the items, like Tabs' indicator -->
+    <!-- The second level. Always in the DOM once there are two levels, so
+         opening and closing it is a width that travels, not a mount. -->
     <div
-      v-if="activeIndex !== -1"
-      class="ds-side-nav__indicator"
-      :class="{ 'ds-side-nav__indicator--animated': ready && !travelling }"
-      :style="style"
-      aria-hidden="true"
-    />
-
-    <div class="ds-side-nav__items">
-      <slot />
+      v-if="tiered"
+      class="ds-side-nav__panel"
+      :class="{ 'ds-side-nav__panel--closed': !panelOpen }"
+    >
+      <div class="ds-side-nav__panel-inner">
+        <template v-if="hasPanel">
+          <div class="ds-side-nav__panel-head">
+            <span :id="titleId" class="ds-side-nav__panel-title">{{ panelTitle }}</span>
+          </div>
+          <!-- Keyed by section: a different section is a different list, and
+               a pill that slid from Parcelles' third row to Producteurs' first
+               would be claiming the two were one list. -->
+          <SideNavList
+            :key="modelValue"
+            role="group"
+            :aria-labelledby="titleId"
+            :model-value="page"
+            @update:model-value="emit('update:page', $event)"
+          >
+            <slot name="panel" />
+          </SideNavList>
+        </template>
+      </div>
     </div>
   </nav>
 </template>
@@ -335,15 +426,27 @@ onBeforeUnmount(() => { clearTimeout(travelTimer); clearTimeout(flipTimer) })
    (ADR-0010) — 48 is the control's own height (8 + Avatar sm + 8) and not a
    step of layout rhythm, which is ADR-0013's argument for why control padding
    is its own scale. */
+/* The row used to be declared on the collapsed form alone, the only place that
+   read it. The second level reads it expanded — the rail is always a rail there,
+   and the panel's title row is one row tall — so it moved to the base, with the
+   rail it derives beside it rather than the same `calc` written four times.
+
+   `--side-nav-panel` is the panel's width, Figma's number (1924:3907, 199 + the
+   1px rule), and **a size rather than a ceiling** for once (ADR-0031's rule,
+   met from its exception). A ceiling lets a box hug its content, and a panel
+   that hugged its labels would change width with every section — the page
+   beside it shifting on each click in the rail. 68 + 200 is 268, the single
+   column's 260 give or take its rule: two levels cost the page nothing. */
 .ds-side-nav {
   --side-nav-header-row: 48px;
+  --side-nav-rail-row: 36px;
+  --side-nav-rail: calc(var(--side-nav-rail-row) + 2 * var(--ds-spacing-xl));
+  --side-nav-panel: 200px;
 }
 
 .ds-side-nav--collapsed {
-  --side-nav-rail-row: 36px;
-
-  width: calc(var(--side-nav-rail-row) + 2 * var(--ds-spacing-xl));
-  max-width: calc(var(--side-nav-rail-row) + 2 * var(--ds-spacing-xl));
+  width: var(--side-nav-rail);
+  max-width: var(--side-nav-rail);
   flex: none;
   /* No `padding` here on purpose: it is the base rule's, unchanged. */
 }
@@ -452,46 +555,185 @@ onBeforeUnmount(() => { clearTimeout(travelTimer); clearTimeout(flipTimer) })
 }
 
 /* ── Items ────────────────────────────────────────────────────────── */
-/* `spacing-md`, the same gap the head uses — they are one decision now, not
-   two. What keeps five destinations from reading as a single block is that
-   each one is a surface; what separates them from the head is the rule and the
+/* The rows, their gap and the pill live in `SideNavList`, which both levels
+   use. What separates the rows from the head is the rule and the
    `spacing-3xl` above, neither of which is a gap between siblings. */
-.ds-side-nav__items {
+
+/* ── Rail ─────────────────────────────────────────────────────────── */
+/* One level, the rail wrapper generates no box: the head and the list stay
+   the column's own children, so the single column lays out exactly as it did
+   before the second level existed — the wrapper is a DOM fact, not a layout
+   one. */
+.ds-side-nav__rail {
+  display: contents;
+}
+
+/* ── Two levels ───────────────────────────────────────────────────── */
+/*
+  The column becomes a row of two boxes and hands its padding to them: the rail
+  keeps the 12/16 it always had, the panel takes the same, so both levels hang
+  their contents on one margin.
+
+  The ceiling follows what is open — rail alone, or rail and panel — and it is
+  what holds against a shell that sets `width: 100%`, for the reason the base
+  rule gives. It travels with the panel on the same curve, so the column's edge
+  and the panel's edge are one edge.
+*/
+.ds-side-nav--tiered {
+  flex-direction: row;
+  gap: 0;
+  padding: 0;
+  flex: none;
+  max-width: var(--side-nav-rail);
+}
+
+.ds-side-nav--tiered.ds-side-nav--panel-open {
+  max-width: calc(var(--side-nav-rail) + var(--side-nav-panel));
+}
+
+/*
+  The rail is a **stacking context above the panel**, and the containing block
+  the toggle is placed against when the panel is open — see below. The toggle
+  is then drawn over the panel's title row, and without the rail's own height
+  the panel's head, later in the DOM, took the click: measured, the point at
+  the toggle's centre hit `ds-side-nav__panel-head`.
+*/
+.ds-side-nav--tiered .ds-side-nav__rail {
+  position: relative;
+  z-index: var(--ds-z-raised);
   display: flex;
   flex-direction: column;
-  align-items: inherit;
-  gap: var(--ds-spacing-md);
+  align-items: stretch;
+  gap: var(--ds-spacing-3xl);
+  flex: none;
+  width: var(--side-nav-rail);
+  padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
+  box-sizing: border-box;
 }
 
-/* ── Sliding indicator ─────────────────────────────────────────────── */
-.ds-side-nav__indicator {
+/*
+  **With the panel open, the toggle is drawn in the panel's title row** — on
+  its trailing edge, where the single column keeps it beside the mark. Figma
+  moved it there (1924:3907), and it is ADR-0034's convention intact: top of
+  the column, trailing edge, first row. Only the column got wider.
+
+  Drawn there, not *moved* there. It stays the rail header's child, placed
+  against the rail's box — the panel's right padding and one row in from the
+  rail's far edge — so collapsing never swaps the element that caused it:
+  a remount would drop keyboard focus mid-gesture (ADR-0044). The restack's
+  FLIP then carries it home to the rail's first row, and because it is 16px in
+  from an edge that closes on the same curve, it rides that edge the whole way
+  (ADR-0046).
+*/
+.ds-side-nav--panel-open .ds-side-nav__toggle {
   position: absolute;
-  left: 0;
-  top: 0;
-  border-radius: var(--ds-radius-control);
-  background-color: var(--ds-bg-default);
-  box-shadow: var(--ds-elevation-surface);
-  pointer-events: none;
-  z-index: 0;
-  /* No transition until after the first paint, or it flies in from 0 */
+  top: var(--ds-spacing-lg);
+  left: calc(100% + var(--side-nav-panel) - var(--ds-spacing-xl) - var(--side-nav-rail-row));
 }
 
-/* A column animates `height`, where a row animates `width` — the composable
-   carries both axes and leaves the choice here. The class is also withheld
-   while the column travels (`travelling`), so this list never competes with the
-   ResizeObserver's per-frame truth. */
-.ds-side-nav__indicator--animated {
+/*
+  The panel's own stacking context, one level under the rail's — which is the
+  half that keeps the rail's tooltips readable. They open to the right, across
+  the panel, and the panel's rows are raised too (`z-raised`, for the pill
+  beneath them): left in the column's stacking, they came later in the DOM at
+  the same height and painted over every tooltip that crossed them.
+
+  The rule is its left border: `border-default`, for ADR-0034's reason — on
+  `bg-neutral` it is 1.34:1 where `border-subtle` is 1.07:1 and reads as
+  nothing. It sits inside the 200px, which is what leaves Figma's rows at
+  exactly 167.
+
+  **Opening and closing is a width that travels.** The inner box keeps the open
+  width throughout and is clipped, so no row reflows or re-truncates on the way;
+  the border travels to zero with it, or a 1px line would outlive the panel at
+  the rail's edge; and `visibility` lands at the end of the close — which is
+  also what takes the closed panel's rows out of the tab order and the
+  accessibility tree.
+*/
+.ds-side-nav__panel {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  width: var(--side-nav-panel);
+  box-sizing: border-box;
+  border-left: var(--ds-border-width-default) solid var(--ds-border-default);
+  overflow: hidden;
   transition:
-    transform var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
-    height    var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
+    width             var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
+    border-left-width var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
+    visibility        0s;
+}
+
+.ds-side-nav__panel--closed {
+  width: 0;
+  border-left-width: 0;
+  visibility: hidden;
+  transition:
+    width             var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
+    border-left-width var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
+    visibility        0s linear var(--ds-motion-duration-enter);
+}
+
+/*
+  The panel's contents are the **second** movement, as the labels are in the
+  single column (ADR-0037), and on the same two lists: arriving, they wait a
+  `quick` and fade in once the width has mostly opened; leaving, they go at
+  `exit` with no delay, gone before the edge closes on them. The exit is faster
+  than the entrance (ADR-0021).
+*/
+.ds-side-nav__panel-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-3xl);
+  flex: 1 1 auto;
+  min-height: 0;
+  width: calc(var(--side-nav-panel) - var(--ds-border-width-default));
+  padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
+  box-sizing: border-box;
+  overflow-y: auto;
+  opacity: 1;
+  transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-out)
+    var(--ds-motion-duration-quick);
+}
+
+.ds-side-nav__panel--closed .ds-side-nav__panel-inner {
+  opacity: 0;
+  transition: opacity var(--ds-motion-duration-exit) var(--ds-motion-easing-in);
+}
+
+/* One row tall, level with the rail's first row, and the toggle's width held
+   free on the right so a long title truncates before it reaches the button
+   drawn over it. `spacing-lg` in, like the rows' glyphs and the group titles:
+   one left edge for everything the panel says. */
+.ds-side-nav__panel-head {
+  display: flex;
+  align-items: center;
+  min-height: var(--side-nav-rail-row);
+  padding-left: var(--ds-spacing-lg);
+  padding-right: calc(var(--side-nav-rail-row) + var(--ds-spacing-md));
+}
+
+.ds-side-nav__panel-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--ds-font-heading-md);
+  color: var(--ds-text-strong);
 }
 
 /* The rail is still the rail when it arrives without travelling, so nothing is
    hidden by removing the trip — the same argument `useSlidingIndicator` makes
    for letting the selection jump (ADR-0033), and the opposite of ADR-0032's
-   marquee, where stopping the loop would have hidden content. */
+   marquee, where stopping the loop would have hidden content. The panel is the
+   same case: it opens and closes at once, its contents intact. */
 @media (prefers-reduced-motion: reduce) {
-  .ds-side-nav {
+  .ds-side-nav,
+  .ds-side-nav__panel,
+  .ds-side-nav__panel-inner,
+  .ds-side-nav__panel--closed .ds-side-nav__panel-inner {
     transition: none;
   }
 }
