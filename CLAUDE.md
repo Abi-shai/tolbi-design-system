@@ -556,6 +556,8 @@ Before working on any component, read:
   (`radius-control`) and an 8px inset and gap — it sits in the page's column now (ADR-0047) — and the
   marquee's runs keep that gap. On the raised ground `text-subtlest` is **4.18:1 in dark**, so the
   capsule's receding ink is `text-subtle` (ADR-0046's call), where the frame kept subtlest.
+  **Amended**: the tile is the capsule's content band — **74 square**, not 64 — and the capsule's
+  inset is `spacing-md` all round, so the row has one height and the edge hugs the tile.
 
 ## Architecture
 

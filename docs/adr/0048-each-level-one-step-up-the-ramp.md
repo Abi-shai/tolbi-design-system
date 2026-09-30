@@ -69,6 +69,20 @@ dark.
 Figma binds the capsule's corners to `radius/xl`, a primitive. The code takes `radius-surface` — 12,
 the tile's own — because a raw step is drift (ADR-0013).
 
+## Amended the same day: the tile is the band
+
+Figma redrew the capsule again (`1982:59956`): the tile is **74 square** — the capsule's content band,
+the height every column already had — where it was 64 centred in it, and the capsule's inset is
+`spacing-md` on all four sides, where it was 12 at the sides. The drawing stays 44, so its margin grows
+from 10 to 15: the tile gives the art room, the art does not grow to fill it.
+
+The two moves are one. With the tile at the band's height the row has a single height, and the
+capsule's edge sits the same 8px from it every way — it hugs its tile rather than holding it off. In
+code the tile reads `--capsule-band` instead of a second length, so the number is still named once.
+
+Measured: every capsule 2px wider (−8 inset, +10 tile) — the Yield capsule 1198 → **1200**, the frame's
+1190 → 1192 — and the band still 106 tall.
+
 ## Measured
 
 Storybook, `Données/ModuleBanner` → *Default*, dark: the band `#18201C`, 8px inset and gap, radius 8,
