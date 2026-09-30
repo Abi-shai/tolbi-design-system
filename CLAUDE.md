@@ -538,6 +538,14 @@ Before working on any component, read:
   does not interpolate — the width is now declared in both states; and the panel's contents are
   **anchored to its right edge**, so they slide under the rail as a drawer instead of being wiped in
   place while the toggle crossed the title (gap 119 → −81px, now a constant 119).
+- **ADR-0047**: the bar's margins are the **page's**. `HorizontalNavigation` has **no padding** — as it
+  has no ground (ADR-0028) — because the bar, the module band and the content share one left and one
+  right edge, so the margins are the column's (Figma `1982:57462`: the bar 0 all round in a column of
+  12 / 12 / 0 / 8, gap 12); with its own 16px the bar sat 16px inside everyone else. The avatar is the
+  **last of the controls** on one `spacing-md` rhythm, no longer a block of one; the credits chip stays
+  `spacing-xl` before them — the frame hides it, and a hidden layer is not a deletion. The bar is
+  **48**, not the frame's 40: ADR-0042's floor, and `SideNavigation`'s header row, so both columns
+  starting 12px down share one line (12 → 60) and the row is still 72.
 
 ## Architecture
 

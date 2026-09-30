@@ -5,11 +5,41 @@ import * as HorizontalNavigationStories from './HorizontalNavigation.stories'
 
 Barre de navigation principale de l'app Tolbi. Elle porte l'identité (marque Tolbi, ou module
 courant), un fil d'Ariane contextuel, les actions rapides et l'avatar utilisateur. Elle ne pose
-aucun fond : elle prend la surface qui se trouve derrière (ADR-0028).
+aucun fond : elle prend la surface qui se trouve derrière (ADR-0028). **Ni marge** : elle prend
+aussi celles de la colonne qui la tient (ADR-0047).
 
 <Canvas of={HorizontalNavigationStories.Accueil} />
 
 <Controls of={HorizontalNavigationStories.Accueil} />
+
+---
+
+## Les marges sont celles de la page
+
+La barre n'a **aucun padding**. C'est une rangée d'une colonne — la barre, le bandeau des modules,
+le contenu — et ces trois rangées partagent un bord gauche et un bord droit : c'est donc la
+**colonne** qui porte les marges, pas l'une de ses rangées. Avec ses 16px à elle, le logo de la barre
+tombait 16px à l'intérieur du bord du contenu, et l'avatar 16px en retrait de son bord droit.
+
+Dans Figma (`1982:57462`), la colonne pose **12** en haut et à droite, **8** du côté de la barre
+latérale, et **12** entre ses rangées :
+
+```css
+.colonne-de-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-lg);
+  padding: var(--ds-spacing-lg) var(--ds-spacing-lg) 0 var(--ds-spacing-md);
+}
+```
+
+Les exemples de cette page sont posés dans cette colonne.
+
+La barre fait **48px** — le plancher de la fente d'identité, plus bas. Avec les 12 de la colonne
+au-dessus et au-dessous, la rangée fait toujours 72. Et 48, c'est la ligne d'en-tête de
+`SideNavigation` : deux colonnes qui commencent à 12px du haut posent la barre et la tête de la
+barre latérale **sur une seule ligne**, 12 → 60. La maquette dessine une barre de 40, centrée 4px
+plus haut que le sélecteur d'espace à côté d'elle.
 
 ---
 
@@ -47,6 +77,19 @@ Le mot par défaut est un **impératif** ici — `Retourner sur l'accueil` — l
 **lieu** (`Accueil`). Ce ne sont pas deux avis sur la formulation : `Breadcrumbs` garde son état
 profondeur 0 où la maison *est* la page, la barre ne l'a plus.
 
+## La droite de la barre — deux blocs
+
+| | |
+|---|---|
+| **les crédits** | la pastille de solde |
+| | `spacing-xl` (16px) |
+| **les contrôles** | `Apprendre`, paramètres, notifications, modules, l'avatar — `spacing-md` (8px) entre chacun |
+
+L'avatar est **le dernier des contrôles**, pas un bloc à lui seul. Il se tenait à 16px, un bloc d'un
+seul élément — une séparation qui ne séparait rien : c'est un contrôle comme les quatre avant lui.
+Ce qui reste à 16px, c'est la pastille : un solde, pas une action. La maquette la masque ; elle reste
+dans la barre tant que le produit affiche un solde (ADR-0047).
+
 ## Identité — la marque, ou le module
 
 <Canvas of={HorizontalNavigationStories.IdentitySwap} />
@@ -74,14 +117,15 @@ en moyenne contre 24. À 48 la moyenne atteint **28,5** — le premier cran où 
 autant à l'œil que celle de la brand. C'est aussi la **grille native** du dessin, donc le seul cran
 sans réduction.
 
-**Ce que ça coûte, c'est la hauteur : 72px au lieu des 64 de l'ADR-0028.** 48 est la seule chose de
-la barre plus haute que l'avatar de 40px, donc l'identité commande la hauteur — sur **toutes** les
+**Ce que ça coûte, c'est la hauteur : 48px de barre, une rangée de 72 avec sa colonne, au lieu des
+64 de l'ADR-0028.** 48 est la seule chose de la barre plus haute que l'avatar de 40px, donc
+l'identité commande la hauteur — sur **toutes** les
 pages, y compris celles sans module, puisque le plancher de la fente vaut 48 dans les deux formes.
 Ce n'est pas du gâchis : une barre qui changerait de hauteur en naviguant, ça, ce serait le vrai
 défaut.
 
 24 et 32 ont été construits et mesurés en chemin. À 24 le trait de Yield tombe à **0,89px** —
-sous-pixel, ce que l'ADR-0041 avait écarté. À 32 il rend 1,19px et la barre reste à 64.
+sous-pixel, ce que l'ADR-0041 avait écarté. À 32 il rend 1,19px et la rangée reste à 64.
 
 **Et pas de nom.** La première miette du fil nomme déjà le module : un mot ici l'écrivait deux fois à
 32px d'écart. Ce qui déplace le nom accessible **sur la marque** — c'est la règle de l'ADR-0041 avec
