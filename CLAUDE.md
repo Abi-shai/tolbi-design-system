@@ -510,6 +510,25 @@ Before working on any component, read:
   (measured 143px standalone): *a component that only renders correctly inside one parent*, shipped
   because the check ran on the story where the motion shows and the two form stories were never
   reopened.
+- **ADR-0046**: `SideNavigation` gains a **second level** — ADR-0034's "two-tier", set aside as "not
+  a collapse", is what the rail is *for*. Eight surveyed products agree: **the rail never folds**, the
+  panel opens and closes, and the panel is **titled with the selected section**. Declaring `#panel`
+  (not filling it) makes the column a row: the rail — the collapsed form, always — and a **200px**
+  panel (Figma `1924:3907`, a **size, not a ceiling**: a panel that hugged its labels would shift the
+  page on every section) with its own `v-model:page`. `collapsed` closes the panel and nothing else.
+  Two selections need two `provide` scopes, so the list became an internal **`SideNavList`** both
+  levels use (one owner of the pill), keyed by section so the pill never slides between two lists;
+  `aria-current` is **`true` on the section, `page` on the page**. The title is **read off the rail**,
+  never a prop (ADR-0042). The toggle is **drawn** in the panel's title row — still the rail header's
+  child, absolutely placed, so collapsing never remounts it — and rides the closing edge home. It
+  trailed that edge by **two frames** (gap 52 → 31.5px, 4.5px overhanging the page) because a
+  transition FLIP needs a double rAF; the FLIP now runs on **Web Animations**, 52 ± 1 all the way, and
+  the single column got the fix too. **No panel, no toggle.** The rule is the panel's
+  `border-default` left border, kept from track A (the frame's wrap had dropped it). Two stacking
+  contexts, each load-bearing, found by switching them off: the panel at 0 keeps the rail's tooltips
+  over its raised rows, the rail at `z-raised` keeps the toggle clickable over the panel's head.
+  `SideNavGroup` titles a run of rows in `label-md` **`text-subtle`** — `text-subtlest` is 3.13:1 in
+  dark.
 
 ## Architecture
 
