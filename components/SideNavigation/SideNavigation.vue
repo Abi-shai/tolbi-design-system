@@ -4,6 +4,7 @@ import {
   type VNode,
 } from 'vue'
 import { IconButton } from '../IconButton'
+import { Skeleton } from '../Skeleton'
 import SideNavList from './SideNavList.vue'
 
 /**
@@ -52,6 +53,18 @@ interface Props {
   /** The panel's selected page. Only read when `#panel` is filled. */
   page?: string
   /**
+   * The panel's title when its pages belong to something the rail does not
+   * carry — a project, a form. Without it (or empty), the panel is titled with
+   * the selected section, read off the rail. `#panel-title` replaces the text
+   * and falls back to this.
+   */
+  panelTitle?: string
+  /**
+   * The object the title names is still loading: the row shows a placeholder
+   * instead of a word that would change.
+   */
+  panelTitleLoading?: boolean
+  /**
    * Icon-only rail. Items move their label into a tooltip. With a panel, the
    * rail is already icon-only and this closes the panel instead.
    */
@@ -66,6 +79,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: undefined,
   page: undefined,
+  panelTitle: undefined,
+  panelTitleLoading: false,
   collapsed: false,
   toggle: true,
   collapseLabel: 'Réduire la navigation',
@@ -145,12 +160,18 @@ const showToggle = computed(() => props.toggle && (!tiered.value || hasPanel.val
 const hasHeader = computed(() => !!slots.header || showToggle.value)
 
 /**
- * The panel is titled with the selected section's label, **read off the rail**
- * rather than passed in: a title that is a second prop is a title that can
- * disagree with the pill beside it (ADR-0042's rule — the current item is
- * derived, never declared twice).
+ * By default the panel is titled with the selected section's label, **read off
+ * the rail** rather than passed in: a title that repeats the section as a second
+ * prop is a title that can disagree with the pill beside it (ADR-0042's rule —
+ * the current item is derived, never declared twice).
+ *
+ * `panelTitle` is for the other case, and only that one: pages that belong to
+ * an **object the rail does not carry** — the project whose pages these are.
+ * That name cannot contradict the rail, because the rail never held it, and the
+ * panel is the one place in the column that can say it (ADR-0046, amended).
  */
-const panelTitle = computed(() => railList.value?.activeLabel ?? '')
+const railTitle = computed(() => railList.value?.activeLabel ?? '')
+const title = computed(() => props.panelTitle || railTitle.value)
 const titleId = `${useId()}-panel`
 
 /**
@@ -318,8 +339,29 @@ onBeforeUnmount(() => { clearTimeout(travelTimer) })
     >
       <div class="ds-side-nav__panel-inner">
         <template v-if="hasPanel">
+          <!-- The row is the component's whatever fills it: its height, the
+               one-line truncation, the room held for the toggle drawn over
+               it, and the id that names the group below. The slot replaces
+               the text only, and keeps it inline so the truncation holds. -->
           <div class="ds-side-nav__panel-head">
-            <span :id="titleId" class="ds-side-nav__panel-title">{{ panelTitle }}</span>
+            <span
+              :id="titleId"
+              class="ds-side-nav__panel-title"
+              :class="{ 'ds-side-nav__panel-title--loading': panelTitleLoading }"
+            >
+              <template v-if="panelTitleLoading">
+                <Skeleton
+                  variant="rect"
+                  emphasis="strong"
+                  :height="24"
+                  class="ds-side-nav__panel-title-skeleton"
+                />
+                <!-- The group keeps a name while its object loads: the
+                     section's, which is true of these pages already. -->
+                <span class="ds-side-nav__visually-hidden">{{ railTitle }}</span>
+              </template>
+              <slot v-else name="panel-title" :title="title">{{ title }}</slot>
+            </span>
           </div>
           <!-- Keyed by section: a different section is a different list, and
                a pill that slid from Parcelles' third row to Producteurs' first
@@ -734,6 +776,39 @@ onBeforeUnmount(() => { clearTimeout(travelTimer) })
   white-space: nowrap;
   font: var(--ds-font-heading-md);
   color: var(--ds-text-strong);
+}
+
+/*
+  While the object loads, the row shows **its weight, not a word**: the product
+  used to write « Projet » there and swap it for the name, a word that changes
+  (ADR-0038: the wait says nothing). The bar is the title's line box, 24px, and
+  takes the whole title width, because a project's name fills this row and
+  truncates in it — which is the truthful preview of what is coming.
+
+  `emphasis="strong"`, and not by taste: `Skeleton`'s default base **is**
+  `bg-neutral`, the panel's own ground, so the obvious placeholder is invisible
+  here — the reason the component owns this state rather than leaving a slot to
+  get it wrong. `bg-pending` on `bg-neutral` is what reads.
+*/
+.ds-side-nav__panel-title--loading {
+  flex: 1 1 auto;
+}
+
+.ds-side-nav__panel-title-skeleton {
+  width: 100%;
+}
+
+/* Visually hidden, still announced — never display:none. */
+.ds-side-nav__visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* The rail is still the rail when it arrives without travelling, so nothing is

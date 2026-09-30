@@ -18,7 +18,8 @@ const meta: Meta = {
           "du composant — la pastille est `bg-default`, elle n'est lisible que posée dessus. " +
           '`v-model:collapsed` la réduit à un rail de 68px où le libellé passe dans un tooltip. ' +
           'Rempli, le slot `#panel` ajoute un second niveau : le rail garde les rubriques, un panneau ' +
-          'de 200px titré par la rubrique sélectionnée porte ses pages (`v-model:page`).',
+          'de 200px titré par la rubrique sélectionnée porte ses pages (`v-model:page`). Quand ces pages ' +
+          "appartiennent à un objet que le rail ne porte pas (un projet), `panel-title` le nomme.",
       },
     },
   },
@@ -389,4 +390,101 @@ export const TwoTierNoPages: Story = {
     },
   },
   render: twoTierStory('accueil'),
+}
+
+/* ── Deux niveaux — le panneau titré par l'objet ──────────────────── */
+
+const PROJECT_SECTIONS = [
+  { value: 'accueil',     icon: 'house',        label: 'Accueil' },
+  { value: 'projets',     icon: 'folder',       label: 'Projets' },
+  { value: 'producteurs', icon: 'users',        label: 'Producteurs' },
+  { value: 'rapports',    icon: 'chart-column', label: 'Rapports' },
+  { value: 'parametres',  icon: 'settings',     label: 'Paramètres' },
+]
+
+/** The pages of one project — they belong to the project, not to « Projets ». */
+const PROJECT_PAGES = [
+  { value: 'apercu',    icon: 'list',           label: 'Aperçu' },
+  { value: 'parcelles', icon: 'map',            label: 'Parcelles' },
+  { value: 'campagnes', icon: 'calendar',       label: 'Campagnes' },
+  { value: 'enquetes',  icon: 'clipboard-list', label: 'Enquêtes' },
+  { value: 'rapports',  icon: 'file-text',      label: 'Rapports' },
+]
+
+const projectStory = (loadingAtStart: boolean) => () => ({
+  setup: () => {
+    const section = ref('projets')
+    const page = ref('apercu')
+    const collapsed = ref(false)
+    const loading = ref(loadingAtStart)
+    const titled = ref(true)
+    return { section, page, collapsed, loading, titled, workspaces, PROJECT_SECTIONS, PROJECT_PAGES }
+  },
+  components: { SideNavigation, SideNavItem, WorkspaceSelector },
+  template: `
+    <div style="height: 100vh; display: flex; background: var(--ds-bg-neutral);">
+      <SideNavigation
+        v-model="section"
+        v-model:page="page"
+        v-model:collapsed="collapsed"
+        :panel-title="titled ? 'Projet arachide Kaolack' : undefined"
+        :panel-title-loading="loading"
+        aria-label="Navigation principale"
+      >
+        <template #header="header">
+          <WorkspaceSelector :workspaces="workspaces" model-value="kaolack" :collapsed="header.collapsed" />
+        </template>
+
+        <SideNavItem v-for="s in PROJECT_SECTIONS" :key="s.value" :value="s.value" :icon="s.icon" :label="s.label" />
+
+        <template #panel>
+          <template v-if="section === 'projets'">
+            <SideNavItem v-for="p in PROJECT_PAGES" :key="p.value" :value="p.value" :icon="p.icon" :label="p.label" />
+          </template>
+          <template v-else-if="section === 'producteurs'">
+            <SideNavItem value="tous" icon="users" label="Tous les producteurs" />
+            <SideNavItem value="enquetes-producteurs" icon="clipboard-list" label="Enquêtes" />
+          </template>
+        </template>
+      </SideNavigation>
+      <main style="flex: 1; margin: 12px 12px 12px 0; border-radius: 12px; background: var(--ds-bg-default); padding: 24px; font: var(--ds-font-body-md); color: var(--ds-text-subtle); display: flex; flex-direction: column; gap: 12px; align-items: flex-start;">
+        <p style="font: var(--ds-font-heading-lg); color: var(--ds-text-strong); margin: 0;">Projet arachide Kaolack</p>
+        <label style="display: flex; gap: 8px; align-items: center;"><input type="checkbox" v-model="loading" /> Projet en cours de chargement</label>
+        <label style="display: flex; gap: 8px; align-items: center;"><input type="checkbox" v-model="titled" /> Titre déclaré (<code>panel-title</code>)</label>
+      </main>
+    </div>
+  `,
+})
+
+export const TwoTierDeclaredTitle: Story = {
+  name: 'Deux niveaux — titre déclaré',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Quand les pages appartiennent à un objet que le rail ne porte pas — un projet, un formulaire —, " +
+          '`panel-title` nomme cet objet : « Projet arachide Kaolack » au-dessus de ses pages, là où le rail ' +
+          "dirait « Projets ». Tronqué sur une ligne, sans passer sous la bascule. Sans lui, le titre revient " +
+          "au rail. `#panel-title` remplace le texte et retombe sur ce même titre. Un titre déclaré ne sert " +
+          "pas à répéter la rubrique : celle-là, le rail la porte déjà.",
+      },
+    },
+  },
+  render: projectStory(false),
+}
+
+export const TwoTierTitleLoading: Story = {
+  name: 'Deux niveaux — titre en chargement',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`panel-title-loading` pose un squelette dans la ligne du titre tant que l'objet charge, plutôt " +
+          "qu'un mot qui change. Il est en `emphasis=\"strong\"` : le squelette par défaut a pour fond " +
+          "`bg-neutral`, le sol même du panneau, et y serait invisible. Le groupe garde un nom pendant ce " +
+          "temps : celui de la rubrique.",
+      },
+    },
+  },
+  render: projectStory(true),
 }
