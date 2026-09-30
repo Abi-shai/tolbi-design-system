@@ -47,19 +47,32 @@ const id = useId()
 </template>
 
 <style scoped>
-/* The list's own gap is 8px between rows; a group adds 8 above itself, so a
-   group break is 16 — twice the row rhythm, which is what Figma draws
-   (1924:3907). The title then binds to its rows at 8. */
+/* A group break is `spacing-3xl`, the gap the column already puts between its
+   head and its list: a panel has two distances, 8 inside a block and 24
+   between blocks. It was 16 — twice the row rhythm, a third distance — until
+   Figma redrew the set's two-level variant (2012:4183).
+
+   Written as the token less the list's own 8px gap, because the gap is already
+   there: the break is the value Figma binds, not two tokens that happen to sum
+   to it. Both sides of a group take it, so an untitled row after a group does
+   not read as the group's last row; two groups in a row share one break. The
+   title still binds to its rows at 8. */
 .ds-side-nav-group {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: var(--ds-spacing-md);
-  margin-top: var(--ds-spacing-md);
+  margin-top: calc(var(--ds-spacing-3xl) - var(--ds-spacing-md));
+  margin-bottom: calc(var(--ds-spacing-3xl) - var(--ds-spacing-md));
 }
 
-.ds-side-nav-group:first-child {
+.ds-side-nav-group:first-child,
+.ds-side-nav-group + .ds-side-nav-group {
   margin-top: 0;
+}
+
+.ds-side-nav-group:last-child {
+  margin-bottom: 0;
 }
 
 /* `spacing-lg` in, the row's own padding, so the title sits on the same line
