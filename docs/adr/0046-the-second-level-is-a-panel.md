@@ -149,7 +149,8 @@ Measured by switching each off:
 
 A titled run of rows. `label-md` in **`text-subtle`**: 6.98:1 on `bg-neutral` light, 4.50:1 dark —
 `text-subtlest` is the obvious quieter pick and is 3.13:1 in dark, a 12px title that fails AA in one
-mode. A group break is 16px, twice the row rhythm, and its title binds to its rows at 8. It carries
+mode. A group break is **24px** — `spacing-3xl`, amended below from 16 — and its title binds to its
+rows at 8. It carries
 no selection and **no position**: its rows still register with the list above it, and an
 unpositioned group keeps their `offsetTop` measured from that list. In a rail the title leaves the
 screen and stays announced.
@@ -212,6 +213,25 @@ It is the component's for a reason a slot would miss: **the obvious placeholder 
 (`bg-pending`) is what reads. Meanwhile the group keeps a name — the section's, visually hidden,
 which is already true of these pages.
 
+## Amended: a group break is the column's block gap
+
+The set gained its two-level variants after 0.22.0 (`2012:4127` open, `2012:4252` closed), which
+closes the *Still open* entry that said it had none — and they are the reference now, not the board's
+`1924:3907`. Drawing them, Figma moved one value: the list (`2012:4183`) puts **24px** between its
+blocks, bound to `spacing-3xl`, where the board had 16, twice the row rhythm. The rest held: 8 between
+rows, 8 from a title to its rows.
+
+Sixteen was a **third distance**. The column already had two — `spacing-md` between anything
+adjacent, `spacing-3xl` between its head and its list — and a group break sat between them, so a group
+read as a looser run of rows rather than as a block. At 24 it is the head's own gap: 8 inside a block,
+24 between blocks, and no other distance in the panel.
+
+The group writes it as `calc(spacing-3xl − spacing-md)`, because the list's gap already puts 8 there:
+`spacing-xl` sums to the same 24 and names the wrong token (ADR-0036 — the numbers being right is not
+the tokens being right). It goes on **both** sides of a group, two groups sharing one break, so an
+untitled row after a group cannot read as that group's last row. Figma draws only rows → group →
+group; the other order is the rule applied, not a drawing.
+
 ## Measured
 
 Live, Chromium at 1280×800, `Navigation/SideNavigation` → *Deux niveaux*:
@@ -238,6 +258,10 @@ Live, Chromium at 1280×800, `Navigation/SideNavigation` → *Deux niveaux*:
   (`getByRole('group', { name })` finds one of each), and by *Projets* while loading.
 - Loading: the bar at the title's own box, 111 × 24 at (97, 18), `bg-pending` → `bg-neutral`,
   `aria-hidden`.
+- Group break, *Deux niveaux* on Parcelles: the list at (17, 72) in the panel, **380** tall — rows
+  0 / 44, *Suivi* 104, rows 128 / 172 / 216, *Données* 276, rows 300 / 344: `2012:4183` to the pixel.
+  The pill still lands on *Imports* exactly. One column: 24 from rows to a group, between groups, and
+  — a row moved after the last group — from a group to a row.
 
 ## Still open
 
@@ -245,8 +269,6 @@ Live, Chromium at 1280×800, `Navigation/SideNavigation` → *Deux niveaux*:
   Sentry floats the panel over the page instead; drawn on the board, not decided.
 - **A section without pages, collapsed.** There the toggle sits above the mark, so walking to
   Accueil removes it and the mark moves up 44px — the one place the rail's head still jumps.
-- **Figma's `SideNavigation` set has no two-level variant.** `1924:3907` is the reference until one
-  is drawn.
 - **167px truncates real labels.** "Toutes les parcelles" does already; the width is the frame's,
   and a section whose pages are long French phrases will want either shorter names or a wider panel.
 
