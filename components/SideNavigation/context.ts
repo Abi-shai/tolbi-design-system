@@ -28,23 +28,6 @@ export interface SideNavigationContext {
    * is the current one *of a set*, and the page is in the panel (ADR-0046).
    */
   current: Ref<'page' | 'true'>
-  /**
-   * The pointer entered (`el`) or left (`null`) an item. Only the rail of a
-   * collapsed two-level column listens: it answers with the section's pages,
-   * floated beside the row (ADR-0047).
-   */
-  hover?(value: string, el: HTMLElement | null): void
-  /**
-   * True when pointing at this item floats its section's pages — the item then
-   * keeps its tooltip for the keyboard only, or the two would stack.
-   */
-  flyoutFor?(value: string): boolean
-  /**
-   * The item whose section's pages are floating. It keeps its hover state for
-   * as long as they do, so the panel reads as coming *from* that row — the
-   * board drew it so (`1917:3939`), and HubSpot does the same.
-   */
-  peek?: Ref<string | null>
 }
 
 export const SIDE_NAVIGATION_KEY: InjectionKey<SideNavigationContext> =

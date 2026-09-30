@@ -173,8 +173,8 @@ Live, Chromium at 1280×800, `Navigation/SideNavigation` → *Deux niveaux*:
 
 ## Still open
 
-- ~~**Hovering a rail item while the panel is closed** shows the tooltip, not the section's pages.~~
-  Closed by ADR-0047: the rail keeps the sections, and pointing at one floats its pages.
+- **Hovering a rail item while the panel is closed** shows the tooltip, not the section's pages.
+  Sentry floats the panel over the page instead; drawn on the board, not decided.
 - **A section without pages, collapsed.** There the toggle sits above the mark, so walking to
   Accueil removes it and the mark moves up 44px — the one place the rail's head still jumps.
 - **Figma's `SideNavigation` set has no two-level variant.** `1924:3907` is the reference until one

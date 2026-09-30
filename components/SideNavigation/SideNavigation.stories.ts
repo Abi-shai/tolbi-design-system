@@ -296,18 +296,13 @@ const PAGES: Record<string, PageGroup[]> = {
 }
 
 const firstPage = (section: string) => PAGES[section]?.[0]?.pages[0]?.value ?? ''
-const pagesOf = (section: string) => (PAGES[section] ?? []).flatMap((g) => g.pages.map((p) => p.value))
 
-/**
- * A shell's own job, not the component's: a new section lands on its first
- * page — unless the page is already one of its own, which is what a page
- * picked from the floated panel is (section and page arrive together).
- */
+/** A shell's own job, not the component's: a new section lands on its first page. */
 function useTwoTier(initial: string, collapsedAtStart = false) {
   const section = ref(initial)
   const page = ref(firstPage(initial))
   const collapsed = ref(collapsedAtStart)
-  watch(section, (s) => { if (!pagesOf(s).includes(page.value)) page.value = firstPage(s) })
+  watch(section, (s) => { page.value = firstPage(s) })
   return { section, page, collapsed }
 }
 
@@ -324,8 +319,8 @@ const TWO_TIER = `
 
     <SideNavItem v-for="s in SECTIONS" :key="s.value" :value="s.value" :icon="s.icon" :label="s.label" />
 
-    <template #panel="panel">
-      <template v-for="(g, i) in PAGES[panel.section]" :key="panel.section + i">
+    <template #panel>
+      <template v-for="(g, i) in PAGES[section]" :key="section + i">
         <SideNavGroup v-if="g.label" :label="g.label">
           <SideNavItem v-for="p in g.pages" :key="p.value" :value="p.value" :icon="p.icon" :label="p.label" />
         </SideNavGroup>
@@ -360,9 +355,7 @@ export const TwoTier: Story = {
           'Le rail porte les rubriques, le panneau les pages de la rubrique sélectionnée — titré par elle, ' +
           'lu sur le rail plutôt que passé en prop. Deux sélections, deux pastilles : `v-model` pour la ' +
           'rubrique, `v-model:page` pour la page. La bascule est dessinée dans la ligne du titre ; ' +
-          'repliée, elle rejoint le rail au-dessus de la marque en suivant le bord du panneau. ' +
-          'Le slot reçoit la rubrique (`#panel="{ section }"`) : le rail peut lui demander les pages ' +
-          "d'une autre rubrique que la sélectionnée — celle qu'on survole une fois réduite.",
+          'repliée, elle rejoint le rail au-dessus de la marque en suivant le bord du panneau.',
       },
     },
   },
@@ -376,9 +369,7 @@ export const TwoTierCollapsed: Story = {
       description: {
         story:
           "Réduite, il ne reste que le rail : c'est la forme réduite d'une seule colonne, à l'identique. " +
-          '`collapsed` ne ferme que le panneau — le rail, lui, ne se replie jamais. Survoler une rubrique ' +
-          'qui a des pages les fait flotter à côté de la ligne : le panneau lui-même, soulevé, avec ' +
-          "l'entrée de `SurfaceTransition`. Une rubrique sans pages garde son tooltip, le clavier aussi.",
+          '`collapsed` ne ferme que le panneau — le rail, lui, ne se replie jamais.',
       },
     },
   },
