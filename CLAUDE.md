@@ -558,6 +558,21 @@ Before working on any component, read:
   capsule's receding ink is `text-subtle` (ADR-0046's call), where the frame kept subtlest.
   **Amended**: the tile is the capsule's content band — **74 square**, not 64 — and the capsule's
   inset is `spacing-md` all round, so the row has one height and the edge hugs the tile.
+- **ADR-0049**: Paramètres is **outside the app**, and the bar there has no identity (3A,
+  `2067:5918`). `lockup: false` closes the slot — a boolean, not a third value beside `module`, which
+  already decides *which* mark (ADR-0024) — and with no identity the bar is **never at home**, so the
+  way out always renders and opens the bar. `homeIcon: 'house' | 'arrow-left'` says what kind of way
+  out it is, a place or a return; two values, not `IconName`. The passage is **two beats and nothing
+  slides**: the way out and the trail are one element keyed by `lockup`, *replaced* in one cell
+  rather than moved — the outgoing pair fades in place, the slot steps one `enter` late, unseen, and
+  the incoming pair arrives where it stays. **An arrival waits for the place it lands in to be
+  free**: back from Paramètres the mark waits one `enter` too. The DOM groups by motion, the gaps by
+  meaning. Film Vue transitions by **slowing the duration tokens**, not CDP's clock — Vue ends a
+  `<Transition>` on an unslowed JS timeout. `credits` absent ⇒ no chip (`0` still renders).
+  `WorkspaceSelector` gains `#actions` in a new `Dropdown` `#footer`, outside the scroll. No
+  choice-with-preview component (one consumer): `ButtonGroup`. Figma: `Breadcrumbs` gained `Maison`
+  with **trailing** chevrons and a `bg/default` current segment; `Button` gained `Size = lg | sm`.
+  Still open: module → home lurches 29.73px at frame 0 (pre-existing).
 
 ## Architecture
 
