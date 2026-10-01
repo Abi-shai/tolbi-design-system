@@ -3,12 +3,12 @@
     "heading-xl": {
       "$value": "{typography.font-size.24}",
       "$type": "dimension",
-      "$description": "Page title"
+      "$description": "Largest heading step. Not the page title — PageHeader takes heading-lg (ADR-0051)"
     },
     "heading-lg": {
       "$value": "{typography.font-size.20}",
       "$type": "dimension",
-      "$description": "Section heading, modal/drawer title"
+      "$description": "Page title (PageHeader, ADR-0051), section heading, modal/drawer title"
     },
     "heading-md": {
       "$value": "{typography.font-size.16}",
