@@ -136,6 +136,16 @@ onUnmounted(() => {
           <slot />
         </div>
       </Scrollbar>
+
+      <!--
+        Footer — the header's twin at the other end: outside the scroll, so an
+        action that concerns the whole list (« Créer une organisation ») stays
+        reachable however long the list grows. Filled with `DropdownItem`s, which
+        line up with the rows above because the padding is the list's.
+      -->
+      <div v-if="$slots.footer" class="ds-dropdown__footer">
+        <slot name="footer" />
+      </div>
     </div>
     </SurfaceTransition>
   </div>
@@ -243,6 +253,16 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   padding: var(--ds-spacing-xs) 0;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────── */
+/* The header's rule, mirrored; the list's padding, so its rows align. */
+.ds-dropdown__footer {
+  display: flex;
+  flex-direction: column;
+  padding: var(--ds-spacing-xs) 0;
+  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  flex-shrink: 0;
 }
 
 </style>

@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 import WorkspaceSelector from './WorkspaceSelector.vue'
+import { DropdownItem } from '../Dropdown'
 
 const meta: Meta = {
   title: 'Navigation/WorkspaceSelector',
@@ -163,6 +164,30 @@ export const Collapsed: Story = {
     template: `
       <div style="width: 68px; padding: 16px; background: var(--ds-bg-neutral); box-sizing: border-box;">
         <WorkspaceSelector v-model="current" :workspaces="workspaces" collapsed />
+      </div>
+    `,
+  }),
+}
+
+/**
+ * Une action sur les espaces eux-mêmes — « Créer une organisation » — au pied du
+ * panneau, sous un filet et hors du défilement : elle concerne la liste, pas une
+ * de ses lignes. Le produit remplit `#actions` de `DropdownItem` et ferme le
+ * panneau avec `close`, comme le fait le choix d'une ligne.
+ */
+export const WithActions: Story = {
+  name: 'Avec une action',
+  render: () => ({
+    setup: () => ({ current: ref('kaolack'), workspaces }),
+    components: { WorkspaceSelector, DropdownItem },
+    template: `
+      <div style="width: 228px; height: 300px; padding: 12px 16px; box-sizing: content-box;
+                  background: var(--ds-bg-neutral); border-radius: var(--ds-radius-surface);">
+        <WorkspaceSelector v-model="current" :workspaces="workspaces">
+          <template #actions="{ close }">
+            <DropdownItem icon="plus" label="Créer une organisation" @click="close()" />
+          </template>
+        </WorkspaceSelector>
       </div>
     `,
   }),

@@ -184,6 +184,17 @@ function select(w: Workspace) {
       :label="w.name"
       @click="select(w)"
     />
+
+    <!--
+      Actions on the workspaces themselves — « Créer une organisation » — in
+      the panel's footer, under a rule and outside the scroll: they concern the
+      list, not one of its rows. The product fills it with `DropdownItem`s and
+      closes the panel through `close`, as `select` does for a row; the switcher
+      cannot know where an action leads.
+    -->
+    <template v-if="$slots.actions" #footer>
+      <slot name="actions" :close="() => (open = false)" />
+    </template>
   </Dropdown>
 </template>
 
