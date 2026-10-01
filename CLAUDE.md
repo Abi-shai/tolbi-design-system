@@ -573,6 +573,17 @@ Before working on any component, read:
   choice-with-preview component (one consumer): `ButtonGroup`. Figma: `Breadcrumbs` gained `Maison`
   with **trailing** chevrons and a `bg/default` current segment; `Button` gained `Size = lg | sm`.
   Still open: module → home lurches 29.73px at frame 0 (pre-existing).
+- **ADR-0050**: **one mark for the current item** of a list — its own ground, that ground's ink,
+  the role's strong weight: `bg-selected` + `text-on-brand-subtle` + `label-*-strong`, **no check**.
+  Chosen from three tracks drawn in both modes (board `2092:4229`): in dark `bg-selected` is 1.145:1
+  on the panel and `bg-hover` 1.233:1, so the tint alone loses to a passing pointer. Hover on the
+  current item stays `bg-selected-hover`. Applies to `DropdownItem`, `DropdownSelectItem`,
+  `ModulesList`, `Pagination` — not `Table` (bulk selection, checkboxes), nor the neutral pill of
+  `SideNavigation`/`Breadcrumbs`/`Tabs` (where you are, on a recessed ground). `DropdownItem.selected`
+  absent = an action (`menuitem`), present = a choice (`menuitemradio`). **One kind of row per
+  panel**: the switcher's rows are `DropdownItem`, with `Avatar xs` before each name; the panel
+  declares `--dropdown-item-leading` so its footer's `+` shares the names' edge. The switcher's
+  panel is `Dropdown`'s 240, floored at the trigger — no invented cap.
 
 ## Architecture
 
