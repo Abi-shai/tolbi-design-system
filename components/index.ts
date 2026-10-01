@@ -120,6 +120,8 @@ export type { TabsSize, TabsItem } from './Tabs'
 
 export { Pagination } from './Pagination'
 
+export { PageHeader } from './PageHeader'
+
 export { StepDots } from './StepDots'
 
 export { ProgressSteps } from './ProgressSteps'
