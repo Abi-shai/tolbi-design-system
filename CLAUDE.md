@@ -584,6 +584,15 @@ Before working on any component, read:
   panel**: the switcher's rows are `DropdownItem`, with `Avatar xs` before each name; the panel
   declares `--dropdown-item-leading` so its footer's `+` shares the names' edge. The switcher's
   panel is `Dropdown`'s 240, floored at the trigger — no invented cap.
+- **ADR-0051**: `PageHeader` — **the page has one heading**, and it is a component: 52 product pages
+  posted their `<h1>` by hand (`text-2xl/3xl/5xl`, Bold). Title = `<h1>` in **`heading-lg`** (20/28),
+  set by the design owner on the Figma component; the roles' descriptions were rewritten to match
+  (`heading-xl` had said *Page title* and is now only the figures' step). `subtitle` + `#subtitle`
+  (the prop as fallback); neither = no line and no gap. `#actions` on the right, centred on the text.
+  `spacing-xs` / `spacing-xl`, subtitle capped at the frame's 720 (`45rem`, a ceiling). **No outer
+  margin** — the 24 below belongs to the page. In a narrow column the actions **drop under the text**
+  when it would go below `20rem` — intrinsic, no breakpoint. A `<div>`, not a `<header>` (the bar is the
+  banner). Figma component `2103:4619` with an `Actions` slot.
 
 ## Architecture
 
