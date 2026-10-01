@@ -41,11 +41,12 @@ function onSelect(item: ModulesListItem) {
             'ds-modules-list__item--disabled': mod.disabled,
           }"
           :disabled="mod.disabled"
+          :aria-current="mod.active ? 'true' : undefined"
           @click="onSelect(mod)"
         >
           <!--
             The primitive, not the logo: the item button already supplies the surface
-            (its own radius, hover background, and bg-brand-primary when active), so the
+            (its own radius, hover background, and bg-selected when current), so the
             logo's tile would be a tile inside a tile and would fight the active state.
             aria-label is null because the visible label below already names the module.
           -->
@@ -124,7 +125,10 @@ function onSelect(item: ModulesListItem) {
   flex-direction: column;
   align-items: center;
   gap: var(--ds-spacing-md);
-  padding: var(--ds-spacing-md);
+  /* Vertical padding only. The 48px drawing centres itself in the 66px tile
+     either way; the label gets the tile's full width — at 50px the current
+     module's strong weight cut « Carbone » (ADR-0050). */
+  padding: var(--ds-spacing-md) 0;
   background: transparent;
   border: none;
   border-radius: var(--ds-radius-control);
@@ -138,8 +142,22 @@ function onSelect(item: ModulesListItem) {
   background: var(--ds-bg-hover);
 }
 
+/*
+  The current module, marked the one way every list in the catalogue marks its
+  current item (ADR-0050): its own ground, that ground's ink, the role's strong
+  weight. It used to be the tint alone — 1.145:1 against the panel in dark,
+  where hover is 1.233:1, so hovering any other module outshone the one you
+  were in. `aria-current`, not a pressed state: this is where you are.
+
+  The hover rule above outweighs this class (`:hover:not(:disabled)` counts
+  three), so the current module's hover is restated in its own family.
+*/
 .ds-modules-list__item--active {
   background: var(--ds-bg-selected);
+}
+
+.ds-modules-list__item--active:hover:not(:disabled) {
+  background: var(--ds-bg-selected-hover);
 }
 
 .ds-modules-list__item--disabled {
@@ -154,5 +172,10 @@ function onSelect(item: ModulesListItem) {
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
+}
+
+.ds-modules-list__item--active .ds-modules-list__label {
+  font: var(--ds-font-label-md-strong);
+  color: var(--ds-text-on-brand-subtle);
 }
 </style>
