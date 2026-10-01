@@ -22,7 +22,8 @@ const meta: Meta<typeof DropdownSelectItem> = {
     docs: {
       description: {
         component:
-          'Ligne de *sélection* d\'un `InputDropdown` — porte un état sélectionné et un texte d\'appui. ' +
+          'Ligne de *sélection* d\'un `InputDropdown` — porte un état sélectionné (son fond, son encre, ' +
+          'la graisse forte — pas de coche, comme tout élément courant du catalogue) et un texte d\'appui. ' +
           '**Ne s\'utilise jamais seule.** Pour une ligne d\'*action* dans un menu, voir `DropdownItem`.',
       },
     },

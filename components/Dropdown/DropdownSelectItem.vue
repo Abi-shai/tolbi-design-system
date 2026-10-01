@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { MarkTransition } from '../MarkTransition'
 import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
 import type { IconName } from '../Icon'
@@ -12,6 +11,8 @@ interface Props {
   type?: DropdownSelectItemType
   icon?: IconName
   avatarSrc?: string
+  /** Shown when there is no `avatarSrc` — the same fallback `Avatar` gives. */
+  avatarInitials?: string
   avatarAlt?: string
   dotColor?: string
   selected?: boolean
@@ -54,6 +55,7 @@ const emit = defineEmits<{
       <Avatar
         v-else-if="type === 'avatar'"
         :src="avatarSrc"
+        :initials="avatarInitials"
         :alt="avatarAlt"
         size="xs"
         class="ds-dropdown-select-item__leading-avatar"
@@ -69,16 +71,6 @@ const emit = defineEmits<{
         <span class="ds-dropdown-select-item__label">{{ label }}</span>
         <span v-if="supportingText" class="ds-dropdown-select-item__supporting">{{ supportingText }}</span>
       </div>
-
-      <MarkTransition>
-        <Icon
-          v-if="selected"
-          name="check"
-          :size="20"
-          class="ds-dropdown-select-item__check"
-          aria-hidden="true"
-        />
-      </MarkTransition>
     </div>
   </div>
 </template>
@@ -108,6 +100,13 @@ const emit = defineEmits<{
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
+/*
+  The current item, marked the one way every list in the catalogue marks it
+  (ADR-0050): its own ground, that ground's ink, and the role's strong weight.
+  No check — the weight is the cue that does not travel by colour, which is
+  what the tint alone could not be: in dark it measures 1.145:1 against the
+  panel, where hover measures 1.233:1.
+*/
 .ds-dropdown-select-item--selected .ds-dropdown-select-item__content {
   background-color: var(--ds-bg-selected);
 }
@@ -115,6 +114,13 @@ const emit = defineEmits<{
 .ds-dropdown-select-item:hover:not(.ds-dropdown-select-item--disabled) .ds-dropdown-select-item__content,
 .ds-dropdown-select-item:focus-visible .ds-dropdown-select-item__content {
   background-color: var(--ds-bg-hover);
+}
+
+/* Hovering the current item keeps its ground's family — `bg-hover` would take
+   the tint away and leave the brand ink on grey. */
+.ds-dropdown-select-item--selected:hover:not(.ds-dropdown-select-item--disabled) .ds-dropdown-select-item__content,
+.ds-dropdown-select-item--selected:focus-visible .ds-dropdown-select-item__content {
+  background-color: var(--ds-bg-selected-hover);
 }
 
 .ds-dropdown-select-item:focus-visible {
@@ -156,12 +162,28 @@ const emit = defineEmits<{
   overflow: hidden;
 }
 
+/*
+  Both texts may give way, the supporting one a hundred times faster — so it is
+  cut first, and the label only once it has nothing left. The label used to be
+  `flex-shrink: 0`, which made its own ellipsis unreachable: a long label was
+  clipped mid-letter by the text box instead (« Coopérative de Kaolac »).
+*/
 .ds-dropdown-select-item__label {  font: var(--ds-font-label-xl);
   color: var(--ds-text-strong);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex-shrink: 0;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.ds-dropdown-select-item--selected .ds-dropdown-select-item__label {
+  font: var(--ds-font-label-xl-strong);
+  color: var(--ds-text-on-brand-subtle);
+}
+
+.ds-dropdown-select-item--selected .ds-dropdown-select-item__leading-icon {
+  color: var(--ds-text-on-brand-subtle);
 }
 
 .ds-dropdown-select-item--disabled .ds-dropdown-select-item__label {
@@ -171,19 +193,15 @@ const emit = defineEmits<{
 .ds-dropdown-select-item__supporting {  font: var(--ds-font-body-lg);
   color: var(--ds-text-subtle);
   white-space: nowrap;
-  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 0 100 auto;
+  min-width: 0;
 }
 
 .ds-dropdown-select-item--disabled .ds-dropdown-select-item__supporting {
   color: var(--ds-text-disabled);
 }
 
-.ds-dropdown-select-item__check {
-  flex-shrink: 0;
-  color: var(--ds-text-brand);
-}
 
-.ds-dropdown-select-item--disabled .ds-dropdown-select-item__check {
-  color: var(--ds-text-subtlest);
-}
 </style>
