@@ -21,9 +21,11 @@ const meta: Meta<typeof DropdownItem> = {
     docs: {
       description: {
         component:
-          'Ligne d\'action d\'un menu `Dropdown`. **Ne s\'utilise jamais seule** — elle attend le panneau ' +
-          'du parent pour son fond, son ombre et sa largeur. Pour une ligne de *sélection* ' +
-          '(état sélectionné, avatar, puce), voir `DropdownSelectItem`.',
+          'Ligne d\'un menu `Dropdown` — une *action*, ou un *choix* dès que `selected` est donné ' +
+          '(`menuitemradio`), avec une icône ou un avatar en tête. Le choix courant est marqué comme tout ' +
+          'élément courant du catalogue : `bg-selected`, son encre `text-on-brand-subtle`, la graisse ' +
+          'forte — pas de coche. **Ne s\'utilise jamais seule** — elle attend le panneau du parent pour ' +
+          'son fond, son ombre et sa largeur. Pour l\'option d\'un champ, voir `DropdownSelectItem`.',
       },
     },
   },
@@ -42,6 +44,17 @@ const meta: Meta<typeof DropdownItem> = {
       control: 'text',
       description: 'Raccourci clavier affiché à droite, aligné en fin de ligne.',
       table: { category: 'Contenu', type: { summary: 'string' } },
+    },
+    avatarInitials: {
+      control: 'text',
+      description: 'Avatar de tête (initiales), à la place de l\'icône — sa présence décide.',
+      table: { category: 'Contenu', type: { summary: 'string' } },
+    },
+    selected: {
+      control: 'select',
+      options: [undefined, false, true],
+      description: 'Absent : une action. Donné : un choix — `true` est le choix courant.',
+      table: { category: 'État', type: { summary: 'boolean | undefined' } },
     },
     disabled: {
       control: 'boolean',
@@ -94,6 +107,25 @@ export const Menu: Story = {
         <DropdownItem label="Télécharger" icon="download" shortcut="⌘D" />
         <DropdownDivider />
         <DropdownItem label="Supprimer" icon="trash-2" disabled />
+      </div>
+    `,
+  }),
+}
+
+/**
+ * Des *choix* : `selected` donné sur chaque ligne, `true` sur la courante —
+ * marquée par son fond, son encre et la graisse forte, sans coche. Avec
+ * l'avatar en tête, comme dans le `WorkspaceSelector`.
+ */
+export const Choices: Story = {
+  name: 'Choix — avec avatar',
+  render: () => ({
+    components: { DropdownItem },
+    template: `
+      <div>
+        <DropdownItem label="Coopérative de Kaolack" avatar-initials="CK" :selected="true" />
+        <DropdownItem label="Coopérative de Nioro" avatar-initials="CN" :selected="false" />
+        <DropdownItem label="Guinguinéo — périmètre sud" avatar-initials="GP" :selected="false" />
       </div>
     `,
   }),
