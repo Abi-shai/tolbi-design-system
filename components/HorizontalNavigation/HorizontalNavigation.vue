@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { Logo } from '../Logo'
 import { Breadcrumbs } from '../Breadcrumbs'
 import { Avatar } from '../Avatar'
@@ -24,6 +24,14 @@ import type { BreadcrumbsItem } from '../Breadcrumbs'
 export type BreadcrumbItem = BreadcrumbsItem
 
 export type NavModule = ModulesListItem
+
+/**
+ * The glyph on the way out, which says **what kind** of way out it is: a place
+ * (`house` — the home page) or a return (`arrow-left` — the page the user left
+ * to come here). Two meanings, so two glyphs, and a glyph that says neither is
+ * unwritable — the type is the coverage (ADR-0041).
+ */
+export type HorizontalNavigationHomeIcon = 'house' | 'arrow-left'
 
 interface Props {
   /**
@@ -50,8 +58,26 @@ interface Props {
    * (`Breadcrumbs.homeLabel`, same reasoning).
    */
   moduleLabel?:     string
+  /**
+   * Whether the bar shows an identity at all. `false` is a space that is
+   * neither a module nor the home page — Paramètres, where the app's column
+   * gives way to the settings' own: there is nothing for the slot to say, so
+   * the slot closes and **the way out opens the bar**.
+   *
+   * Named after the thing it removes, like `Breadcrumbs.home` and
+   * `SideNavigation.toggle` (ADR-0034). A boolean rather than a third value
+   * beside `module`: `module` already decides *which* mark, and a second prop
+   * that could also say "module" would be ADR-0024's two owners again.
+   *
+   * Without an identity the bar is never at home, so the way out is always
+   * there — it is the only thing left that says where the user can go.
+   */
+  lockup?:          boolean
   breadcrumbs?:     BreadcrumbItem[]
-  /** Où mène la maison du fil. Avec, c'est une ancre ; sans, un bouton. */
+  /**
+   * Où mène le bouton de retour — l'accueil, ou la page quittée dans
+   * Paramètres. Avec, c'est une ancre ; sans, un bouton.
+   */
   homeHref?:        string
   /**
    * Le mot du bouton de retour. Une chaîne appartient au produit, donc elle est
@@ -61,6 +87,21 @@ interface Props {
    * `Breadcrumbs`, qui garde son état profondeur 0, doit rester sur un lieu.
    */
   homeLabel?:       string
+  /**
+   * Le glyphe du bouton de retour — `house` quand il mène à l'accueil,
+   * `arrow-left` quand il ramène à la page quittée (Paramètres). Le mot et le
+   * glyphe suivent le même raisonnement : c'est le produit qui sait où mène la
+   * sortie, donc les deux sont à lui. Défaut `house`, ce qu'ADR-0042 a posé.
+   *
+   * Deux valeurs et pas tout `IconName` : la sortie a deux sens, un lieu ou un
+   * retour, et un glyphe qui ne dit ni l'un ni l'autre ne doit pas s'écrire.
+   */
+  homeIcon?:        HorizontalNavigationHomeIcon
+  /**
+   * The balance. **Absent, there is no chip** — the bar shows a balance when the
+   * product has one to show, and Paramètres has its own page for it. `0` is a
+   * balance, not an absence, so it still renders.
+   */
   credits?:         number
   /** Expiry reminder shown in the credits chip, e.g. `Expirent dans 14 jours`. */
   creditsReminder?: string
@@ -72,8 +113,9 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  lockup:          true,
   homeLabel:       'Retourner sur l\u2019accueil',
-  credits:         0,
+  homeIcon:        'house',
   userInitials:    'TD',
   hasNotification: false,
   modules:         () => [],
@@ -117,8 +159,28 @@ function toggleModules() {
  * Home is the absence of both — no module, and no path. The way back and the
  * trail are the two things that have nothing to say there, so they share one
  * condition and one entrance.
+ *
+ * And it is the Tolbi lockup standing alone, so a bar with no identity is never
+ * home: without it, the way out is the first thing in the bar and the only one
+ * that says where the user can go.
  */
-const atHome = computed(() => !props.module && !props.breadcrumbs?.length)
+const atHome = computed(() => props.lockup && !props.module && !props.breadcrumbs?.length)
+
+/**
+ * The identity slot is **opening** — the bar had no identity a moment ago and
+ * has one now (Paramètres → the app).
+ *
+ * The incoming mark then waits one `enter` before it rolls in, because the slot
+ * it lands in is not free yet: the way out is still standing there, fading. The
+ * slot opens in the gap between the two beats, unseen, and the mark arrives with
+ * everything else in the second. Every other arrival rolls at once — module to
+ * module, or past the Tolbi lockup leaving the same window.
+ *
+ * Set before the render that mounts the mark (a `pre` watcher), cleared once it
+ * has settled.
+ */
+const opening = ref(false)
+watch(() => props.lockup, (now, before) => { opening.value = now && !before })
 
 /**
  * The dropdown's current item, derived — never declared. `module` is the one
@@ -147,144 +209,187 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 <template>
   <header class="ds-hnav">
 
-    <!-- ── Gauche : logo + breadcrumbs ────────────────────────────────── -->
+    <!-- ── Gauche : l'identité, puis la sortie et le fil ─────────────────── -->
+    <!--
+      Two statements, said by the gaps: *where you are and how to leave* (the
+      mark, `spacing-lg`, the way out) and *how you got to this page* (the trail,
+      `spacing-4xl` further). 12px binds, 32px separates (ADR-0042).
+
+      The DOM groups by **motion** instead. The mark has its own window; the way
+      out and the trail arrive and leave together, so they are one element — and
+      that element is what lets them be replaced in place when the identity slot
+      opens or closes, without the outgoing pair and the incoming pair ever
+      standing side by side.
+    -->
     <div class="ds-hnav__left">
+
       <!--
-        ── The identity block ────────────────────────────────────────────
-        Where you are, and the way out of it — one unit, `spacing-lg` apart.
-        The trail is a **separate** block `spacing-4xl` away, and it shows the
-        path *inside* the module rather than from the top: the module is the
-        mark on its left, not a crumb.
+        ── The identity slot ─────────────────────────────────────────────
+        A track that can **close**. `lockup: false` (Paramètres) has nothing for
+        the slot to say, so the window goes to nothing and takes its 12px with
+        it: the way out then opens the bar.
+
+        The clip is load-bearing. A `0fr` track still counts its item's margins
+        and padding, so the 12px cannot live on the grid item — it lives on the
+        window, inside the clip.
       -->
-      <div class="ds-hnav__identity-block">
+      <div
+        class="ds-hnav__identity-track"
+        :class="{
+          'ds-hnav__identity-track--closed':  !lockup,
+          'ds-hnav__identity-track--opening': opening,
+        }"
+      >
+        <div class="ds-hnav__identity-clip">
+          <!--
+            One slot, two forms: the Tolbi lockup at home, the module's mark
+            inside a module. `module` is the only thing that decides which.
 
-        <!--
-          One slot, two forms: the Tolbi lockup at home, the module's mark
-          inside a module. `module` is the only thing that decides which.
+            The two share one grid cell (ADR-0027's `grid-area: 1 / 1`) so the
+            slot is never empty mid-swap — and here that is structural rather
+            than prudent: they roll past each other, so both have to be in the
+            slot at once. `mode="out-in"` would make it two movements.
+          -->
+          <div class="ds-hnav__identity">
+            <Transition name="ds-hnav-identity" @after-enter="opening = false">
+              <!--
+                The module's mark, and nothing else. The trail beside it no
+                longer names the module either — the mark is the name.
 
-          The two share one grid cell (ADR-0027's `grid-area: 1 / 1`) so the
-          slot is never empty mid-swap — and here that is structural rather
-          than prudent: they roll past each other, so both have to be in the
-          slot at once. `mode="out-in"` would make it two movements.
-        -->
-        <div class="ds-hnav__identity">
-          <Transition name="ds-hnav-identity">
-            <!--
-              The module's mark, and nothing else. The trail beside it no
-              longer names the module either — the mark is the name.
+                Which moves the accessible name **onto the mark** — ADR-0041's
+                rule with the opposite input. There, visible text beside the
+                artwork made `aria-label` noise; here nothing in the slot names
+                the module, so the artwork has to. `moduleLabel` undefined falls
+                through to `ModuleIcon`'s own default, which is the module's name.
 
-              Which moves the accessible name **onto the mark** — ADR-0041's
-              rule with the opposite input. There, visible text beside the
-              artwork made `aria-label` noise; here nothing in the slot names
-              the module, so the artwork has to. `moduleLabel` undefined falls
-              through to `ModuleIcon`'s own default, which is the module's name.
+                `illustration`, the primitive: the two forms alternate in one
+                slot, so they have to be the same kind of object, and the Tolbi
+                mark is untiled artwork. The bar has no ground of its own to hand
+                it either (ADR-0028).
+              -->
+              <div v-if="lockup && module" :key="module" class="ds-hnav__lockup">
+                <ModuleIcon
+                  :module="module"
+                  variant="illustration"
+                  size="var(--hnav-mark)"
+                  :aria-label="moduleLabel"
+                />
+              </div>
 
-              `illustration`, the primitive: the two forms alternate in one
-              slot, so they have to be the same kind of object, and the Tolbi
-              mark is untiled artwork. The bar has no ground of its own to hand
-              it either (ADR-0028).
-            -->
-            <div v-if="module" :key="module" class="ds-hnav__lockup">
-              <ModuleIcon
-                :module="module"
-                variant="illustration"
-                size="var(--hnav-mark)"
-                :aria-label="moduleLabel"
-              />
-            </div>
+              <!--
+                The coloured lockup, inside a plain wrapper — and the wrapper is
+                load-bearing.
 
-            <!--
-              The coloured lockup, inside a plain wrapper — and the wrapper is
-              load-bearing.
+                `<Logo>` as the direct child of the `<Transition>` fades **in** and
+                is **cut** on the way out. Bisected: `Logo`'s own root is a
+                `v-if`/`v-else` pair, and only the `v-if` branch carries the leave
+                hooks — `variant="nav"` (the `v-if`) leaves correctly, `default`
+                (the `v-else`) never gets a `-leave-*` class at all. The failure is
+                asymmetric in *both* senses, which is what hides it: one variant of
+                one component, in one direction of the swap.
 
-              `<Logo>` as the direct child of the `<Transition>` fades **in** and
-              is **cut** on the way out. Bisected: `Logo`'s own root is a
-              `v-if`/`v-else` pair, and only the `v-if` branch carries the leave
-              hooks — `variant="nav"` (the `v-if`) leaves correctly, `default`
-              (the `v-else`) never gets a `-leave-*` class at all. The failure is
-              asymmetric in *both* senses, which is what hides it: one variant of
-              one component, in one direction of the swap.
+                So the `<Transition>` gets plain elements on both branches —
+                `RevealTransition` renders its own element for the same class of
+                reason (ADR-0032).
 
-              So the `<Transition>` gets plain elements on both branches —
-              `RevealTransition` renders its own element for the same class of
-              reason (ADR-0032).
-
-              `24`, two rungs **below** the module mark beside it — see
-              `--hnav-mark` for why the two differ, and ADR-0043 for the
-              measurement behind it.
-            -->
-            <div v-else key="tolbi" class="ds-hnav__lockup">
-              <Logo variant="default" :size="24" alt="Tolbi" />
-            </div>
-          </Transition>
+                `24`, two rungs **below** the module mark beside it — see
+                `--hnav-mark` for why the two differ, and ADR-0043 for the
+                measurement behind it.
+              -->
+              <div v-else-if="lockup" key="tolbi" class="ds-hnav__lockup">
+                <Logo variant="default" :size="24" alt="Tolbi" />
+              </div>
+            </Transition>
+          </div>
         </div>
-
-        <!--
-          The way back. A real `Button` rather than a crumb (ADR-0001): it left
-          the trail, so it stopped being a node in a path and became an action
-          beside the identity — and it is drawn as one.
-
-          `secondary-gray`, not the `ghost` chrome the crumb had: a ghost is
-          *nothing at rest* and only answers a pointer that has already found
-          it, which is the wrong contract for the single way out of a module.
-          A declared box also bounds the block, so the 12px gap reads as binding
-          two objects rather than as loose space beside the mark.
-
-          `href` makes it an `<a>`, the rule ADR-0014 set and `Breadcrumbs`
-          already followed.
-
-          `sm` is the **smallest size the catalogue has**, and it is taken as it
-          comes: `label-lg-strong` and `control-padding-sm`, no local override.
-          A component that is 90% the real one is the defect ADR-0001 exists to
-          stop, and a font declared here would be exactly that.
-        -->
-        <Transition name="ds-hnav-away">
-          <Button
-            v-if="!atHome"
-            class="ds-hnav__home"
-            data-hnav-home
-            variant="secondary-gray"
-            size="sm"
-            iconLeading="house"
-            :label="homeLabel"
-            :href="homeHref"
-            @click="emit('home', $event)"
-          />
-        </Transition>
       </div>
 
       <!--
-        The catalogue's Breadcrumbs, not a second drawing of it (ADR-0001) —
-        **without its house**, and not at depth 0.
+        ── What arrives once you have left home ──────────────────────────
+        The way out and the trail, in **one cell**: when the identity slot opens
+        or closes they are about to move, so they are replaced rather than
+        shoved — the outgoing pair fades where it stands while the incoming pair
+        waits, invisible, in the same cell, and arrives where it will stay. That
+        is what the key is: `lockup`, the one change that moves them.
 
-        The house moved into the identity block, so the trail is now exactly
-        what its name says: the path from this module to this page. It no longer
-        starts at the top of the product, because the mark on its left is where
-        it starts.
-
-        Its visibility is the **trail being empty**, not `module` being absent —
-        a page outside any module still has a path worth showing, and the two
-        props stay independent.
-
-        No wrapper here, unlike `<Logo>` above: `Breadcrumbs`' root is a single
-        unconditional `<nav>`, which is the case that transitions correctly.
+        One cell for both, not one each: a cell is as wide as the wider of its
+        two occupants, so a cell around the button alone would push the trail
+        the moment a longer label came in.
       -->
-      <Transition name="ds-hnav-away">
-        <Breadcrumbs
-          v-if="breadcrumbs?.length"
-          class="ds-hnav__trail"
-          :items="breadcrumbs"
-          :home="false"
-          @select="(item, event) => emit('breadcrumb-select', item, event)"
-        />
-      </Transition>
+      <div class="ds-hnav__away-cell">
+        <Transition name="ds-hnav-away">
+          <div v-if="!atHome" :key="lockup ? 'identity' : 'no-identity'" class="ds-hnav__away">
+            <!--
+              The way out. A real `Button` rather than a crumb (ADR-0001): it
+              left the trail, so it stopped being a node in a path and became an
+              action beside the identity — and it is drawn as one.
+
+              `secondary-gray`, not the `ghost` chrome the crumb had: a ghost is
+              *nothing at rest* and only answers a pointer that has already found
+              it, which is the wrong contract for the single way out of a module.
+              A declared box also bounds the block, so the 12px gap reads as
+              binding two objects rather than as loose space beside the mark.
+
+              `href` makes it an `<a>`, the rule ADR-0014 set and `Breadcrumbs`
+              already followed.
+
+              `sm` is the **smallest size the catalogue has**, and it is taken as
+              it comes: `label-lg-strong` and `control-padding-sm`, no local
+              override. A component that is 90% the real one is the defect
+              ADR-0001 exists to stop, and a font declared here would be exactly
+              that.
+
+              Its glyph and its word are the product's: `house` when it leads
+              home, `arrow-left` when it returns to the page the user left.
+            -->
+            <Button
+              class="ds-hnav__home"
+              data-hnav-home
+              variant="secondary-gray"
+              size="sm"
+              :iconLeading="homeIcon"
+              :label="homeLabel"
+              :href="homeHref"
+              @click="emit('home', $event)"
+            />
+
+            <!--
+              The catalogue's Breadcrumbs, not a second drawing of it (ADR-0001)
+              — **without its house**, and not at depth 0.
+
+              The house moved beside the identity, so the trail is now exactly
+              what its name says: the path from this module to this page. It no
+              longer starts at the top of the product, because the mark on its
+              left is where it starts.
+
+              Its visibility is the **trail being empty**, not `module` being
+              absent — a page outside any module still has a path worth showing,
+              and the two props stay independent.
+
+              No wrapper here, unlike `<Logo>` above: `Breadcrumbs`' root is a
+              single unconditional `<nav>`, which is the case that transitions
+              correctly.
+            -->
+            <Transition name="ds-hnav-away">
+              <Breadcrumbs
+                v-if="breadcrumbs?.length"
+                class="ds-hnav__trail"
+                :items="breadcrumbs"
+                :home="false"
+                @select="(item, event) => emit('breadcrumb-select', item, event)"
+              />
+            </Transition>
+          </div>
+        </Transition>
+      </div>
     </div>
 
     <!-- ── Droite : crédits + actions (l'avatar compris) ──────────────── -->
     <div class="ds-hnav__right">
 
-      <!-- Crédits -->
+      <!-- Crédits — only when the product has a balance to show -->
       <CreditsChip
+        v-if="credits !== undefined"
         :credits="credits"
         :reminder="creditsReminder"
         :tone="creditsTone"
@@ -408,24 +513,42 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 }
 
 /* ── Gauche ───────────────────────────────────────────────────────── */
+/*
+  No gap of its own. The two gaps that make the left side read as two
+  statements belong to what they separate: the identity carries its 12px to the
+  way out (and takes it away when it closes), and the way out carries its 32px
+  to the trail.
+*/
 .ds-hnav__left {
   display: flex;
   align-items: center;
-  /* 32px between the lockup and the trail, at every depth — Figma's `left`
-     frame carries the same gap in all four views. */
-  gap: var(--ds-spacing-4xl);
 }
 
 /*
-  ── The identity block ────────────────────────────────────────────────
-  Where you are, and the way out of it. `spacing-lg` (12px) between the two —
-  closer than the `spacing-4xl` (32px) that separates the block from the trail,
-  because they are one statement and the trail is another.
+  ── The identity track ────────────────────────────────────────────────
+  `1fr` with an identity, `0fr` without (`lockup: false`). The fraction is not
+  animated: both directions are a **step**, taken one `enter` late — closing,
+  once the leaving mark has rolled out of the window; opening, before the
+  incoming one rolls in. Either way the step lands between the two beats, when
+  the way out and the trail are faded out on one side and not yet faded in on
+  the other, so nothing visible is pushed. A travelling width would make the
+  outgoing pair slide while it fades — movement that explains nothing
+  (ADR-0023).
 */
-.ds-hnav__identity-block {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-lg);
+.ds-hnav__identity-track {
+  display: grid;
+  grid-template-columns: 1fr;
+  transition: grid-template-columns 0s linear var(--ds-motion-duration-enter);
+}
+
+.ds-hnav__identity-track--closed {
+  grid-template-columns: 0fr;
+}
+
+/* What lets a `0fr` track close: no minimum, and no paint past its edge. */
+.ds-hnav__identity-clip {
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* ── L'identité : la marque, ou le module ─────────────────────────── */
@@ -476,6 +599,9 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   display: grid;
   min-height: var(--hnav-mark);
   overflow: hidden;
+
+  /* The 12px to the way out — the identity's, so it closes with the slot. */
+  margin-inline-end: var(--ds-spacing-lg);
 }
 
 .ds-hnav__lockup {
@@ -539,15 +665,38 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 }
 
 /*
+  **An arrival waits for the place it lands in to be free.** Coming back from a
+  bar with no identity, the window is closed and the way out is standing where
+  the mark is about to land — so the mark arrives in the second beat, with the
+  way out and the trail, once the window has opened under them unseen. Rolling
+  at once would have meant pushing the fading way out aside, or rising through
+  it.
+
+  Every other arrival has its place free: module to module, or past the Tolbi
+  lockup leaving the same window — the roll is designed for that crossing.
+*/
+.ds-hnav__identity-track--opening .ds-hnav-identity-enter-active {
+  transition-delay: var(--ds-motion-duration-enter);
+}
+
+/*
   The identity still swaps, instantly, and the transform is reset with the
   transition — otherwise the incoming form would be parked one slot-height below
   and snap. Cutting the travel hides nothing (ADR-0033), unlike ADR-0032's
   marquee where stopping the loop would have hidden content.
+
+  The track's late step and the arrival's wait go too: a delay with no movement
+  behind it is only lateness.
 */
 @media (prefers-reduced-motion: reduce) {
+  .ds-hnav__identity-track,
   .ds-hnav-identity-enter-active,
   .ds-hnav-identity-leave-active {
     transition: none;
+  }
+
+  .ds-hnav__identity-track--opening .ds-hnav-identity-enter-active {
+    transition-delay: 0s;
   }
 
   .ds-hnav-identity-enter-from,
@@ -560,7 +709,8 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   ── What arrives once you have left home ──────────────────────────────
 
   Two elements, one entrance: the **way back** and the **trail**. Neither exists
-  on the home page, so they share a condition and they share a beat.
+  on the home page, so they share a condition and they share a beat — and now an
+  element, `.ds-hnav__away`, so that they can also be **replaced** together.
 
   The **second** movement, and it waits for the first. The identity's roll ends
   with the slot narrowing from the Tolbi lockup's width to the mark's, which
@@ -577,7 +727,28 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 
   A fade, not a roll: the trail is not in the window, and it has no "left /
   arrived" story to tell. It is there, or the page has no path.
+
+  **Replaced when the identity slot opens or closes** (Paramètres ⇄ the app).
+  The pair is about to move by the slot's width, so the outgoing one fades where
+  it stands and the incoming one waits its `enter`, invisible, in the same cell —
+  the slot's step falls between the two, and the new pair arrives where it will
+  stay. Two beats, nothing slides: the same sentence as arriving in a module.
 */
+.ds-hnav__away-cell {
+  display: grid;
+}
+
+/* Both occupants in one cell (ADR-0027), so the leaving pair holds its place
+   and the arriving pair never stands beside it. */
+.ds-hnav__away {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  /* 32px to the trail, at every depth — Figma's `left` frame carries the same
+     gap in all four views. */
+  gap: var(--ds-spacing-4xl);
+}
+
 .ds-hnav-away-enter-active {
   transition: opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out)
               var(--ds-motion-duration-enter);
@@ -585,6 +756,8 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 
 .ds-hnav-away-leave-active {
   transition: opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
+  /* Fading is leaving: the outgoing way out must not take a second click. */
+  pointer-events: none;
 }
 
 .ds-hnav-away-enter-from,
@@ -592,8 +765,13 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   opacity: 0;
 }
 
+/*
+  The enter class here used to read `ds-hnav-trail-enter-active` — a name left
+  over from before the transition was renamed — so under reduced motion the way
+  out and the trail still waited one `enter` and faded in.
+*/
 @media (prefers-reduced-motion: reduce) {
-  .ds-hnav-trail-enter-active,
+  .ds-hnav-away-enter-active,
   .ds-hnav-away-leave-active {
     transition: none;
   }

@@ -3,8 +3,9 @@ import * as HorizontalNavigationStories from './HorizontalNavigation.stories'
 
 # HorizontalNavigation
 
-Barre de navigation principale de l'app Tolbi. Elle porte l'identité (marque Tolbi, ou module
-courant), un fil d'Ariane contextuel, les actions rapides et l'avatar utilisateur. Elle ne pose
+Barre de navigation principale de l'app Tolbi. Elle porte l'identité (marque Tolbi, module
+courant — ou aucune, dans Paramètres), un fil d'Ariane contextuel, les actions rapides et l'avatar
+utilisateur. Elle ne pose
 aucun fond : elle prend la surface qui se trouve derrière (ADR-0028). **Ni marge** : elle prend
 aussi celles de la colonne qui la tient (ADR-0047).
 
@@ -55,8 +56,13 @@ plus haut que le sélecteur d'espace à côté d'elle.
 autre. C'est l'écart qui le dit — 12px lie, 32px sépare — et c'est lui qui rend le fil lisible comme
 un chemin dans le module plutôt qu'un chemin depuis la racine.
 
-Mesuré à 1440px : le bloc fait 77,7px à l'accueil et 162,6px dans un module, l'écart interne **12px**
+Mesuré à 1440px : le bloc fait 77,7px à l'accueil et 269,4px dans un module, l'écart interne **12px**
 et l'écart au fil **32px** à toutes les profondeurs.
+
+Ce sont les écarts qui groupent par **sens** ; le DOM, lui, groupe par **mouvement**. La fenêtre de
+l'identité porte ses 12px — elle les emporte quand elle se ferme — et la sortie et le fil forment un
+seul élément, qui porte les 32px : ils arrivent et repartent ensemble, et c'est ce qui permet de les
+remplacer d'un bloc (voir *Hors de l'app*).
 
 Le fil ne commence donc plus par le module : la marque à sa gauche est son point de départ. Et il
 n'a plus de maison — `Breadcrumbs` reçoit `:home="false"`, ce qui retire aussi le chevron devant le
@@ -81,14 +87,15 @@ profondeur 0 où la maison *est* la page, la barre ne l'a plus.
 
 | | |
 |---|---|
-| **les crédits** | la pastille de solde |
+| **les crédits** | la pastille de solde — quand le produit en passe un |
 | | `spacing-xl` (16px) |
 | **les contrôles** | `Apprendre`, paramètres, notifications, modules, l'avatar — `spacing-md` (8px) entre chacun |
 
 L'avatar est **le dernier des contrôles**, pas un bloc à lui seul. Il se tenait à 16px, un bloc d'un
 seul élément — une séparation qui ne séparait rien : c'est un contrôle comme les quatre avant lui.
-Ce qui reste à 16px, c'est la pastille : un solde, pas une action. La maquette la masque ; elle reste
-dans la barre tant que le produit affiche un solde (ADR-0047).
+Ce qui reste à 16px, c'est la pastille : un solde, pas une action. Elle n'est rendue que si le produit
+passe `credits` — **absent, pas de pastille** ; `0` est un solde, et il s'affiche. La coquille
+(`1130:16686`) et Paramètres (3A) n'en montrent pas : Paramètres a sa page Facturation (ADR-0049).
 
 ## Identité — la marque, ou le module
 
@@ -206,6 +213,64 @@ fente plus bas puis sauterait. Couper le trajet ne cache rien (ADR-0033).
 
 ---
 
+## Hors de l'app — Paramètres
+
+<Canvas of={HorizontalNavigationStories.Settings} />
+
+Paramètres n'est ni un module ni l'accueil : la colonne de l'app laisse place à celle des réglages,
+et la barre n'a plus rien à dire de l'identité (maquette 3A, `2067:5918`). Le bouton de retour ouvre
+la barre, et il ramène à la page quittée — pas à l'accueil.
+
+| | |
+|---|---|
+| `lockup` | `false` ferme la fente d'identité. Sans identité la barre n'est **jamais** à l'accueil, donc le bouton de retour est toujours là. Défaut `true` |
+| `homeIcon` | `'house'` — un lieu, l'accueil — ou `'arrow-left'` — un retour, la page quittée. Deux valeurs et pas tout `IconName` : un glyphe qui ne dit ni l'un ni l'autre ne s'écrit pas |
+| `homeLabel` | le mot : `Retourner sur l'app` |
+| `homeHref` | la page quittée — c'est le produit qui la connaît |
+
+`lockup` est un booléen et non une troisième valeur à côté de `module` : `module` décide déjà *quelle*
+marque, et une seconde prop capable de dire « module » ferait deux propriétaires (ADR-0024). La barre
+garde ses **48px** : le plancher de la fente ne dépend pas de sa largeur.
+
+### Le passage — deux temps, rien ne glisse
+
+<Canvas of={HorizontalNavigationStories.SettingsSwap} />
+
+Entre l'app et Paramètres, trois choses changent : la marque part ou arrive, la fente se ferme ou
+s'ouvre de 60px, et la sortie et le fil changent de contenu.
+
+| | module → Paramètres | Paramètres → module |
+|---|---|---|
+| **1** · 0 → 200 ms | la marque sort par le haut ; sortie et fil s'effacent **sur place** | sortie et fil s'effacent sur place |
+| *entre les deux* | la fente se ferme, invisible | la fente s'ouvre, invisible |
+| **2** · 200 → 400 ms | « Retourner sur l'app » et « Paramètres » apparaissent **à leur place** | la marque monte dans la fenêtre ; la sortie et le fil apparaissent à leur place |
+
+**Rien ne glisse.** Une fente qui se fermerait en glissant ferait coulisser la paire sortante pendant
+qu'elle s'efface — un mouvement qui n'explique rien (ADR-0023) ; une fente qui sauterait la pousserait
+de 60px encore visible. La sortie et le fil sont donc **remplacés**, pas déplacés : la paire qui part
+s'efface où elle est, celle qui arrive attend son `enter`, invisible, dans la même cellule, et la fente
+change de largeur entre les deux. C'est la phrase de l'arrivée dans un module (ADR-0042), dite une
+seconde fois.
+
+Une cellule pour **les deux**, pas une chacun : une cellule est aussi large que le plus large de ses
+deux occupants, et une cellule autour du seul bouton pousserait le fil dès qu'un libellé plus long
+arrive.
+
+**Une arrivée attend que sa place soit libre.** Au retour, la marque atterrirait là où la sortie
+s'efface encore : elle arrive donc au second temps, avec le reste. Partout ailleurs elle roule tout de
+suite — de module à module, ou en croisant le lockup Tolbi dans la même fenêtre, ce pour quoi le
+roulement est dessiné.
+
+Mesuré sur les quatre passages (module ⇄ Paramètres, accueil ⇄ Paramètres), ralentis 10× par les
+jetons de durée : **aucun déplacement latéral d'un élément visible**. La fente change de largeur à
+200 ms, quand la paire sortante est à 0 et l'entrante pas encore apparue.
+
+En `prefers-reduced-motion`, tout bascule d'un coup — y compris la sortie et le fil, qui attendaient
+jusqu'ici leur `enter` et s'affichaient en fondu : la règle visait un nom de classe disparu
+(`ds-hnav-trail-*`).
+
+---
+
 ## Profondeur
 
 C'est la longueur de `breadcrumbs` qui fait la profondeur, et rien d'autre — il n'y a pas de prop
@@ -283,13 +348,13 @@ bizarrement *dans* un chemin (`Revenir sur l'accueil › Projets › Campagne ma
 
 | Événement | Déclencheur |
 |---|---|
-| `home` | Clic sur la maison du fil — **distinct de `learn`** |
+| `home` | Clic sur le bouton de retour — l'accueil, ou la page quittée dans Paramètres. **Distinct de `learn`** |
 | `breadcrumb-select` | Clic sur un maillon ; émis même sur une ancre, pour qu'un routeur puisse `preventDefault()` |
 | `learn` | Clic sur le bouton « Apprendre » |
 | `settings` | Clic sur l'icône paramètres |
 | `notifications` | Clic sur la cloche |
 | `module-select` | Choix d'un module dans la grille — c'est au produit de reposer `module` |
-| `credits` | Clic sur la pastille de crédits |
+| `credits` | Clic sur la pastille de crédits, quand il y en a une |
 | `user` | Clic sur l'avatar |
 
 ---
@@ -300,6 +365,7 @@ Ce composant utilise en interne :
 - `<Logo>` — l'identité à l'accueil
 - `<ModuleIcon variant="illustration">` — l'identité dans un module
 - `<Breadcrumbs>` — le fil, pas une seconde version dessinée à la main (ADR-0001)
+- `<Button size="sm">` — le bouton de retour
 - `<CreditsChip>`, `<Button size="lg-compact">`, `<IconButton>`, `<Tooltip>`, `<Avatar>`
 - `<ModulesList>` dans une `<SurfaceTransition>` — le sélecteur de modules
 

@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 import HorizontalNavigation from './HorizontalNavigation.vue'
 import type { ModuleName } from '../ModuleIcon'
@@ -54,13 +54,22 @@ const meta: Meta<typeof HorizontalNavigation> = {
       control: 'text',
       table: { category: 'Contenu', defaultValue: { summary: "'Retourner sur l\u2019accueil'" } },
     },
+    homeIcon: {
+      control: 'inline-radio',
+      options: ['house', 'arrow-left'],
+      table: { category: 'Contenu', defaultValue: { summary: "'house'" } },
+    },
+    lockup: {
+      control: 'boolean',
+      table: { category: 'Contenu', defaultValue: { summary: 'true' } },
+    },
     creditsReminder: {
       control: 'text',
       table: { category: 'Contenu' },
     },
     credits: {
       control: 'number',
-      table: { category: 'Contenu', defaultValue: { summary: '0' } },
+      table: { category: 'Contenu', defaultValue: { summary: 'undefined — pas de pastille' } },
     },
     userInitials: {
       control: 'text',
@@ -261,6 +270,94 @@ export const HomeLabel: Story = {
           :breadcrumbs="[{ label: 'Projets' }, { label: 'Campagne maïs' }]"
         />
       </div>
+    `,
+  }),
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Hors de l'app : Paramètres
+// ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Paramètres n'est ni un module ni l'accueil (maquette 3A, `2067:5918`) : la
+ * fente d'identité se ferme, le bouton de retour ouvre la barre et ramène à la
+ * page quittée — d'où la flèche et non la maison. Pas de pastille de crédits :
+ * Paramètres a sa page Facturation, et `credits` absent ne rend rien.
+ */
+export const Settings: Story = {
+  name: 'Paramètres — sans identité',
+  render: (args) => ({
+    components: { HorizontalNavigation },
+    setup: () => ({ args }),
+    template: `<HorizontalNavigation v-bind="args" :credits="undefined" />`,
+  }),
+  args: {
+    lockup: false,
+    homeIcon: 'arrow-left',
+    homeLabel: 'Retourner sur l\u2019app',
+    breadcrumbs: [{ label: 'Paramètres' }],
+  },
+}
+
+/**
+ * Le passage entre l'app et Paramètres, piloté par la barre elle-même : la roue
+ * crantée ouvre Paramètres, « Retourner sur l'app » ramène à la page quittée, la
+ * grille change de module. Depuis l'accueil, la roue crantée y mène aussi.
+ *
+ * Deux temps, et **rien ne glisse** : ce qui part s'efface sur place, la fente
+ * s'ouvre ou se ferme entre les deux temps, et ce qui arrive arrive à sa place.
+ */
+export const SettingsSwap: Story = {
+  name: 'Le passage — l\u2019app ⇄ Paramètres',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Cliquez la roue crantée, puis « Retourner sur l\u2019app ». Chaque temps dure ' +
+          '`--ds-motion-duration-enter` (200 ms).',
+      },
+    },
+  },
+  render: (args) => ({
+    components: { HorizontalNavigation },
+    setup() {
+      // Where the user is in the app, and whether they have stepped out of it.
+      // Paramètres remembers the page it was opened from, so the way out can
+      // return there rather than home.
+      const module     = ref<ModuleName | undefined>('Yield')
+      const inSettings = ref(false)
+
+      function onSelect(mod: NavModule) {
+        module.value     = mod.name
+        inSettings.value = false
+      }
+
+      function onHome() {
+        if (inSettings.value) inSettings.value = false
+        else module.value = undefined
+      }
+
+      const crumbs = computed(() =>
+        inSettings.value ? [{ label: 'Paramètres' }]
+          : module.value ? [{ label: 'Projets' }, { label: 'Campagne maïs' }]
+          : [],
+      )
+
+      return { args, module, inSettings, onSelect, onHome, crumbs }
+    },
+    template: `
+      <HorizontalNavigation
+        v-bind="args"
+        :credits="undefined"
+        :module="inSettings ? undefined : module"
+        :lockup="!inSettings"
+        :home-icon="inSettings ? 'arrow-left' : 'house'"
+        :home-label="inSettings ? 'Retourner sur l\u2019app' : undefined"
+        :breadcrumbs="crumbs"
+        @module-select="onSelect"
+        @settings="inSettings = true"
+        @home="onHome"
+      />
     `,
   }),
 }

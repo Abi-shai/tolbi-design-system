@@ -43,7 +43,7 @@ export type { ModulesListItem } from './ModulesList'
 export { IconButton } from './IconButton'
 export type { IconButtonSize } from './IconButton'
 export { HorizontalNavigation } from './HorizontalNavigation'
-export type { BreadcrumbItem, NavModule } from './HorizontalNavigation'
+export type { BreadcrumbItem, NavModule, HorizontalNavigationHomeIcon } from './HorizontalNavigation'
 
 export { SideNavigation, SideNavItem, SideNavGroup } from './SideNavigation'
 
