@@ -17,6 +17,9 @@ const meta: Meta = {
           "le repos, un contour `border-default` et l'encre promue au survol, le même contour en " +
           '`border-brand` tant que le panneau est sorti. ' +
           'Il occupe 48px (8 + marque de 32 + 8) ; replié, il devient un carré de la ligne du rail. ' +
+          'Le panneau a la largeur du `Dropdown` — 240px, jamais moins que le déclencheur. Chaque espace ' +
+          'y porte son avatar, et l\'espace courant est marqué comme tout élément courant du catalogue : ' +
+          'son fond, son encre, la graisse forte. ' +
           'Les vues ci-dessous sont posées sur `bg-neutral` — sur blanc, la pastille disparaît dans ' +
           'la page.',
       },

@@ -178,10 +178,25 @@ function select(w: Workspace) {
       </DropdownTrigger>
     </template>
 
+    <!--
+      The menu's own row, for the choices as for the footer's actions — one
+      kind of row per panel, so one edge for every label (ADR-0050). Each is a
+      **choice** (`selected` given: `menuitemradio`), and the current one is
+      marked the way every list in the catalogue marks it: its ground, that
+      ground's ink, the strong weight. Nothing in the list used to say where the
+      user was.
+
+      The avatar is the trigger's mark, a size down (`xs`, the catalogue's row
+      avatar): the list names each workspace the way the trigger names the
+      current one.
+    -->
     <DropdownItem
       v-for="w in workspaces"
       :key="w.id"
       :label="w.name"
+      :avatar-src="w.src"
+      :avatar-initials="marks(w)"
+      :selected="w.id === current?.id"
       @click="select(w)"
     />
 
@@ -328,39 +343,37 @@ function select(w: Workspace) {
   }
 }
 
-/* `Dropdown`'s panel is a fixed 240px pinned to `right: 0`, which is right for a
-   trigger floating in a toolbar and wrong here: in a 228px column it hangs 12px
-   off the left edge. The panel matches the trigger instead. */
+/*
+  `Dropdown`'s panel is pinned to `right: 0`, which is right for a trigger
+  floating in a toolbar and wrong in a column, where it hangs off the left edge.
+  So it opens under the mark instead, aligned to its leading edge — 8px below,
+  scaling from `top left`, all of it `Dropdown`'s own.
+
+  Its width is `Dropdown`'s too — 240px, **never narrower than the trigger**.
+  It used to *be* the trigger's width: right for the 228px box it was drawn in,
+  wrong once the toggle came to share the row, where at 184px the footer's
+  « Créer une organisation » was cut. One width for every panel in the
+  catalogue, and a floor for the trigger that is wider than it (ADR-0050).
+
+  Which makes the two forms **one rule**. Collapsed, 100% of a 36px mark is 36px,
+  so the 240 opens and overhangs the rail — as an overlay may, and as the
+  expanded panel now covers the toggle beside its trigger. The collapsed
+  override, and the declaration order it depended on, are gone.
+
+  (It once opened *beside* the rail — `left: 100%`, `top: 0` — a second placement
+  and a second gesture, and so a second component to anyone using it.)
+*/
 .ds-workspace-selector :deep(.ds-dropdown__panel) {
   right: auto;
   left: 0;
-  width: 100%;
-}
+  min-width: 100%;
 
-/*
-  Collapsed, the panel overrides **one** declaration, and that is the point: the
-  two forms are one control, so they open the same way — under the mark, aligned
-  to its leading edge, 8px below it, scaling from `top left`. All of that is
-  inherited, from the rule above and from `Dropdown` itself.
-
-  The width is the single thing that cannot be: the rule above makes the panel
-  follow its trigger, and 100% of a 36px mark is 36px, which no workspace name
-  fits in. So it falls back to `Dropdown`'s own 240px and overhangs the rail —
-  an overlay is allowed to, and the expanded form already covers the
-  destinations beneath it in exactly the same way.
-
-  It used to open *beside* the rail (`left: 100%`, `top: 0`), which was a second
-  placement logic, a second gesture — `transform-origin: top left` grows a
-  surface downward from under its trigger, not sideways out of a column — and
-  therefore a second component as far as anyone using it could tell.
-
-  **After the rule above, and that is load-bearing.** Both selectors are one
-  class plus a `:deep()`, so they carry the same specificity and order decides.
-  Written first, this rule lost, and the collapsed panel took `width: 100%` from
-  the general case: a 36px panel drawn on top of the control that opened it.
-*/
-.ds-workspace-selector--collapsed :deep(.ds-dropdown__panel) {
-  width: 240px;
+  /*
+    The rows' leading column is the avatars' — `Avatar xs`, 24px — so the
+    footer's `+` centres in it and every label in the panel starts on one edge.
+    Read by `DropdownItem`; a variant switch, not a token (ADR-0010).
+  */
+  --dropdown-item-leading: 24px;
 }
 
 /* The name takes the room the chevron leaves, and truncates — a workspace name
