@@ -138,9 +138,12 @@ function goToPage(page: number) {
   background-color: var(--ds-bg-hover);
 }
 
+/* The current page, marked the one way every list marks its current item
+   (ADR-0050) — ground, that ground's ink, strong weight. It had the ground and
+   the weight already; the ink was `text-strong`, not the ground's partner. */
 .ds-pagination__num--active {
   background-color: var(--ds-bg-selected);
-  color: var(--ds-text-strong);
+  color: var(--ds-text-on-brand-subtle);
   font-weight: var(--ds-font-weight-label-lg-strong);
 }
 
