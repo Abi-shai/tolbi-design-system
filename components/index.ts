@@ -155,8 +155,8 @@ export type { CalloutTone } from './Callout'
 export { EmptyState } from './EmptyState'
 export type { EmptyStateSize } from './EmptyState'
 
-export { Toast } from './Toast'
-export type { ToastTone } from './Toast'
+export { Toast, ToastRegion } from './Toast'
+export type { ToastTone, ToastRegionPlacement } from './Toast'
 
 export { StatTile } from './StatTile'
 
