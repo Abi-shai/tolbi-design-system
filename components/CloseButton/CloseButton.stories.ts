@@ -18,11 +18,11 @@ const meta: Meta<typeof CloseButton> = {
   argTypes: {
     size: {
       control: 'inline-radio',
-      options: ['sm', 'md', 'lg'],
+      options: ['xs', 'sm', 'md', 'lg'],
       description: 'Taille du bouton.',
       table: {
         category: 'Apparence',
-        type: { summary: "'sm' | 'md' | 'lg'" },
+        type: { summary: "'xs' | 'sm' | 'md' | 'lg'" },
         defaultValue: { summary: "'sm'" },
       },
     },
@@ -75,6 +75,11 @@ export const Default: Story = {
   },
 }
 
+/** La croix d’une surface dense — celle d’un toast : 16 px dans 32 px. */
+export const ExtraSmall: Story = {
+  args: { size: 'xs' },
+}
+
 export const Small: Story = {
   args: { size: 'sm' },
 }
@@ -105,7 +110,7 @@ export const AllSizes: Story = {
   render: () => ({
     components: { StoryGrid },
     setup: () => ({
-      items: ['sm', 'md', 'lg'].map(size => ({ component: CloseButton, props: { size, ariaLabel: 'Fermer' } })),
+      items: ['xs', 'sm', 'md', 'lg'].map(size => ({ component: CloseButton, props: { size, ariaLabel: 'Fermer' } })),
     }),
     template: `<StoryGrid :items="items" wrap="nowrap" />`,
   }),
@@ -120,7 +125,7 @@ export const AllSizesDark: Story = {
   render: () => ({
     components: { StoryGrid },
     setup: () => ({
-      items: ['sm', 'md', 'lg'].map(size => ({ component: CloseButton, props: { size, ariaLabel: 'Fermer', darkBackground: true } })),
+      items: ['xs', 'sm', 'md', 'lg'].map(size => ({ component: CloseButton, props: { size, ariaLabel: 'Fermer', darkBackground: true } })),
     }),
     template: `<StoryGrid :items="items" wrap="nowrap" />`,
   }),

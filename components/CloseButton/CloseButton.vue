@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { Icon } from '../Icon'
 
-export type CloseButtonSize = 'sm' | 'md' | 'lg'
+export type CloseButtonSize = 'xs' | 'sm' | 'md' | 'lg'
 
 interface Props {
   size?: CloseButtonSize
@@ -24,7 +24,12 @@ const emit = defineEmits<{
   click: [event: MouseEvent]
 }>()
 
-const iconSize = computed(() => (props.size === 'lg' ? 24 : 20))
+/*
+  `xs` is the close of a dense surface — a toast's 14px line — where a 20px cross
+  weighs as much as the sentence beside it. 16px glyph in a 32px box: the 8px
+  around the glyph every size keeps, `IconButton xs`'s geometry (ADR-0039).
+*/
+const iconSize = computed(() => (props.size === 'lg' ? 24 : props.size === 'xs' ? 16 : 20))
 
 function handleClick(event: MouseEvent) {
   if (!props.disabled) emit('click', event)
@@ -69,6 +74,7 @@ function handleClick(event: MouseEvent) {
 }
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
+.ds-close-button--xs { width: 32px; height: 32px; }
 .ds-close-button--sm { width: 36px; height: 36px; }
 .ds-close-button--md { width: 40px; height: 40px; }
 .ds-close-button--lg { width: 44px; height: 44px; }
