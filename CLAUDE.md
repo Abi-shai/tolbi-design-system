@@ -593,6 +593,21 @@ Before working on any component, read:
   margin** — the 24 below belongs to the page. In a narrow column the actions **drop under the text**
   when it would go below `20rem` — intrinsic, no breakpoint. A `<div>`, not a `<header>` (the bar is the
   banner). Figma component `2103:4619` with an `Actions` slot.
+- **ADR-0052**: `Toast` is **track A** (board `2113:1427`, 20 products benchmarked) — `Dropdown`'s
+  floating surface, and the tone is a **glyph** and its ink, never the surface; the 3px stripe (2 of 20)
+  is gone. Four tones (`brand` gone, `info` → `neutral`), no `icon` prop. `message` (one sentence, never
+  « Succès »), `detail`, `#actions` on the message's line (`Button link sm`), `CloseButton xs` (new, 32px
+  box). **The time is the toast's**: 5s, 8s with an action, an error or a pending task stays, paused on
+  hover and focus with what was left; `dismiss` says `close` or `timeout`, and the product removes it.
+  **The motion is `ToastRegion`'s** — a component cannot animate its own removal, so ADR-0021's "Toast
+  animates nothing" was right about visibility and wrong as an outcome. A newcomer **rises from the
+  edge with the stack** on the move's own `enter` + `easing-in-out`, 8px from the toast above all the
+  way (scaled in place, the toast above sat on it for 110ms). A leaver fades **in place**, pinned where
+  it is seen, out of reach of the pointer, and the stack **waits one `exit`** before it closes (else it
+  slid 31px over the fading one). **A running transition outlives its class** — `transition-property`
+  falls back to `all` — so the group's FLIP measured through the remaining offset and an interrupted
+  stack snapped 54px; `settle()` cancels the transforms inside the update, and a newcomer starts where
+  the edge toast is *seen*. Ten scenarios filmed: gap ≥ 8px in every frame, zero reversals.
 
 ## Architecture
 
