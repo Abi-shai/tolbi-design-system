@@ -608,6 +608,17 @@ Before working on any component, read:
   falls back to `all` — so the group's FLIP measured through the remaining offset and an interrupted
   stack snapped 54px; `settle()` cancels the transforms inside the update, and a newcomer starts where
   the edge toast is *seen*. Ten scenarios filmed: gap ≥ 8px in every frame, zero reversals.
+- **ADR-0053**: the bar's avatar **opens the account menu** when the product fills `#user-menu` — the
+  slot's **presence decides** (ADR-0028): empty, the avatar still emits `user`; filled, the click opens
+  the menu and **emits nothing** (one click, one meaning). It is `Dropdown trigger="avatar"` — header
+  (`userName`, `userEmail`), 240px panel 8px under the avatar on its right edge, Escape and outside
+  click — not a second drawing (ADR-0001); the rows and `close` are the product's (ADR-0049's
+  `#actions`). `Dropdown` gained `avatarInitials`, **Escape hands the focus back to the trigger**, a
+  `:focus-visible` ring on the avatar, a panel that grows from **its** anchor (pinned right, it scaled
+  from `top left`, so the edge under the trigger travelled 9.6px), and a header avatar that is
+  decorative and no longer claims « En ligne ». **The header keeps its avatar**: the email has 156px
+  for addresses of 157–234px, so the domain is cut — dropping the avatar (208px, 5 of 6 fit) was
+  drawn and declined.
 
 ## Architecture
 
