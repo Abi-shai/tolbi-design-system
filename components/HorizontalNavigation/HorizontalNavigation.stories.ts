@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 import HorizontalNavigation from './HorizontalNavigation.vue'
+import { DropdownItem, DropdownDivider } from '../Dropdown'
 import type { ModuleName } from '../ModuleIcon'
 import type { NavModule } from './HorizontalNavigation.vue'
 import HorizontalNavigationDocs from './HorizontalNavigation.mdx'
@@ -75,6 +76,16 @@ const meta: Meta<typeof HorizontalNavigation> = {
       control: 'text',
       table: { category: 'Contenu', defaultValue: { summary: "'TD'" } },
     },
+    userName: {
+      control: 'text',
+      description: 'L’en-tête du menu du compte — lu seulement quand `#user-menu` est fourni.',
+      table: { category: 'Contenu' },
+    },
+    userEmail: {
+      control: 'text',
+      description: 'L’en-tête du menu du compte — lu seulement quand `#user-menu` est fourni.',
+      table: { category: 'Contenu' },
+    },
     hasNotification: {
       control: 'boolean',
       table: { category: 'Contenu', defaultValue: { summary: 'false' } },
@@ -83,6 +94,8 @@ const meta: Meta<typeof HorizontalNavigation> = {
   args: {
     credits: 250,
     userInitials: 'MD',
+    userName: 'Mariama Diop',
+    userEmail: 'mariama.diop@exemple.sn',
     hasNotification: false,
     modules: ALL_MODULES,
   },
@@ -163,6 +176,36 @@ export const CreditsExpired: Story = {
     credits: 0,
     creditsReminder: 'Crédits expirés',
     creditsTone: 'error',
+  },
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Le menu du compte
+// ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Cliquez l'avatar. `#user-menu` fourni, il ouvre sous lui le menu du compte :
+ * qui est connecté, puis les lignes du produit, qu'il ferme avec `close`.
+ * Échap et le clic à l'extérieur le ferment. Sans le slot, l'avatar émet `user`.
+ */
+export const UserMenu: Story = {
+  name: 'Le menu du compte',
+  render: (args) => ({
+    components: { HorizontalNavigation, DropdownItem, DropdownDivider },
+    setup: () => ({ args }),
+    template: `
+      <HorizontalNavigation v-bind="args">
+        <template #user-menu="{ close }">
+          <DropdownItem icon="user-cog" label="Paramètres du compte" @click="close()" />
+          <DropdownDivider />
+          <DropdownItem icon="log-out" label="Se déconnecter" @click="close()" />
+        </template>
+      </HorizontalNavigation>
+    `,
+  }),
+  args: {
+    module: 'Yield',
+    breadcrumbs: [{ label: 'Projets' }, { label: 'Campagne maïs' }],
   },
 }
 

@@ -10,6 +10,7 @@ import { Tooltip } from '../Tooltip'
 import { ModulesList } from '../ModulesList'
 import { ModuleIcon } from '../ModuleIcon'
 import { SurfaceTransition } from '../SurfaceTransition'
+import { Dropdown } from '../Dropdown'
 import type { ModulesListItem } from '../ModulesList'
 import type { ModuleName } from '../ModuleIcon'
 import type { CreditsChipTone } from '../CreditsChip'
@@ -108,6 +109,12 @@ interface Props {
   /** How bad the credits situation is — see `CreditsChipTone`. */
   creditsTone?: CreditsChipTone
   userInitials?:    string
+  /**
+   * The account menu's header — who is signed in. Read only when the product
+   * fills `#user-menu`: without a menu there is no header to put them in.
+   */
+  userName?:        string
+  userEmail?:       string
   hasNotification?: boolean
   modules?:         NavModule[]
 }
@@ -134,6 +141,11 @@ const emit = defineEmits<{
   learn:           []
   settings:        []
   notifications:   []
+  /**
+   * L'avatar a été cliqué — **sans** `#user-menu`. Avec un menu, le clic
+   * l'ouvre et n'émet rien : un clic, un sens. Un produit qui écoutait `user`
+   * pour mener à Paramètres et fournissait le menu aurait fait les deux à la fois.
+   */
   user:            []
   credits:         []
   'module-select': [module: NavModule]
@@ -141,10 +153,18 @@ const emit = defineEmits<{
 
 const activeTooltip = ref<string | null>(null)
 function showTooltip(name: string) {
-  if (modulesOpen.value) return
+  // An open panel covers the tooltips' row: the account menu is 240px wide and
+  // hangs over the four controls before the avatar.
+  if (modulesOpen.value || userMenuOpen.value) return
   activeTooltip.value = name
 }
 function hideTooltip() { activeTooltip.value = null }
+
+// ── Account menu ───────────────────────────────────────────────────
+const userMenuOpen = ref(false)
+
+/* The avatar's name, in both forms: the person when the product says who it is. */
+const userLabel = computed(() => `Profil ${props.userName ?? props.userInitials}`)
 
 // ── Modules dropdown ───────────────────────────────────────────────
 const modulesOpen    = ref(false)
@@ -477,8 +497,35 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
           </SurfaceTransition>
         </div>
 
-        <!-- Avatar utilisateur — the last of the controls, not a block of its own -->
-        <button class="ds-hnav__user" @click="emit('user')" :aria-label="`Profil ${userInitials}`">
+        <!--
+          Avatar utilisateur — the last of the controls, not a block of its own.
+
+          **The slot's presence decides what it is** (ADR-0028's `reminder`).
+          Filled, the avatar is the account menu's trigger — `Dropdown`'s own
+          avatar trigger and panel, not a second drawing of either (ADR-0001):
+          the header with who is signed in, the product's rows under it, and
+          Escape and the click outside, which `Dropdown` already owns. The panel
+          hangs from the avatar's right edge, 8px below, like the modules'.
+
+          The rows are the product's — « Paramètres du compte », « Se
+          déconnecter » — and so is where they lead. It closes the menu through
+          `close`, the shape `WorkspaceSelector`'s `#actions` already has.
+
+          Empty, it stays the plain button it was, and emits `user`.
+        -->
+        <Dropdown
+          v-if="$slots['user-menu']"
+          v-model:open="userMenuOpen"
+          trigger="avatar"
+          class="ds-hnav__user-menu"
+          :button-label="userLabel"
+          :avatar-initials="userInitials"
+          :user-name="userName"
+          :user-email="userEmail"
+        >
+          <slot name="user-menu" :close="() => (userMenuOpen = false)" />
+        </Dropdown>
+        <button v-else class="ds-hnav__user" :aria-label="userLabel" @click="emit('user')">
           <Avatar size="md" :initials="userInitials" />
         </button>
       </div>

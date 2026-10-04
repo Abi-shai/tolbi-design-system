@@ -344,6 +344,34 @@ bizarrement *dans* un chemin (`Revenir sur l'accueil › Projets › Campagne ma
 
 ---
 
+## Le menu du compte
+
+<Canvas of={HorizontalNavigationStories.UserMenu} />
+
+L'avatar ouvre le **menu du compte** quand le produit fournit `#user-menu` : sous lui, accroché à
+son bord droit, l'en-tête avec qui est connecté (`userName`, `userEmail`), puis les lignes du
+produit — « Paramètres du compte », « Se déconnecter ». C'est le `Dropdown` du catalogue, son
+déclencheur avatar et son panneau, pas un second dessin (ADR-0001) : Échap et le clic à l'extérieur
+le ferment, et Échap rend le focus à l'avatar.
+
+Les lignes sont des `DropdownItem`, et c'est le produit qui sait où elles mènent ; il ferme le menu
+avec `close`, la forme que `#actions` a déjà sur `WorkspaceSelector`.
+
+```vue
+<HorizontalNavigation user-name="Mariama Diop" user-email="mariama.diop@exemple.sn">
+  <template #user-menu="{ close }">
+    <DropdownItem icon="user-cog" label="Paramètres du compte" @click="goToAccount(); close()" />
+    <DropdownDivider />
+    <DropdownItem icon="log-out" label="Se déconnecter" @click="signOut()" />
+  </template>
+</HorizontalNavigation>
+```
+
+**La présence du slot décide.** Sans lui, l'avatar reste le bouton qu'il était et émet `user`. Avec
+lui, le clic ouvre le menu et **n'émet rien** : un clic, un sens.
+
+---
+
 ## Événements
 
 | Événement | Déclencheur |
@@ -355,7 +383,7 @@ bizarrement *dans* un chemin (`Revenir sur l'accueil › Projets › Campagne ma
 | `notifications` | Clic sur la cloche |
 | `module-select` | Choix d'un module dans la grille — c'est au produit de reposer `module` |
 | `credits` | Clic sur la pastille de crédits, quand il y en a une |
-| `user` | Clic sur l'avatar |
+| `user` | Clic sur l'avatar — **sans** `#user-menu` ; avec, le clic ouvre le menu et n'émet rien |
 
 ---
 
@@ -368,6 +396,7 @@ Ce composant utilise en interne :
 - `<Button size="sm">` — le bouton de retour
 - `<CreditsChip>`, `<Button size="lg-compact">`, `<IconButton>`, `<Tooltip>`, `<Avatar>`
 - `<ModulesList>` dans une `<SurfaceTransition>` — le sélecteur de modules
+- `<Dropdown trigger="avatar">` — le menu du compte, quand `#user-menu` est fourni
 
 ---
 
