@@ -347,7 +347,7 @@ function select(w: Workspace) {
   `Dropdown`'s panel is pinned to `right: 0`, which is right for a trigger
   floating in a toolbar and wrong in a column, where it hangs off the left edge.
   So it opens under the mark instead, aligned to its leading edge — 8px below,
-  scaling from `top left`, all of it `Dropdown`'s own.
+  and scaling from the corner it now hangs from, `top left`.
 
   Its width is `Dropdown`'s too — 240px, **never narrower than the trigger**.
   It used to *be* the trigger's width: right for the 228px box it was drawn in,
@@ -367,6 +367,7 @@ function select(w: Workspace) {
   right: auto;
   left: 0;
   min-width: 100%;
+  transform-origin: top left;
 
   /*
     The rows' leading column is the avatars' — `Avatar xs`, 24px — so the

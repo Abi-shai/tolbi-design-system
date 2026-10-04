@@ -18,9 +18,15 @@ export type DropdownTriggerVariant = 'button' | 'icon' | 'avatar'
 interface Props {
   trigger?:    DropdownTriggerVariant
   open?:       boolean
+  /**
+   * The trigger's name — the button's text, and the avatar's accessible name.
+   * An avatar shows a face or initials, and neither says what pressing it does.
+   */
   buttonLabel?: string
   avatarSrc?:  string
   avatarAlt?:  string
+  /** What the avatar shows without a picture — on the trigger and in the header. */
+  avatarInitials?: string
   userName?:   string
   userEmail?:  string
 }
@@ -51,10 +57,19 @@ function onClickOutside(e: MouseEvent) {
   }
 }
 
+/*
+  Escape closes — and **hands the focus back to the trigger**. Focus left on a
+  row would fall to <body> when the panel unmounts, and a keyboard user would
+  start again from the top of the page (the WAI-ARIA menu button's rule). The
+  trigger is the first focusable element in the root: it precedes the panel.
+*/
 function onKeyDown(e: KeyboardEvent) {
-  if (e.key === 'Escape' && props.open) {
-    close()
+  if (e.key !== 'Escape' || !props.open) return
+  const root = rootEl.value
+  if (root?.querySelector('.ds-dropdown__panel')?.contains(document.activeElement)) {
+    root.querySelector<HTMLElement>('button, a[href], [tabindex]:not([tabindex="-1"])')?.focus()
   }
+  close()
 }
 
 onMounted(() => {
@@ -108,9 +123,10 @@ onUnmounted(() => {
         :class="{ 'ds-dropdown__trigger--avatar-open': open }"
         :aria-expanded="open"
         aria-haspopup="true"
+        :aria-label="buttonLabel"
         @click="toggle"
       >
-        <Avatar :src="avatarSrc" :alt="avatarAlt" size="md" />
+        <Avatar :src="avatarSrc" :alt="avatarAlt" :initials="avatarInitials" size="md" />
       </button>
     </slot>
 
@@ -121,9 +137,14 @@ onUnmounted(() => {
       class="ds-dropdown__panel"
       role="menu"
     >
-      <!-- User header -->
+      <!--
+        User header. The avatar is decorative — the name beside it names the
+        person (ADR-0041) — and it carries no status: it used to say « En ligne »
+        on every account menu, a presence the component cannot know, about the
+        one user who is certainly there.
+      -->
       <div v-if="userName || userEmail" class="ds-dropdown__header">
-        <Avatar :src="avatarSrc" :alt="avatarAlt" status="online" size="md" />
+        <Avatar :src="avatarSrc" alt="" :initials="avatarInitials" size="md" />
         <div class="ds-dropdown__header-text">
           <span v-if="userName"  class="ds-dropdown__header-name">{{ userName }}</span>
           <span v-if="userEmail" class="ds-dropdown__header-email">{{ userEmail }}</span>
@@ -194,13 +215,18 @@ onUnmounted(() => {
   border-radius: var(--ds-radius-pill);
 }
 
-.ds-dropdown__trigger--avatar-open {
+.ds-dropdown__trigger--avatar-open,
+.ds-dropdown__trigger--avatar:focus-visible {
+  outline: none;
   box-shadow: var(--ds-focus-ring-gray);
 }
 
 /* ── Panel ────────────────────────────────────────────────────────── */
+/* Pinned under the trigger's right edge, so it grows from that corner
+   (ADR-0021: the surface scales from its anchor). It said `top left`, and the
+   right edge — the one under the trigger — travelled 9.6px on every entrance. */
 .ds-dropdown__panel {
-  transform-origin: top left;
+  transform-origin: top right;
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
