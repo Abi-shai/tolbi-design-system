@@ -99,11 +99,20 @@ interface Props {
    */
   homeIcon?:        HorizontalNavigationHomeIcon
   /**
-   * The balance. **Absent, there is no chip** — the bar shows a balance when the
-   * product has one to show, and Paramètres has its own page for it. `0` is a
-   * balance, not an absence, so it still renders.
+   * The module's balance. **The chip belongs to the module** (ADR-0054): each
+   * module has its own credits, spent nowhere else, so the chip shows only in a
+   * module — never at home (no `module`), never in Paramètres (`lockup: false`),
+   * whatever is passed. `module` stays the single owner of "the user is in a
+   * module" (ADR-0024), and the chip reads it rather than asking the product to
+   * repeat it.
+   *
+   * - **absent** — this module has no credits: no chip;
+   * - **`null`** — it has a balance that has not arrived: the chip comes in with
+   *   the module's mark and a placeholder holds the number, which rolls in when
+   *   it lands. Never `0` for want of data;
+   * - **a number** — the balance. `0` is a balance, not an absence.
    */
-  credits?:         number
+  credits?:         number | null
   /** Expiry reminder shown in the credits chip, e.g. `Expirent dans 14 jours`. */
   creditsReminder?: string
   /** How bad the credits situation is — see `CreditsChipTone`. */
@@ -203,6 +212,13 @@ const opening = ref(false)
 watch(() => props.lockup, (now, before) => { opening.value = now && !before })
 
 /**
+ * The chip is the module's (ADR-0054): it needs a module, an identity slot that
+ * is open, and a balance — or one on its way (`null`). Read off `module` and
+ * `lockup`, never declared beside them.
+ */
+const creditsShown = computed(() => props.lockup && !!props.module && props.credits !== undefined)
+
+/**
  * The dropdown's current item, derived — never declared. `module` is the one
  * place the bar says where you are, and the switcher reads it back (ADR-0024).
  */
@@ -227,7 +243,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 </script>
 
 <template>
-  <header class="ds-hnav">
+  <header class="ds-hnav" :class="{ 'ds-hnav--opening': opening }">
 
     <!-- ── Gauche : l'identité, puis la sortie et le fil ─────────────────── -->
     <!--
@@ -255,10 +271,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
       -->
       <div
         class="ds-hnav__identity-track"
-        :class="{
-          'ds-hnav__identity-track--closed':  !lockup,
-          'ds-hnav__identity-track--opening': opening,
-        }"
+        :class="{ 'ds-hnav__identity-track--closed': !lockup }"
       >
         <div class="ds-hnav__identity-clip">
           <!--
@@ -407,14 +420,36 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
     <!-- ── Droite : crédits + actions (l'avatar compris) ──────────────── -->
     <div class="ds-hnav__right">
 
-      <!-- Crédits — only when the product has a balance to show -->
-      <CreditsChip
-        v-if="credits !== undefined"
-        :credits="credits"
-        :reminder="creditsReminder"
-        :tone="creditsTone"
-        @click="emit('credits')"
-      />
+      <!--
+        ── The credits ─────────────────────────────────────────────────
+        The module's balance, so it **moves with the module's mark** (ADR-0054):
+        it arrives with the incoming mark and leaves with the outgoing one — the
+        same roll, the same window height, the same duration, curve and delay —
+        and between two modules it stays, its number rolling instead.
+
+        The track is the chip's **place**, and it travels: `0fr → 1fr` (ADR-0025)
+        on the roll's duration and curve, so whatever stands beside the chip
+        slides rather than jumps. The 16px to the controls lives inside the clip,
+        on the window, so it opens and closes with the place (ADR-0049's
+        identity track).
+      -->
+      <div class="ds-hnav__credits-track" :class="{ 'ds-hnav__credits-track--closed': !creditsShown }">
+        <div class="ds-hnav__credits-clip">
+          <div class="ds-hnav__credits-window">
+            <!-- The identity's own transition, not a copy of it: one roll. -->
+            <Transition name="ds-hnav-identity">
+              <div v-if="creditsShown" class="ds-hnav__credits">
+                <CreditsChip
+                  :credits="credits ?? null"
+                  :reminder="creditsReminder"
+                  :tone="creditsTone"
+                  @click="emit('credits')"
+                />
+              </div>
+            </Transition>
+          </div>
+        </div>
+      </div>
 
       <!--
         Actions — **one** block, the avatar included. It stood 16px apart, a
@@ -536,6 +571,14 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 <style scoped>
 /* ── Shell ────────────────────────────────────────────────────────── */
 .ds-hnav {
+  /*
+    The identity's window, and the chip's: the chip rolls through a window of
+    the mark's height, so the two travel the same 48px on the same curve and
+    read as one movement. Declared here so both can read it — what the value
+    is, and why, is told at `.ds-hnav__identity`.
+  */
+  --hnav-mark: 48px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -621,6 +664,9 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
     48 is also the artwork's **native** grid: it is the only rung that is not a
     downscale at all, so it is where the drawings are sharpest.
 
+    (Declared on `.ds-hnav` since ADR-0054: the credits chip rolls through a
+    window of the same height.)
+
     What it costs is the bar's height. 48 is the one thing here taller than the
     40px avatar, so the bar is **48px** — a 72px row once its column's 12 above
     and 12 below are counted, where ADR-0028's was 64 — on every page, including
@@ -630,7 +676,6 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
     so a shell that starts both columns at the same height puts the two on one
     line (ADR-0047).
   */
-  --hnav-mark: 48px;
 
   /*
     The floor is load-bearing: the Tolbi lockup is 24 tall and the module mark
@@ -722,7 +767,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
   Every other arrival has its place free: module to module, or past the Tolbi
   lockup leaving the same window — the roll is designed for that crossing.
 */
-.ds-hnav__identity-track--opening .ds-hnav-identity-enter-active {
+.ds-hnav--opening .ds-hnav-identity-enter-active {
   transition-delay: var(--ds-motion-duration-enter);
 }
 
@@ -742,13 +787,24 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
     transition: none;
   }
 
-  .ds-hnav__identity-track--opening .ds-hnav-identity-enter-active {
+  .ds-hnav--opening .ds-hnav-identity-enter-active,
+  .ds-hnav--opening .ds-hnav__credits-track {
     transition-delay: 0s;
   }
 
   .ds-hnav-identity-enter-from,
   .ds-hnav-identity-leave-to {
     transform: none;
+  }
+
+  /* Gone from the first frame: Vue swaps its classes a frame late, and the
+     leaving mark would stand in the window with the arriving one. */
+  .ds-hnav-identity-leave-active {
+    visibility: hidden;
+  }
+
+  .ds-hnav__credits-track {
+    transition: none;
   }
 }
 
@@ -825,12 +881,81 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 }
 
 /* ── Droite ───────────────────────────────────────────────────────── */
-/* `spacing-xl` between the two blocks — the credits, and the controls. */
+/* Two blocks — the credits, and the controls — `spacing-xl` apart. The gap is
+   the chip's, inside its track, so it closes with the chip's place. */
 .ds-hnav__right {
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-xl);
   overflow: visible;
+}
+
+/*
+  ── The credits' place ──────────────────────────────────────────────
+  `1fr` with a chip, `0fr` without, **travelling** on the roll's duration and
+  curve: the place opens as the chip rises into it and closes as it leaves, so
+  nothing beside it jumps (ADR-0054). Where the identity's track steps (ADR-0049
+  — the pair beside it is faded out at that moment), this one cannot: the
+  controls next to it are always on screen.
+
+  With the controls pinned to the bar's right edge, the place opens leftward
+  into free space and nothing visible moves; where the bar is crowded and the
+  controls are pushed, they slide.
+
+  From Paramètres, the place waits one `enter` with the mark (`--opening`).
+*/
+.ds-hnav__credits-track {
+  display: grid;
+  grid-template-columns: 1fr;
+  /*
+    The column at the track's **end**. Mid-transition a fractional `fr` takes
+    that fraction of the free space, so the column is narrower than the track
+    that holds it (measured 52.8 of 93.6px) — and at the start, the chip slid
+    41px sideways while it rose. At the end, the column's right edge is the
+    track's, which does not move.
+  */
+  justify-content: end;
+  transition: grid-template-columns var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
+}
+
+.ds-hnav__credits-track--closed {
+  grid-template-columns: 0fr;
+}
+
+.ds-hnav--opening .ds-hnav__credits-track {
+  transition-delay: var(--ds-motion-duration-enter);
+}
+
+/*
+  What lets the track close — no minimum — **without clipping the chip
+  sideways**: a place narrower than the chip, mid-opening, lets it overflow
+  toward the free space (`flex-end`) instead of cutting it, so the chip rises at
+  the spot where it will stay.
+*/
+.ds-hnav__credits-clip {
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/*
+  The window the chip rolls through: the mark's height, clipped on that axis
+  only (`clip`, which unlike `hidden` leaves the other axis visible).
+*/
+.ds-hnav__credits-window {
+  flex-shrink: 0;
+  display: grid;
+  height: var(--hnav-mark);
+  overflow-x: visible;
+  overflow-y: clip;
+  margin-inline-end: var(--ds-spacing-xl);
+}
+
+/* Stretched to the window, so its roll is the window's 48px — the mark's. */
+.ds-hnav__credits {
+  grid-area: 1 / 1;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
 }
 
 /* ── Actions ──────────────────────────────────────────────────────── */

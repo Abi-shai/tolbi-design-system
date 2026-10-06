@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 import HorizontalNavigation from './HorizontalNavigation.vue'
 import { DropdownItem, DropdownDivider } from '../Dropdown'
+import { Button } from '../Button'
 import type { ModuleName } from '../ModuleIcon'
 import type { NavModule } from './HorizontalNavigation.vue'
 import HorizontalNavigationDocs from './HorizontalNavigation.mdx'
@@ -70,7 +71,10 @@ const meta: Meta<typeof HorizontalNavigation> = {
     },
     credits: {
       control: 'number',
-      table: { category: 'Contenu', defaultValue: { summary: 'undefined — pas de pastille' } },
+      description:
+        'Le solde **du module** : sans `module` ou avec `lockup: false`, pas de pastille. Absent : ce module n’a ' +
+        'pas de crédits. `null` : un solde existe et n’est pas encore arrivé.',
+      table: { category: 'Contenu', type: { summary: 'number | null' }, defaultValue: { summary: 'undefined — pas de pastille' } },
     },
     userInitials: {
       control: 'text',
@@ -164,6 +168,8 @@ export const WithActiveModule: Story = {
 export const WithCreditsReminder: Story = {
   name: 'Avec rappel d\u2019\u00e9ch\u00e9ance',
   args: {
+    module: 'Yield',
+    breadcrumbs: [{ label: 'Projets' }],
     credits: 250,
     creditsReminder: 'Expire dans 14 jours',
     creditsTone: 'warning',
@@ -173,6 +179,8 @@ export const WithCreditsReminder: Story = {
 export const CreditsExpired: Story = {
   name: 'Crédits expirés',
   args: {
+    module: 'Yield',
+    breadcrumbs: [{ label: 'Projets' }],
     credits: 0,
     creditsReminder: 'Crédits expirés',
     creditsTone: 'error',
@@ -324,15 +332,15 @@ export const HomeLabel: Story = {
 /**
  * Paramètres n'est ni un module ni l'accueil (maquette 3A, `2067:5918`) : la
  * fente d'identité se ferme, le bouton de retour ouvre la barre et ramène à la
- * page quittée — d'où la flèche et non la maison. Pas de pastille de crédits :
- * Paramètres a sa page Facturation, et `credits` absent ne rend rien.
+ * page quittée — d'où la flèche et non la maison. Pas de pastille de crédits,
+ * même si `credits` est passé : elle appartient au module (ADR-0054).
  */
 export const Settings: Story = {
   name: 'Paramètres — sans identité',
   render: (args) => ({
     components: { HorizontalNavigation },
     setup: () => ({ args }),
-    template: `<HorizontalNavigation v-bind="args" :credits="undefined" />`,
+    template: `<HorizontalNavigation v-bind="args" />`,
   }),
   args: {
     lockup: false,
@@ -391,7 +399,6 @@ export const SettingsSwap: Story = {
     template: `
       <HorizontalNavigation
         v-bind="args"
-        :credits="undefined"
         :module="inSettings ? undefined : module"
         :lockup="!inSettings"
         :home-icon="inSettings ? 'arrow-left' : 'house'"
@@ -403,4 +410,95 @@ export const SettingsSwap: Story = {
       />
     `,
   }),
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// La pastille appartient au module
+// ─────────────────────────────────────────────────────────────────────
+
+interface Beat {
+  /** The button's word for going *to* this beat. */
+  label:  string
+  props:  Record<string, unknown>
+  /** What lands later — a balance arriving after the module. */
+  later?: { ms: number, props: Record<string, unknown> }
+}
+
+/** A bar, and one button that walks it through `beats`, in a loop. */
+const choreography = (beats: Beat[]): Story['render'] => (args) => ({
+  components: { HorizontalNavigation, Button },
+  setup() {
+    const at = ref(0)
+    const landed = ref<Record<string, unknown>>({})
+    let timer: ReturnType<typeof setTimeout> | undefined
+    function step() {
+      clearTimeout(timer)
+      landed.value = {}
+      at.value = (at.value + 1) % beats.length
+      const later = beats[at.value].later
+      if (later) timer = setTimeout(() => { landed.value = later.props }, later.ms)
+    }
+    const bar = computed(() => ({ ...args, ...beats[at.value].props, ...landed.value }))
+    const label = computed(() => beats[(at.value + 1) % beats.length].label)
+    return { bar, label, step }
+  },
+  template: `
+    <div style="display: flex; flex-direction: column; gap: var(--ds-spacing-xl);">
+      <HorizontalNavigation v-bind="bar" />
+      <div><Button :label="label" variant="secondary-gray" size="sm" data-step @click="step" /></div>
+    </div>
+  `,
+})
+
+const HOME  = { module: undefined, breadcrumbs: [] }
+const YIELD = { module: 'Yield', breadcrumbs: [{ label: 'Projets' }] }
+const SCAN  = { module: 'Scan', breadcrumbs: [{ label: 'Analyses' }] }
+
+/**
+ * La pastille entre avec la marque du module et sort avec elle — même fenêtre,
+ * même durée, même courbe — et sa place s'ouvre et se referme au même pas. À
+ * l'accueil elle n'existe pas, même avec `credits` (ADR-0054).
+ */
+export const CreditsHomeModule: Story = {
+  name: 'La pastille — accueil ⇄ module',
+  render: choreography([
+    { label: 'Revenir à l\u2019accueil', props: { ...HOME, credits: 250 } },
+    { label: 'Entrer dans Yield',         props: { ...YIELD, credits: 250 } },
+  ]),
+}
+
+/**
+ * D'un module à l'autre, la pastille reste : le solde roule avec la marque —
+ * l'ancien sort par le haut, le nouveau entre par le bas — et le ton passe en
+ * fondu.
+ */
+export const CreditsModuleModule: Story = {
+  name: 'La pastille — module → module',
+  render: choreography([
+    { label: 'Revenir dans Yield', props: { ...YIELD, credits: 250 } },
+    { label: 'Passer à Scan',      props: { ...SCAN, credits: 12, creditsTone: 'warning' } },
+  ]),
+}
+
+/** Le solde change sans changer de module — après une analyse : le même roulement, seul. */
+export const CreditsUpdate: Story = {
+  name: 'La pastille — solde mis à jour',
+  render: choreography([
+    { label: 'Recharger (+70)',          props: { ...YIELD, credits: 250 } },
+    { label: 'Lancer une analyse (−70)', props: { ...YIELD, credits: 180 } },
+  ]),
+}
+
+/**
+ * `credits: null` — le module a un solde, pas encore arrivé. La pastille entre
+ * avec la marque, un emplacement tient la place du nombre, puis le nombre roule
+ * en arrivant (1,5 s ici). Jamais « 0 crédits » faute de donnée.
+ */
+export const CreditsPending: Story = {
+  name: 'La pastille — solde en attente',
+  render: choreography([
+    { label: 'Revenir à l\u2019accueil', props: { ...HOME, credits: null } },
+    { label: 'Entrer dans Yield',         props: { ...YIELD, credits: null }, later: { ms: 1500, props: { credits: 250 } } },
+    { label: 'Passer à Scan',             props: { ...SCAN, credits: null }, later: { ms: 1500, props: { credits: 1200 } } },
+  ]),
 }

@@ -87,15 +87,48 @@ profondeur 0 où la maison *est* la page, la barre ne l'a plus.
 
 | | |
 |---|---|
-| **les crédits** | la pastille de solde — quand le produit en passe un |
+| **les crédits** | la pastille de solde — dans un module qui en a un |
 | | `spacing-xl` (16px) |
 | **les contrôles** | `Apprendre`, paramètres, notifications, modules, l'avatar — `spacing-md` (8px) entre chacun |
 
 L'avatar est **le dernier des contrôles**, pas un bloc à lui seul. Il se tenait à 16px, un bloc d'un
 seul élément — une séparation qui ne séparait rien : c'est un contrôle comme les quatre avant lui.
-Ce qui reste à 16px, c'est la pastille : un solde, pas une action. Elle n'est rendue que si le produit
-passe `credits` — **absent, pas de pastille** ; `0` est un solde, et il s'affiche. La coquille
-(`1130:16686`) et Paramètres (3A) n'en montrent pas : Paramètres a sa page Facturation (ADR-0049).
+Ce qui reste à 16px, c'est la pastille : un solde, pas une action. Elle **appartient au module** —
+voir plus bas.
+
+## La pastille appartient au module
+
+Chaque module a son solde, qui ne se dépense que chez lui (ADR-0054). La pastille n'a donc de sens
+que dans un module : **jamais à l'accueil** (pas de `module`), **jamais dans Paramètres**
+(`lockup: false`), même si `credits` est passé. `module` reste le seul propriétaire de « on est dans
+un module » (ADR-0024) ; la pastille le lit, le produit n'a pas à le redire.
+
+| `credits` | |
+|---|---|
+| absent | ce module n'a pas de crédits — pas de pastille |
+| `null` | il a un solde, pas encore arrivé — la pastille entre, un emplacement tient la place du nombre |
+| un nombre | le solde ; `0` est un solde, et il s'affiche |
+
+**Elle bouge avec la marque.** Elle entre avec la marque qui arrive et sort avec celle qui part — la
+même fenêtre de 48px, la même durée, la même courbe, le même délai (depuis Paramètres, elle attend un
+`enter` avec la marque) — et sa place s'ouvre et se referme au même pas : rien à côté d'elle ne saute.
+D'un module à l'autre elle reste, et **son solde roule** comme la marque : l'ancien sort par le haut,
+le nouveau entre par le bas ; le ton passe en fondu. Mesuré au dixième de vitesse : la pastille et la
+marque à **0,00px** l'une de l'autre sur toute la course, les contrôles immobiles.
+
+<Canvas of={HorizontalNavigationStories.CreditsHomeModule} />
+
+<Canvas of={HorizontalNavigationStories.CreditsModuleModule} />
+
+<Canvas of={HorizontalNavigationStories.CreditsUpdate} />
+
+**En attente, jamais « 0 crédits ».** Le produit charge le solde après la navigation ; sans donnée,
+il n'avait rien de juste à montrer. `credits: null` fait entrer la pastille avec la marque, un
+emplacement à la place du nombre, et le nombre roule en arrivant.
+
+<Canvas of={HorizontalNavigationStories.CreditsPending} />
+
+Mouvements réduits : rien ne se déplace — la pastille, la marque et le solde changent net.
 
 ## Identité — la marque, ou le module
 
