@@ -631,6 +631,17 @@ Before working on any component, read:
   owns it), its window travelling its width (14.8px at « 250 » → « 12 ») with fractions (0.42px),
   clipped by `clip-path` (an `overflow` box loses its baseline); the tone fades. Reduced motion: nothing
   travels, and the leavers are hidden from the first frame.
+- **ADR-0055**: `ProjectCard` **loses its banner** — one map snapshot per project is more than the
+  product's backend can carry. Three tracks drawn in both modes (board `2278:7785`): A a head row,
+  B the pill at the foot (the hover menu covered « Projet démo »), C the status as a word of the
+  identity line (the line overflowed); **A chosen — both corners kept**: the pill top left in a head
+  row, the menu unmoved at the top right, so hover fades it in where it always was. **378 → 296px**,
+  one height in all four states. What left with the image: the **contrast risk** ADR-0038 named (the
+  two controls now stand on the card's own ground), **`state: 'error'`** (the snapshot's failure —
+  nothing to fetch, nothing fails), and `snapshot` / `snapshotAlt` / `#snapshot` / `emptyLabel`
+  (ADR-0040's frame and slot superseded, its ceiling kept). Loading keeps the head with a 68×**20**
+  bar — the `md` badge's height, or the content rose 4px on arrival. Figma's set (`1488:4799`)
+  followed: head row, 32px mark on every variant, demo badge bound everywhere, `Erreur` deleted.
 
 ## Architecture
 
