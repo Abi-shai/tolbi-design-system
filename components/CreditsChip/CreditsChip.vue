@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { Icon } from '../Icon'
+import { Skeleton } from '../Skeleton'
 import coinSrc from './credits-coin.svg'
 
 /**
@@ -39,8 +41,14 @@ import coinSrc from './credits-coin.svg'
 export type CreditsChipTone = 'default' | 'warning' | 'error'
 
 interface Props {
-  /** The balance. Rendered tabular so it does not jitter as it counts down. */
-  credits: number
+  /**
+   * The balance. Rendered tabular so it does not jitter as it counts down.
+   *
+   * `null` is a balance that **exists and has not arrived**: a placeholder holds
+   * the number's place, and the chip wears no tone — it does not say how bad a
+   * balance is before it knows it. Never `0` for want of data (ADR-0054).
+   */
+  credits: number | null
   /** Unit after the count. */
   unit?: string
   /**
@@ -52,12 +60,53 @@ interface Props {
   tone?: CreditsChipTone
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   unit: 'crédits',
   tone: 'default',
 })
 
 const emit = defineEmits<{ click: [event: MouseEvent] }>()
+
+const pending = computed(() => props.credits === null)
+
+/* Who wears the tone: the badge when there is one, and nobody while the balance
+   it would judge has not arrived. */
+const register = computed(() => (props.reminder || pending.value ? 'default' : props.tone))
+
+/*
+  **The number rolls**, like the bar's identity (ADR-0042): the old one leaves
+  through the top, the new one arrives from below — an odometer, a value changing
+  in place, always the same direction.
+
+  And its window **travels its width** rather than stepping it. Both numbers sit
+  in one cell, so the cell is as wide as the wider of the two, and at the end of
+  the roll it would snap to the new one — a digit's width, ~10px, on the chip's
+  edge. So the window is pinned to its width as the old number starts to leave,
+  then transitions to the new number's width while the two cross, and goes back
+  to `auto` once only the new one is left: a width written down for the length
+  of one roll, never longer, so a late web font can never find it stale.
+*/
+const countWindow = ref<HTMLElement>()
+
+/* Widths with their fractions: `offsetWidth` rounds, and the window travelled
+   to 26px, then stepped to the number's 26.42 when it went back to `auto`. */
+function holdWidth() {
+  const win = countWindow.value
+  if (win) win.style.width = `${win.getBoundingClientRect().width}px`
+}
+
+function travelWidth(el: Element) {
+  const win = countWindow.value
+  if (!win) return
+  const width = el.getBoundingClientRect().width
+  void win.offsetWidth
+  win.style.width = `${width}px`
+}
+
+function releaseWidth() {
+  const win = countWindow.value
+  if (win && win.children.length <= 1) win.style.width = ''
+}
 </script>
 
 <template>
@@ -68,14 +117,24 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   <button
     type="button"
     class="ds-credits-chip"
-    :class="`ds-credits-chip--${reminder ? 'default' : tone}`"
+    :class="`ds-credits-chip--${register}`"
+    :aria-busy="pending || undefined"
     @click="emit('click', $event)"
   >
     <span class="ds-credits-chip__balance">
       <img :src="coinSrc" alt="" class="ds-credits-chip__coin" width="24" height="24" />
       <!-- One run of text, not two boxes: the count and its unit are separated
-           by a space rather than a gap, and share one colour. -->
-      <span><span class="ds-credits-chip__count">{{ credits }}</span> <span
+           by a space rather than a gap, and share one colour. The count sits
+           in its window, which the roll travels through. -->
+      <span><span ref="countWindow" class="ds-credits-chip__count-window"><Transition
+        name="ds-credits-chip-roll"
+        @before-leave="holdWidth"
+        @enter="travelWidth"
+        @after-enter="releaseWidth"
+        @after-leave="releaseWidth"
+      ><span v-if="pending" key="pending" class="ds-credits-chip__count"><Skeleton
+        class="ds-credits-chip__placeholder" emphasis="strong" width="3ch" /></span><span
+        v-else :key="credits!" class="ds-credits-chip__count">{{ credits }}</span></Transition></span> <span
         class="ds-credits-chip__unit">{{ unit }}</span></span>
     </span>
 
@@ -111,6 +170,14 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   cursor: pointer;
   flex-shrink: 0;
   white-space: nowrap;
+  /*
+    The tone **fades**: a register is a state, not a thing that travels, so it
+    takes the default curve — over the roll's own duration, because the balance
+    and its verdict change together (ADR-0037: one gesture, one duration).
+  */
+  transition:
+    background-color var(--ds-motion-duration-enter) var(--ds-motion-easing-default),
+    border-color     var(--ds-motion-duration-enter) var(--ds-motion-easing-default);
 }
 
 /* ADR-0006: one focus treatment, and no component defines its own. */
@@ -157,6 +224,7 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   align-items: center;
   gap: var(--ds-spacing-sm);
   color: var(--chip-text);
+  transition: color var(--ds-motion-duration-enter) var(--ds-motion-easing-default);
 }
 
 /*
@@ -172,10 +240,81 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   flex-shrink: 0;
 }
 
+/*
+  The window the count rolls through: one cell for the leaving and the arriving
+  number, each at its own width (`justify-items: end`, so the digits keep to the
+  unit), clipped by `clip-path` rather than `overflow` — an inline box with
+  `overflow: hidden` takes its baseline from its bottom edge, and the count would
+  drop off the unit's line.
+*/
+.ds-credits-chip__count-window {
+  display: inline-grid;
+  /*
+    The column is the window's width, not its widest number's. With an `auto`
+    column the leaving number held the track at its own width while the window
+    narrowed, so the arriving one — aligned to the column's end — sat past the
+    window's edge and was clipped: filmed, « 12 » was invisible for the last
+    half of its roll.
+  */
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: end;
+  clip-path: inset(0);
+  transition: width var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
+}
+
 .ds-credits-chip__count {
+  grid-area: 1 / 1;
   font: var(--ds-font-label-xl-strong);
   /* Must follow `font:`, which resets font-variant-numeric (ADR-0011). */
   font-variant-numeric: tabular-nums;
+}
+
+/* Three digits' worth (`3ch` at the count's size), on the count's line, and
+   `strong`: the placeholder previews the weight of what is coming (ADR-0039),
+   and the count is the chip's heaviest text — the default grey on the chip's
+   white all but vanished. */
+.ds-credits-chip__placeholder {
+  display: inline-block;
+  vertical-align: -0.1em;
+}
+
+/* `enter` + `easing-in-out`, both halves, the bar identity's own roll: the
+   easing is "a thing that travels", and the two numbers are one movement. */
+.ds-credits-chip-roll-enter-active,
+.ds-credits-chip-roll-leave-active {
+  transition: transform var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
+}
+
+/* Arrives from below. */
+.ds-credits-chip-roll-enter-from {
+  transform: translateY(100%);
+}
+
+/* Leaves through the top. */
+.ds-credits-chip-roll-leave-to {
+  transform: translateY(-100%);
+}
+
+/*
+  The number changes, nothing travels. The leaving one goes from the first
+  frame: Vue swaps its classes a frame late, and two numbers would stand in one
+  cell for that frame (ADR-0052's reduced-motion finding).
+*/
+@media (prefers-reduced-motion: reduce) {
+  .ds-credits-chip__count-window,
+  .ds-credits-chip-roll-enter-active,
+  .ds-credits-chip-roll-leave-active {
+    transition: none;
+  }
+
+  .ds-credits-chip-roll-enter-from,
+  .ds-credits-chip-roll-leave-to {
+    transform: none;
+  }
+
+  .ds-credits-chip-roll-leave-active {
+    visibility: hidden;
+  }
 }
 
 .ds-credits-chip__unit {
@@ -211,5 +350,6 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 .ds-credits-chip__chevron {
   flex-shrink: 0;
   color: var(--chip-chevron);
+  transition: color var(--ds-motion-duration-enter) var(--ds-motion-easing-default);
 }
 </style>

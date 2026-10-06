@@ -1,5 +1,7 @@
+import { ref } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 import CreditsChip from './CreditsChip.vue'
+import { Button } from '../Button'
 import Docs from './CreditsChip.mdx'
 
 const meta: Meta<typeof CreditsChip> = {
@@ -11,7 +13,11 @@ const meta: Meta<typeof CreditsChip> = {
     docs: { page: Docs },
   },
   argTypes: {
-    credits:  { control: 'number', table: { category: 'Contenu' } },
+    credits:  {
+      control: 'number',
+      description: '`null` : un solde existe et n’est pas encore arrivé — un emplacement tient la place du nombre.',
+      table: { category: 'Contenu', type: { summary: 'number | null' } },
+    },
     unit:     { control: 'text',   table: { category: 'Contenu', defaultValue: { summary: "'crédits'" } } },
     reminder: { control: 'text',   table: { category: 'Contenu' } },
     tone: {
@@ -75,4 +81,35 @@ export const TabularCount: Story = {
       </div>
     `,
   }),
+}
+
+/** Le solde roule : l'ancien sort par le haut, le nouveau entre par le bas, et le ton passe en fondu. */
+export const Rolling: Story = {
+  name: 'Le solde roule',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { CreditsChip, Button },
+    setup() {
+      const steps = [
+        { credits: 250, tone: 'default' as const },
+        { credits: 180, tone: 'default' as const },
+        { credits: 12, tone: 'warning' as const },
+        { credits: 0, tone: 'error' as const },
+      ]
+      const at = ref(0)
+      return { steps, at }
+    },
+    template: `
+      <div style="display:flex;gap:14px;align-items:center;">
+        <CreditsChip :credits="steps[at].credits" :tone="steps[at].tone" />
+        <Button label="Dépenser" variant="secondary-gray" size="sm" data-step @click="at = (at + 1) % steps.length" />
+      </div>
+    `,
+  }),
+}
+
+/** `credits: null` — un emplacement à la place du nombre, aucun ton. */
+export const Pending: Story = {
+  name: 'En attente',
+  args: { credits: null, tone: 'warning' },
 }

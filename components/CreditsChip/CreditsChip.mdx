@@ -67,16 +67,39 @@ Un solde qui descend ne doit pas faire sauter ce qui l'entoure.
 
 ---
 
+## Le solde roule
+
+Quand le solde change, il **roule** comme l'identité de la barre (ADR-0042) : l'ancien nombre sort
+par le haut, le nouveau entre par le bas — un compteur, toujours dans le même sens. Sa fenêtre
+**parcourt sa largeur** au lieu de sauter d'un chiffre à la fin du roulement, et le ton passe en
+fondu sur la même durée (ADR-0054). Mouvements réduits : le nombre change net.
+
+<Canvas of={Stories.Rolling} />
+
+## En attente
+
+`credits: null` — un solde existe et n'est pas encore arrivé. Un emplacement de trois chiffres tient
+sa place, en `strong` : le nombre est le texte le plus lourd de la pastille. Elle ne porte aucun ton
+— elle ne juge pas un solde qu'elle ne connaît pas — et n'affiche **jamais `0`** faute de donnée.
+
+<Canvas of={Stories.Pending} />
+
+---
+
 ## Utilisation dans HorizontalNavigation
 
 ```vue
 <HorizontalNavigation
+  module="Yield"
   :credits="250"
   credits-reminder="Expirent dans 7 jours"
-  credits-reminder-tone="soon"
+  credits-tone="warning"
   @credits="openCreditsPanel"
 />
 ```
+
+La pastille appartient au module : sans `module`, ou avec `lockup: false`, la barre n'en rend pas
+(ADR-0054).
 
 La pastille est un `<button>` : le chevron promet qu'elle ouvre quelque chose,
 et un `<div>` qui émet `click` est inatteignable au clavier (ADR-0014).
