@@ -3,23 +3,6 @@ import ProjectCard from './ProjectCard.vue'
 import Docs from './ProjectCard.mdx'
 import { moduleNames } from '../ModuleIcon'
 
-/**
- * A stand-in for the map snapshot. Inline so the stories never depend on a
- * tile server — the real one is a render of every geometry the project holds,
- * framed to this tile's ratio.
- */
-const SNAPSHOT =
-  'data:image/svg+xml;utf8,' +
-  encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 128">
-      <rect width="280" height="128" fill="#8a7a55"/>
-      <rect x="0" y="0" width="90" height="70" fill="#7d8f5a"/>
-      <rect x="150" y="20" width="130" height="60" fill="#96854f"/>
-      <rect x="40" y="80" width="120" height="48" fill="#6f8350"/>
-      <path d="M40 30 L150 18 L235 44 L210 96 L86 104 Z"
-            fill="#0C6033" fill-opacity="0.32" stroke="#fff" stroke-width="2"/>
-    </svg>`)
-
 const meta: Meta<typeof ProjectCard> = {
   title: 'Données/ProjectCard',
   component: ProjectCard,
@@ -31,7 +14,7 @@ const meta: Meta<typeof ProjectCard> = {
       description: {
         component:
           "Un projet d'un module, en tuile. **La coque est partagée, l'aperçu ne l'est pas** : " +
-          'tous les modules ont la même anatomie — snapshot, nom, ligne d’identité, deux chiffres, ' +
+          'tous les modules ont la même anatomie — état, nom, ligne d’identité, deux chiffres, ' +
           'fraîcheur — et c’est ce qui rend lisible une grille qui les mélange. Ce qu’un module ' +
           '*mesure* est le seul endroit où le motif a le droit de casser.\n\n' +
           'Il se trouve que les deux modules livrés décrivent **la même chose** : une répartition. ' +
@@ -51,7 +34,7 @@ const meta: Meta<typeof ProjectCard> = {
   argTypes: {
     state: {
       control: 'inline-radio',
-      options: ['planned', 'running', 'done', 'loading', 'error'],
+      options: ['planned', 'running', 'done', 'loading'],
       table: { category: 'État' },
     },
     demo: { control: 'boolean', table: { category: 'État' } },
@@ -73,7 +56,6 @@ type Story = StoryObj<typeof meta>
 const YIELD = {
   title: 'Rendement Arachide Nord',
   module: 'Yield' as const,
-  snapshot: SNAPSHOT,
   demo: true,
   // Pas de surface : la carte ne la porte plus. Le rendement est en t/ha et la
   // production en t — l'hectare est déjà dans les deux chiffres, le répéter en
@@ -99,7 +81,6 @@ const YIELD = {
 const SCAN = {
   title: 'Cartographie Casamance',
   module: 'Scan' as const,
-  snapshot: SNAPSHOT,
   demo: true,
   meta: [
     { icon: 'wheat', label: '4 cultures' },
@@ -169,21 +150,21 @@ export const CropOverflow: Story = {
 }
 
 /**
- * Les cinq états. `loading` et `error` ne sont pas des états de projet — ils
- * sont sur le même axe parce que c'est ce que le consommateur doit rendre.
+ * Les quatre états. `loading` n'est pas un état de projet — il est sur le même
+ * axe parce que c'est ce que le consommateur doit rendre.
  *
  * Le chargement ne porte **ni pastille ni menu** : il n'y a encore rien à
- * commander, et un glyphe y ferait lire un état final. `error` garde les deux,
- * parce que c'est le snapshot qui a échoué, pas le projet.
+ * commander, et un glyphe y ferait lire un état final. Une barre tient la place
+ * de la pastille, pour que la carte ne grandisse pas à l'arrivée.
  */
 export const States: Story = {
-  name: 'Les cinq états',
+  name: 'Les quatre états',
   parameters: { layout: 'padded' },
   render: () => ({
     components: { ProjectCard },
     setup: () => ({ args: YIELD }),
     template: `
-      <div style="display: grid; grid-template-columns: repeat(5, 280px); gap: var(--ds-spacing-xl);">
+      <div style="display: grid; grid-template-columns: repeat(4, 280px); gap: var(--ds-spacing-xl);">
         <ProjectCard v-bind="args" state="planned"
           :metrics="[{ label: 'Rendement', value: '—' }, { label: 'Production', value: '—' }]"
           stageLabel="Démarre le 15 juin 2026" :stage="[]" />
@@ -191,7 +172,6 @@ export const States: Story = {
         <ProjectCard v-bind="args" state="done"
           :stage="[{ label: 'Maturité', share: 96 }, { label: 'Floraison', share: 4 }]" />
         <ProjectCard v-bind="args" state="loading" />
-        <ProjectCard v-bind="args" state="error" />
       </div>
     `,
   }),
@@ -246,40 +226,6 @@ export const ModuleMark: Story = {
         <ProjectCard v-bind="y" />
         <ProjectCard v-bind="s" />
         <ProjectCard v-bind="y" :module="undefined" title="Rendement Arachide Nord" />
-      </div>
-    `,
-  }),
-}
-
-/**
- * La référence de la bannière n'est pas limitée à une URL. `snapshot` reste le
- * chemin simple ; le slot `#snapshot` est là pour tout ce qu'une chaîne ne sait
- * pas porter — `srcset`, une source AVIF avec un JPEG derrière, `loading="lazy"`
- * sur une grille de vingt cartes, ou un `<canvas>` dans lequel le produit rend
- * la carte lui-même.
- *
- * Le cadre, lui, ne bouge pas : ratio, découpe, rayon, pill et bouton de menu
- * restent au design system. Les deux cartes ci-dessous sont strictement
- * identiques à l'œil — c'est le but.
- */
-export const SnapshotSlot: Story = {
-  name: 'Bannière — la référence vient du produit',
-  parameters: { layout: 'padded' },
-  render: () => ({
-    components: { ProjectCard },
-    setup: () => ({ args: SCAN, snapshot: SNAPSHOT }),
-    template: `
-      <div style="display: grid; grid-template-columns: repeat(2, 280px); gap: var(--ds-spacing-xl);">
-        <ProjectCard v-bind="args" />
-
-        <ProjectCard v-bind="args" :snapshot="undefined">
-          <template #snapshot>
-            <picture>
-              <source :srcset="snapshot" type="image/svg+xml" />
-              <img :src="snapshot" alt="Parcelles détectées" loading="lazy" />
-            </picture>
-          </template>
-        </ProjectCard>
       </div>
     `,
   }),

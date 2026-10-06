@@ -3,12 +3,29 @@ import * as Stories from './ProjectCard.stories'
 
 # ProjectCard
 
-Un projet d'un module, en tuile : un aperçu cartographique, un nom, une ligne
+Un projet d'un module, en tuile : une pastille d'état, un nom, une ligne
 d'identité, deux chiffres, un bloc d'aperçu et une ligne de fraîcheur.
 
 <Canvas of={Stories.Yield} />
 
 <Controls of={Stories.Yield} />
+
+---
+
+## Sans bannière
+
+La carte s'ouvrait sur un instantané cartographique du projet. En produire un par
+projet coûte plus que le backend du produit ne peut porter : **la bannière est
+partie** (ADR-0055). Trois pistes ont été dessinées en clair et en sombre — la
+pastille dans une rangée de tête, au pied à côté de la date, ou devenue un mot de
+la ligne d'identité — et la première a été retenue : **les deux coins sont
+gardés**. La pastille d'état reste en haut à gauche, le menu « … » en haut à
+droite, au même endroit qu'avant ; la carte passe de 378 à 298px.
+
+Ce qu'on y gagne : la pastille et le menu ne sont plus posés sur une photographie
+sans fond garanti — le seul risque de contraste que la carte portait — mais sur
+son propre fond. Ce qu'on y perd : l'état `error`, qui était l'échec de
+l'instantané. Sans rien à charger, rien ne peut échouer.
 
 ---
 
@@ -47,9 +64,9 @@ C'est **l'illustration, pas le logo** (ADR-0005) : la carte est déjà la surfac
 une tuile dans une tuile se battrait avec son rayon — le même arbitrage que
 `ModulesList` et `ModuleCapsule`.
 
-Elle tient sur **la ligne du titre**, et pas dans le coin du média : la pastille
-d'état y est déjà posée sur une photographie sans fond garanti (ADR-0038), et
-c'est un risque qu'on tient à un, pas à deux.
+Elle tient sur **la ligne du titre**. (Le coin du média avait été écarté parce que
+la pastille d'état y était déjà posée sur une photographie sans fond garanti —
+ADR-0038 ; la bannière est partie depuis, ADR-0055.)
 
 **Il y avait une taille gratuite et on ne l'a pas prise.** 24px, c'est exactement
 une boîte de ligne de `label-xl-strong` (16/24 dans les deux échelles typo) :
@@ -130,22 +147,22 @@ passe à la ligne non plus : une carte qui grandit casse sa grille.
 
 ---
 
-## Cinq états, dont deux qui n'en sont pas
+## Quatre états, dont un qui n'en est pas un
 
 <Canvas of={Stories.States} />
 
-`loading` et `error` ne sont pas des phases d'un projet. Ils sont sur le même axe
-parce que c'est ce que le consommateur doit réellement choisir, et parce que la
-teinte de la pastille découle de la même valeur — les deux ne peuvent donc pas
-se contredire.
-
-**`error` est l'échec du snapshot, pas celui du projet** : la pastille reste, le
-projet tourne toujours, c'est son image qui manque.
+`loading` n'est pas une phase d'un projet. Il est sur le même axe parce que c'est
+ce que le consommateur doit réellement choisir, et parce que la teinte de la
+pastille découle de la même valeur — les deux ne peuvent donc pas se contredire.
+Il y en avait un cinquième, `error` : l'échec de l'instantané, parti avec la
+bannière (ADR-0055).
 
 **L'attente ne dit rien.** Yield et Scan chargent à l'identique, parce qu'un
 placeholder qui devinerait se tromperait une fois sur deux. Ce qu'elle dit en
 revanche, c'est la *forme* : un nom au-dessus d'une légende, puis deux chiffres
-et une barre. Ni pastille ni menu — il n'y a encore rien à commander.
+et une barre. Ni pastille ni menu — il n'y a encore rien à commander — mais une
+barre tient la place de la pastille, pour que la carte ne grandisse pas à
+l'arrivée.
 
 ---
 
@@ -156,10 +173,10 @@ Le `<h3>` contient un vrai contrôle — un `<button>`, ou un `<a>` si l'on pass
 `click` est inatteignable au clavier** (ADR-0014) ; ici la cible est le titre,
 donc elle a un nom, un rôle et une place dans l'ordre de tabulation.
 
-Le menu « … » est **dernier dans le DOM**, même s'il se dessine sur le snapshot :
-une grille qui ferait menu, projet, menu, projet mettrait l'accessoire avant la
-chose. Et la carte a cessé de clipper — c'est le média qui clippe désormais —
-pour que l'anneau de focus, qui déborde de 4px, ne soit pas coupé.
+Le menu « … » est **dernier dans le DOM**, même s'il se dessine dans le coin de
+la tête : une grille qui ferait menu, projet, menu, projet mettrait l'accessoire
+avant la chose. Et la carte ne clippe pas, pour que l'anneau de focus, qui déborde
+de 4px, ne soit pas coupé.
 
 Le compromis assumé : la surcouche empêche de sélectionner le texte de la carte.
 C'est le prix d'une tuile entièrement cliquable.

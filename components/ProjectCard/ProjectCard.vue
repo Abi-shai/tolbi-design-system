@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, useSlots } from 'vue'
+import { computed } from 'vue'
 import { Badge } from '../Badge'
 import { Icon, type IconName } from '../Icon'
 import { IconButton } from '../IconButton'
@@ -10,7 +10,7 @@ import { Skeleton } from '../Skeleton'
  * One project of one module, as a tile in a grid.
  *
  * **The shell is shared, the insight is not.** Every module's project has the
- * same anatomy — a snapshot, a name, a line of identity metadata, two figures
+ * same anatomy — a status, a name, a line of identity metadata, two figures
  * and a freshness line — and that is what keeps a grid of mixed modules
  * readable. What a module *measures* is where the pattern is allowed to break,
  * because forcing one shape onto different data is how a card starts lying.
@@ -41,21 +41,20 @@ import { Skeleton } from '../Skeleton'
  * share always gets the most distinguishable hue and the `+N` tail is always
  * the small change.
  *
- * **`state` is the card's one axis**, and it carries two things that are not
- * project states at all — `loading` and `error`. They sit beside `planned`,
- * `running` and `done` because they are what the consumer actually has to
- * render, and because the pill's tone falls out of the same value.
+ * **`state` is the card's one axis**, and it carries one thing that is not a
+ * project state at all — `loading`. It sits beside `planned`, `running` and
+ * `done` because it is what the consumer actually has to render, and because
+ * the pill's tone falls out of the same value.
  *
- * **`error` is the snapshot's failure, not the project's.** The status pill
- * stays, because the project is still running; only its picture is missing.
- *
- * **Nothing in the body is laid over the image.** Only the pill and the overflow
- * button are, which is the one contrast risk the card carries: a snapshot is an
- * arbitrary photograph and neither is guaranteed a ground. Felt avoids this
- * entirely by putting every control below the image — worth revisiting if the
- * pill turns out to be unreadable on pale tiles.
+ * **No banner** (ADR-0055). The card opened on a map snapshot of the project,
+ * and generating one per project is more than the product's backend can carry.
+ * The two controls that sat on the image keep their corners in a head row — the
+ * status top left, the menu top right — and lose the one contrast risk the card
+ * had: they stood on an arbitrary photograph, and now stand on the card's own
+ * ground. `error`, the snapshot's failure, went with it: with nothing to fetch,
+ * nothing can fail.
  */
-export type ProjectCardState = 'planned' | 'running' | 'done' | 'loading' | 'error'
+export type ProjectCardState = 'planned' | 'running' | 'done' | 'loading'
 
 /** A chip in the identity line: what the project *is*, not what it measures. */
 export interface ProjectCardMeta {
@@ -77,7 +76,7 @@ export interface ProjectCardMeta {
  * that already picks the tone, so the two can no longer disagree.
  */
 export interface ProjectCardMetricBadge {
-  /** Before the period has passed — `Prévu`. Also what `planned` and `error` read. */
+  /** Before the period has passed — `Prévu`. Also what `planned` reads. */
   running: string
   /** Once it has — `Estimé`. */
   done:    string
@@ -131,31 +130,11 @@ interface Props {
    * `ina` and `conformite`. A wrong mark is worse than no mark.
    */
   module?:     ModuleName
-  /** The pill over the snapshot. Defaults to a label read off `state`. */
+  /** The pill at the head of the card. Defaults to a label read off `state`. */
   status?:     string
   /** The "Projet démo" badge. A condition of the account, not of the project. */
   demo?:       boolean
   demoLabel?:  string
-  /**
-   * The map snapshot, as a URL. The simple path, and the one the product will
-   * use for a rendered tile it already has a link to.
-   *
-   * A URL is not the only shape a reference comes in, so it is the **fallback
-   * of the `snapshot` slot**, not the only way in — `Table` does the same with
-   * `emptyText` behind `#empty`. A product that needs `srcset`, an AVIF source
-   * with a JPEG behind it, `loading="lazy"` across a grid of twenty, or a
-   * `<canvas>` the map renders into, fills the slot instead. The frame stays
-   * the design system's either way: ratio, clip, radius and the two controls
-   * that sit on top are declared here and are not negotiable.
-   */
-  snapshot?:   string
-  /**
-   * The snapshot's alternative text. Empty by default, which is the honest
-   * value while the tile is a render of data the card already states in words.
-   * A product that puts something *else* in the frame has to be able to name
-   * it — `Avatar` and `Tag` both take one for the same reason.
-   */
-  snapshotAlt?: string
   meta?:       ProjectCardMeta[]
   metrics?:    ProjectCardMetric[]
   /**
@@ -180,8 +159,6 @@ interface Props {
    */
   href?:       string
   freshness?:  string
-  /** What the media says when there is no snapshot to show. */
-  emptyLabel?: string
   ariaLabel?:  string
 }
 
@@ -191,8 +168,6 @@ const props = withDefaults(defineProps<Props>(), {
   status:     undefined,
   demo:       false,
   demoLabel:  'Projet démo',
-  snapshot:    undefined,
-  snapshotAlt: '',
   meta:       () => [],
   metrics:    () => [],
   stage:      () => [],
@@ -203,7 +178,6 @@ const props = withDefaults(defineProps<Props>(), {
   cropsShown: 3,
   href:       undefined,
   freshness:  undefined,
-  emptyLabel: 'Imagerie indisponible',
   ariaLabel:  undefined,
 })
 
@@ -214,38 +188,11 @@ const emit = defineEmits<{
 
 const isLoading = computed(() => props.state === 'loading')
 
-/**
- * **A snapshot can fail after the card has already decided it has one**, and
- * the card is the only thing that finds out. `state="error"` is a prop, so
- * reaching it means the product preflighted the URL — which it cannot do
- * without fetching the image twice. So the frame listens to its own `<img>`
- * instead, and a 404 lands on the same empty state the prop reaches.
- *
- * **Only the `<img>` the frame renders itself.** Fill the `snapshot` slot and
- * the failure is yours: we do not own that element and cannot hear it. The
- * prop is still there to reach this rendering by hand.
- *
- * It resets when the reference changes, or a card recycled through a list
- * would stay broken on an address that was never tried.
- */
-const snapshotFailed = ref(false)
-watch(() => props.snapshot, () => { snapshotFailed.value = false })
-
-/*
-  The union, and it stops here: `statusLabel` and `statusTone` read `state`
-  directly, so a broken image never moves the pill. ADR-0038's rule — the error
-  is the snapshot's, not the project's — is load-bearing now rather than
-  descriptive, because this is the path that reaches it without the product
-  saying so.
-*/
-const isError = computed(() => props.state === 'error' || snapshotFailed.value)
-
 /** The pill's tone is the state's, so the two can never disagree. */
 const STATUS = {
   planned: { label: 'Planifié', tone: 'neutral' },
   running: { label: 'En cours', tone: 'warning' },
   done:    { label: 'Terminé',  tone: 'success' },
-  error:   { label: 'En cours', tone: 'warning' },
   loading: { label: '',         tone: 'neutral' },
 } as const
 
@@ -258,8 +205,8 @@ const statusTone  = computed(() => STATUS[props.state].tone)
  * `Prévu` — the right colour on the wrong word, which is the failure ADR-0031
  * closed for `ModuleCapsule` and this component only half-applied.
  *
- * `done` is the only state that re-words: `planned` and `error` are still
- * before the period has passed, and `loading` renders no badge at all.
+ * `done` is the only state that re-words: `planned` is still before the period
+ * has passed, and `loading` renders no badge at all.
  */
 const metricBadge = computed(() => {
   const badge = props.metrics.find((m) => m.badge)?.badge
@@ -270,15 +217,6 @@ const metricBadge = computed(() => {
     tone:  done ? 'success' : 'warning',
   } as const
 })
-
-const slots = useSlots()
-
-/**
- * The snapshot shows only when there is one and nothing has gone wrong — and
- * "there is one" now means a URL **or** a filled slot, or a product that only
- * ever fills the slot would render an empty frame forever.
- */
-const showSnapshot = computed(() => (!!props.snapshot || !!slots.snapshot) && !isLoading.value && !isError.value)
 
 /**
  * **One block, two props.** `stage` and `crops` carry the same shape and render
@@ -328,37 +266,19 @@ function shareColour(i: number) {
     :aria-label="ariaLabel"
     :aria-busy="isLoading || undefined"
   >
-    <!-- ── Media ────────────────────────────────────────────────────
-         Loading carries neither pill nor menu: there is nothing to
-         command yet, and a glyph here would read as a final state. -->
-    <div class="ds-project-card__media">
-      <!-- The frame is the design system's, what fills it is the product's.
-           Fallback content, so `snapshot` alone keeps working untouched. -->
-      <div v-if="showSnapshot" class="ds-project-card__snapshot">
-        <slot name="snapshot">
-          <img :src="snapshot" :alt="snapshotAlt" @error="snapshotFailed = true" />
-        </slot>
-      </div>
-
-      <!-- The word, and nothing else. Both error variants hide the glyph and
-           the frame was re-centred on the line alone, so this is a state and
-           not a stray toggle — but it does overturn ADR-0038's "the absence
-           speaks: glyph, word, action". One line to put back. -->
-      <div v-if="isError" class="ds-project-card__media-empty">
-        <span>{{ emptyLabel }}</span>
-      </div>
-
-      <Badge
-        v-if="!isLoading"
-        class="ds-project-card__status"
-        :label="statusLabel"
-        :tone="statusTone"
-        size="md"
-      />
-    </div>
-
-    <!-- ── Body ─────────────────────────────────────────────────── -->
     <div class="ds-project-card__body">
+      <!-- ── Head ───────────────────────────────────────────────────
+           Where the banner was: the status keeps its corner, top left, and
+           the menu keeps the other (ADR-0055). Loading holds the pill's place
+           with a bar — the wait says nothing, so no glyph and no word, but a
+           head that appeared on arrival would push the whole card down. -->
+      <div class="ds-project-card__head">
+        <!-- 20px: the `md` badge's own height, or the card's content would
+             rise 4px on arrival (measured). -->
+        <Skeleton v-if="isLoading" variant="rect" :height="20" :width="68" />
+        <Badge v-else :label="statusLabel" :tone="statusTone" size="md" />
+      </div>
+
       <!-- Yield and Scan load **identically** — the wait says nothing about
            which module is coming, because a placeholder that guessed would be
            wrong half the time. What it does say is the card's *shape*: a name
@@ -504,10 +424,9 @@ function shareColour(i: number) {
     </div>
 
     <!--
-      **Last in the DOM, on purpose.** It sits on the snapshot, but a keyboard
-      reaches things in source order, and a grid that goes menu, project, menu,
-      project puts the afterthought before the thing itself. Placed against the
-      card rather than the media, which also keeps its shadow out of the clip.
+      **Last in the DOM, on purpose.** It sits in the head's corner, but a
+      keyboard reaches things in source order, and a grid that goes menu,
+      project, menu, project puts the afterthought before the thing itself.
 
       `xs`: 32px, not the navigation bar's 36. A tile 280px wide cannot spend a
       36px disc on a menu it shares with a status pill.
@@ -526,7 +445,7 @@ function shareColour(i: number) {
 <style scoped>
 /*
   `10px`, declared once and **off the ramp** — the scale goes 8 then 12. It is
-  the gap the ten variants agree on for the card's three seams: media to body,
+  the gap the variants agree on for the card's three seams: head to identity,
   identity block to insight, content to footer. Not control padding, so
   ADR-0013's exemption does not cover it: either it becomes a step or it snaps
   to `spacing-md`.
@@ -537,7 +456,8 @@ function shareColour(i: number) {
   many fit, the card decides how wide it is willing to get. Without the cap it
   took whatever the container offered, and the media's `280 / 128` grew with it:
   a snapshot framed on the union of the project's geometries turning into a
-  banner. `max-width`, not `width`, so a narrower column still gets a card.
+  banner (ADR-0040; the snapshot itself has gone since, ADR-0055). `max-width`,
+  not `width`, so a narrower column still gets a card.
 
   **`17.5em`, not `280px`.** The cap is expressed in the card's own type size,
   so a consumer that shrinks the text shrinks the shell with it rather than
@@ -562,7 +482,6 @@ function shareColour(i: number) {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--project-card-gap);
   box-sizing: border-box;
   max-width: 17.5em;
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
@@ -605,87 +524,12 @@ function shareColour(i: number) {
   }
 }
 
-/* ── Media ────────────────────────────────────────────────────────── */
-/*
-  A ratio rather than a height: the snapshot is framed on the union of the
-  project's geometries, so the tile's shape is what the framing has to satisfy,
-  and it has to hold at any card width.
-*/
-/* The clip moved here from the card. The card had to stop clipping so the
-   focus ring — 4px outside the border box — is not cut off; the only thing that
-   ever needed clipping was the snapshot, and it can do it itself. */
-.ds-project-card__media {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 280 / 128;
-  border-radius: var(--ds-radius-surface) var(--ds-radius-surface) 0 0;
-  background-color: var(--ds-bg-neutral);
-}
-
-/*
-  **The media dictates its child's geometry, whatever that child is.** The
-  slot's whole point is that the product brings the reference format, so the
-  frame cannot assume it got an `<img>`: a `<picture>` is a wrapper whose own
-  box means nothing, a `<canvas>` has intrinsic pixels, an inline `<svg>` has a
-  viewBox. So the rule is in two parts — the direct child fills the box, and the
-  thing that actually carries pixels covers it, at whatever depth it sits. That
-  second selector is what makes `<picture><img></picture>` behave, since
-  `object-fit` on the wrapper does nothing.
-
-  `:deep()`, because slotted content carries the *consumer's* scope id and a
-  plain scoped rule would miss it silently — the trap ADR-0021 already recorded
-  against `SurfaceTransition`.
-*/
-.ds-project-card__snapshot {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.ds-project-card__snapshot > :deep(*) {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.ds-project-card__snapshot :deep(:is(img, canvas, video, svg)) {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.ds-project-card__media-empty {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ds-spacing-sm);
-  color: var(--ds-text-subtle);
-  font: var(--ds-font-label-md);
-}
-
 /* No edge while it waits, as drawn: the hairline is what makes the block a
    surface, and a placeholder is not one yet. `transparent` rather than `none`
    so the border box does not change — the skeleton bars sit exactly where the
    real content will, and nothing shifts on arrival. */
 .ds-project-card--loading .ds-project-card__insight {
   border-color: transparent;
-}
-
-/* The snapshot's placeholder is the same `bg-pending` as the skeleton's heavy
-   bars — Figma fills all of them with one value, because they are all the same
-   statement. Says nothing else: no glyph, no word. */
-.ds-project-card--loading .ds-project-card__media {
-  background-color: var(--ds-bg-pending);
-}
-
-.ds-project-card__status {
-  position: absolute;
-  top: var(--ds-spacing-lg);
-  left: var(--ds-spacing-lg);
 }
 
 /* Above the title's overlay, or the card would swallow the menu's clicks.
@@ -741,15 +585,26 @@ function shareColour(i: number) {
 }
 
 /* ── Body ─────────────────────────────────────────────────────────── */
-/* No padding on top: the 10px above the body is the card's own seam, so the
-   media stays flush to the three edges it touches. */
+/* `spacing-lg` all round now that nothing is flush to the edge: the banner was,
+   on three sides, and the body started under it with no padding of its own. */
 .ds-project-card__body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   flex: 1 1 auto;
   gap: var(--project-card-gap);
-  padding: 0 var(--ds-spacing-lg) var(--ds-spacing-lg);
+  padding: var(--ds-spacing-lg);
+}
+
+/*
+  The head: the status, top left, where it sat on the banner. The menu is not in
+  this row — it is last in the DOM for the tab order and placed against the card
+  (`__more`), at the same 12px from the top and the right as before, so the two
+  corners are where they were and nothing on hover moves.
+*/
+.ds-project-card__head {
+  display: flex;
+  align-items: center;
 }
 
 .ds-project-card__content {
