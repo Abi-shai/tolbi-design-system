@@ -619,6 +619,18 @@ Before working on any component, read:
   decorative and no longer claims « En ligne ». **The header keeps its avatar**: the email has 156px
   for addresses of 157–234px, so the domain is cut — dropping the avatar (208px, 5 of 6 fit) was
   drawn and declined.
+- **ADR-0054**: **the credits belong to the module** — each module has its own balance, so the chip
+  shows only with a `module` and an open slot (`lockup`): never at home, never in Paramètres, whatever
+  is passed (`module` the single owner, ADR-0024). `credits: null` is a balance **on its way** — a third
+  value, not a `creditsPending` beside the number (which could contradict it): a `strong` 3-digit
+  `Skeleton`, no tone, `aria-busy`, **never `0` for want of data**. The chip **moves with the mark**
+  through the identity's own transition — same 48px window (`--hnav-mark` moved to the root), duration,
+  curve and delay (`--opening` on the root) — measured **0.00px** apart; its place travels `0fr → 1fr`
+  with the 16px inside the clip. Filmed: a fractional `fr` column is narrower than its track, so the
+  chip slid 41px sideways (`justify-content: end`). Between modules **the number rolls** (`CreditsChip`
+  owns it), its window travelling its width (14.8px at « 250 » → « 12 ») with fractions (0.42px),
+  clipped by `clip-path` (an `overflow` box loses its baseline); the tone fades. Reduced motion: nothing
+  travels, and the leavers are hidden from the first frame.
 
 ## Architecture
 
