@@ -722,7 +722,7 @@ Before working on any component, read:
   Storybook builds with `vite.config.ts` too, so that guard broke the Vercel deployment until Storybook
   dropped the declaration plugin (`viteFinal`) — a guard is part of every build that loads it.
 - **ADR-0062**: the panel is a column — `TolbiAiPanel` is **docked**, a flex sibling of the page, so
-  opening, closing and expanding (400 → 720) are **one width that travels** (ADR-0037: `enter`,
+  opening and closing are **one width that travels** (ADR-0037: `enter`,
   `in-out`), the surface anchored to the screen edge like a drawer (ADR-0046). It owns its 12px gap
   **inside** the width, or a closed panel would leave one — filmed: page + panel = 1256px every frame.
   The head says the **name alone** (Figma's sign there is a hidden layer; the handoff said 24 — the
@@ -747,6 +747,18 @@ Before working on any component, read:
   region widened, the default cut it). It **ends on `rest`** value for value; `awake` fires once — and
   at once under reduced motion, where nothing plays and so nothing would end. `TolbiAiWelcome`
   `awaken` plays **as the panel opens**, never while closed (it would play unseen).
+- **ADR-0064**: expanded, the panel **takes the surface** (Figma `2310:4829`) — it covers the row it
+  stands in, the bar and the navigation untouched, and **the footprint stays**: the page keeps its
+  width under the surface (812px every frame), so « Réduire » hands the map back as it was left. The
+  surface overflows to the left at the row's **measured** width, set without a transition (a resize
+  is not a gesture). What hides a closing panel is a **`clip-path`, not `overflow`** — a clip can open
+  past the panel's box and travels with the gesture; closed while expanded, it closes over the surface
+  from the left, and `expanded` survives the close. **720 is the reading column**, not the panel: one
+  padding rule, `max(2xl, (100% − 720px) / 2)`, follows the surface as it travels (the frame's 920 is
+  a fixed 252 padding left behind by a collapsed navigation); the composer stands `2xl − xl` past it.
+  The covered siblings are **`inert`**, handed back on reduce. The page must be **its own stacking
+  context** (`isolation: isolate`): a map's controls (`z-index` 2) would paint through, and raising
+  the panel would cover the rail's tooltips or the bar's menus.
 
 ## Architecture
 

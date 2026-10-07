@@ -32,6 +32,9 @@ not move.
 Figma's surface: `bg-default`, `radius-surface` on the top corners only, no shadow — it sits in the
 page.
 
+**Amended by ADR-0064:** expanding no longer widens the column to 720. The surface takes the page's
+whole row, the page staying under it at its width; 720 is the reading column.
+
 ### The head says the name
 
 « Tolbi AI » and an `ALPHA` badge (`Badge` `success`), then history, new conversation, expand and
