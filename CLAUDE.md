@@ -718,7 +718,9 @@ Before working on any component, read:
   **paused, not extendable** (the mic was released). The box keeps its height through a swap, then
   **glides** (WAAPI off the cascade); the defect: **cancelling a finished Animation queues its `cancel`
   event**, which unlocked the box mid-swap — 30px in one frame. `IconButton` gains **`neutral`**. The
-  build now fails on a dropped `.d.ts` and on a declaration pointing outside `dist/`.
+  build now fails on a dropped `.d.ts` and on a declaration pointing outside `dist/`. **Amended**:
+  Storybook builds with `vite.config.ts` too, so that guard broke the Vercel deployment until Storybook
+  dropped the declaration plugin (`viteFinal`) — a guard is part of every build that loads it.
 - **ADR-0062**: the panel is a column — `TolbiAiPanel` is **docked**, a flex sibling of the page, so
   opening, closing and expanding (400 → 720) are **one width that travels** (ADR-0037: `enter`,
   `in-out`), the surface anchored to the screen edge like a drawer (ADR-0046). It owns its 12px gap

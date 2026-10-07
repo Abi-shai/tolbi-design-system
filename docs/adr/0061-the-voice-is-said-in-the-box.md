@@ -97,6 +97,12 @@ stays green (0.37.0 shipped `TolbiAiVoiceNote` untyped), and a declaration that 
 `dist/` ships a dangling path — the recorder's first home, `composables/`, would have done that. The
 build now fails on either; each was proven by reintroducing the fault.
 
+**Amended the same day:** Storybook builds with the project's `vite.config.ts`, plugins included, so the
+declaration plugin ran inside `build-storybook` too, wrote into `storybook-static/` — and the second
+guard rejected every declaration there, since none of them is inside `dist/`. The Vercel deployment
+failed from 0.38.0 until the fix: Storybook now drops the plugin (`viteFinal`), and the guard checks
+against the build's real output directory. A guard is part of every build that loads it.
+
 ## What changes
 
 - `TolbiAiComposer`: `voice` (default on), `voiceLimit` (120s), `voiceLabels`; events `send-voice` and
