@@ -15,8 +15,11 @@ export type IconButtonSize = 'xs' | 'sm'
  * card's corner. `primary` — the brand fill, for the one action a composite is
  * built around: the Tolbi AI composer's send and record, where green is the
  * action (ADR-0059). The same pair as `Button`'s ghost and primary.
+ *
+ * `surface` — a white disc, for a control standing on a tinted ground: the
+ * play button of a voice note on its `bg-neutral` bubble (ADR-0060).
  */
-export type IconButtonVariant = 'ghost' | 'primary'
+export type IconButtonVariant = 'ghost' | 'primary' | 'surface'
 
 interface Props {
   /** The glyph. Mirrors the `Icône` instance-swap on the Figma component. */
@@ -132,5 +135,23 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 
 .ds-icon-button--primary:disabled {
   background: var(--ds-bg-disabled);
+}
+
+/* ── Surface: a white disc on a tinted ground ─────────────────────── */
+.ds-icon-button--surface {
+  background: var(--ds-bg-default);
+}
+
+/*
+  On white, no tint can say hover — `bg-hover` is 1.045:1 against it (ADR-0044)
+  — so the hover is a contour, drawn as an outline inside the edge. An outline,
+  not a shadow: the focus ring owns `box-shadow`, and a hovered button that has
+  the focus must show both.
+*/
+.ds-icon-button--surface:hover:not(:disabled),
+.ds-icon-button--surface.ds-icon-button--active {
+  background: var(--ds-bg-default);
+  outline: var(--ds-border-width-default) solid var(--ds-border-default);
+  outline-offset: calc(-1 * var(--ds-border-width-default));
 }
 </style>

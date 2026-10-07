@@ -31,11 +31,11 @@ const meta: Meta<typeof IconButton> = {
     },
     variant: {
       control: 'inline-radio',
-      options: ['ghost', 'primary'],
+      options: ['ghost', 'primary', 'surface'],
       description:
         '`ghost` prend la surface derrière lui. `primary` porte le remplissage brand : ' +
         'l\'action autour de laquelle un composite est construit (la saisie de Tolbi AI).',
-      table: { category: 'Apparence', type: { summary: "'ghost' | 'primary'" }, defaultValue: { summary: "'ghost'" } },
+      table: { category: 'Apparence', type: { summary: "'ghost' | 'primary' | 'surface'" }, defaultValue: { summary: "'ghost'" } },
     },
     active:    { control: 'boolean', table: { category: 'État', defaultValue: { summary: 'false' } } },
     disabled:  { control: 'boolean', table: { category: 'État', defaultValue: { summary: 'false' } } },
@@ -91,6 +91,26 @@ export const Primary: Story = {
         <IconButton icon="mic" ariaLabel="Envoyer un vocal" size="xs" variant="primary" />
         <IconButton icon="arrow-up" ariaLabel="Envoyer" size="xs" variant="primary" disabled />
         <IconButton icon="arrow-up" ariaLabel="Envoyer" size="sm" variant="primary" />
+      </div>
+    `,
+  }),
+}
+
+/**
+ * `surface` : un disque blanc, pour un bouton posé sur un fond teinté — la
+ * lecture d'un vocal sur sa bulle `bg-neutral` (ADR-0060). Au survol, un
+ * contour : sur du blanc, aucune teinte ne se lit.
+ */
+export const Surface: Story = {
+  name: 'Surface',
+  render: () => ({
+    components: { IconButton },
+    template: `
+      <div style="display:flex;gap:16px;align-items:center;padding:12px;border-radius:var(--ds-radius-surface-sm);background:var(--ds-bg-neutral);">
+        <IconButton icon="play" ariaLabel="Écouter le vocal" size="xs" variant="surface" />
+        <IconButton icon="pause" ariaLabel="Mettre en pause" size="xs" variant="surface" />
+        <IconButton icon="play" ariaLabel="Écouter le vocal" size="xs" variant="surface" active />
+        <IconButton icon="play" ariaLabel="Écouter le vocal" size="xs" variant="surface" disabled />
       </div>
     `,
   }),
