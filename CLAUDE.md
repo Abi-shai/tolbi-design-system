@@ -734,6 +734,17 @@ Before working on any component, read:
   `TolbiAiNavButton` is a `Button` — which gains **`#leading`** and **`selected`** (ADR-0050's mark) —
   with ⌘J/Ctrl+J; `HorizontalNavigation` gains **`#assistant`**, first of the controls (page before
   app); a slot, ADR-0053's shape: the bar decides the place, the product decides presence.
+- **ADR-0063**: the awakening is the exception — it departs from ADR-0002 (3.2s, a choreography, a
+  decoration) and from the charter (a glow), **accepted by the owner for this one moment**: the
+  panel's first opening. `TolbiAiSpark` `state="awakening"`: **transcribed from Figma's Motion data,
+  not redesigned** — seeked every 10ms, all eight tracks on Figma's curves to < 0.001 (the turn to
+  0.0005°). Turn and growth are the individual `rotate`/`scale` properties (two timings, one group).
+  **Its curves are its own** — CSS `ease-in-out` (motion.dev's, *not* the token), (0.18, 1, 0.3, 1),
+  (0.42, 0, 0.25, 1) — literals: an exception borrows nothing from the scale it departs from. The glow
+  is the spark **blurred** (`feGaussianBlur` 1.25 in the drawing's units = Figma's 2.5 halved; filter
+  region widened, the default cut it). It **ends on `rest`** value for value; `awake` fires once — and
+  at once under reduced motion, where nothing plays and so nothing would end. `TolbiAiWelcome`
+  `awaken` plays **as the panel opens**, never while closed (it would play unseen).
 
 ## Architecture
 
