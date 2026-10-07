@@ -10,6 +10,14 @@ import { Icon, type IconName } from '../Icon'
  */
 export type IconButtonSize = 'xs' | 'sm'
 
+/**
+ * `ghost` — no fill of its own: it takes the surface behind it, the bar or a
+ * card's corner. `primary` — the brand fill, for the one action a composite is
+ * built around: the Tolbi AI composer's send and record, where green is the
+ * action (ADR-0059). The same pair as `Button`'s ghost and primary.
+ */
+export type IconButtonVariant = 'ghost' | 'primary'
+
 interface Props {
   /** The glyph. Mirrors the `Icône` instance-swap on the Figma component. */
   icon: IconName
@@ -23,6 +31,7 @@ interface Props {
   active?: boolean
   disabled?: boolean
   size?: IconButtonSize
+  variant?: IconButtonVariant
   type?: 'button' | 'submit' | 'reset'
 }
 
@@ -30,6 +39,7 @@ const props = withDefaults(defineProps<Props>(), {
   active: false,
   disabled: false,
   size: 'sm',
+  variant: 'ghost',
   type: 'button',
 })
 
@@ -52,7 +62,7 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
     :disabled="disabled"
     :aria-label="ariaLabel"
     class="ds-icon-button"
-    :class="[`ds-icon-button--${size}`, { 'ds-icon-button--active': active }]"
+    :class="[`ds-icon-button--${size}`, `ds-icon-button--${variant}`, { 'ds-icon-button--active': active }]"
     @click="emit('click', $event)"
   >
     <Icon :name="icon" :size="iconSize" />
@@ -103,5 +113,24 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 .ds-icon-button:disabled {
   cursor: not-allowed;
   color: var(--ds-text-disabled);
+}
+
+/* ── Primary: the brand fill, as Button's primary ─────────────────── */
+.ds-icon-button--primary {
+  background: var(--ds-bg-brand-solid);
+  color: var(--ds-text-on-brand-solid);
+}
+
+.ds-icon-button--primary:hover:not(:disabled),
+.ds-icon-button--primary.ds-icon-button--active {
+  background: var(--ds-bg-brand-solid-hover);
+}
+
+.ds-icon-button--primary:focus-visible {
+  box-shadow: var(--ds-focus-ring-brand);
+}
+
+.ds-icon-button--primary:disabled {
+  background: var(--ds-bg-disabled);
 }
 </style>

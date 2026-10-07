@@ -29,6 +29,14 @@ const meta: Meta<typeof IconButton> = {
       options: ['xs', 'sm'],
       table: { category: 'Apparence', type: { summary: "'xs' | 'sm'" }, defaultValue: { summary: "'sm'" } },
     },
+    variant: {
+      control: 'inline-radio',
+      options: ['ghost', 'primary'],
+      description:
+        '`ghost` prend la surface derrière lui. `primary` porte le remplissage brand : ' +
+        'l\'action autour de laquelle un composite est construit (la saisie de Tolbi AI).',
+      table: { category: 'Apparence', type: { summary: "'ghost' | 'primary'" }, defaultValue: { summary: "'ghost'" } },
+    },
     active:    { control: 'boolean', table: { category: 'État', defaultValue: { summary: 'false' } } },
     disabled:  { control: 'boolean', table: { category: 'État', defaultValue: { summary: 'false' } } },
   },
@@ -63,6 +71,26 @@ export const Sizes: Story = {
       <div style="display:flex;gap:16px;align-items:center;">
         <IconButton icon="ellipsis" ariaLabel="Actions" size="xs" />
         <IconButton icon="ellipsis" ariaLabel="Actions" size="sm" />
+      </div>
+    `,
+  }),
+}
+
+/**
+ * `primary` : le remplissage brand, pour l'action autour de laquelle un
+ * composite est construit — Envoyer et le micro de la saisie de Tolbi AI
+ * (ADR-0059). Le vert est l'action.
+ */
+export const Primary: Story = {
+  name: 'Primary',
+  render: () => ({
+    components: { IconButton },
+    template: `
+      <div style="display:flex;gap:16px;align-items:center;">
+        <IconButton icon="arrow-up" ariaLabel="Envoyer" size="xs" variant="primary" />
+        <IconButton icon="mic" ariaLabel="Envoyer un vocal" size="xs" variant="primary" />
+        <IconButton icon="arrow-up" ariaLabel="Envoyer" size="xs" variant="primary" disabled />
+        <IconButton icon="arrow-up" ariaLabel="Envoyer" size="sm" variant="primary" />
       </div>
     `,
   }),
