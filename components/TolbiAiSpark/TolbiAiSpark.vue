@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, useId, watch } from 'vue'
 import type { ArtworkSize } from '../artwork-size'
 import { leaves, spark, viewBox } from './art'
 
@@ -16,8 +16,15 @@ import { leaves, spark, viewBox } from './art'
  * its own: Figma pairs it with a line saying what the work is, which carries
  * the status for assistive tech. Under reduced motion it does not turn — it is
  * `off`, and `rest` follows when the work ends (ADR-0057).
+ *
+ * `awakening` — the one exception (ADR-0063): played once, on the panel's
+ * first opening. The pictogram turns once and grows from 94 %, the leaves
+ * light in two rounds from the north, then the spark arrives and a soft glow
+ * rises, holds and fades; 3.2 s, and it ends at `rest`, so the state can stay
+ * as it is. It emits `awake` when it is over. Under reduced motion it is
+ * `rest` at once.
  */
-export type TolbiAiSparkState = 'rest' | 'off' | 'thinking'
+export type TolbiAiSparkState = 'rest' | 'off' | 'thinking' | 'awakening'
 
 /**
  * The ground the sign sits on. It decides the leaves' ink and nothing else:
@@ -61,7 +68,31 @@ const props = withDefaults(defineProps<Props>(), {
   ariaLabel: undefined,
 })
 
+const emit = defineEmits<{
+  /** The awakening is over and the sign is at rest. */
+  awake: []
+}>()
+
 const label = computed(() => (props.ariaLabel === undefined ? 'Tolbi AI' : props.ariaLabel))
+
+/* The glow is a blurred copy of the spark; two signs on a page need two filters. */
+const glowId = `ds-tolbi-ai-spark-glow-${useId()}`
+
+/* Every track of the awakening lasts the whole 3.2s; the turn is the one to
+   listen for, so `awake` fires once. */
+function onAnimationEnd(event: AnimationEvent) {
+  if (props.state === 'awakening' && event.animationName.startsWith('ds-tolbi-ai-wake-turn')) emit('awake')
+}
+
+/* Under reduced motion nothing plays, so nothing ends: it is over at once. */
+watch(
+  () => props.state,
+  (state) => {
+    if (state === 'awakening' && typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches)
+      void nextTick(() => emit('awake'))
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -76,19 +107,39 @@ const label = computed(() => (props.ariaLabel === undefined ? 'Tolbi AI' : props
     :role="label ? 'img' : undefined"
     :aria-label="label || undefined"
     :aria-hidden="label ? undefined : true"
+    @animationend="onAnimationEnd"
   >
+    <defs v-if="accent && state === 'awakening'">
+      <!-- Figma's layer blur of 2.5 on the 48 grid: a standard deviation of
+           half that, in the drawing's own units, so it scales with the sign.
+           The region is widened, or the default 10 % margin cuts the glow. -->
+      <filter :id="glowId" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation="1.25" />
+      </filter>
+    </defs>
     <!--
       One path per leaf, named by compass point and listed from the west,
-      clockwise — the order the light goes round when Tolbi AI is working.
+      clockwise — the order the light goes round when Tolbi AI is working. The
+      group is what turns and grows when the sign awakens.
     -->
-    <path
-      v-for="leaf in leaves"
-      :key="leaf.direction"
-      class="ds-tolbi-ai-spark__leaf"
-      :class="`ds-tolbi-ai-spark__leaf--${leaf.direction}`"
-      :d="leaf.d"
-    />
-    <path v-if="accent && state !== 'thinking'" class="ds-tolbi-ai-spark__accent" :d="spark" />
+    <g class="ds-tolbi-ai-spark__leaves">
+      <path
+        v-for="leaf in leaves"
+        :key="leaf.direction"
+        class="ds-tolbi-ai-spark__leaf"
+        :class="`ds-tolbi-ai-spark__leaf--${leaf.direction}`"
+        :d="leaf.d"
+      />
+    </g>
+    <g v-if="accent && state !== 'thinking'" class="ds-tolbi-ai-spark__spark">
+      <path
+        v-if="state === 'awakening'"
+        class="ds-tolbi-ai-spark__accent ds-tolbi-ai-spark__glow"
+        :d="spark"
+        :filter="`url(#${glowId})`"
+      />
+      <path class="ds-tolbi-ai-spark__accent" :d="spark" />
+    </g>
   </svg>
 </template>
 
@@ -190,6 +241,145 @@ const label = computed(() => (props.ariaLabel === undefined ? 'Tolbi AI' : props
 */
 @media (prefers-reduced-motion: reduce) {
   .ds-tolbi-ai-spark--thinking .ds-tolbi-ai-spark__leaf {
+    animation: none;
+  }
+}
+
+/*
+  The awakening — ADR-0063, the one exception to ADR-0002: 3.2 s, a
+  choreography, and a glow the brand charter does not have. Accepted for this
+  one moment, the panel's first opening, and kept to it.
+
+  Every track below is Figma's Motion data (`TolbiAI/Éveil`, 2393:101704)
+  transcribed: the times are its keyframe positions over 3.2 s, and the curves
+  are its own — `ease-in-out` is motion.dev's easeInOut, exactly the CSS keyword
+  (not the `easing-in-out` token), and cubic-bezier(0.18, 1, 0.3, 1) is the
+  turn's ease-out. They are written here, not borrowed from the token scale,
+  because they are not the system's: that is what an exception is. And they
+  sit in the keyframes as literals — a `var()` there is dropped (ADR-0057).
+
+  It ends on `rest`, frame for frame, so nothing jumps when the state is
+  changed afterwards, or never changed at all.
+*/
+.ds-tolbi-ai-spark--awakening {
+  --tolbi-ai-spark-awakening: 3.2s;
+}
+
+.ds-tolbi-ai-spark--awakening .ds-tolbi-ai-spark__leaves {
+  transform-origin: 50% 50%;
+  animation:
+    ds-tolbi-ai-wake-turn var(--tolbi-ai-spark-awakening) linear both,
+    ds-tolbi-ai-wake-grow var(--tolbi-ai-spark-awakening) linear both;
+}
+
+.ds-tolbi-ai-spark--awakening .ds-tolbi-ai-spark__leaf--north {
+  animation: ds-tolbi-ai-wake-north var(--tolbi-ai-spark-awakening) linear both;
+}
+
+.ds-tolbi-ai-spark--awakening .ds-tolbi-ai-spark__leaf--east {
+  animation: ds-tolbi-ai-wake-east var(--tolbi-ai-spark-awakening) linear both;
+}
+
+.ds-tolbi-ai-spark--awakening .ds-tolbi-ai-spark__leaf--south {
+  animation: ds-tolbi-ai-wake-south var(--tolbi-ai-spark-awakening) linear both;
+}
+
+.ds-tolbi-ai-spark--awakening .ds-tolbi-ai-spark__leaf--west {
+  animation: ds-tolbi-ai-wake-west var(--tolbi-ai-spark-awakening) linear both;
+}
+
+.ds-tolbi-ai-spark--awakening .ds-tolbi-ai-spark__spark {
+  animation: ds-tolbi-ai-wake-spark var(--tolbi-ai-spark-awakening) linear both;
+}
+
+.ds-tolbi-ai-spark__glow {
+  opacity: 0;
+}
+
+.ds-tolbi-ai-spark--awakening .ds-tolbi-ai-spark__glow {
+  animation: ds-tolbi-ai-wake-glow var(--tolbi-ai-spark-awakening) linear both;
+}
+
+/* 0 → 1.65 s: one turn. */
+@keyframes ds-tolbi-ai-wake-turn {
+  0%     { rotate: 0deg; animation-timing-function: cubic-bezier(0.18, 1, 0.3, 1); }
+  51.56% { rotate: 360deg; }
+  100%   { rotate: 360deg; }
+}
+
+/* 0 → 0.5 s: 94 % → 100 %. */
+@keyframes ds-tolbi-ai-wake-grow {
+  0%     { scale: 0.94; animation-timing-function: cubic-bezier(0.18, 1, 0.3, 1); }
+  15.63% { scale: 1; }
+  100%   { scale: 1; }
+}
+
+/* Two rounds, N → E → S → W, a leaf every ~0.2 s; all full at 1.75 s. */
+@keyframes ds-tolbi-ai-wake-north {
+  0%     { opacity: 1; animation-timing-function: ease-in-out; }
+  6.25%  { opacity: 0.2; animation-timing-function: linear; }
+  18.75% { opacity: 0.2; animation-timing-function: ease-in-out; }
+  24.38% { opacity: 1; animation-timing-function: ease-in-out; }
+  30%    { opacity: 0.2; animation-timing-function: linear; }
+  40%    { opacity: 0.2; animation-timing-function: cubic-bezier(0.42, 0, 0.25, 1); }
+  54.69% { opacity: 1; }
+  100%   { opacity: 1; }
+}
+
+@keyframes ds-tolbi-ai-wake-east {
+  0%     { opacity: 0.2; animation-timing-function: ease-in-out; }
+  6.25%  { opacity: 1; animation-timing-function: ease-in-out; }
+  12.5%  { opacity: 0.2; animation-timing-function: linear; }
+  24.38% { opacity: 0.2; animation-timing-function: ease-in-out; }
+  30%    { opacity: 1; animation-timing-function: ease-in-out; }
+  35%    { opacity: 0.2; animation-timing-function: linear; }
+  40%    { opacity: 0.2; animation-timing-function: cubic-bezier(0.42, 0, 0.25, 1); }
+  54.69% { opacity: 1; }
+  100%   { opacity: 1; }
+}
+
+@keyframes ds-tolbi-ai-wake-south {
+  0%     { opacity: 0.2; animation-timing-function: linear; }
+  6.25%  { opacity: 0.2; animation-timing-function: ease-in-out; }
+  12.5%  { opacity: 1; animation-timing-function: ease-in-out; }
+  18.75% { opacity: 0.2; animation-timing-function: linear; }
+  30%    { opacity: 0.2; animation-timing-function: ease-in-out; }
+  35%    { opacity: 1; animation-timing-function: ease-in-out; }
+  40%    { opacity: 0.2; animation-timing-function: cubic-bezier(0.42, 0, 0.25, 1); }
+  54.69% { opacity: 1; }
+  100%   { opacity: 1; }
+}
+
+@keyframes ds-tolbi-ai-wake-west {
+  0%     { opacity: 0.2; animation-timing-function: linear; }
+  12.5%  { opacity: 0.2; animation-timing-function: ease-in-out; }
+  18.75% { opacity: 1; animation-timing-function: ease-in-out; }
+  24.38% { opacity: 0.2; animation-timing-function: linear; }
+  35%    { opacity: 0.2; animation-timing-function: ease-in-out; }
+  40%    { opacity: 1; }
+  100%   { opacity: 1; }
+}
+
+/* 1.70 s: the spark enters, in 250 ms. */
+@keyframes ds-tolbi-ai-wake-spark {
+  0%     { opacity: 0; }
+  53.13% { opacity: 0; animation-timing-function: cubic-bezier(0.18, 1, 0.3, 1); }
+  60.94% { opacity: 1; }
+  100%   { opacity: 1; }
+}
+
+/* 1.70 s: its glow rises (400 ms), holds (400 ms), fades (700 ms). */
+@keyframes ds-tolbi-ai-wake-glow {
+  0%     { opacity: 0; }
+  53.13% { opacity: 0; animation-timing-function: cubic-bezier(0.18, 1, 0.3, 1); }
+  65.63% { opacity: 1; }
+  78.13% { opacity: 1; animation-timing-function: ease-in-out; }
+  100%   { opacity: 0; }
+}
+
+/* Reduced motion: the final state at once — which is `rest`. */
+@media (prefers-reduced-motion: reduce) {
+  .ds-tolbi-ai-spark--awakening :is(.ds-tolbi-ai-spark__leaves, .ds-tolbi-ai-spark__leaf, .ds-tolbi-ai-spark__spark, .ds-tolbi-ai-spark__glow) {
     animation: none;
   }
 }

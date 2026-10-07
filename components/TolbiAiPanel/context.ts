@@ -1,7 +1,8 @@
 import type { InjectionKey, Ref } from 'vue'
 
-/** What the panel tells what it holds — today, only whether it is expanded. */
+/** What the panel tells what it holds. */
 export interface TolbiAiPanelContext {
+  open: Ref<boolean>
   expanded: Ref<boolean>
 }
 

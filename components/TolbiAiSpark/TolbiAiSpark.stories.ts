@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import { ref } from 'vue'
 import TolbiAiSpark from './TolbiAiSpark.vue'
 import { ARTWORK_SIZES } from '../artwork-size'
 
@@ -38,14 +39,15 @@ const meta: Meta<typeof TolbiAiSpark> = {
     },
     state: {
       control: 'inline-radio',
-      options: ['rest', 'off', 'thinking'],
+      options: ['rest', 'off', 'thinking', 'awakening'],
       description:
         '`rest` — chargé. `off` — pas encore chargé : les feuilles à 20 %, la petite ' +
         'étincelle garde son jaune. `thinking` — Tolbi AI travaille : la lumière fait le ' +
-        'tour des feuilles, sans jaune. Mouvement réduit : `off`.',
+        'tour des feuilles, sans jaune. Mouvement réduit : `off`. `awakening` — l\'éveil, une ' +
+        'fois, à la première ouverture du panneau (ADR-0063).',
       table: {
         category: 'Apparence',
-        type: { summary: "'rest' | 'off' | 'thinking'" },
+        type: { summary: "'rest' | 'off' | 'thinking' | 'awakening'" },
         defaultValue: { summary: "'rest'" },
       },
     },
@@ -184,6 +186,37 @@ export const Thinking: Story = {
           :style="{ background: g.bg, borderRadius: 'var(--ds-radius-surface)', padding: 'var(--ds-spacing-3xl)', display: 'flex', alignItems: 'center', gap: 'var(--ds-spacing-4xl)' }"
         >
           <TolbiAiSpark v-for="s in sizes" :key="s" :size="s" :surface="g.surface" state="thinking" :aria-label="null" />
+        </div>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * L'éveil — l'exception (ADR-0063) : une fois, à la première ouverture du
+ * panneau. Le pictogramme fait un tour et passe de 94 à 100 %, les feuilles
+ * s'allument en deux rondes depuis le nord, puis l'étincelle entre et sa lueur
+ * monte, tient et s'éteint. 3,2 s ; l'état final est le repos. « Rejouer » le
+ * relance. Mouvement réduit : le repos, tout de suite.
+ */
+export const Awakening: Story = {
+  name: 'Éveil — l’exception',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { TolbiAiSpark },
+    setup() {
+      const take = ref(0)
+      const awoken = ref(0)
+      return { take, awoken, sizes: [24, 48, 64, 96, 128] }
+    },
+    template: `
+      <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-3xl);">
+        <div style="display:flex; align-items:center; gap:var(--ds-spacing-4xl);">
+          <TolbiAiSpark v-for="s in sizes" :key="s + '-' + take" :size="s" state="awakening" :aria-label="null" @awake="awoken++" />
+        </div>
+        <div style="display:flex; align-items:center; gap:var(--ds-spacing-lg); font:var(--ds-font-body-sm); color:var(--ds-text-subtle);">
+          <button type="button" style="font:var(--ds-font-label-md-strong); padding:var(--ds-spacing-xs) var(--ds-spacing-md); border-radius:var(--ds-radius-control); border:var(--ds-border-width-default) solid var(--ds-border-default); background:var(--ds-bg-default); color:var(--ds-text-default); cursor:pointer;" @click="take++; awoken = 0">Rejouer</button>
+          <span>awake : {{ awoken }} / {{ sizes.length }}</span>
         </div>
       </div>
     `,

@@ -106,7 +106,8 @@ export const Conversation: Story = {
 }
 
 /**
- * Le parcours, dans la page : l'entrée de la barre ouvre le panneau (⌘J aussi),
+ * Le parcours, dans la page : l'entrée de la barre ouvre le panneau (⌘J aussi) —
+ * la première fois, le signe s'éveille —
  * la page se resserre ; une suggestion ou une question part dans le fil, la ligne
  * d'attente la suit, la réponse prend sa place. Le micro de cette histoire est le
  * vrai : le navigateur le demandera.
@@ -121,6 +122,8 @@ export const InThePage: Story = {
     setup() {
       const open = ref(false)
       const expanded = ref(false)
+      /* The first opening awakens the sign; after that, it is at rest. */
+      const awoken = ref(false)
       const question = ref('')
       const status = ref<'ready' | 'pending' | 'failed'>('ready')
       type Item =
@@ -162,7 +165,7 @@ export const InThePage: Story = {
         stop()
         items.value = []
       }
-      return { open, expanded, question, status, items, panel, ask, askVoice, stop, restart, SUGGESTIONS, ANSWER, SOURCES, FOLLOW_UPS }
+      return { open, expanded, awoken, question, status, items, panel, ask, askVoice, stop, restart, SUGGESTIONS, ANSWER, SOURCES, FOLLOW_UPS }
     },
     template: `
       <div style="height:100vh; min-height:720px; display:flex; flex-direction:column; background:var(--ds-bg-neutral);">
@@ -180,7 +183,13 @@ export const InThePage: Story = {
             </div>
           </main>
           <TolbiAiPanel id="tolbi-ai-panel" ref="panel" v-model:open="open" v-model:expanded="expanded" @new-conversation="restart">
-            <TolbiAiWelcome v-if="!items.length && status === 'ready'" :suggestions="SUGGESTIONS" @select="ask" />
+            <TolbiAiWelcome
+              v-if="!items.length && status === 'ready'"
+              :suggestions="SUGGESTIONS"
+              :awaken="!awoken"
+              @awake="awoken = true"
+              @select="ask"
+            />
             <TolbiAiThread v-else>
               <template v-for="item in items" :key="item.id">
                 <TolbiAiQuestion v-if="item.kind === 'question'" :text="item.text" />

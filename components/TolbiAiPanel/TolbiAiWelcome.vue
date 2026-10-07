@@ -13,23 +13,36 @@ interface Props {
   title?: string
   /** Questions to start from, one per line. Picking one asks it. */
   suggestions?: string[]
+  /**
+   * Play the awakening (ADR-0063) — for the panel's **first** opening only,
+   * which is the product's to know. It plays as the panel opens, not while it
+   * is closed; on `awake`, stop asking for it, or the next opening plays it
+   * again.
+   */
+  awaken?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   title: 'Que voulez-vous savoir sur votre projet ?',
   suggestions: () => [],
+  awaken: false,
 })
 
-const emit = defineEmits<{ select: [suggestion: string] }>()
+const emit = defineEmits<{
+  select: [suggestion: string]
+  /** The awakening is over. */
+  awake: []
+}>()
 
 const panel = inject(TOLBI_AI_PANEL, null)
 const sign = computed(() => (panel?.expanded.value ? 96 : 64))
+const signState = computed(() => (props.awaken && (panel?.open.value ?? true) ? 'awakening' : 'rest'))
 </script>
 
 <template>
   <div class="ds-tolbi-ai-welcome">
     <div class="ds-tolbi-ai-welcome__intro">
-      <TolbiAiSpark :size="sign" :aria-label="null" />
+      <TolbiAiSpark :size="sign" :state="signState" :aria-label="null" @awake="emit('awake')" />
       <h2 class="ds-tolbi-ai-welcome__title">{{ title }}</h2>
     </div>
     <div v-if="suggestions.length || $slots.default" class="ds-tolbi-ai-welcome__suggestions">

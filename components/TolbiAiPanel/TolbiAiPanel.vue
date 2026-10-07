@@ -55,7 +55,7 @@ const open = defineModel<boolean>('open', { default: false })
 /** 720px instead of 400 — for a long answer, a table, a wider look. */
 const expanded = defineModel<boolean>('expanded', { default: false })
 
-provide(TOLBI_AI_PANEL, { expanded: toRef(() => expanded.value) })
+provide(TOLBI_AI_PANEL, { open: toRef(() => open.value), expanded: toRef(() => expanded.value) })
 
 const surface = ref<HTMLElement>()
 const scroller = ref<InstanceType<typeof Scrollbar>>()
