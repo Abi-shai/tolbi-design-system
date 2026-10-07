@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
-import { resolve } from 'path'
+import { dirname, relative, resolve } from 'path'
 import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
 
 const copyTokens = () => ({
@@ -37,6 +37,19 @@ export default defineConfig({
       // way — `TolbiAiVoiceNote` untyped, the build green. Fail instead.
       afterDiagnostic(diagnostics) {
         if (diagnostics.length) throw new Error(`${diagnostics.length} declaration error(s) — see above`)
+      },
+      // A declaration may only point at what the package ships. The composer's
+      // first build imported its recorder from `composables/`, outside `dist/`:
+      // no error anywhere, and every consumer would have lost the type.
+      afterBuild(emitted) {
+        const out = resolve(__dirname, 'dist')
+        const escaped: string[] = []
+        for (const [file, code] of emitted) {
+          for (const [, spec] of code.matchAll(/from\s+['"](\.{1,2}\/[^'"]+)['"]/g)) {
+            if (relative(out, resolve(dirname(file), spec)).startsWith('..')) escaped.push(`${relative(out, file)} → ${spec}`)
+          }
+        }
+        if (escaped.length) throw new Error(`declarations point outside dist/:\n  ${escaped.join('\n  ')}`)
       },
     }),
     copyTokens(),
