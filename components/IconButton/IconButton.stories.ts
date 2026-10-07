@@ -31,11 +31,11 @@ const meta: Meta<typeof IconButton> = {
     },
     variant: {
       control: 'inline-radio',
-      options: ['ghost', 'primary', 'surface'],
+      options: ['ghost', 'primary', 'surface', 'neutral'],
       description:
         '`ghost` prend la surface derrière lui. `primary` porte le remplissage brand : ' +
         'l\'action autour de laquelle un composite est construit (la saisie de Tolbi AI).',
-      table: { category: 'Apparence', type: { summary: "'ghost' | 'primary' | 'surface'" }, defaultValue: { summary: "'ghost'" } },
+      table: { category: 'Apparence', type: { summary: "'ghost' | 'primary' | 'surface' | 'neutral'" }, defaultValue: { summary: "'ghost'" } },
     },
     active:    { control: 'boolean', table: { category: 'État', defaultValue: { summary: 'false' } } },
     disabled:  { control: 'boolean', table: { category: 'État', defaultValue: { summary: 'false' } } },
@@ -111,6 +111,21 @@ export const Surface: Story = {
         <IconButton icon="pause" ariaLabel="Mettre en pause" size="xs" variant="surface" />
         <IconButton icon="play" ariaLabel="Écouter le vocal" size="xs" variant="surface" active />
         <IconButton icon="play" ariaLabel="Écouter le vocal" size="xs" variant="surface" disabled />
+      </div>
+    `,
+  }),
+}
+
+/** `neutral` : le même disque à l'envers, teinté sur un fond blanc — « Réécouter » dans la saisie (ADR-0061). */
+export const Neutral: Story = {
+  name: 'Neutral',
+  render: () => ({
+    components: { IconButton },
+    template: `
+      <div style="display:flex;gap:16px;align-items:center;padding:12px;border-radius:var(--ds-radius-surface-sm);background:var(--ds-bg-default);border:var(--ds-border-width-default) solid var(--ds-border-subtle);">
+        <IconButton icon="play" ariaLabel="Réécouter" size="xs" variant="neutral" />
+        <IconButton icon="pause" ariaLabel="Arrêter l’écoute" size="xs" variant="neutral" />
+        <IconButton icon="play" ariaLabel="Réécouter" size="xs" variant="neutral" active />
       </div>
     `,
   }),

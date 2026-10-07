@@ -18,8 +18,11 @@ export type IconButtonSize = 'xs' | 'sm'
  *
  * `surface` — a white disc, for a control standing on a tinted ground: the
  * play button of a voice note on its `bg-neutral` bubble (ADR-0060).
+ * `neutral` — the same disc the other way round, tinted on a white ground: the
+ * composer's « Réécouter » (ADR-0061). A disc stands off its ground; which
+ * variant is the one that does depends on the ground.
  */
-export type IconButtonVariant = 'ghost' | 'primary' | 'surface'
+export type IconButtonVariant = 'ghost' | 'primary' | 'surface' | 'neutral'
 
 interface Props {
   /** The glyph. Mirrors the `Icône` instance-swap on the Figma component. */
@@ -137,9 +140,13 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   background: var(--ds-bg-disabled);
 }
 
-/* ── Surface: a white disc on a tinted ground ─────────────────────── */
+/* ── Surface and neutral: a disc that stands off its ground ────────── */
 .ds-icon-button--surface {
   background: var(--ds-bg-default);
+}
+
+.ds-icon-button--neutral {
+  background: var(--ds-bg-neutral);
 }
 
 /*
@@ -149,9 +156,20 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   the focus must show both.
 */
 .ds-icon-button--surface:hover:not(:disabled),
-.ds-icon-button--surface.ds-icon-button--active {
-  background: var(--ds-bg-default);
+.ds-icon-button--surface.ds-icon-button--active,
+.ds-icon-button--neutral:hover:not(:disabled),
+.ds-icon-button--neutral.ds-icon-button--active {
   outline: var(--ds-border-width-default) solid var(--ds-border-default);
   outline-offset: calc(-1 * var(--ds-border-width-default));
+}
+
+.ds-icon-button--surface:hover:not(:disabled),
+.ds-icon-button--surface.ds-icon-button--active {
+  background: var(--ds-bg-default);
+}
+
+.ds-icon-button--neutral:hover:not(:disabled),
+.ds-icon-button--neutral.ds-icon-button--active {
+  background: var(--ds-bg-neutral);
 }
 </style>
