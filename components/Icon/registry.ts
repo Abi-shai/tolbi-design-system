@@ -133,6 +133,7 @@ import Navigation          from './icons/navigation.vue'
 import Package             from './icons/package.vue'
 import Palette             from './icons/palette.vue'
 import PanelLeft           from './icons/panel-left.vue'
+import Pause               from './icons/pause.vue'
 import Pencil              from './icons/pencil.vue'
 import Percent             from './icons/percent.vue'
 import Phone               from './icons/phone.vue'
@@ -327,6 +328,7 @@ export const icons = {
   'package':                Package,
   'palette':                Palette,
   'panel-left':             PanelLeft,
+  'pause':                  Pause,
   'pencil':                 Pencil,
   'percent':                Percent,
   'phone':                  Phone,

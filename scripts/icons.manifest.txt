@@ -134,6 +134,7 @@ navigation
 package
 palette
 panel-left
+pause
 pencil
 percent
 phone
