@@ -719,6 +719,21 @@ Before working on any component, read:
   **glides** (WAAPI off the cascade); the defect: **cancelling a finished Animation queues its `cancel`
   event**, which unlocked the box mid-swap — 30px in one frame. `IconButton` gains **`neutral`**. The
   build now fails on a dropped `.d.ts` and on a declaration pointing outside `dist/`.
+- **ADR-0062**: the panel is a column — `TolbiAiPanel` is **docked**, a flex sibling of the page, so
+  opening, closing and expanding (400 → 720) are **one width that travels** (ADR-0037: `enter`,
+  `in-out`), the surface anchored to the screen edge like a drawer (ADR-0046). It owns its 12px gap
+  **inside** the width, or a closed panel would leave one — filmed: page + panel = 1256px every frame.
+  The head says the **name alone** (Figma's sign there is a hidden layer; the handoff said 24 — the
+  frames win); the welcome sign is **64, 96 expanded** (« accueil agrandi »). Pieces titled under it:
+  `TolbiAiWelcome`, `TolbiAiSuggestion` (wraps; hover darkens the contour), `TolbiAiQuestion`,
+  `TolbiAiAnswer` (product's markdown in the slot, `v-model:feedback`), `TolbiAiSource` (a citation,
+  not a Badge; `href` makes it a link), `TolbiAiThread` (arrivals 8px up + fade; history does not
+  replay). Answers arrive **whole** (no streaming), so the thread follows **the top of what arrives —
+  the question at the top**, not the bottom; the first anchor was the waiting line still leaving and
+  took 32px with it. Opening focuses the field; closing returns focus to the entry.
+  `TolbiAiNavButton` is a `Button` — which gains **`#leading`** and **`selected`** (ADR-0050's mark) —
+  with ⌘J/Ctrl+J; `HorizontalNavigation` gains **`#assistant`**, first of the controls (page before
+  app); a slot, ADR-0053's shape: the bar decides the place, the product decides presence.
 
 ## Architecture
 
