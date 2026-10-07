@@ -1,10 +1,6 @@
-<script lang="ts">
-/* One voice note plays at a time: starting one pauses whichever was playing. */
-let playingNow: HTMLAudioElement | null = null
-</script>
-
 <script setup lang="ts">
 import { computed, ref, useId } from 'vue'
+import { nowPlaying } from './now-playing'
 import { Badge } from '../Badge'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
@@ -92,8 +88,8 @@ function toggle() {
     el.pause()
     return
   }
-  if (playingNow && playingNow !== el) playingNow.pause()
-  playingNow = el
+  if (nowPlaying.audio && nowPlaying.audio !== el) nowPlaying.audio.pause()
+  nowPlaying.audio = el
   el.play().catch(() => (playing.value = false))
 }
 

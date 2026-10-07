@@ -27,10 +27,17 @@ export default defineConfig({
       entryRoot: 'components',
       // env.d.ts carries the `*.svg` module declaration that Logo and
       // CreditsChip rely on; stories are not API and their `*.mdx` imports
-      // would be the only thing left failing.
+      // would be the only thing left failing. `*.demo.ts` is story material
+      // too (the Tolbi AI voice note's synthetic recording).
       include: ['env.d.ts', 'components/**/*.ts', 'components/**/*.vue'],
-      exclude: ['components/**/*.stories.ts'],
+      exclude: ['components/**/*.stories.ts', 'components/**/*.demo.ts'],
       tsconfigPath: './tsconfig.json',
+      // A declaration error does not stop the build on its own: the plugin
+      // logs it and leaves the component's `.d.ts` out. 0.37.0 shipped that
+      // way — `TolbiAiVoiceNote` untyped, the build green. Fail instead.
+      afterDiagnostic(diagnostics) {
+        if (diagnostics.length) throw new Error(`${diagnostics.length} declaration error(s) — see above`)
+      },
     }),
     copyTokens(),
   ],
