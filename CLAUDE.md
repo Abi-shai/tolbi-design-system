@@ -675,6 +675,21 @@ Before working on any component, read:
   (React Aria's and Angular CDK's wait), while the visible words are `aria-hidden` so a reader meets
   them once. Traced: empty → first text at ~100ms → second at the threshold. Still open: **no screen
   reader has heard it** (DOM and accessibility tree only — `Toast`'s gap, ADR-0052).
+- **ADR-0059**: one composer, one action — `TolbiAiComposer`, the text half of Figma's `TolbiAI/Saisie`
+  (`2354:12487`). The right of the box holds **exactly one control**: send with a question, « Arrêter »
+  while an answer is coming (empty, until the voice step: send disabled, the mic's future place).
+  `status` (`ready | pending | failed`) is the one fact it cannot know. **It does not clear itself**:
+  `send` emits the trimmed question; the product moves it into the thread and **puts it back on
+  failure**. Enter sends, Shift+Enter breaks the line, never while an IME composes. **Pending is
+  `readonly`, not `disabled`** — disabling drops the focus from the field the user just pressed Enter
+  in — and every action hands the focus back to the field, because the pressed control is replaced.
+  The failure sits **above** the box (`role="alert"` on the words, « Réessayer » beside them). Two
+  controls widened rather than drawn (ADR-0001): `IconButton` gains **`variant="primary"`** (the 32px
+  brand disc), `Button` gains **`xs`** (`control-padding-xs` 4/10 → 26px, `label-md-strong`) — Figma's
+  « Arrêter » box exactly, but `radius-control`, not its pill: **a button's shape is the component's,
+  not the slot's**. The scope chip is a **statement**, not a Badge: the composer's own, read as the
+  field's `aria-describedby`. The field grows to 8 lines, then scrolls. Measured: 154/174/148px,
+  Figma's heights exactly.
 
 ## Architecture
 
