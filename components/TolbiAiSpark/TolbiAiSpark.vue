@@ -8,8 +8,16 @@ import { leaves, spark, viewBox } from './art'
  *
  * `off` — not loaded yet: every leaf at 20 %. The small spark keeps its yellow,
  * so what is dimmed is still recognisably the sign.
+ *
+ * `thinking` — Tolbi AI is working: the light goes round the leaves from the
+ * west, clockwise, one turn every 800 ms, for as long as the work lasts and no
+ * longer. **No yellow**: the loop says only that work is happening, and the
+ * spark comes back when the answer does — so `accent` is ignored here. Never on
+ * its own: Figma pairs it with a line saying what the work is, which carries
+ * the status for assistive tech. Under reduced motion it does not turn — it is
+ * `off`, and `rest` follows when the work ends (ADR-0057).
  */
-export type TolbiAiSparkState = 'rest' | 'off'
+export type TolbiAiSparkState = 'rest' | 'off' | 'thinking'
 
 /**
  * The ground the sign sits on. It decides the leaves' ink and nothing else:
@@ -32,7 +40,7 @@ interface Props {
   size?: ArtworkSize
   /**
    * The small yellow spark beside the leaves. Off, the sign is the pictogram
-   * alone — the form the thinking loop uses, since that motion has no yellow.
+   * alone. Never drawn while `thinking`, whatever this says.
    */
   accent?: boolean
   state?: TolbiAiSparkState
@@ -80,7 +88,7 @@ const label = computed(() => (props.ariaLabel === undefined ? 'Tolbi AI' : props
       :class="`ds-tolbi-ai-spark__leaf--${leaf.direction}`"
       :d="leaf.d"
     />
-    <path v-if="accent" class="ds-tolbi-ai-spark__accent" :d="spark" />
+    <path v-if="accent && state !== 'thinking'" class="ds-tolbi-ai-spark__accent" :d="spark" />
   </svg>
 </template>
 
@@ -118,6 +126,72 @@ const label = computed(() => (props.ariaLabel === undefined ? 'Tolbi AI' : props
 
 .ds-tolbi-ai-spark--off .ds-tolbi-ai-spark__leaf {
   opacity: var(--tolbi-ai-spark-dim);
+}
+
+/*
+  Thinking. Each leaf runs the same curve — lit, down to 20 % over a quarter
+  turn, held, back up over the last quarter — and each starts a quarter turn
+  after the one before it, so at every moment one leaf is rising while the
+  previous one falls: a cross-fade that travels, with nothing held at full.
+
+  `in-out` on both halves, because its description is "a thing that travels"
+  and that is what the light does here. Rise and fall meet at the peak with no
+  velocity on either side, which is what makes the wrap seamless: 100 % and 0 %
+  are the same value AND the same speed, so no frame can tell where a turn ends.
+
+  The period is the component's own (ADR-0010): a loop has no start to time,
+  so it is not a duration and takes no token (ADR-0032, ADR-0039). Its quarter
+  is the 200 ms Figma gives each cross-fade.
+
+  The negative delays put each leaf mid-curve on the first frame, so the first
+  frame is already the loop — west lit, Figma's fixed view — and not a frame
+  that the loop then jumps away from.
+*/
+.ds-tolbi-ai-spark--thinking {
+  --tolbi-ai-spark-period: 800ms;
+}
+
+.ds-tolbi-ai-spark--thinking .ds-tolbi-ai-spark__leaf {
+  opacity: var(--tolbi-ai-spark-dim);
+  animation: ds-tolbi-ai-spark-turn var(--tolbi-ai-spark-period) var(--ds-motion-easing-in-out) infinite;
+}
+
+.ds-tolbi-ai-spark--thinking .ds-tolbi-ai-spark__leaf--north {
+  animation-delay: calc(var(--tolbi-ai-spark-period) * -0.75);
+}
+
+.ds-tolbi-ai-spark--thinking .ds-tolbi-ai-spark__leaf--east {
+  animation-delay: calc(var(--tolbi-ai-spark-period) * -0.5);
+}
+
+.ds-tolbi-ai-spark--thinking .ds-tolbi-ai-spark__leaf--south {
+  animation-delay: calc(var(--tolbi-ai-spark-period) * -0.25);
+}
+
+/*
+  The curve is set on the element, not per keyframe: a `var()` inside a
+  keyframe's `animation-timing-function` is dropped and the segment falls back
+  to `ease` (measured — 0.14 of opacity off the in-out curve a quarter of the
+  way up). One curve for every segment is also all this needs: the hold runs
+  from 20 % to 20 %, where no curve can show.
+*/
+@keyframes ds-tolbi-ai-spark-turn {
+  0%   { opacity: 1; }
+  25%  { opacity: var(--tolbi-ai-spark-dim); }
+  75%  { opacity: var(--tolbi-ai-spark-dim); }
+  100% { opacity: 1; }
+}
+
+/*
+  Reduced motion: no loop. The leaves hold at 20 % — `off` — until the work
+  ends and the caller sets `rest`. Said here rather than left to motion.css's
+  global override, which would run each leaf's curve once in 0.01ms and land
+  on the same frame only by the accident of the base opacity.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .ds-tolbi-ai-spark--thinking .ds-tolbi-ai-spark__leaf {
+    animation: none;
+  }
 }
 
 /*

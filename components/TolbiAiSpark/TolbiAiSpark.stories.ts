@@ -38,13 +38,14 @@ const meta: Meta<typeof TolbiAiSpark> = {
     },
     state: {
       control: 'inline-radio',
-      options: ['rest', 'off'],
+      options: ['rest', 'off', 'thinking'],
       description:
         '`rest` — chargé. `off` — pas encore chargé : les feuilles à 20 %, la petite ' +
-        'étincelle garde son jaune.',
+        'étincelle garde son jaune. `thinking` — Tolbi AI travaille : la lumière fait le ' +
+        'tour des feuilles, sans jaune. Mouvement réduit : `off`.',
       table: {
         category: 'Apparence',
-        type: { summary: "'rest' | 'off'" },
+        type: { summary: "'rest' | 'off' | 'thinking'" },
         defaultValue: { summary: "'rest'" },
       },
     },
@@ -149,6 +150,40 @@ export const Surfaces: Story = {
             <TolbiAiSpark v-for="s in sizes" :key="s" :size="s" :surface="g.surface" :aria-label="null" />
             <TolbiAiSpark :size="48" :surface="g.surface" state="off" :aria-label="null" />
           </div>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * La lumière fait le tour des feuilles, de l'ouest dans le sens des aiguilles
+ * d'une montre : chaque feuille monte en 200 ms pendant que la précédente
+ * redescend, un tour en 800 ms, sans jaune. La première image est la vue fixe
+ * de Figma — la feuille de gauche allumée. Mouvement réduit : les feuilles
+ * restent à 20 %.
+ */
+export const Thinking: Story = {
+  name: 'Réflexion — la boucle',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { TolbiAiSpark },
+    setup: () => ({
+      sizes: ARTWORK_SIZES,
+      grounds: [
+        { surface: 'neutral', bg: 'var(--ds-bg-default)' },
+        { surface: 'brand', bg: 'var(--ds-bg-brand-solid)' },
+        { surface: 'inverse', bg: 'var(--ds-bg-inverse)' },
+      ],
+    }),
+    template: `
+      <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-lg);">
+        <div
+          v-for="g in grounds"
+          :key="g.surface"
+          :style="{ background: g.bg, borderRadius: 'var(--ds-radius-surface)', padding: 'var(--ds-spacing-3xl)', display: 'flex', alignItems: 'center', gap: 'var(--ds-spacing-4xl)' }"
+        >
+          <TolbiAiSpark v-for="s in sizes" :key="s" :size="s" :surface="g.surface" state="thinking" :aria-label="null" />
         </div>
       </div>
     `,
