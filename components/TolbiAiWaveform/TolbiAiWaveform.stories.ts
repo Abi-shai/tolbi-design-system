@@ -21,9 +21,11 @@ const meta: Meta<typeof TolbiAiWaveform> = {
   },
   argTypes: {
     fit: { control: 'inline-radio', options: ['tail', 'whole'], table: { category: 'Apparence' } },
+    // Left out of the args at rest: Storybook's range control cannot draw `null`
+    // (it calls `toFixed` on it), and the component's own default is `null`.
     progress: { control: { type: 'range', min: 0, max: 1, step: 0.01 }, table: { category: 'État' } },
   },
-  args: { levels: speechLevels(23), fit: 'whole', progress: null },
+  args: { levels: speechLevels(23), fit: 'whole' },
   decorators: [() => ({ template: '<div style="width:196px"><story /></div>' })],
 }
 
