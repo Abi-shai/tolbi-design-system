@@ -50,6 +50,17 @@ export { TolbiAiWaveform } from './TolbiAiWaveform'
 export type { TolbiAiWaveformFit } from './TolbiAiWaveform'
 export { TolbiAiVoiceNote } from './TolbiAiVoiceNote'
 export type { TolbiAiVoiceNoteState } from './TolbiAiVoiceNote'
+export {
+  TolbiAiPanel,
+  TolbiAiWelcome,
+  TolbiAiThread,
+  TolbiAiQuestion,
+  TolbiAiAnswer,
+  TolbiAiSuggestion,
+  TolbiAiSource,
+} from './TolbiAiPanel'
+export type { TolbiAiSourceItem, TolbiAiFollowUp, TolbiAiFeedback } from './TolbiAiPanel'
+export { TolbiAiNavButton } from './TolbiAiNavButton'
 
 export { ModulesList } from './ModulesList'
 export type { ModulesListItem } from './ModulesList'
@@ -102,6 +113,7 @@ export type {
 } from './Dropdown'
 
 export { Scrollbar } from './Scrollbar'
+export type { ScrollbarProps } from './Scrollbar'
 
 export { Toggle } from './Toggle'
 export type { ToggleSize } from './Toggle'
