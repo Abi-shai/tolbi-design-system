@@ -690,6 +690,19 @@ Before working on any component, read:
   not the slot's**. The scope chip is a **statement**, not a Badge: the composer's own, read as the
   field's `aria-describedby`. The field grows to 8 lines, then scrolls. Measured: 154/174/148px,
   Figma's heights exactly.
+- **ADR-0060**: the note goes as it is — `TolbiAiVoiceNote` (Figma `TolbiAI/Vocal` `2354:12700`)
+  **plays its own recording** (`src`, an internal `<audio>`; one note at a time) and takes its
+  `duration` as given — a MediaRecorder blob reports `Infinity`. The time **reserves its playing
+  width** (« 0:00 / 0:00 ») from the start: otherwise play widened it 38px and the waveform refolded
+  26 → 19 bars the moment it started. `TolbiAiWaveform` is Figma's `TolbiAI/Onde` (3px / 2px / 4→24px):
+  `tail` for a live recording, `whole` folded by the **mean** (peaks flattened every word into the same
+  bar) and **scaled to its loudest bar** (live is not — a running maximum makes bars jump). One
+  `Button` (`link`, `xs`) shows and hides the transcript — **its words change, the focus does not
+  move**. The transcript opens its own space (ADR-0025, 200ms in / 100ms out) with the gap **inside
+  the row**, or it would snap shut at the end — filmed ×10: 78→106px, ≤ 0.55px/frame, no reversal.
+  `transcribing` has no language yet; `failed` is an alert + « Réessayer »; Wolof (beta) opens on a
+  sentence, not words. `IconButton` gains **`surface`** (white disc on a tint; hover is an *outline*
+  contour, since no tint reads on white and the focus ring owns `box-shadow`); `pause` joins the icons.
 
 ## Architecture
 
