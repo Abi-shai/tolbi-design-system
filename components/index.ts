@@ -40,12 +40,14 @@ export type { ModuleName, ModuleVariant } from './ModuleIcon'
 export { TolbiAiSpark } from './TolbiAiSpark'
 export type { TolbiAiSparkState, TolbiAiSparkSurface, TolbiAiSparkLeaf } from './TolbiAiSpark'
 export { TolbiAiThinkingLine } from './TolbiAiThinkingLine'
+export { TolbiAiComposer } from './TolbiAiComposer'
+export type { TolbiAiComposerStatus } from './TolbiAiComposer'
 
 export { ModulesList } from './ModulesList'
 export type { ModulesListItem } from './ModulesList'
 
 export { IconButton } from './IconButton'
-export type { IconButtonSize } from './IconButton'
+export type { IconButtonSize, IconButtonVariant } from './IconButton'
 export { HorizontalNavigation } from './HorizontalNavigation'
 export type { BreadcrumbItem, NavModule, HorizontalNavigationHomeIcon } from './HorizontalNavigation'
 
