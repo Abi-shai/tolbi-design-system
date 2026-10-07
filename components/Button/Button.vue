@@ -34,6 +34,13 @@ interface Props {
   href?: string
   /** Fills its container. A full-width action is a layout decision, not a size. */
   block?: boolean
+  /**
+   * The button stands for something that is on — the Tolbi AI panel it opens,
+   * open (ADR-0062). It takes the current item's mark (ADR-0050): `bg-selected`,
+   * the brand tint's hairline and its ink. Say what it controls with
+   * `aria-expanded` or `aria-pressed`; the look alone is not the state.
+   */
+  selected?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -44,6 +51,7 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   type: 'button',
   block: false,
+  selected: false,
 })
 
 const emit = defineEmits<{
@@ -85,7 +93,7 @@ function handleClick(event: MouseEvent) {
       'ds-button',
       `ds-button--${variant}`,
       `ds-button--${size}`,
-      { 'ds-button--icon-only': iconOnly, 'ds-button--block': block },
+      { 'ds-button--icon-only': iconOnly, 'ds-button--block': block, 'ds-button--selected': selected },
     ]"
     :aria-busy="loading || undefined"
     :aria-label="iconOnly || loading ? label : undefined"
@@ -106,7 +114,11 @@ function handleClick(event: MouseEvent) {
     -->
     <span class="ds-button__stack">
       <span class="ds-button__body" :class="{ 'ds-button__body--hidden': loading }">
-        <Icon v-if="iconLeading" :name="iconLeading" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
+        <!-- A leading mark that is not a Lucide glyph — Tolbi AI's sign in the
+             bar's entry (ADR-0062). The glyph is the fallback. -->
+        <slot name="leading">
+          <Icon v-if="iconLeading" :name="iconLeading" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
+        </slot>
         <span v-if="!iconOnly" class="ds-button__label">{{ label }}</span>
         <Icon v-if="iconTrailing && !iconOnly" :name="iconTrailing" :size="iconSize" class="ds-button__icon" aria-hidden="true" />
       </span>
@@ -346,6 +358,18 @@ function handleClick(event: MouseEvent) {
 .ds-button--icon-only.ds-button--lg-compact { width: 36px; height: 36px; }
 .ds-button--icon-only.ds-button--xl  { width: 48px; height: 48px; }
 .ds-button--icon-only.ds-button--2xl { width: 56px; height: 56px; }
+
+/* ── Selected: the current item's mark (ADR-0050) ─────────────────── */
+.ds-button--selected:not(:disabled) {
+  background-color: var(--ds-bg-selected);
+  border-color: var(--ds-border-on-brand-subtle);
+  color: var(--ds-text-on-brand-subtle);
+}
+
+.ds-button--selected:hover:not(:disabled) {
+  background-color: var(--ds-bg-selected-hover);
+  color: var(--ds-text-on-brand-subtle);
+}
 
 /* ── Disabled ─────────────────────────────────────────────────────── */
 .ds-button:disabled {
