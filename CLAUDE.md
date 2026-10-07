@@ -665,6 +665,16 @@ Before working on any component, read:
   defect: **a `var()` inside a keyframe's `animation-timing-function` is dropped** to `ease` (0.527
   where in-out says 0.389) — the curve lives on the element. No yellow while thinking (`accent`
   ignored); reduced motion is `off` then `rest`, said with `animation: none`, not left to `motion.css`.
+- **ADR-0058**: the waiting line — `TolbiAiThinkingLine` is the thinking sign at 16 and a few words in
+  `body-sm` / `text-subtlest` (Figma `2317:4909`, same ink box to the pixel at 3×). **The words do not
+  move** — no shimmer, no animated ellipsis; one movement at a time. `label`, then `longWaitLabel`
+  after `longWaitAfter` (10 000ms, from the line's appearance; `null` keeps the first) — Figma's copy
+  verbatim as defaults, props so the product localises; the change is a **cut**. The status is
+  **announced once per text**: a live region announces a *change*, and one that arrives filled is
+  skipped by some readers, so a visually hidden `role="status"` mounts **empty and fills 100ms later**
+  (React Aria's and Angular CDK's wait), while the visible words are `aria-hidden` so a reader meets
+  them once. Traced: empty → first text at ~100ms → second at the threshold. Still open: **no screen
+  reader has heard it** (DOM and accessibility tree only — `Toast`'s gap, ADR-0052).
 
 ## Architecture
 
