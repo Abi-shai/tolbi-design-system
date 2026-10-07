@@ -42,6 +42,10 @@ export type { TolbiAiSparkState, TolbiAiSparkSurface, TolbiAiSparkLeaf } from '.
 export { TolbiAiThinkingLine } from './TolbiAiThinkingLine'
 export { TolbiAiComposer } from './TolbiAiComposer'
 export type { TolbiAiComposerStatus } from './TolbiAiComposer'
+export { TolbiAiWaveform } from './TolbiAiWaveform'
+export type { TolbiAiWaveformFit } from './TolbiAiWaveform'
+export { TolbiAiVoiceNote } from './TolbiAiVoiceNote'
+export type { TolbiAiVoiceNoteState } from './TolbiAiVoiceNote'
 
 export { ModulesList } from './ModulesList'
 export type { ModulesListItem } from './ModulesList'
