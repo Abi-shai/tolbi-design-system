@@ -703,6 +703,22 @@ Before working on any component, read:
   `transcribing` has no language yet; `failed` is an alert + « Réessayer »; Wolof (beta) opens on a
   sentence, not words. `IconButton` gains **`surface`** (white disc on a tint; hover is an *outline*
   contour, since no tint reads on white and the focus ring owns `box-shadow`); `pause` joins the icons.
+- **ADR-0061**: the voice is said in the box — **the recording is the package's**: `TolbiAiComposer`
+  records and emits `send-voice` (blob, length, levels — what `TolbiAiVoiceNote` draws). Its
+  `useVoiceRecorder` lives **beside the composer, not in `composables/`**, because its type is public
+  and a declaration may only point at what ships. Permission read before asked (`permissions.query`
+  authoritative); levels = RMS every 100ms (×3.5, √); time measured; **the cap pauses, it does not
+  stop**; the mic is **released** on send, delete and unmount; the audio context is resumed (a
+  suspended one feeds silence). The mic holds send's place while empty (tooltip after 400ms). One
+  line holds the focus — **Enter sends, Escape deletes, Space pauses** (Space/Enter only on the line
+  itself, so its buttons keep theirs); pause and resume trade places, so the focus returns to the line.
+  The red dot breathes (1s, still under reduced motion; the waveform keeps moving — it is information).
+  Last 15s: timer + « Encore N s » in warning ink. Permission, blocked, silence (loudest level < 0.12)
+  are **messages in the box**, no modal. Delete → product toast (8s), `undoDelete()` restores it
+  **paused, not extendable** (the mic was released). The box keeps its height through a swap, then
+  **glides** (WAAPI off the cascade); the defect: **cancelling a finished Animation queues its `cancel`
+  event**, which unlocked the box mid-swap — 30px in one frame. `IconButton` gains **`neutral`**. The
+  build now fails on a dropped `.d.ts` and on a declaration pointing outside `dist/`.
 
 ## Architecture
 
