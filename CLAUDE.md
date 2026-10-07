@@ -654,6 +654,17 @@ Before working on any component, read:
   inverse`) decides the leaves' ink only — the ground's exact on-colour, so `inverse` flips with the
   mode; the spark stays yellow. `off` dims the **leaf**, not the ink; the spark keeps its yellow.
   Still open: in dark the leaves are 2.44:1 on `bg-default`, 1.49:1 on `bg-neutral`.
+- **ADR-0057**: the light goes round — `TolbiAiSpark` gains **`state="thinking"`**, not a second
+  component (Figma's `TolbiAI/Réflexion` `2395:14767` is a set only because a variant cannot loop).
+  Figma's four Motion tracks are **one curve offset by a quarter turn**: lit, down to 20 % over 200ms,
+  held 400ms, back up over 200ms, `easing-in-out` on both halves — one `@keyframes`, delays −¾/−½/−¼
+  of a private **800ms period** (a loop's period is not a duration, ADR-0039). The first frame is
+  Figma's **fixed view** (west lit), not its timeline's t = 0 (south), or the loop would open on a jump.
+  Peak meets peak at zero velocity, so the wrap is seamless — measured: on the curve to 1e-5 seeked
+  every 5ms, o(t) = o(t + 800) exactly, 486 real-time frames over four wraps all on the curve. The
+  defect: **a `var()` inside a keyframe's `animation-timing-function` is dropped** to `ease` (0.527
+  where in-out says 0.389) — the curve lives on the element. No yellow while thinking (`accent`
+  ignored); reduced motion is `off` then `rest`, said with `animation: none`, not left to `motion.css`.
 
 ## Architecture
 
