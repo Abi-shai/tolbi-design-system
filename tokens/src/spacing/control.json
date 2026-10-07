@@ -1,5 +1,9 @@
 {
   "control-padding": {
+    "xs": {
+      "$value": "{space.1} {space.2-5}",
+      "$description": "4px 10px — 24px control. The smallest text control, riding inside a composite rather than in a bar of its own — the Tolbi AI composer's « Arrêter » (ADR-0059). Label-md-strong's 16px line box; 26px rendered with its border (ADR-0033)"
+    },
     "sm": {
       "$value": "{space.2} {space.3}",
       "$description": "8px 12px — 36px control"

@@ -25,11 +25,11 @@ const meta: Meta<typeof Button> = {
     },
     size: {
       control: 'inline-radio',
-      options: ['sm', 'md', 'lg', 'xl', '2xl'],
+      options: ['xs', 'sm', 'md', 'lg', 'xl', '2xl'],
       description: 'Taille du bouton.',
       table: {
         category: 'Apparence',
-        type: { summary: "'sm' | 'md' | 'lg' | 'xl' | '2xl'" },
+        type: { summary: "'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'" },
         defaultValue: { summary: "'md'" },
       },
     },
@@ -141,6 +141,16 @@ export const DangerSecondary: Story = {
 
 // ── Sizes ────────────────────────────────────────────────────────────
 
+/**
+ * Le plus petit contrôle à libellé : 24px de boîte (26 avec sa bordure),
+ * label-md-strong, glyphe 16. Il vit à l'intérieur d'un composite — le
+ * « Arrêter » de la saisie de Tolbi AI (ADR-0059).
+ */
+export const ExtraSmall: Story = {
+  name: 'Extra small',
+  args: { label: 'Arrêter', size: 'xs', variant: 'secondary-gray', iconLeading: 'x' },
+}
+
 export const Small: Story = {
   args: { label: 'Filtrer', size: 'sm' },
 }
@@ -209,6 +219,7 @@ export const AllSizes: Story = {
     components: { StoryGrid },
     setup: () => ({
       items: [
+        { component: Button, props: { label: 'xs',  size: 'xs'  } },
         { component: Button, props: { label: 'sm',  size: 'sm'  } },
         { component: Button, props: { label: 'md',  size: 'md'  } },
         { component: Button, props: { label: 'lg',  size: 'lg'  } },

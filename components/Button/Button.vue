@@ -14,7 +14,7 @@ export type ButtonVariant =
   | 'danger-secondary'
   | 'ghost'
 
-export type ButtonSize = 'sm' | 'md' | 'lg' | 'lg-compact' | 'xl' | '2xl'
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'lg-compact' | 'xl' | '2xl'
 
 interface Props {
   label: string
@@ -50,7 +50,9 @@ const emit = defineEmits<{
   click: [event: MouseEvent]
 }>()
 
-const iconSize = computed(() => (props.size === '2xl' ? 24 : 20))
+/* `xs` steps the glyph down with the type: 20px beside a 12px label would
+   outweigh the word it illustrates (ADR-0004: 16 is a size, 18 is not). */
+const iconSize = computed(() => (props.size === '2xl' ? 24 : props.size === 'xs' ? 16 : 20))
 
 const tag = computed(() => (props.href && !props.disabled ? 'a' : 'button'))
 
@@ -169,6 +171,16 @@ function handleClick(event: MouseEvent) {
 }
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
+/*
+  The smallest text control: a 24px box (26 rendered with its border, as every
+  bordered size is 2px over its token — ADR-0033) and label-md-strong. It rides
+  inside a composite rather than in a bar of its own — the Tolbi AI composer's
+  « Arrêter », in the slot its 32px round actions take (ADR-0059).
+*/
+.ds-button--xs {
+  padding: var(--ds-control-padding-xs);
+  font: var(--ds-font-label-md-strong);
+}
 .ds-button--sm {
   padding: var(--ds-control-padding-sm);
 }
@@ -327,6 +339,7 @@ function handleClick(event: MouseEvent) {
   padding: 0;
   gap: 0;
 }
+.ds-button--icon-only.ds-button--xs  { width: 24px; height: 24px; }
 .ds-button--icon-only.ds-button--sm  { width: 36px; height: 36px; }
 .ds-button--icon-only.ds-button--md  { width: 40px; height: 40px; }
 .ds-button--icon-only.ds-button--lg  { width: 44px; height: 44px; }
