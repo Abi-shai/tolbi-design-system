@@ -2,7 +2,7 @@
  * The artwork ladder — the one scale every drawing in the system is rendered at.
  *
  * It is Figma's `Size` enum on `ModuleIllustration` (ADR-0041), and it is also
- * `Icon`'s existing `16 | 20 | 24 | 32` with two steps added at the top. Three
+ * `Icon`'s existing `16 | 20 | 24 | 32` with steps added at the top. Three
  * components had three answers to "what is a size": `Icon` a typed number,
  * `Logo` a two-step `sm | md`, `ModuleIcon` a free number. Nothing could say
  * "the brand mark and the module mark, the same size", because the two were not
@@ -13,10 +13,14 @@
  * beside its wordmark, `ModuleIcon` at 48 draws a 48×48 module mark, and the
  * two line up.
  *
+ * 96 and 128 are `TolbiAI/Étincelle`'s top rungs (ADR-0056) — the welcome
+ * screen's sizes. They continue the ladder's own alternation (×1.5, ×1.33) and,
+ * like 48 and 64 before them, they are what Figma draws: nothing invented.
+ *
  * Not a token, deliberately, and for ADR-0020's stated reason: icon sizes are a
  * **typed component API**, not a scale the cascade needs to carry.
  */
-export type ArtworkSize = 16 | 20 | 24 | 32 | 48 | 64
+export type ArtworkSize = 16 | 20 | 24 | 32 | 48 | 64 | 96 | 128
 
 /** The ladder as a value — for story controls and iteration. */
-export const ARTWORK_SIZES = [16, 20, 24, 32, 48, 64] as const satisfies readonly ArtworkSize[]
+export const ARTWORK_SIZES = [16, 20, 24, 32, 48, 64, 96, 128] as const satisfies readonly ArtworkSize[]

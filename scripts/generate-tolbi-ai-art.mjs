@@ -1,0 +1,150 @@
+/**
+ * Generates components/TolbiAiSpark/art.ts from the raw Figma SVG export in
+ * scripts/tolbi-ai-raw/.
+ *
+ *   npm run tolbi-ai-art
+ *
+ * ONE export, not ninety-six. Figma's `TolbiAI/Étincelle` set has 96 variants
+ * (Taille × État × Petite étincelle), and measured with the Plugin API every one
+ * of them is the 48px drawing scaled — the largest deviation, normalised to the
+ * 48 grid, is 9.5e-7px — and every state is a per-leaf opacity. So the drawing
+ * is extracted once, at its native grid, and a `viewBox` makes every size
+ * (ADR-0031's argument for `ModuleCapsule`'s 44, applied to the whole set).
+ *
+ * The same extraction as `generate-module-art.mjs`, for the same reason: an
+ * export of a node inside a section carries the section with it (a #F5F5F5 rect
+ * and two backdrop paths), so only the variant's own `<g>` is read and anything
+ * outside the artwork is dropped by construction. The vectors are untouched.
+ *
+ * What differs is the output. The four leaves are SEPARATE paths named by
+ * compass point, because the thinking loop and the awakening light them one at
+ * a time — the drawing's structure is the motion's API. And the inks are not
+ * copied: the component binds the same two primitives Figma binds
+ * (`brand/500`, `accent/400`), so this script checks the export's hexes against
+ * tokens/src/color/primitives.json and fails when Figma's file has drifted from
+ * them, rather than shipping a hex that disagrees with its own token.
+ */
+import { readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath, pathToFileURL } from 'node:url'
+import { dirname, join } from 'node:path'
+
+const HERE = dirname(fileURLToPath(import.meta.url))
+const ROOT = join(HERE, '..')
+export const RAW = join(HERE, 'tolbi-ai-raw', 'spark.svg')
+export const OUT = join(ROOT, 'components/TolbiAiSpark/art.ts')
+
+/** The variant the export was taken from — the only one this script reads. */
+const VARIANT = 'Taille=48, État=Repos, Petite étincelle=Avec'
+
+/**
+ * Figma layer name → compass point. `O` is French for west (Ouest). Listed in
+ * the order the light goes round: from the west, clockwise.
+ */
+export const LEAVES = [
+  { layer: 'Feuille O', direction: 'west' },
+  { layer: 'Feuille N', direction: 'north' },
+  { layer: 'Feuille E', direction: 'east' },
+  { layer: 'Feuille S', direction: 'south' },
+]
+const SPARK = 'Petite étincelle'
+
+/**
+ * Figma writes layer names as UTF-8 bytes, each one escaped as a Latin-1
+ * character reference: `É` arrives as `&#195;&#137;`. Undo both layers.
+ */
+const decodeName = (raw) =>
+  Buffer.from(raw.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n))), 'latin1').toString('utf8')
+
+/** The full element from the `<g` at `start` to its matching `</g>`. */
+function balancedGroup(svg, start) {
+  let depth = 0
+  for (let i = start; i < svg.length; ) {
+    if (svg.startsWith('<g', i) && /[\s>]/.test(svg[i + 2] ?? '')) { depth++; i += 2 }
+    else if (svg.startsWith('</g>', i)) { depth--; i += 4; if (depth === 0) return svg.slice(start, i) }
+    else i++
+  }
+  throw new Error('unbalanced <g> while extracting the artwork')
+}
+
+/**
+ * The pure half: one raw export in, the drawing out. No filesystem, so the
+ * test suite can run it against the committed export (ADR-0018's shape).
+ */
+export function extractSpark(svg) {
+  const viewBox = svg.match(/<svg[^>]*\bviewBox="([^"]+)"/)?.[1]
+  if (viewBox !== '0 0 48 48') throw new Error(`expected the 48 grid, the export says viewBox="${viewBox}"`)
+
+  const groups = [...svg.matchAll(/<g id="([^"]*)"/g)]
+  const at = groups.find((m) => decodeName(m[1]) === VARIANT)
+  if (!at) throw new Error(`the export has no "${VARIANT}" group`)
+  const artwork = balancedGroup(svg, at.index)
+
+  const paths = new Map()
+  for (const m of artwork.matchAll(/<path id="([^"]*)" d="([^"]+)" fill="(#[0-9A-Fa-f]{6})"\/>/g))
+    paths.set(decodeName(m[1]), { d: m[2], fill: m[3].toUpperCase() })
+
+  const take = (layer) => {
+    const p = paths.get(layer)
+    if (!p) throw new Error(`the variant has no "${layer}" layer — found: ${[...paths.keys()].join(', ')}`)
+    paths.delete(layer)
+    return p
+  }
+  const leaves = LEAVES.map(({ layer, direction }) => ({ direction, ...take(layer) }))
+  const spark = take(SPARK)
+  if (paths.size) throw new Error(`unexpected layers in the drawing: ${[...paths.keys()].join(', ')}`)
+
+  const leafInks = new Set(leaves.map((l) => l.fill))
+  if (leafInks.size !== 1) throw new Error(`the four leaves disagree on their ink: ${[...leafInks].join(', ')}`)
+
+  return { viewBox, leaves, spark, inks: { leaf: leaves[0].fill, accent: spark.fill } }
+}
+
+/** The two primitives Figma binds the inks to, read from the token source. */
+export function primitiveInks(primitives) {
+  const c = primitives.color
+  return { leaf: c.brand['500'].$value.toUpperCase(), accent: c.accent['400'].$value.toUpperCase() }
+}
+
+export function render(art) {
+  const leaf = (l) => `  { direction: '${l.direction}', d: '${l.d}' },`
+  return `/**
+ * GENERATED by scripts/generate-tolbi-ai-art.mjs — do not edit by hand.
+ * Run \`npm run tolbi-ai-art\` after changing scripts/tolbi-ai-raw/.
+ *
+ * Source: Figma Sprint 18 (\`Dpy2nP7IFnnmaPh9bBSOaq\`), page « Tolbi AI — retenu,
+ * vers le paquet » — \`TolbiAI/Étincelle\` (node 2341:12352), variant
+ * \`${VARIANT}\` (node 2341:12050).
+ * Every other variant is this drawing scaled (ADR-0056).
+ *
+ * No colour lives here: the inks are bound in the component, to the primitives
+ * Figma binds them to (brand/500 for the leaves, accent/400 for the spark).
+ */
+
+/** The drawing's grid — 48 is its native size, every other rung a scale of it. */
+export const viewBox = '${art.viewBox}'
+
+/** The four leaves, in the order the light goes round: from the west, clockwise. */
+export const leaves = [
+${art.leaves.map(leaf).join('\n')}
+] as const
+
+/** The small spark — the only yellow in the drawing. */
+export const spark = '${art.spark.d}'
+
+export type TolbiAiSparkLeaf = typeof leaves[number]['direction']
+`
+}
+
+function run() {
+  const art = extractSpark(readFileSync(RAW, 'utf8'))
+  const expected = primitiveInks(JSON.parse(readFileSync(join(ROOT, 'tokens/src/color/primitives.json'), 'utf8')))
+  for (const k of ['leaf', 'accent']) {
+    if (art.inks[k] !== expected[k])
+      throw new Error(`the export's ${k} ink is ${art.inks[k]}, the primitive it is bound to is ${expected[k]} — ` +
+        'Figma has drifted from the tokens; fix the file, not this check')
+  }
+  writeFileSync(OUT, render(art))
+  console.log(`leaves: ${art.leaves.map((l) => l.direction).join(' → ')}   spark: 1   inks: ${art.inks.leaf} · ${art.inks.accent}`)
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) run()
