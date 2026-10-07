@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-interface Props {
+/* Exported so that a component holding a Scrollbar ref can be declared:
+   an unexported props interface cannot be named in its .d.ts. */
+export interface ScrollbarProps {
   /** Caps the scroll viewport. Any CSS length. */
   maxHeight?: string
   /** Scroll on the x axis instead of the y axis. Thumb moves to the bottom edge. */
@@ -17,7 +19,7 @@ interface Props {
   shadows?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), { horizontal: false, shadows: false })
+const props = withDefaults(defineProps<ScrollbarProps>(), { horizontal: false, shadows: false })
 
 /**
  * The native scrollbar is hidden and replaced by an absolutely positioned thumb.
@@ -139,6 +141,10 @@ onBeforeUnmount(() => {
   observer?.disconnect()
   if (hideTimer) clearTimeout(hideTimer)
 })
+
+/* The element that scrolls, for a parent that has to move it — a thread that
+   follows its newest message (`TolbiAiPanel`, ADR-0062). */
+defineExpose({ viewport })
 </script>
 
 <template>
