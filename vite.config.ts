@@ -4,6 +4,16 @@ import dts from 'vite-plugin-dts'
 import { dirname, relative, resolve } from 'path'
 import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
 
+/* Where this build writes — the guard below checks declarations against it,
+   not against a hardcoded `dist/`. */
+let outDir = resolve(__dirname, 'dist')
+const readOutDir = () => ({
+  name: 'read-out-dir',
+  configResolved(config: { root: string; build: { outDir: string } }) {
+    outDir = resolve(config.root, config.build.outDir)
+  },
+})
+
 const copyTokens = () => ({
   name: 'copy-tokens',
   closeBundle() {
@@ -17,6 +27,7 @@ const copyTokens = () => ({
 
 export default defineConfig({
   plugins: [
+    readOutDir(),
     vue(),
     // `types` in package.json has always pointed at dist/index.d.ts; nothing was
     // producing it. `vue-tsc --noEmit` in the build script checks and emits
@@ -42,14 +53,14 @@ export default defineConfig({
       // first build imported its recorder from `composables/`, outside `dist/`:
       // no error anywhere, and every consumer would have lost the type.
       afterBuild(emitted) {
-        const out = resolve(__dirname, 'dist')
+        const out = outDir
         const escaped: string[] = []
         for (const [file, code] of emitted) {
           for (const [, spec] of code.matchAll(/from\s+['"](\.{1,2}\/[^'"]+)['"]/g)) {
             if (relative(out, resolve(dirname(file), spec)).startsWith('..')) escaped.push(`${relative(out, file)} → ${spec}`)
           }
         }
-        if (escaped.length) throw new Error(`declarations point outside dist/:\n  ${escaped.join('\n  ')}`)
+        if (escaped.length) throw new Error(`declarations point outside ${relative(__dirname, out)}/:\n  ${escaped.join('\n  ')}`)
       },
     }),
     copyTokens(),
