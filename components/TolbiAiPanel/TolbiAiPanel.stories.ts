@@ -10,6 +10,8 @@ import { TolbiAiThinkingLine } from '../TolbiAiThinkingLine'
 import { TolbiAiVoiceNote } from '../TolbiAiVoiceNote'
 import { TolbiAiNavButton } from '../TolbiAiNavButton'
 import { HorizontalNavigation } from '../HorizontalNavigation'
+import { SideNavigation, SideNavItem } from '../SideNavigation'
+import { WorkspaceSelector } from '../WorkspaceSelector'
 import type { TolbiAiFollowUp, TolbiAiSourceItem } from './TolbiAiAnswer.vue'
 import type { TolbiAiVoiceRecording } from '../TolbiAiComposer'
 
@@ -52,9 +54,13 @@ const meta: Meta<typeof TolbiAiPanel> = {
         component:
           'Tolbi AI ancré dans la page : une colonne de 400 px, la hauteur de la surface, que la page ' +
           'laisse passer au lieu de la recouvrir. Elle ne flotte pas : s\'ouvrir est une largeur qui ' +
-          'voyage (ADR-0037), et « Agrandir » la porte à 720 px. En-tête (le nom, ALPHA, historique, ' +
-          'nouvelle conversation, agrandir, fermer), le fil qui défile et suit son dernier message, la ' +
-          'saisie en pied (ADR-0062).',
+          'voyage (ADR-0037). En-tête (le nom, ALPHA, historique, nouvelle conversation, agrandir, ' +
+          'fermer), le fil qui défile et suit son dernier message, la saisie en pied (ADR-0062).\n\n' +
+          '« Agrandir » lui donne la surface de la page — barre et navigation intactes — et une colonne ' +
+          'de lecture de 720 px. La page reste dessous, telle quelle : « Réduire » la rend comme on ' +
+          'l\'a laissée (ADR-0064). Elle doit être son propre contexte d\'empilement ' +
+          '(`isolation: isolate`), sinon ce qui y porte un `z-index` — les contrôles d\'une carte — ' +
+          'passe devant le panneau.',
       },
     },
   },
@@ -105,81 +111,105 @@ export const Conversation: Story = {
   }),
 }
 
-/**
- * Le parcours, dans la page : l'entrée de la barre ouvre le panneau (⌘J aussi) —
- * la première fois, le signe s'éveille —
- * la page se resserre ; une suggestion ou une question part dans le fil, la ligne
- * d'attente la suit, la réponse prend sa place. Le micro de cette histoire est le
- * vrai : le navigateur le demandera.
- */
-export const InThePage: Story = {
-  name: 'Dans la page',
-  render: () => ({
-    components: {
-      HorizontalNavigation, TolbiAiNavButton, TolbiAiPanel, TolbiAiWelcome, TolbiAiThread,
-      TolbiAiQuestion, TolbiAiAnswer, TolbiAiThinkingLine, TolbiAiVoiceNote, TolbiAiComposer,
-    },
-    setup() {
-      const open = ref(false)
-      const expanded = ref(false)
-      /* The first opening awakens the sign; after that, it is at rest. */
-      const awoken = ref(false)
-      const question = ref('')
-      const status = ref<'ready' | 'pending' | 'failed'>('ready')
-      type Item =
-        | { id: number; kind: 'question'; text: string }
-        | { id: number; kind: 'voice'; recording: TolbiAiVoiceRecording; src: string; state: 'transcribing' | 'transcribed' }
-        | { id: number; kind: 'answer' }
-      const items = ref<Item[]>([])
-      const panel = ref<InstanceType<typeof TolbiAiPanel>>()
-      let next = 1
-      let timer: ReturnType<typeof setTimeout> | undefined
-      const answerLater = () => {
-        status.value = 'pending'
-        timer = setTimeout(() => {
-          items.value.push({ id: next++, kind: 'answer' })
-          status.value = 'ready'
-        }, 2600)
-      }
-      const ask = (text: string) => {
-        items.value.push({ id: next++, kind: 'question', text })
-        question.value = ''
-        void nextTick(() => panel.value?.scrollToEnd())
-        answerLater()
-      }
-      const askVoice = (recording: TolbiAiVoiceRecording) => {
-        const id = next++
-        items.value.push({ id, kind: 'voice', recording, src: URL.createObjectURL(recording.blob), state: 'transcribing' })
-        setTimeout(() => {
-          const voice = items.value.find((i) => i.id === id)
-          if (voice?.kind === 'voice') voice.state = 'transcribed'
-        }, 1500)
-        void nextTick(() => panel.value?.scrollToEnd())
-        answerLater()
-      }
-      const stop = () => {
-        clearTimeout(timer)
+const WORKSPACES = [{ id: 'kaolack', name: 'Coopérative de Kaolack' }]
+
+/*
+  The product's frame, as Figma draws it (2310:3618): the navigation, then a
+  column holding the bar and the row — the page, then the panel. The page is
+  its own stacking context, as the panel asks.
+*/
+const inThePage = ({ open: startOpen = false, expanded: startExpanded = false } = {}) => ({
+  components: {
+    SideNavigation, SideNavItem, WorkspaceSelector, HorizontalNavigation, TolbiAiNavButton, TolbiAiPanel,
+    TolbiAiWelcome, TolbiAiThread, TolbiAiQuestion, TolbiAiAnswer, TolbiAiThinkingLine, TolbiAiVoiceNote,
+    TolbiAiComposer,
+  },
+  setup() {
+    const section = ref('projets')
+    const navCollapsed = ref(false)
+    const open = ref(startOpen)
+    const expanded = ref(startExpanded)
+    /* The first opening awakens the sign; after that, it is at rest. */
+    const awoken = ref(startOpen)
+    const question = ref('')
+    const status = ref<'ready' | 'pending' | 'failed'>('ready')
+    type Item =
+      | { id: number; kind: 'question'; text: string }
+      | { id: number; kind: 'voice'; recording: TolbiAiVoiceRecording; src: string; state: 'transcribing' | 'transcribed' }
+      | { id: number; kind: 'answer' }
+    const items = ref<Item[]>([])
+    const panel = ref<InstanceType<typeof TolbiAiPanel>>()
+    let next = 1
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const answerLater = () => {
+      status.value = 'pending'
+      timer = setTimeout(() => {
+        items.value.push({ id: next++, kind: 'answer' })
         status.value = 'ready'
-      }
-      const restart = () => {
-        stop()
-        items.value = []
-      }
-      return { open, expanded, awoken, question, status, items, panel, ask, askVoice, stop, restart, SUGGESTIONS, ANSWER, SOURCES, FOLLOW_UPS }
-    },
-    template: `
-      <div style="height:100vh; min-height:720px; display:flex; flex-direction:column; background:var(--ds-bg-neutral);">
-        <div style="padding:var(--ds-spacing-lg) var(--ds-spacing-lg) 0 var(--ds-spacing-md);">
-          <HorizontalNavigation module="Yield" :breadcrumbs="[{ label: 'Projets' }, { label: 'Rendement Arachide Nord' }]" user-initials="AY">
-            <template #assistant>
-              <TolbiAiNavButton v-model:open="open" controls="tolbi-ai-panel" />
-            </template>
-          </HorizontalNavigation>
-        </div>
-        <div style="flex:1; min-height:0; display:flex; padding:var(--ds-spacing-lg) var(--ds-spacing-lg) 0;">
-          <main style="flex:1; min-width:0; display:flex; flex-direction:column; gap:var(--ds-spacing-lg);">
-            <div style="flex:1; border-radius:var(--ds-radius-surface) var(--ds-radius-surface) 0 0; background:var(--ds-bg-default); padding:var(--ds-spacing-2xl); font:var(--ds-font-body-md); color:var(--ds-text-subtle);">
-              La page du projet — elle se resserre quand le panneau s'ouvre.
+      }, 2600)
+    }
+    const ask = (text: string) => {
+      items.value.push({ id: next++, kind: 'question', text })
+      question.value = ''
+      void nextTick(() => panel.value?.scrollToEnd())
+      answerLater()
+    }
+    const askVoice = (recording: TolbiAiVoiceRecording) => {
+      const id = next++
+      items.value.push({ id, kind: 'voice', recording, src: URL.createObjectURL(recording.blob), state: 'transcribing' })
+      setTimeout(() => {
+        const voice = items.value.find((i) => i.id === id)
+        if (voice?.kind === 'voice') voice.state = 'transcribed'
+      }, 1500)
+      void nextTick(() => panel.value?.scrollToEnd())
+      answerLater()
+    }
+    const stop = () => {
+      clearTimeout(timer)
+      status.value = 'ready'
+    }
+    const restart = () => {
+      stop()
+      items.value = []
+    }
+    return {
+      section, navCollapsed, open, expanded, awoken, question, status, items, panel, ask, askVoice, stop, restart,
+      WORKSPACES, SUGGESTIONS, ANSWER, SOURCES, FOLLOW_UPS,
+    }
+  },
+  template: `
+    <div style="height:100vh; min-height:720px; display:flex; background:var(--ds-bg-neutral);">
+      <SideNavigation
+        v-model="section"
+        v-model:collapsed="navCollapsed"
+        aria-label="Navigation principale"
+        :style="navCollapsed ? '' : 'width: 268px'"
+      >
+        <template #header>
+          <WorkspaceSelector :workspaces="WORKSPACES" model-value="kaolack" :collapsed="navCollapsed" />
+        </template>
+        <SideNavItem value="accueil" icon="house" label="Accueil" />
+        <SideNavItem value="projets" icon="folder" label="Projets" />
+        <SideNavItem value="cartographie" icon="map" label="Cartographie" />
+        <SideNavItem value="rapports" icon="chart-column" label="Rapports" />
+        <SideNavItem value="parametres" icon="settings" label="Paramètres" />
+      </SideNavigation>
+      <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:var(--ds-spacing-lg); padding:var(--ds-spacing-lg) var(--ds-spacing-lg) 0 var(--ds-spacing-md);">
+        <HorizontalNavigation module="Yield" :breadcrumbs="[{ label: 'Projets' }, { label: 'Rendement Arachide Nord' }]" user-initials="AY">
+          <template #assistant>
+            <TolbiAiNavButton v-model:open="open" controls="tolbi-ai-panel" />
+          </template>
+        </HorizontalNavigation>
+        <div style="flex:1; min-height:0; display:flex;">
+          <main style="flex:1; min-width:0; isolation:isolate; display:flex; flex-direction:column;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:var(--ds-spacing-xl); border-radius:var(--ds-radius-surface) var(--ds-radius-surface) 0 0; background:var(--ds-bg-default); padding:var(--ds-spacing-2xl);">
+              <p style="margin:0; font:var(--ds-font-body-md); color:var(--ds-text-subtle);">
+                La page du projet — elle se resserre quand le panneau s'ouvre. Agrandi, le panneau la
+                recouvre sans la toucher ; « Réduire » la rend telle qu'on l'a laissée.
+              </p>
+              <div style="flex:1; display:grid; place-items:center; border-radius:var(--ds-radius-surface-sm); background:var(--ds-bg-neutral-subtle); font:var(--ds-font-label-md); color:var(--ds-text-subtlest);">
+                Carte
+              </div>
             </div>
           </main>
           <TolbiAiPanel id="tolbi-ai-panel" ref="panel" v-model:open="open" v-model:expanded="expanded" @new-conversation="restart">
@@ -215,6 +245,30 @@ export const InThePage: Story = {
           </TolbiAiPanel>
         </div>
       </div>
-    `,
-  }),
+    </div>
+  `,
+})
+
+/**
+ * Le parcours, dans la page : l'entrée de la barre ouvre le panneau (⌘J aussi) —
+ * la première fois, le signe s'éveille —
+ * la page se resserre ; une suggestion ou une question part dans le fil, la ligne
+ * d'attente la suit, la réponse prend sa place. « Agrandir » donne au panneau la
+ * surface de la page, « Réduire » la lui rend. Le micro de cette histoire est le
+ * vrai : le navigateur le demandera.
+ */
+export const InThePage: Story = {
+  name: 'Dans la page',
+  render: () => inThePage(),
+}
+
+/**
+ * Agrandi (Figma 2310:4829) : le panneau prend la surface de la page — la barre
+ * et la navigation n'en perdent rien —, une colonne de lecture de 720 px, la
+ * saisie en bas. La page est dessous, inerte, à sa largeur : « Réduire » la rend
+ * telle qu'on l'a laissée.
+ */
+export const Expanded: Story = {
+  name: 'Agrandi',
+  render: () => inThePage({ open: true, expanded: true }),
 }

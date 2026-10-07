@@ -7,7 +7,8 @@ import { TOLBI_AI_PANEL } from './context'
 /**
  * What an empty conversation shows: the sign, the question Tolbi AI asks, and
  * a few to start from. The sign is 64 in the docked panel and 96 once it is
- * expanded — Figma's « accueil agrandi » (ADR-0062).
+ * expanded — Figma's « accueil agrandi » (ADR-0062) — and it grows on the
+ * panel's own travel rather than jumping at its start (ADR-0064).
  */
 interface Props {
   title?: string
@@ -42,7 +43,13 @@ const signState = computed(() => (props.awaken && (panel?.open.value ?? true) ? 
 <template>
   <div class="ds-tolbi-ai-welcome">
     <div class="ds-tolbi-ai-welcome__intro">
-      <TolbiAiSpark :size="sign" :state="signState" :aria-label="null" @awake="emit('awake')" />
+      <TolbiAiSpark
+        class="ds-tolbi-ai-welcome__sign"
+        :size="sign"
+        :state="signState"
+        :aria-label="null"
+        @awake="emit('awake')"
+      />
       <h2 class="ds-tolbi-ai-welcome__title">{{ title }}</h2>
     </div>
     <div v-if="suggestions.length || $slots.default" class="ds-tolbi-ai-welcome__suggestions">
@@ -69,6 +76,15 @@ const signState = computed(() => (props.awaken && (panel?.open.value ?? true) ? 
   flex-direction: column;
   align-items: flex-start;
   gap: var(--ds-spacing-lg);
+}
+
+/* The size is the sign's own attribute — a presentation attribute, so the
+   cascade sees it change and the transition runs on it. */
+.ds-tolbi-ai-welcome__sign {
+  flex: none;
+  transition:
+    width  var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
+    height var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
 }
 
 .ds-tolbi-ai-welcome__title {
