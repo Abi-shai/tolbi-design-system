@@ -642,6 +642,18 @@ Before working on any component, read:
   (ADR-0040's frame and slot superseded, its ceiling kept). Loading keeps the head with a 68×**20**
   bar — the `md` badge's height, or the content rose 4px on arrival. Figma's set (`1488:4799`)
   followed: head row, 32px mark on every variant, demo badge bound everywhere, `Erreur` deleted.
+- **ADR-0056**: Tolbi AI's sign — the « Feuilles » spark — is **one drawing**: Figma's 96 variants
+  (`TolbiAI/Étincelle` `2341:12352`, 8 sizes × 6 states × small spark) measure within **9.5e-7px** of
+  the 48 grid, and the states are per-leaf opacity. So `TolbiAiSpark` draws every size from one export
+  (`npm run tolbi-ai-art`; `art.ts` is build output), and the four directional states are the
+  **thinking loop's frames**, not props: `state` is `rest | off`, and each leaf is its own path named
+  by compass point, from the west clockwise — **the drawing's structure is the motion's API**. The
+  inks are **bound, not copied**: `brand/500` and `accent/400` straight from the primitives (ADR-0010's
+  categorical clause, named suppressions), and the generator fails when the export's hexes drift from
+  them. The ladder gains **96 and 128** (strict here, like `Logo`). `surface` (`neutral | brand |
+  inverse`) decides the leaves' ink only — the ground's exact on-colour, so `inverse` flips with the
+  mode; the spark stays yellow. `off` dims the **leaf**, not the ink; the spark keeps its yellow.
+  Still open: in dark the leaves are 2.44:1 on `bg-default`, 1.49:1 on `bg-neutral`.
 
 ## Architecture
 
@@ -653,6 +665,7 @@ Before working on any component, read:
 - Icons are generated — run `npm run icons` after editing `scripts/icons.manifest.txt`; `components/Icon/registry.ts` and `components/Icon/icons/` are build output, not source
 - Module artwork is generated — run `npm run module-art`; `components/ModuleIcon/registry.ts` and `components/ModuleIcon/art/` are build output, not source
 - The brand pattern is generated — run `npm run brand-pattern`; `components/BrandPattern/tile.ts` is build output, not source. Its input is the *stamp* in `scripts/brand-pattern-raw/`, not the Figma sheet: the sheet is 23 MB and has no 2D period (ADR-0035)
+- Tolbi AI's sign is generated — run `npm run tolbi-ai-art`; `components/TolbiAiSpark/art.ts` is build output, not source. Its input is one export in `scripts/tolbi-ai-raw/`, because Figma's 96 variants are one drawing (ADR-0056)
 - All components are exported from `components/index.ts`
 - Tokens use the `--ds-` prefix and are exposed as CSS custom properties on `:root`
 - Semantic tokens (`--ds-semantic-*`) are what components consume — never raw primitive tokens directly
