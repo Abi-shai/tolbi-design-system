@@ -58,7 +58,7 @@ export {
   TolbiAiAnswer,
   TolbiAiSuggestion,
 } from './TolbiAiPanel'
-export type { TolbiAiFeedback } from './TolbiAiPanel'
+export type { TolbiAiFeedback, TolbiAiConversation, TolbiAiHistoryLabels } from './TolbiAiPanel'
 export { TolbiAiNavButton } from './TolbiAiNavButton'
 
 export { ModulesList } from './ModulesList'
@@ -105,7 +105,7 @@ export type { CreditsChipTone } from './CreditsChip'
 export { Tag } from './Tag'
 export type { TagSize, TagAction } from './Tag'
 
-export { Dropdown, DropdownTrigger, DropdownItem, DropdownDivider, DropdownSelectItem, InputDropdown } from './Dropdown'
+export { Dropdown, DropdownTrigger, DropdownItem, DropdownDivider, DropdownGroup, DropdownSelectItem, InputDropdown } from './Dropdown'
 export type {
   DropdownTriggerVariant, DropdownTriggerSize, DropdownTriggerChrome,
   DropdownSelectItemType, InputDropdownType, InputDropdownOption,

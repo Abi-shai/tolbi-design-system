@@ -1,12 +1,24 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, toRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, toRef, useId, watch } from 'vue'
 import { Badge } from '../Badge'
+import { Dropdown, DropdownTrigger } from '../Dropdown'
 import type { IconName } from '../Icon'
 import { IconButton } from '../IconButton'
+import { InputField } from '../InputField'
 import { Scrollbar } from '../Scrollbar'
+import { Skeleton } from '../Skeleton'
 import { SurfaceTransition } from '../SurfaceTransition'
+import { SwapTransition } from '../SwapTransition'
 import { Tooltip } from '../Tooltip'
 import { TOLBI_AI_PANEL } from './context'
+import TolbiAiHistory from './TolbiAiHistory.vue'
+import {
+  HISTORY_LABELS,
+  SEARCH_FROM,
+  describe,
+  type TolbiAiConversation,
+  type TolbiAiHistoryLabels,
+} from './history'
 
 /**
  * Tolbi AI, docked: a column in the page's layout, 400px wide, the height of
@@ -24,10 +36,18 @@ import { TOLBI_AI_PANEL } from './context'
  * anything in it with a `z-index` of its own — a map's controls — would paint
  * through.
  *
+ * The head names the conversation and is the way to the project's others
+ * (ADR-0069): give it `conversations` and `v-model:conversation`, and its title
+ * opens them — grouped by day, the current one marked. Choosing one sets
+ * `conversation`; the product loads it (`loading` holds its place) and renders
+ * its thread, **keyed by the conversation**, which the body swaps in by a
+ * cross-fade.
+ *
  *     <div style="display: flex">
  *       <main style="flex: 1; min-width: 0; isolation: isolate">…</main>
- *       <TolbiAiPanel v-model:open="open" v-model:expanded="expanded">
- *         <TolbiAiWelcome … /> or <TolbiAiThread>…</TolbiAiThread>
+ *       <TolbiAiPanel v-model:open="open" v-model:expanded="expanded"
+ *                     :conversations="list" v-model:conversation="current">
+ *         <TolbiAiWelcome … /> or <TolbiAiThread :key="current">…</TolbiAiThread>
  *         <template #composer><TolbiAiComposer … /></template>
  *       </TolbiAiPanel>
  *     </div>
@@ -40,9 +60,24 @@ interface Props {
    * shown: the bar's entry above the panel already says it (ADR-0062).
    */
   title?: string
-  /** At the head's start — « ALPHA ». `null` hides it. */
+  /** After the conversation's title — « ALPHA ». `null` hides it. */
   badge?: string | null
+  /**
+   * The project's conversations, for the head's switcher (ADR-0069). Its
+   * **presence decides**: absent, the head has no switcher; an empty list is a
+   * project with none yet. Sorted, grouped and dated here.
+   */
+  conversations?: TolbiAiConversation[]
+  /** The list is on its way: the switcher shows skeleton rows. */
+  conversationsLoading?: boolean
+  /** The current conversation is on its way: a skeleton of an exchange holds its place. */
+  loading?: boolean
+  /** What the switcher does, said to a reader after its title. */
   historyLabel?: string
+  historyLabels?: Partial<TolbiAiHistoryLabels>
+  /** For the history's hours, days and dates. */
+  locale?: string
+  /** The switcher's title while the conversation has no question yet, and the button that starts one. */
   newConversationLabel?: string
   expandLabel?: string
   collapseLabel?: string
@@ -53,7 +88,12 @@ const props = withDefaults(defineProps<Props>(), {
   id: undefined,
   title: 'Tolbi AI',
   badge: 'ALPHA',
-  historyLabel: 'Historique',
+  conversations: undefined,
+  conversationsLoading: false,
+  loading: false,
+  historyLabel: 'Changer de conversation',
+  historyLabels: () => ({}),
+  locale: 'fr-FR',
   newConversationLabel: 'Nouvelle conversation',
   expandLabel: 'Agrandir',
   collapseLabel: 'Réduire',
@@ -61,6 +101,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
+  /** The switcher opened — fetch the list now if it is not there yet. */
   history: []
   'new-conversation': []
 }>()
@@ -72,6 +113,8 @@ const open = defineModel<boolean>('open', { default: false })
  * back as it was. Kept when the panel closes: it reopens as it was left.
  */
 const expanded = defineModel<boolean>('expanded', { default: false })
+/** The current conversation's id; `null` while it has no question yet. */
+const conversation = defineModel<string | null>('conversation', { default: null })
 
 provide(TOLBI_AI_PANEL, { open: toRef(() => open.value), expanded: toRef(() => expanded.value) })
 
@@ -254,8 +297,59 @@ function tipAway() {
 watch(open, (now) => !now && tipAway())
 onBeforeUnmount(() => clearTimeout(tipTimer))
 
+/* ── The head names the conversation, and leads to the others ─────────── */
+/*
+  The title is the switcher (ADR-0069): Figma section 14's track B, chosen on
+  8 Oct. — five of six docked assistants name the conversation in their head,
+  and a menu that says its value is the plainest sign that there is a list.
+  It is `DropdownTrigger`'s `ghost` chrome, the hover of the `IconButton`s
+  beside it; its panel opens under it from its start, 320 wide, because its
+  rows are sentences.
+*/
+const historyOpen = ref(false)
+const query = ref('')
+const now = ref(new Date())
+const labels = computed<TolbiAiHistoryLabels>(() => ({ ...HISTORY_LABELS, ...props.historyLabels }))
+const current = computed(() => props.conversations?.find((c) => c.id === conversation.value) ?? null)
+const conversationTitle = computed(() => current.value?.title ?? props.newConversationLabel)
+const searchable = computed(() => !props.conversationsLoading && (props.conversations?.length ?? 0) >= SEARCH_FROM)
+const switchHint = useId()
+
+function toggleHistory(toggle: () => void) {
+  tipAway()
+  if (!historyOpen.value) {
+    now.value = new Date()
+    emit('history')
+  }
+  toggle()
+}
+
+function choose(id: string) {
+  historyOpen.value = false
+  conversation.value = id
+}
+
+watch(historyOpen, (shown) => !shown && (query.value = ''))
+watch(open, (shown) => !shown && (historyOpen.value = false))
+
+/*
+  A title the head cuts short is given in full, in a tooltip under it — with
+  when it was, the switcher's own dating. Only when it is cut: a whole title
+  needs no second copy.
+*/
+const titleEl = ref<HTMLElement>()
+const conversationWhen = computed(() => {
+  if (!current.value) return undefined
+  const { group, meta } = describe(current.value.at, new Date(), props.locale)
+  return `${labels.value[group]} · ${meta}`
+})
+
+function titleTipSoon() {
+  const el = titleEl.value
+  if (el && el.scrollWidth > el.clientWidth) tipSoon('title')
+}
+
 const actions = computed<{ key: string; icon: IconName; label: string; run: () => void }[]>(() => [
-  { key: 'history', icon: 'history', label: props.historyLabel, run: () => emit('history') },
   { key: 'new', icon: 'square-pen', label: props.newConversationLabel, run: () => emit('new-conversation') },
   {
     key: 'size',
@@ -284,7 +378,50 @@ defineExpose({ scrollToEnd })
   >
     <div ref="surface" class="ds-tolbi-ai-panel__surface" @focusout="onFocusOut">
       <header class="ds-tolbi-ai-panel__head">
-        <Badge v-if="badge" :label="badge" tone="success" size="sm" />
+        <Dropdown v-if="conversations" v-model:open="historyOpen" class="ds-tolbi-ai-panel__switcher">
+          <template #trigger="{ open: listed, toggle }">
+            <DropdownTrigger
+              chrome="ghost"
+              size="sm"
+              chevron
+              :open="listed"
+              class="ds-tolbi-ai-panel__switch"
+              :aria-describedby="switchHint"
+              @click="toggleHistory(toggle)"
+              @pointerenter="titleTipSoon"
+              @pointerleave="tipAway"
+              @focusin="titleTipSoon"
+              @focusout="tipAway"
+            >
+              <span ref="titleEl" class="ds-tolbi-ai-panel__title">{{ conversationTitle }}</span>
+            </DropdownTrigger>
+            <span :id="switchHint" class="ds-tolbi-ai-panel__hidden">{{ historyLabel }}</span>
+            <SurfaceTransition>
+              <Tooltip
+                v-if="tip === 'title' && !listed"
+                class="ds-tolbi-ai-panel__title-tip"
+                :title="conversationTitle"
+                :supporting-text="conversationWhen"
+                arrow="top-left"
+                role="presentation"
+              />
+            </SurfaceTransition>
+          </template>
+          <template v-if="searchable" #header>
+            <InputField v-model="query" size="sm" type="search" :placeholder="labels.search" />
+          </template>
+          <TolbiAiHistory
+            :conversations="conversations"
+            :current="conversation"
+            :loading="conversationsLoading"
+            :query="query"
+            :labels="labels"
+            :now="now"
+            :locale="locale"
+            @select="choose"
+          />
+        </Dropdown>
+        <Badge v-if="badge" class="ds-tolbi-ai-panel__badge" :label="badge" tone="success" size="sm" />
         <div class="ds-tolbi-ai-panel__actions">
           <span
             v-for="action in actions"
@@ -310,7 +447,25 @@ defineExpose({ scrollToEnd })
       </header>
 
       <Scrollbar ref="scroller" class="ds-tolbi-ai-panel__body" shadows>
-        <div ref="content" class="ds-tolbi-ai-panel__content"><slot /></div>
+        <div ref="content" class="ds-tolbi-ai-panel__content">
+          <!-- One thing in place of another — the welcome, a conversation, the
+               next one — by a cross-fade (ADR-0026, ADR-0069). -->
+          <SwapTransition @enter="follow">
+            <div
+              v-if="loading"
+              key="ds-tolbi-ai-panel-loading"
+              class="ds-tolbi-ai-panel__skeleton"
+              role="status"
+              aria-busy="true"
+              :aria-label="labels.loading"
+            >
+              <Skeleton class="ds-tolbi-ai-panel__skeleton-question" :width="220" />
+              <Skeleton :lines="4" />
+              <Skeleton :lines="3" />
+            </div>
+            <slot v-else />
+          </SwapTransition>
+        </div>
       </Scrollbar>
 
       <div v-if="$slots.composer" class="ds-tolbi-ai-panel__composer">
@@ -408,8 +563,69 @@ defineExpose({ scrollToEnd })
   border-bottom: var(--ds-border-width-default) solid var(--ds-border-subtle);
 }
 
-/* The head says no name (ADR-0062): the actions keep its end, with or
-   without the badge before them. */
+/*
+  The switcher (ADR-0069). It gives way before anything else in the head — the
+  title truncates — and stands `spacing-md` out into the head's padding, so its
+  hover lands 8px from the panel's edge as the close button's does on the other
+  side, and the title's first letter on the content's 20px. The badge follows
+  the chevron at 16px rather than 20: the 4px are what keep « Nouvelle
+  conversation » whole at 400.
+*/
+.ds-tolbi-ai-panel__switcher {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-left: calc(-1 * var(--ds-spacing-md));
+  margin-right: calc(-1 * var(--ds-spacing-xs));
+}
+
+.ds-tolbi-ai-panel__switch {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-tolbi-ai-panel__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Under the title, from its start, 320 wide: its rows are sentences. */
+.ds-tolbi-ai-panel__switcher :deep(.ds-dropdown__panel) {
+  right: auto;
+  left: 0;
+  width: 320px;
+  transform-origin: top left;
+}
+
+/* The whole title, under the cut one — from its start, as the list opens. */
+.ds-tolbi-ai-panel__title-tip {
+  position: absolute;
+  top: calc(100% + var(--ds-spacing-sm));
+  left: 0;
+  z-index: var(--ds-z-popover);
+  pointer-events: none;
+  transform-origin: top left;
+}
+
+/* Said, not shown. */
+.ds-tolbi-ai-panel__hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ds-tolbi-ai-panel__badge {
+  flex: none;
+}
+
+/* The actions keep the head's end, with or without the switcher and the badge. */
 .ds-tolbi-ai-panel__actions {
   display: flex;
   align-items: center;
@@ -444,6 +660,17 @@ defineExpose({ scrollToEnd })
 /* The thread scrolls; the head and the composer stay. */
 .ds-tolbi-ai-panel__body {
   flex: 1 1 auto;
+}
+
+/* An exchange, not yet there: a question on the user's side, then an answer. */
+.ds-tolbi-ai-panel__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-xl);
+}
+
+.ds-tolbi-ai-panel__skeleton-question {
+  align-self: flex-end;
 }
 
 /*
