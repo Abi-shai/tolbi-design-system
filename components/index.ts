@@ -38,7 +38,7 @@ export { ModuleIcon, moduleNames } from './ModuleIcon'
 export type { ModuleName, ModuleVariant } from './ModuleIcon'
 
 export { TolbiAiSpark } from './TolbiAiSpark'
-export type { TolbiAiSparkState, TolbiAiSparkSurface, TolbiAiSparkLeaf } from './TolbiAiSpark'
+export type { TolbiAiSparkProps, TolbiAiSparkState, TolbiAiSparkSurface, TolbiAiSparkLeaf } from './TolbiAiSpark'
 export { TolbiAiThinkingLine } from './TolbiAiThinkingLine'
 export { TolbiAiComposer } from './TolbiAiComposer'
 export type {

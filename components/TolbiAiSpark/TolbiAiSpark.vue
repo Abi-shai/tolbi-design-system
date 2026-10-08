@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, useId, watch } from 'vue'
+import { computed, nextTick, ref, useId, watch } from 'vue'
 import type { ArtworkSize } from '../artwork-size'
 import { leaves, spark, viewBox } from './art'
 
@@ -35,7 +35,7 @@ export type TolbiAiSparkState = 'rest' | 'off' | 'thinking' | 'awakening'
  */
 export type TolbiAiSparkSurface = 'neutral' | 'brand' | 'inverse'
 
-interface Props {
+export interface TolbiAiSparkProps {
   /**
    * **The artwork's box in px**, on the shared ladder — the same one `Logo` and
    * `ModuleIcon` take. Every rung is the one 48-grid drawing scaled: Figma's 96
@@ -60,7 +60,7 @@ interface Props {
   ariaLabel?: string | null
 }
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<TolbiAiSparkProps>(), {
   size: 48,
   accent: true,
   state: 'rest',
@@ -93,6 +93,41 @@ watch(
   },
   { immediate: true },
 )
+
+/* ── The turn (ADR-0071) ─────────────────────────────────────────────── */
+const group = ref<SVGGElement>()
+let turning: Animation | undefined
+
+/**
+ * One turn of the leaves: the awakening's own turn, alone — its 1.65 s and
+ * its curve, with the spark still and nothing dimmed, so it leaves `rest` and
+ * comes back to it, 360° being 0° (ADR-0071). Something the sign does rather
+ * than a state it is in: `TolbiAiLauncher` asks for it when the pointer
+ * arrives. A turn under way is not restarted, only a sign at `rest` turns,
+ * and under reduced motion none does — Web Animations are outside
+ * motion.css's reach, so the sign asks itself (ADR-0068).
+ */
+function turn() {
+  const g = group.value
+  if (!g || typeof g.animate !== 'function' || props.state !== 'rest') return
+  if (turning?.playState === 'running') return
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const style = getComputedStyle(g)
+  turning = g.animate([{ rotate: '0deg' }, { rotate: '360deg' }], {
+    duration: parseFloat(style.getPropertyValue('--tolbi-ai-spark-turn')),
+    easing: style.getPropertyValue('--tolbi-ai-spark-turn-curve').trim(),
+  })
+}
+
+/* A state that moves the leaves itself takes them over: no turn underneath. */
+watch(
+  () => props.state,
+  (state) => {
+    if (state !== 'rest') turning?.cancel()
+  },
+)
+
+defineExpose({ turn })
 </script>
 
 <template>
@@ -122,7 +157,7 @@ watch(
       clockwise — the order the light goes round when Tolbi AI is working. The
       group is what turns and grows when the sign awakens.
     -->
-    <g class="ds-tolbi-ai-spark__leaves">
+    <g ref="group" class="ds-tolbi-ai-spark__leaves">
       <path
         v-for="leaf in leaves"
         :key="leaf.direction"
@@ -162,9 +197,25 @@ watch(
   */
   --tolbi-ai-spark-dim: 0.2;
 
+  /*
+    The turn (ADR-0071) is the awakening's own: one turn in 1.65 s — its
+    51.56 % of 3.2 s — on its ease-out. Written once more here for Web
+    Animations to read off the cascade, because the awakening holds its values
+    as literals in its keyframes, where a `var()` is dropped (ADR-0057). The
+    two must stay equal.
+  */
+  --tolbi-ai-spark-turn: 1650ms;
+  --tolbi-ai-spark-turn-curve: cubic-bezier(0.18, 1, 0.3, 1);
+
   display: inline-block;
   flex-shrink: 0;
   vertical-align: middle;
+}
+
+/* Both of the sign's turns — the awakening's, and the one it does alone —
+   pivot on the drawing's centre. */
+.ds-tolbi-ai-spark__leaves {
+  transform-origin: 50% 50%;
 }
 
 .ds-tolbi-ai-spark__leaf {
@@ -266,7 +317,6 @@ watch(
 }
 
 .ds-tolbi-ai-spark--awakening .ds-tolbi-ai-spark__leaves {
-  transform-origin: 50% 50%;
   animation:
     ds-tolbi-ai-wake-turn var(--tolbi-ai-spark-awakening) linear both,
     ds-tolbi-ai-wake-grow var(--tolbi-ai-spark-awakening) linear both;

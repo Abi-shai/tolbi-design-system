@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import { ref } from 'vue'
 import TolbiAiSpark from './TolbiAiSpark.vue'
 import { ARTWORK_SIZES } from '../artwork-size'
+import { Button } from '../Button'
 
 const meta: Meta<typeof TolbiAiSpark> = {
   title: 'Identité & média/TolbiAiSpark',
@@ -15,7 +16,8 @@ const meta: Meta<typeof TolbiAiSpark> = {
           'Le signe de Tolbi AI : l\'étincelle « Feuilles », quatre feuilles pointues aux deux ' +
           'bouts, sans cœur, et une petite étincelle jaune. Un seul dessin sur la grille 48, ' +
           'extrait de Figma (`TolbiAI/Étincelle`, 2341:12352) par `npm run tolbi-ai-art` — ' +
-          'les 96 variantes du fichier sont ce dessin mis à l\'échelle (ADR-0056).',
+          'les 96 variantes du fichier sont ce dessin mis à l\'échelle (ADR-0056). Hors de ses ' +
+          'états, il sait faire un tour quand on le lui demande — `turn()`, exposé (ADR-0071).',
       },
     },
   },
@@ -218,6 +220,39 @@ export const Awakening: Story = {
           <button type="button" style="font:var(--ds-font-label-md-strong); padding:var(--ds-spacing-xs) var(--ds-spacing-md); border-radius:var(--ds-radius-control); border:var(--ds-border-width-default) solid var(--ds-border-default); background:var(--ds-bg-default); color:var(--ds-text-default); cursor:pointer;" @click="take++; awoken = 0">Rejouer</button>
           <span>awake : {{ awoken }} / {{ sizes.length }}</span>
         </div>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * Le tour — le geste de l'éveil, seul (ADR-0071) : les feuilles font un tour en
+ * 1,65 s sur la courbe du tour de l'éveil, l'étincelle ne bouge pas, rien ne
+ * s'éteint — du repos au repos. Ce n'est pas un état : le signe le fait quand on
+ * le lui demande (`turn()`), une fois, sans recommencer un tour en cours. Le
+ * lanceur le demande quand le pointeur arrive. Survolez un signe, ou « Faire un
+ * tour » pour tous. Mouvement réduit : rien ne tourne.
+ */
+export const Turn: Story = {
+  name: 'Le tour — au survol',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { TolbiAiSpark, Button },
+    setup() {
+      const sizes = [24, 32, 48, 64, 96]
+      const signs: Record<number, { turn: () => void } | null> = {}
+      const keep = (size: number) => (el: unknown) => {
+        signs[size] = el as { turn: () => void } | null
+      }
+      const turn = (size: number) => signs[size]?.turn()
+      return { sizes, keep, turn, turnAll: () => sizes.forEach(turn) }
+    },
+    template: `
+      <div style="display:flex; flex-direction:column; align-items:flex-start; gap:var(--ds-spacing-3xl);">
+        <div style="display:flex; align-items:center; gap:var(--ds-spacing-4xl);">
+          <TolbiAiSpark v-for="s in sizes" :key="s" :ref="keep(s)" :size="s" :aria-label="null" @pointerenter="turn(s)" />
+        </div>
+        <Button label="Faire un tour" variant="secondary-gray" size="sm" @click="turnAll" />
       </div>
     `,
   }),
