@@ -751,6 +751,7 @@ Before working on any component, read:
   **`top-left` / `top-right`**, mirrors of the bottom pair.
   **Amended again**: the head says **no name** — the bar's entry above already says « Tolbi AI »; `title`
   stays the region's `aria-label`, the head is `ALPHA` + the actions (still 61px).
+  **Amended by ADR-0069**: the head names the **conversation** — its title is the switcher; the clock is gone.
 - **ADR-0063**: the awakening is the exception — it departs from ADR-0002 (3.2s, a choreography, a
   decoration) and from the charter (a glow), **accepted by the owner for this one moment**: the
   panel's first opening. `TolbiAiSpark` `state="awakening"`: **transcribed from Figma's Motion data,
@@ -819,6 +820,22 @@ Before working on any component, read:
   mounted after it passes, a reopened conversation does not, nothing outside a thread; the thread's 8px
   arrival **leaves answers out** (one movement at a time). Reduced motion: **nothing passes** — WAAPI is
   outside `motion.css`'s reach, so the component asks itself.
+- **ADR-0069**: the conversation is the **head's title** — Figma section 14 (`2468:14703`), track B: of the
+  docked assistants on Mobbin, five of six name the conversation in their head (Notion, Linktree, Whop), and a
+  menu that says its value is the plainest sign of a list. A `DropdownTrigger` **`ghost`** (new chrome for
+  `bg-default`: `quiet`'s tint is 1.02:1 there; `IconButton`'s `bg-hover`; 16px chevron at `spacing-xs`) in
+  place of the clock; cut at 400px (≈ 22 characters), the whole title in a tooltip **only when cut**, with its
+  date; « Nouvelle conversation » holds whole (159px in 152 until the chevron shrank). Name = the visible
+  title, « Changer de conversation » = `aria-describedby`. **The list is derived**: `conversations` (`id`,
+  `title`, `at`, `pending`) + `v-model:conversation`, **presence decides**; sorted, grouped by calendar day
+  (Aujourd’hui / Hier / 7 derniers jours / Plus ancien, `DropdownGroup` — new), dated by hour, weekday or date
+  (`Intl`, `locale`; `DropdownItem.meta` — new); the current one ADR-0050's mark; « En cours » for a pending
+  answer; search **from 8**, in `Dropdown`'s new **`#header`** (outside the scroll; the user header's classes
+  became `__user`); `history` = the switcher opened; `conversationsLoading` = skeleton rows. **320px** from the
+  title's start: its rows are sentences. Choosing sets `conversation`; `loading` = a skeleton exchange; the
+  body swaps through **`SwapTransition`** (key the thread by conversation), lands on the **last exchange**
+  (ADR-0062's `follow`; measured 25px under the top), focus to the field; nothing replays. Filmed: head and
+  composer still, skeleton and thread never share a frame. Delete/rename not in a menu (still open).
 
 ## Architecture
 

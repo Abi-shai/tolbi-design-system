@@ -62,6 +62,10 @@ actions, which keep its end with or without the badge; its height does not chang
 were the tallest thing in it. In Figma the name was already a hidden layer of `TolbiAI/En-tête`; it is
 deleted. That component shows the sign at 24px beside `ALPHA`, which the code has never drawn.
 
+**Amended by ADR-0069:** the head names the conversation instead — its title is the switcher to the
+project's other conversations, and the clock is gone. The head is the title, `ALPHA`, new conversation,
+expand and close.
+
 ### The pieces
 
 All of them exist only inside the panel, so they are titled under it (ADR-0007):
@@ -170,5 +174,5 @@ assistant at all.
   `surface` or `neutral`; the composer's « Arrêter » is a pill.
 - **Narrow screens.** 400px beside the page assumes a desktop; there is no breakpoint in the system
   (ADR-0020) and no decision for a phone.
-- **The sign in the head.** Figma's `TolbiAI/En-tête` shows the sign at 24px beside `ALPHA`, where the
-  name used to be; the code shows the badge alone.
+- ~~**The sign in the head.**~~ Closed by ADR-0069: the conversation's title took the place, and Figma's
+  `TolbiAI/En-tête` follows.
