@@ -33,11 +33,19 @@ interface Props {
    * Vue would otherwise cast an absent boolean to `false`.
    */
   selected?:  boolean
+  /**
+   * `menuitem` in a menu. `button` in a `Dropdown role="dialog"`, where a row
+   * may carry actions of its own — which a menu item cannot, its children
+   * being presentational (ADR-0072): a real `<button>`, and the current one
+   * `aria-current` rather than checked. The same row to the eye.
+   */
+  as?:        'menuitem' | 'button'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   selected: undefined,
+  as:       'menuitem',
 })
 
 const emit = defineEmits<{
@@ -45,22 +53,43 @@ const emit = defineEmits<{
 }>()
 
 const isChoice  = computed(() => props.selected !== undefined)
+const isButton  = computed(() => props.as === 'button')
+
+/* A `div` row is made a menu item by hand; a `button` row is one already. */
+const rootAttrs = computed(() =>
+  isButton.value
+    ? { type: 'button', 'aria-current': props.selected ? 'true' : undefined, disabled: props.disabled || undefined }
+    : {
+        role: isChoice.value ? 'menuitemradio' : 'menuitem',
+        'aria-checked': isChoice.value ? props.selected : undefined,
+        tabindex: props.disabled ? -1 : 0,
+      },
+)
+
+/* Enter and Space are a native button's own: only the `div` row is taught them. */
+function onKeydown(event: KeyboardEvent) {
+  if (isButton.value || props.disabled) return
+  if (event.key === 'Enter') emit('click')
+  else if (event.key === ' ') {
+    event.preventDefault()
+    emit('click')
+  }
+}
+
 const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
 </script>
 
 <template>
-  <div
+  <component
+    :is="isButton ? 'button' : 'div'"
     class="ds-dropdown-item"
     :class="{
       'ds-dropdown-item--disabled': disabled,
       'ds-dropdown-item--selected': selected,
     }"
-    :role="isChoice ? 'menuitemradio' : 'menuitem'"
-    :aria-checked="isChoice ? selected : undefined"
-    :tabindex="disabled ? -1 : 0"
+    v-bind="rootAttrs"
     @click="!disabled && emit('click')"
-    @keydown.enter="!disabled && emit('click')"
-    @keydown.space.prevent="!disabled && emit('click')"
+    @keydown="onKeydown"
   >
     <div class="ds-dropdown-item__content">
       <div class="ds-dropdown-item__icon-text">
@@ -85,7 +114,7 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
       </div>
       <span v-if="shortcut || meta" class="ds-dropdown-item__shortcut">{{ shortcut || meta }}</span>
     </div>
-  </div>
+  </component>
 </template>
 
 <style scoped>
@@ -97,6 +126,13 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
   flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
+  /* The `button` row starts from nothing, as the `div` one does. */
+  margin: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
 }
 
 .ds-dropdown-item__content {

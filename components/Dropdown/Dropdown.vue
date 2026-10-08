@@ -29,12 +29,23 @@ interface Props {
   avatarInitials?: string
   userName?:   string
   userEmail?:  string
+  /**
+   * `menu` is a list of actions or choices — and only that: a menu may hold
+   * menu items and nothing else. `dialog` is for a panel that holds more — a
+   * search, rows with actions of their own, a field — and names itself with
+   * `label` (ADR-0072).
+   */
+  role?:       'menu' | 'dialog'
+  /** The panel's accessible name; a `dialog` needs one. */
+  label?:      string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   trigger:     'button',
   open:        false,
   buttonLabel: 'Account',
+  role:        'menu',
+  label:       undefined,
 })
 
 const emit = defineEmits<{
@@ -135,7 +146,8 @@ onUnmounted(() => {
     <div
       v-if="open"
       class="ds-dropdown__panel"
-      role="menu"
+      :role="role"
+      :aria-label="label"
     >
       <!--
         User header. The avatar is decorative — the name beside it names the
