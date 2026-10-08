@@ -60,7 +60,7 @@ import { Icon } from '../Icon'
 export type DropdownTriggerSize = 'sm' | 'md'
 
 /** Which of the three chromes the trigger wears. */
-export type DropdownTriggerChrome = 'boxed' | 'quiet' | 'surface'
+export type DropdownTriggerChrome = 'boxed' | 'quiet' | 'surface' | 'ghost'
 
 interface Props {
   /**
@@ -73,7 +73,9 @@ interface Props {
    * `boxed` is a control before you touch it; `quiet` is nothing until you do;
    * `surface` is a raised pill that is already one. Pick `quiet` or `surface`
    * only on a recessed ground — on `bg-default`, `quiet`'s resting form and its
-   * hover are the same pixel, and `surface` disappears into the page.
+   * hover are the same pixel, and `surface` disappears into the page. `ghost`
+   * is for `bg-default`: nothing at rest, and the hover of the `IconButton`s
+   * it stands among.
    */
   chrome?:    DropdownTriggerChrome
   /** Drives `aria-expanded` and which way the chevron points. */
@@ -112,7 +114,7 @@ withDefaults(defineProps<Props>(), {
     <Icon
       v-if="chevron"
       :name="open ? 'chevron-up' : 'chevron-down'"
-      :size="20"
+      :size="chrome === 'ghost' ? 16 : 20"
       class="ds-dropdown-trigger__chevron"
       aria-hidden="true"
     />
@@ -209,6 +211,34 @@ withDefaults(defineProps<Props>(), {
    on this ground measures 1.000:1. So the disabled form is the resting form
    with the colour dimmed, and nothing else. */
 .ds-dropdown-trigger--quiet:disabled {
+  background-color: transparent;
+}
+
+/* ── Ghost ────────────────────────────────────────────────────────── */
+/*
+  For a trigger on `bg-default` — a panel's head, among `IconButton`s — where
+  `quiet`'s tint cannot show: it measures 1.02:1 on white. So it takes the
+  buttons' own chrome, as a text: nothing at rest, `bg-hover` under the pointer
+  and while its panel is out, the same tint an `IconButton` takes when active
+  (ADR-0069). A pill, like `quiet`: a mark, not a destination.
+*/
+/* It carries a title, and its chevron is the title's: 16px, `spacing-xs` from
+   it — a boxed control's 20px chevron 8px away took the room a head needs for
+   « Nouvelle conversation » (159px of text in 152). */
+.ds-dropdown-trigger--ghost {
+  gap: var(--ds-spacing-xs);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--ds-radius-pill);
+  box-shadow: none;
+}
+
+.ds-dropdown-trigger--ghost:hover:not(:disabled),
+.ds-dropdown-trigger--ghost.ds-dropdown-trigger--open {
+  background-color: var(--ds-bg-hover);
+}
+
+.ds-dropdown-trigger--ghost:disabled {
   background-color: transparent;
 }
 

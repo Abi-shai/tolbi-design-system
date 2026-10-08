@@ -17,6 +17,11 @@ interface Props {
   avatarSrc?:      string
   avatarInitials?: string
   shortcut?:  string
+  /**
+   * What the row carries beside its name — a time, a count — in a shortcut's
+   * place and ink. A row has one or the other (ADR-0069).
+   */
+  meta?:      string
   disabled?:  boolean
   /**
    * The row is one of a set of choices. **Absent, it is an action**
@@ -78,7 +83,7 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
         </span>
         <span class="ds-dropdown-item__label">{{ label }}</span>
       </div>
-      <span v-if="shortcut" class="ds-dropdown-item__shortcut">{{ shortcut }}</span>
+      <span v-if="shortcut || meta" class="ds-dropdown-item__shortcut">{{ shortcut || meta }}</span>
     </div>
   </div>
 </template>

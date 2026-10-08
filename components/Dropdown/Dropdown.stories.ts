@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import Dropdown from './Dropdown.vue'
 import DropdownItem from './DropdownItem.vue'
 import DropdownDivider from './DropdownDivider.vue'
+import DropdownGroup from './DropdownGroup.vue'
+import { InputField } from '../InputField'
 
 const meta: Meta<typeof Dropdown> = {
   title: 'Superposition/Dropdown',
@@ -134,6 +136,44 @@ export const AllTriggers: Story = {
           <DropdownItem icon="settings" label="Settings"  shortcut="⌘S"   @click="openAvatar = false" />
           <DropdownDivider />
           <DropdownItem icon="log-out" label="Log out"    shortcut="⌥⇧Q"  @click="openAvatar = false" />
+        </Dropdown>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * Un en-tête et des groupes (ADR-0069) : `#header` est le jumeau de `#footer`, hors
+ * du défilement — une recherche sur les lignes y reste à portée — et `DropdownGroup`
+ * titre une suite de lignes, `label-md` en `text-subtle`. `meta` porte l'heure à la
+ * place d'un raccourci.
+ */
+export const HeaderAndGroups: Story = {
+  name: 'En-tête et groupes',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { Dropdown, DropdownItem, DropdownGroup, InputField },
+    setup() {
+      const open = ref(true)
+      const query = ref('')
+      return { open, query }
+    },
+    template: `
+      <div style="height: 420px; padding: 16px; display: flex; justify-content: flex-end;">
+        <Dropdown trigger="button" v-model:open="open" button-label="Conversations">
+          <template #header>
+            <InputField v-model="query" size="sm" type="search" placeholder="Rechercher une conversation" />
+          </template>
+          <DropdownGroup label="Aujourd’hui">
+            <DropdownItem label="Expliquer les résultats de ce projet" meta="14:32" :selected="true" />
+            <DropdownItem label="Quelle parcelle a le plus produit ?" meta="11:05" :selected="false" />
+          </DropdownGroup>
+          <DropdownGroup label="Hier">
+            <DropdownItem label="Comparer avec la campagne 2024" meta="18:10" :selected="false" />
+          </DropdownGroup>
+          <DropdownGroup label="Plus ancien">
+            <DropdownItem label="Préparer le rapport pour la coopérative" meta="28 sept." :selected="false" />
+          </DropdownGroup>
         </Dropdown>
       </div>
     `,

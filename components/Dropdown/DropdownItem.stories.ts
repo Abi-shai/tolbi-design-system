@@ -45,6 +45,11 @@ const meta: Meta<typeof DropdownItem> = {
       description: 'Raccourci clavier affiché à droite, aligné en fin de ligne.',
       table: { category: 'Contenu', type: { summary: 'string' } },
     },
+    meta: {
+      control: 'text',
+      description: 'Ce que la ligne porte à côté de son nom — une heure, un nombre —, à la place et dans l\'encre d\'un raccourci.',
+      table: { category: 'Contenu', type: { summary: 'string' } },
+    },
     avatarInitials: {
       control: 'text',
       description: 'Avatar de tête (initiales), à la place de l\'icône — sa présence décide.',
@@ -129,4 +134,10 @@ export const Choices: Story = {
       </div>
     `,
   }),
+}
+
+/** Une heure à la place d'un raccourci — l'historique de Tolbi AI (ADR-0069). */
+export const WithMeta: Story = {
+  name: 'Avec une méta',
+  args: { label: 'Comparer avec la campagne 2024', meta: '18:10', selected: false },
 }

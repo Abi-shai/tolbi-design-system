@@ -143,12 +143,21 @@ onUnmounted(() => {
         on every account menu, a presence the component cannot know, about the
         one user who is certainly there.
       -->
-      <div v-if="userName || userEmail" class="ds-dropdown__header">
+      <div v-if="userName || userEmail" class="ds-dropdown__user">
         <Avatar :src="avatarSrc" alt="" :initials="avatarInitials" size="md" />
-        <div class="ds-dropdown__header-text">
-          <span v-if="userName"  class="ds-dropdown__header-name">{{ userName }}</span>
-          <span v-if="userEmail" class="ds-dropdown__header-email">{{ userEmail }}</span>
+        <div class="ds-dropdown__user-text">
+          <span v-if="userName"  class="ds-dropdown__user-name">{{ userName }}</span>
+          <span v-if="userEmail" class="ds-dropdown__user-email">{{ userEmail }}</span>
         </div>
+      </div>
+
+      <!--
+        Header — the footer's twin at the top: outside the scroll, so what
+        concerns the whole list (a search over its rows) stays in reach however
+        far the list has scrolled (ADR-0069).
+      -->
+      <div v-if="$slots.header" class="ds-dropdown__header">
+        <slot name="header" />
       </div>
 
       <!-- Items slot -->
@@ -241,8 +250,8 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-/* ── Header ───────────────────────────────────────────────────────── */
-.ds-dropdown__header {
+/* ── User ─────────────────────────────────────────────────────────── */
+.ds-dropdown__user {
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-lg);
@@ -251,25 +260,35 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-.ds-dropdown__header-text {
+.ds-dropdown__user-text {
   display: flex;
   flex-direction: column;
   min-width: 0;
   flex: 1;
 }
 
-.ds-dropdown__header-name {  font: var(--ds-font-heading-sm);
+.ds-dropdown__user-name {  font: var(--ds-font-heading-sm);
   color: var(--ds-text-default);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.ds-dropdown__header-email {  font: var(--ds-font-body-md);
+.ds-dropdown__user-email {  font: var(--ds-font-body-md);
   color: var(--ds-text-subtle);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ── Header ───────────────────────────────────────────────────────── */
+/* No rule under it: a search belongs to the rows it filters. In line with
+   the rows, which stand `spacing-sm` in. */
+.ds-dropdown__header {
+  display: flex;
+  flex-direction: column;
+  padding: var(--ds-spacing-sm) var(--ds-spacing-sm) var(--ds-spacing-xs);
+  flex-shrink: 0;
 }
 
 /* ── Items wrapper ────────────────────────────────────────────────── */

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import DropdownTrigger from './DropdownTrigger.vue'
+import { IconButton } from '../IconButton'
 import { Avatar } from '../Avatar'
 
 const meta: Meta = {
@@ -22,7 +23,7 @@ const meta: Meta = {
   },
   argTypes: {
     size: { control: 'inline-radio', options: ['sm', 'md'] },
-    chrome: { control: 'inline-radio', options: ['boxed', 'quiet'] },
+    chrome: { control: 'inline-radio', options: ['boxed', 'quiet', 'surface', 'ghost'] },
     open: { control: 'boolean' },
     chevron: { control: 'boolean' },
     disabled: { control: 'boolean' },
@@ -123,6 +124,38 @@ export const Quiet: Story = {
           <Avatar size="xs" initials="CK" alt="Coopérative de Kaolack" />
           <span>Désactivé</span>
         </DropdownTrigger>
+      </div>
+    `,
+  }),
+}
+
+export const Ghost: Story = {
+  name: 'Chrome fantôme',
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        story:
+          "`chrome=\"ghost\"` est pour `bg-default`, où la teinte de `quiet` ne se voit pas (1,02:1 sur blanc) : " +
+          "rien au repos, et le survol des `IconButton` parmi lesquels il se tient — `bg-hover`, gardé tant " +
+          "que le panneau est sorti. Il porte un titre, et son chevron est celui du titre : 16 px, à " +
+          '`spacing-xs`. La tête du panneau Tolbi AI (ADR-0069).',
+      },
+    },
+  },
+  render: () => ({
+    components: { DropdownTrigger, IconButton },
+    template: `
+      <div style="display: flex; align-items: center; gap: 8px; padding: 12px 8px; width: 400px;
+                  background: var(--ds-bg-default); border-radius: var(--ds-radius-surface);">
+        <DropdownTrigger size="sm" chrome="ghost" chevron>Comparer avec la campagne 2024</DropdownTrigger>
+        <span style="flex: 1" />
+        <IconButton icon="square-pen" ariaLabel="Nouvelle conversation" />
+        <IconButton icon="x" ariaLabel="Fermer" />
+      </div>
+      <div style="display: flex; gap: 16px; margin-top: 16px;">
+        <DropdownTrigger size="sm" chrome="ghost" chevron open>Ouvert</DropdownTrigger>
+        <DropdownTrigger size="sm" chrome="ghost" chevron disabled>Désactivé</DropdownTrigger>
       </div>
     `,
   }),

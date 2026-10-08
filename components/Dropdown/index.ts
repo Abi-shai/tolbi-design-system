@@ -5,6 +5,7 @@ export { default as DropdownTrigger } from './DropdownTrigger.vue'
 export type { DropdownTriggerSize, DropdownTriggerChrome } from './DropdownTrigger.vue'
 export { default as DropdownItem } from './DropdownItem.vue'
 export { default as DropdownDivider } from './DropdownDivider.vue'
+export { default as DropdownGroup } from './DropdownGroup.vue'
 export { default as DropdownSelectItem } from './DropdownSelectItem.vue'
 export type { DropdownSelectItemType } from './DropdownSelectItem.vue'
 
