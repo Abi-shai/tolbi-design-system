@@ -106,7 +106,11 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   border: none;
   cursor: pointer;
   color: var(--ds-text-default);
-  transition: background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+  /* The ground and the ink move together: a state that turned the disc and cut
+     the glyph would show a white arrow on a grey disc for most of the fade. */
+  transition:
+    background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    color      var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-icon-button--sm { width: 36px; height: 36px; }
@@ -131,9 +135,6 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 /* ── Subtle: a ghost whose ink recedes ─────────────────────────────── */
 .ds-icon-button--subtle {
   color: var(--ds-text-subtle);
-  transition:
-    background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
-    color      var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
 }
 
 .ds-icon-button--subtle:hover:not(:disabled),

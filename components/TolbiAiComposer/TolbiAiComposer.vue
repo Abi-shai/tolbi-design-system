@@ -419,6 +419,10 @@ let glide: Animation | undefined
 function lockHeight() {
   const el = box.value
   if (!el) return
+  /* The height that is seen — mid-glide, if one is running — read before the
+     glide is cancelled: once it is, the box reports where it was going, and an
+     interrupted travel would jump there (filmed on the slot below: 6px). */
+  const seen = el.getBoundingClientRect().height
   /* Detached before it is cancelled: cancelling an animation — even one that
      finished long ago — queues its `cancel` event, which would unlock the box
      in the middle of the swap and cut the travel to nothing (filmed: 30px in
@@ -428,7 +432,7 @@ function lockHeight() {
     glide.cancel()
     glide = undefined
   }
-  el.style.height = `${el.offsetHeight}px`
+  el.style.height = `${seen}px`
   /* Clipped only while it travels: at rest the microphone's tooltip has to
      leave the box. */
   el.style.overflow = 'hidden'
@@ -444,9 +448,9 @@ function unlock() {
 function glideHeight() {
   const el = box.value
   if (!el) return
-  const from = el.offsetHeight
+  const from = el.getBoundingClientRect().height
   el.style.height = ''
-  const to = el.offsetHeight
+  const to = el.getBoundingClientRect().height
   const style = getComputedStyle(el)
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
   if (reduced || from === to) return unlock()
@@ -457,6 +461,58 @@ function glideHeight() {
   glide.onfinish = glide.oncancel = () => {
     glide = undefined
     unlock()
+  }
+}
+
+/*
+  The trailing control travels the same way the box does (ADR-0061): send
+  becoming « Arrêter » is 32px becoming 85, and with the microphone beside it
+  (ADR-0067) a cut threw the microphone 53px in one frame. The slot holds its
+  width while the leaver fades, then glides to the arriver's, which comes in
+  over the glide — and the microphone rides it. Clipped only while it travels.
+*/
+const go = ref<HTMLElement>()
+let goGlide: Animation | undefined
+
+function lockWidth() {
+  const el = go.value
+  if (!el) return
+  /* What is seen, read before the running glide is cancelled — see lockHeight —
+     and to the subpixel: `offsetWidth` rounds, and a lock 0.13px short reads as
+     a step back. */
+  const seen = el.getBoundingClientRect().width
+  if (goGlide) {
+    goGlide.onfinish = goGlide.oncancel = null
+    goGlide.cancel()
+    goGlide = undefined
+  }
+  el.style.width = `${seen}px`
+  el.style.overflow = 'hidden'
+}
+
+function unlockWidth() {
+  const el = go.value
+  if (!el) return
+  el.style.width = ''
+  el.style.overflow = ''
+}
+
+function glideWidth() {
+  const el = go.value
+  if (!el) return
+  const from = el.getBoundingClientRect().width
+  el.style.width = ''
+  const to = el.getBoundingClientRect().width
+  const style = getComputedStyle(el)
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (reduced || from === to) return unlockWidth()
+  goGlide = el.animate([{ width: `${from}px` }, { width: `${to}px` }], {
+    duration: parseFloat(style.getPropertyValue('--ds-motion-duration-enter')) || 200,
+    easing: style.getPropertyValue('--ds-motion-easing-out').trim() || 'ease-out',
+  })
+  goGlide.onfinish = goGlide.oncancel = () => {
+    goGlide = undefined
+    unlockWidth()
   }
 }
 
@@ -625,23 +681,32 @@ function messageAct() {
                     />
                   </SurfaceTransition>
                 </span>
-                <Button
-                  v-if="pending"
-                  variant="secondary-gray"
-                  size="xs"
-                  icon-leading="x"
-                  :label="stopLabel"
-                  @click="stop"
-                />
-                <IconButton
-                  v-else
-                  icon="arrow-up"
-                  variant="primary"
-                  size="xs"
-                  :ariaLabel="sendLabel"
-                  :disabled="!canSend"
-                  @click="send"
-                />
+                <!-- Send, or « Arrêter » while an answer comes: the slot holds its
+                     width while one leaves, then glides to the other's, so the
+                     microphone beside it is carried rather than jumped. -->
+                <span ref="go" class="ds-tolbi-ai-composer__go">
+                  <Transition name="ds-tolbi-ai-swap" mode="out-in" @before-leave="lockWidth" @enter="glideWidth">
+                    <Button
+                      v-if="pending"
+                      key="stop"
+                      variant="secondary-gray"
+                      size="xs"
+                      icon-leading="x"
+                      :label="stopLabel"
+                      @click="stop"
+                    />
+                    <IconButton
+                      v-else
+                      key="send"
+                      icon="arrow-up"
+                      variant="primary"
+                      size="xs"
+                      :ariaLabel="sendLabel"
+                      :disabled="!canSend"
+                      @click="send"
+                    />
+                  </Transition>
+                </span>
               </div>
             </div>
 
@@ -853,6 +918,12 @@ function messageAct() {
   align-items: center;
   justify-content: flex-end;
   gap: var(--ds-spacing-xs);
+}
+
+/* Anchored right, where the box's edge is: a slot that widens grows leftwards. */
+.ds-tolbi-ai-composer__go {
+  display: inline-flex;
+  justify-content: flex-end;
 }
 
 /* ── The microphone and its tooltip ───────────────────────────────── */
