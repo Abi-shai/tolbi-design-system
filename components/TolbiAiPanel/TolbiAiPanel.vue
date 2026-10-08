@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, toRef, useId, watch } from 'vue'
+import { useDelayedTooltip } from '../../composables/useDelayedTooltip'
 import { Badge } from '../Badge'
 import { Dropdown, DropdownTrigger } from '../Dropdown'
 import type { IconName } from '../Icon'
@@ -280,22 +281,9 @@ function onFocusOut(event: FocusEvent) {
   Pressed, the action has answered the question the tooltip asked, so the
   tooltip goes; closing takes it with the panel.
 */
-const TIP_DELAY = 400
-const tip = ref<string | null>(null)
-let tipTimer: ReturnType<typeof setTimeout> | undefined
-
-function tipSoon(action: string) {
-  clearTimeout(tipTimer)
-  tipTimer = setTimeout(() => (tip.value = action), TIP_DELAY)
-}
-
-function tipAway() {
-  clearTimeout(tipTimer)
-  tip.value = null
-}
+const { shown: tip, soon: tipSoon, away: tipAway } = useDelayedTooltip<string>()
 
 watch(open, (now) => !now && tipAway())
-onBeforeUnmount(() => clearTimeout(tipTimer))
 
 /* ── The head names the conversation, and leads to the others ─────────── */
 /*

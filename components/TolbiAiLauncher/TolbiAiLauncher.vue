@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { SurfaceTransition } from '../SurfaceTransition'
 import { TolbiAiSpark } from '../TolbiAiSpark'
 import { Tooltip } from '../Tooltip'
+import { useDelayedTooltip } from '../../composables/useDelayedTooltip'
 
 /**
  * Tolbi AI's way in: a white disc with the sign, floating at the bottom right
@@ -61,7 +62,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKey)
-  clearTimeout(tipTimer)
 })
 
 /*
@@ -84,20 +84,8 @@ watch(open, (now, was) => {
   }
 })
 
-/* ── Saying what it does: after 400ms on hover or focus (ADR-0066) ────── */
-const TIP_DELAY = 400
-const tip = ref(false)
-let tipTimer: ReturnType<typeof setTimeout> | undefined
-
-function tipSoon() {
-  clearTimeout(tipTimer)
-  tipTimer = setTimeout(() => (tip.value = true), TIP_DELAY)
-}
-
-function tipAway() {
-  clearTimeout(tipTimer)
-  tip.value = false
-}
+/* ── Saying what it does: after a beat on hover or focus (ADR-0066) ───── */
+const { shown: tip, soon: tipSoon, away: tipAway } = useDelayedTooltip()
 
 function toggle() {
   tipAway()

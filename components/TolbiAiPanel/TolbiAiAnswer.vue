@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { inject, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useDelayedTooltip } from '../../composables/useDelayedTooltip'
 import { Icon } from '../Icon'
 import { IconButton } from '../IconButton'
 import { MarkTransition } from '../MarkTransition'
@@ -86,19 +87,7 @@ async function copy() {
   composer's microphone does the same (ADR-0061). Presentational: the button's
   own name already says it to a screen reader.
 */
-const TIP_DELAY = 400
-const tip = ref<string | null>(null)
-let tipTimer: ReturnType<typeof setTimeout> | undefined
-
-function tipSoon(action: string) {
-  clearTimeout(tipTimer)
-  tipTimer = setTimeout(() => (tip.value = action), TIP_DELAY)
-}
-
-function tipAway() {
-  clearTimeout(tipTimer)
-  tip.value = null
-}
+const { shown: tip, soon: tipSoon, away: tipAway } = useDelayedTooltip<string>()
 
 /*
   The pass (ADR-0068) — the exception the awakening opened (ADR-0063): longer
@@ -154,7 +143,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   clearTimeout(copiedTimer)
-  clearTimeout(tipTimer)
   sweep?.cancel()
 })
 </script>
