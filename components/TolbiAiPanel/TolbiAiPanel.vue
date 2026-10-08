@@ -211,11 +211,15 @@ watch(open, (now) => {
   A control that asks — a suggestion — is often gone once it has:
   the welcome makes way for the thread. When the focus falls out of the panel
   with the element that held it, it lands in the field, where the next
-  question goes, rather than on the page.
+  question goes, rather than on the page. Only then: an element still in the
+  document was left, not lost — a click on the answer or on the page is the
+  user's way out, and the field lets go.
 */
-function onFocusOut() {
+function onFocusOut(event: FocusEvent) {
+  const left = event.target as Node
   setTimeout(() => {
-    if (open.value && (!document.activeElement || document.activeElement === document.body)) focusField()
+    if (!open.value || left.isConnected) return
+    if (!document.activeElement || document.activeElement === document.body) focusField()
   })
 }
 
