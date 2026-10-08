@@ -11,9 +11,10 @@ const meta: Meta<typeof TolbiAiThinkingLine> = {
       description: {
         component:
           'Tolbi AI travaille : une ligne, là où la réponse va s\'afficher. Les feuilles qui ' +
-          'tournent (`TolbiAiSpark` en 16, `state="thinking"`) et quelques mots en body-sm, ' +
-          'text-subtlest ; le texte ne bouge pas. Au-delà de 10 s, un second texte. Le statut ' +
-          'est annoncé aux lecteurs d\'écran, une fois par texte. La réponse prend sa place ' +
+          'tournent (`TolbiAiSpark` en 16, `state="thinking"`) et quelques mots à la taille de ' +
+          'la réponse — body-md, text-subtle : l\'encre dit « pas encore », pas la taille ' +
+          '(ADR-0065). Le texte ne bouge pas. Au-delà de 10 s, un second texte. Le statut est ' +
+          'annoncé aux lecteurs d\'écran, une fois par texte. La réponse prend sa place ' +
           '(ADR-0058).',
       },
     },

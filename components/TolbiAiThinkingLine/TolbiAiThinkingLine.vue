@@ -4,8 +4,8 @@ import { TolbiAiSpark } from '../TolbiAiSpark'
 
 /**
  * Tolbi AI is working: one line, where the answer is about to appear — the sign
- * thinking at 16 and a few words saying what the work is. The answer takes its
- * place (ADR-0058).
+ * thinking at 16 and a few words saying what the work is, at the answer's own
+ * size in the receding ink (ADR-0065). The answer takes its place (ADR-0058).
  *
  * One movement at a time: the leaves turn and the text does not — no shimmer,
  * no animated ellipsis. The words change once, when the wait gets long.
@@ -67,7 +67,9 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="ds-tolbi-ai-thinking-line">
-    <TolbiAiSpark :size="16" state="thinking" :aria-label="null" />
+    <span class="ds-tolbi-ai-thinking-line__sign">
+      <TolbiAiSpark :size="16" state="thinking" :aria-label="null" />
+    </span>
     <span class="ds-tolbi-ai-thinking-line__label" aria-hidden="true">{{ shown }}</span>
     <span class="ds-tolbi-ai-thinking-line__status" role="status">{{ announced }}</span>
   </div>
@@ -75,19 +77,31 @@ onBeforeUnmount(() => {
 
 <style scoped>
 /*
-  `flex-start`, not `center`: the sign is one 16px line box tall, so it sits on
-  the first line whether the words fit on one or wrap onto two.
+  The words are read at the answer's size — `body-md`, the answer's own role —
+  and recede by their ink, `text-subtle`, not by shrinking (ADR-0065: measured
+  across twelve products, ours was the smallest and among the palest).
+
+  `flex-start`, not `center`: the sign sits in a box one line tall (`1lh`) and
+  is centred in it, so it stays on the first line whether the words fit on one
+  or wrap onto two — and follows the role if the role changes.
 */
 .ds-tolbi-ai-thinking-line {
   display: flex;
   align-items: flex-start;
   gap: var(--ds-spacing-md);
   min-width: 0;
+  font: var(--ds-font-body-md);
+  color: var(--ds-text-subtle);
+}
+
+.ds-tolbi-ai-thinking-line__sign {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 1lh;
 }
 
 .ds-tolbi-ai-thinking-line__label {
-  font: var(--ds-font-body-sm);
-  color: var(--ds-text-subtlest);
   min-width: 0;
 }
 
