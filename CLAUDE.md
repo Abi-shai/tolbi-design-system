@@ -792,6 +792,10 @@ Before working on any component, read:
   « Arrêter » takes send's place and the microphone is **disabled**. A written question **waits in the
   field** while a note is recorded (it is the product's `v-model`; measured: back with the focus after
   Escape). Without voice, send alone.
+  **Send ↔ « Arrêter » travels** (32 → 85px): the slot holds its width while the leaver fades, then glides
+  to the arriver's — a cut threw the microphone 53px; filmed ×10: < 1px a frame, no reversal. A lock reads
+  the **seen** size before cancelling a running glide (cancelled, it reports the destination — 6px jump),
+  box included. `IconButton` now transitions its **ink with its ground**.
 
 ## Architecture
 

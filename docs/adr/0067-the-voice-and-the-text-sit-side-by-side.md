@@ -33,6 +33,17 @@ removing the brand from the microphone (ADR-0061, amended) set up.
 « Arrêter » takes send's place and the microphone is **disabled**, its tooltip silenced: no new question
 starts while one is being answered, the same reason the field is read-only (ADR-0059).
 
+### Send and « Arrêter » travel
+
+Side by side, a cut between send (32px) and « Arrêter » (85px) threw the microphone 53px in one frame. The
+trailing slot now travels the way the box does (ADR-0061): it holds its width while the leaver fades out
+in `exit`, then glides to the arriver's width over `enter` on `easing-out` while the arriver comes in — and
+the microphone rides the glide. Filmed at a tenth of the speed: 305 → 258px and back, under 1px a frame,
+no reversal; an answer landing mid-glide holds the slot where it is and glides it home.
+
+Send's disc and glyph now move together: `IconButton` transitions its ink with its ground, where it
+turned the disc and cut the glyph — a white arrow on a grey disc for most of the fade.
+
 ### A written question waits for a note
 
 Recording replaces the box's content and leaves the text alone — it is the product's `v-model`, and

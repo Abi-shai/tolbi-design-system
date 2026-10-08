@@ -100,6 +100,11 @@ It shipped broken once. Cancelling the previous glide — even one that had fini
 box cut 30px in one frame. The old animation is detached before it is cancelled. Filmed at a tenth of
 the speed: 114 ↔ 84px and 114 ↔ 124px, at most 0.61px a frame, no reversal.
 
+**Amended (8 Oct.):** an interrupted glide jumped to where it was going. The lock read the box's size after
+cancelling the running glide, which reports the destination once cancelled; it now reads what is seen
+first, to the subpixel (`offsetHeight` rounds, and a lock 0.13px short reads as a step back). Found on the
+trailing slot's glide (ADR-0067): 6px in one frame when an answer landed mid-travel.
+
 ### Two guards in the build
 
 Both found here, both silent until now: a declaration error drops a component's `.d.ts` while the build
