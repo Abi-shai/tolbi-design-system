@@ -842,7 +842,8 @@ Before working on any component, read:
   title's start: its rows are sentences. Choosing sets `conversation`; `loading` = a skeleton exchange; the
   body swaps through **`SwapTransition`** (key the thread by conversation), lands on the **last exchange**
   (ADR-0062's `follow`; measured 25px under the top), focus to the field; nothing replays. Filmed: head and
-  composer still, skeleton and thread never share a frame. Delete/rename not in a menu (still open).
+  composer still, skeleton and thread never share a frame. **Amended by ADR-0072**: rows rename and
+  delete, so the list is a `dialog` of buttons.
 - **ADR-0070**: Tolbi AI **floats in the corner** — the owner's frame (`2308:2429`): the entry is not in the
   bar. `TolbiAiLauncher` is Figma's disc — the sign at 32, `spacing-md` around, a `border-subtlest`
   hairline, **50px** declared, `bg-default` + `elevation-control` — **fixed** over the page's bottom-right
@@ -866,6 +867,19 @@ Before working on any component, read:
   state** — a state is what the sign is, a turn what it does; Web Animations off the cascade
   (`--tolbi-ai-spark-turn`, equal to the awakening's literals), only from `rest`, asking reduced motion
   itself (ADR-0068).
+- **ADR-0072**: a conversation is **renamed and deleted from its row** — two `IconButton xs subtle`
+  (pencil, trash) take the **time's place** under the pointer or the focus, named with the row's title,
+  tooltips after the catalogue's delay. Not « ⋯ » (Grok, Gemini, Plane): in a list that is already a menu,
+  it opens a menu in a menu. **A menu item cannot hold buttons** (its children are presentational), so
+  `Dropdown` gains **`role="dialog"` + `label`** and `DropdownItem` **`as="button"`** (current =
+  `aria-current`), the same row to the eye — which also settles ADR-0069's search-in-a-menu. **Renamed in
+  the row**: the title becomes a field selected from its start; Enter keeps, **Escape restores without
+  closing the list**, leaving keeps; the field overhangs 1px each way so the rows below never move.
+  **Deleted at once**, no confirmation (no modal; « Annuler » catches it): the row closes over `exit`,
+  the focus goes to the next row; the product shows « Conversation supprimée » + « Annuler » and holds it
+  **as long as the toast offers it** (its time pauses, ADR-0052); undone, it opens back over `enter`
+  where it was. Deleting the current one opens a new conversation. Only what the product changes moves —
+  the search filters at once.
 
 ## Architecture
 

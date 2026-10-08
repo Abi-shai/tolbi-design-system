@@ -51,7 +51,8 @@ project with none yet. The panel sorts them by `at` and groups them by calendar 
 this one (`Intl`, `locale`). The groups are `DropdownGroup`s, `SideNavGroup`'s title in a menu.
 
 The current conversation is a checked `menuitemradio` carrying the mark of every current item in the
-catalogue (ADR-0050). A conversation still awaiting its answer says « En cours » in place of its time, and
+catalogue (ADR-0050). **Amended by ADR-0072:** the rows carry actions of their own, which a menu item
+cannot hold, so the list is a `dialog` of buttons and the current one is `aria-current` — the same mark. A conversation still awaiting its answer says « En cours » in place of its time, and
 the answer lands in it wherever the reader is.
 
 From eight conversations on, a search sits in the menu's header — outside the scroll, so it stays in reach —
@@ -101,9 +102,10 @@ the skeleton never share a frame (menu out, skeleton at 113ms, thread at 576ms).
 
 ## Still open
 
-- **Delete and rename** are not in the menu: a menu is a choice. Track C had a place for deleting; if a
-  conversation must go, it will need one.
-- **A search inside `role="menu"`** is not the combobox pattern, and no screen reader has heard it.
+- ~~**Delete and rename** are not in the menu~~ — **closed by ADR-0072**: two icons in each row, the
+  list a `dialog` of buttons.
+- ~~**A search inside `role="menu"`**~~ — the list is a `dialog` since ADR-0072; no screen reader has
+  heard it yet.
 - **The times are taken when the menu opens**; one left open across midnight keeps yesterday's groups.
 - **Figma** shows the head and the menu (`TolbiAI/En-tête`, section 14); its own `Dropdown` components do
   not exist.
