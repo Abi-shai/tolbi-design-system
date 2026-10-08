@@ -62,6 +62,10 @@ panel opens**, not while it is closed: a CSS animation starts when its class lan
 mounted in a closed panel would play unseen and be over by the time anyone looked. On `awake`, stop
 asking for it, or the next opening plays it again.
 
+**Amended by ADR-0071:** the turn alone — its 1.65s and its curve, nothing else — answers the launcher's
+hover, from rest to rest, through `TolbiAiSpark.turn()`. Everything else stays with the first opening:
+the two rounds of light, the spark's arrival, the glow.
+
 ## What changes
 
 - `TolbiAiSparkState` gains `'awakening'`; `TolbiAiSpark` emits `awake`.

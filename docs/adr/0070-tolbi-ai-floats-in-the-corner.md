@@ -36,6 +36,9 @@ and to the right is the screen's edge.
 « Interroger Tolbi xAI » and nothing else. The shortcut is no longer written on the screen — it still works,
 and `aria-keyshortcuts` still declares it.
 
+**Amended by ADR-0071:** the pointer's arrival — or the keyboard's focus — also turns the sign once: the
+awakening's turn, alone, from rest to rest; not when the focus is handed back as the panel closes.
+
 ### It gives way to the panel
 
 Open, the panel stands where the disc floats; so the disc leaves as anything that floats does — scale and

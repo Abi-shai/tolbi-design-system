@@ -764,7 +764,8 @@ Before working on any component, read:
   is the spark **blurred** (`feGaussianBlur` 1.25 in the drawing's units = Figma's 2.5 halved; filter
   region widened, the default cut it). It **ends on `rest`** value for value; `awake` fires once — and
   at once under reduced motion, where nothing plays and so nothing would end. `TolbiAiWelcome`
-  `awaken` plays **as the panel opens**, never while closed (it would play unseen).
+  `awaken` plays **as the panel opens**, never while closed (it would play unseen). **Amended by
+  ADR-0071**: its turn alone answers the launcher's hover; the rest stays with the first opening.
 - **ADR-0064**: expanded, the panel **takes the surface** (Figma `2310:4829`) — it covers the row it
   stands in, the bar and the navigation untouched, and **the footprint stays**: the page keeps its
   width under the surface (812px every frame), so « Réduire » hands the map back as it was left. The
@@ -849,7 +850,18 @@ Before working on any component, read:
   **gives way** while the panel is open (`SurfaceTransition`, exit) and returns **one `enter` late** — the
   panel closes over `enter`, and an arrival waits for its place (ADR-0049); the focus comes back to it; ⌘J
   moves to it. `TolbiAiNavButton` and `HorizontalNavigation`'s `#assistant` are **deleted**; `Button`'s
-  `#leading` / `selected` stay.
+  `#leading` / `selected` stay. Its hover **turns the sign** (ADR-0071).
+- **ADR-0071**: the sign **turns to meet the pointer** — the owner asked the launcher's hover for « the
+  loading animation when you open the panel », which names two; three tracks filmed (section 16,
+  `2482:14612`): the loop (A) **cuts in and out** (no frame of it has four leaves lit) and says « working »,
+  which ADR-0057 keeps for work; the whole awakening (B) makes the first opening's exception **ordinary**;
+  **C** chosen — the awakening's **turn alone**: 1.65s on (0.18, 1, 0.3, 1), the spark still, nothing
+  dimmed, rest to rest (92 % at 600ms; departs from ADR-0002 on length, accepted). Once per approach —
+  never restarted mid-turn, finished if the pointer leaves — on pointer or keyboard focus, **not when the
+  focus is handed back** (the disc is arriving: one movement). `TolbiAiSpark.turn()` is **exposed, not a
+  state** — a state is what the sign is, a turn what it does; Web Animations off the cascade
+  (`--tolbi-ai-spark-turn`, equal to the awakening's literals), only from `rest`, asking reduced motion
+  itself (ADR-0068).
 
 ## Architecture
 
