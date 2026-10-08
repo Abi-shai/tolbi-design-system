@@ -15,15 +15,16 @@ defineProps<Props>()
 </template>
 
 <style scoped>
-/* Figma's bubble: 10px by 14px, `radius-surface-sm`, hugging its words. Control
-   padding, off the spacing ramp (ADR-0013). Line breaks typed with Shift+Enter
-   are kept. */
+/* Figma's bubble: 10px by 14px, `radius-surface-sm`, hugging its words — the
+   control scale's `md`, which Figma binds here: one line of body-md stands 40px
+   tall, as a control does (ADR-0013). Line breaks typed with Shift+Enter are
+   kept. */
 .ds-tolbi-ai-question {
   align-self: flex-end;
   max-width: 80%;
   box-sizing: border-box;
   margin: 0;
-  padding: 10px 14px;
+  padding: var(--ds-control-padding-md);
   border-radius: var(--ds-radius-surface-sm);
   background: var(--ds-bg-neutral);
   font: var(--ds-font-body-md);
