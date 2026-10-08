@@ -19,7 +19,10 @@ import { Tooltip } from '../Tooltip'
 interface Props {
   /** The name a reader hears: the disc shows only the sign. */
   label?: string
-  /** Shown on hover and focus, with the shortcut. */
+  /**
+   * Shown on hover and focus — these words and nothing else. The shortcut is
+   * declared to assistive tech (`aria-keyshortcuts`), not written here.
+   */
   tooltip?: string
   /** The panel's `id`, so the button says what it opens. */
   controls?: string
@@ -29,7 +32,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   label: 'Tolbi AI',
-  tooltip: 'Interroger Tolbi AI sur ce projet',
+  tooltip: 'Interroger Tolbi xAI',
   controls: undefined,
   shortcut: true,
 })
@@ -40,7 +43,6 @@ const button = ref<HTMLButtonElement>()
 
 /* ── The shortcut ─────────────────────────────────────────────────────── */
 const apple = ref(false)
-const keyName = computed(() => (apple.value ? '⌘J' : 'Ctrl+J'))
 const ariaKeys = computed(() => (apple.value ? 'Meta+J' : 'Control+J'))
 
 function onKey(event: KeyboardEvent) {
@@ -118,7 +120,7 @@ function toggle() {
         <Tooltip
           v-if="tip"
           class="ds-tolbi-ai-launcher__tip"
-          :title="shortcut ? `${tooltip} · ${keyName}` : tooltip"
+          :title="tooltip"
           arrow="right"
           role="presentation"
         />
