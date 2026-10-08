@@ -742,7 +742,9 @@ Before working on any component, read:
   **sources** — they named the product's own data, which is noise: `sources`, `TolbiAiSource` and
   `TolbiAiSourceItem` are deleted, the answer is its words and its actions, and the composer's
   disclaimer drops « Veuillez vérifier les sources citées ». **Amended by ADR-0068**: an answer no longer
-  takes the thread's arrival — it arrives under its own light.
+  takes the thread's arrival — it arrives under its own light. **Amended**: the focus goes back to the
+  field only when the control that held it is **gone from the document** — re-homing whenever it landed
+  on the body made every click away (the answer, the page, the map) put it back: a focus held hostage.
 - **ADR-0063**: the awakening is the exception — it departs from ADR-0002 (3.2s, a choreography, a
   decoration) and from the charter (a glow), **accepted by the owner for this one moment**: the
   panel's first opening. `TolbiAiSpark` `state="awakening"`: **transcribed from Figma's Motion data,

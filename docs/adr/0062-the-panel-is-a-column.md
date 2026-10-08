@@ -102,6 +102,15 @@ Opened, the panel focuses the field: it is where the question is asked. Closed f
 returns to the bar's entry. A control that asks and then disappears — a suggestion, as the welcome
 makes way for the thread — hands the focus to the field rather than dropping it on the page.
 
+**Amended (8 Oct.):** only when the control has disappeared. The first version handed the focus to the
+field whenever it landed on the page, and a click on nothing focusable lands it there too — on the
+answer's words, on the page, on the map: the field took the focus back every time, its ring stayed on,
+and the panel held the focus hostage. The panel now checks that the element which lost the focus is
+**no longer in the document**: an element still there was left, not lost, and a click away is the user's
+choice. Measured in Chromium: a click on the answer, the page or the map leaves the focus on the body and
+the ring off; a suggestion pressed with Enter still lands the focus in the field, and the composer's own
+actions still hand it back; Shift+Tab leaves the field.
+
 ### The entry in the bar
 
 `TolbiAiNavButton` is the sign and the name in a `Button` — `secondary-gray` at `sm`, Figma's
