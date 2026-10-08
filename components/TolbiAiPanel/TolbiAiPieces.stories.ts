@@ -60,6 +60,48 @@ export const Answer: Story = {
   }),
 }
 
+/**
+ * Tout ce qu'un markdown peut écrire, dans les encres et le rythme de la
+ * réponse : titres (de tout niveau, à l'emphase du texte), liens, code en ligne
+ * et en bloc, citation, tableau, filet, liste imbriquée. Le produit rend son
+ * markdown dans le slot ; rien n'y retombe sur les styles du navigateur.
+ */
+export const AnswerMarkdown: Story = {
+  name: 'Réponse — tout le markdown',
+  render: () => ({
+    components: { TolbiAiAnswer },
+    setup: () => ({ feedback: ref(null) }),
+    template: `
+      <div style="width:352px;">
+        <TolbiAiAnswer v-model:feedback="feedback">
+          <h1>Rendement de la campagne</h1>
+          <p>Le projet atteint <strong>1,9 t/ha</strong> sur 152 ha — <em>estimation au 5 novembre</em>. Voir la <a href="#methode">méthode de calcul</a>.</p>
+          <h3>Par parcelle</h3>
+          <table>
+            <thead><tr><th>Parcelle</th><th>Surface</th><th>Rendement</th></tr></thead>
+            <tbody>
+              <tr><td>Mariama Baldé</td><td>9 ha</td><td>2,1 t/ha</td></tr>
+              <tr><td>Modou Sène</td><td>12 ha</td><td>1,5 t/ha</td></tr>
+            </tbody>
+          </table>
+          <blockquote>Les trois parcelles du nord ferment la marche, faute de pluie fin août.</blockquote>
+          <ul>
+            <li>Indice <code>NDVI</code> moyen : <strong>0,62</strong>
+              <ul><li>au-dessus de 0,7 sur 4 parcelles</li></ul>
+            </li>
+            <li>Sénescence : <strong>79,6 %</strong> des surfaces</li>
+          </ul>
+          <hr />
+          <p>Export brut :</p>
+          <pre><code>parcelle,surface_ha,rendement_t_ha
+mariama-balde,9,2.1
+modou-sene,12,1.5</code></pre>
+        </TolbiAiAnswer>
+      </div>
+    `,
+  }),
+}
+
 export const Welcome: Story = {
   name: 'Accueil',
   render: () => ({

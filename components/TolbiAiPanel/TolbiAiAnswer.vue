@@ -337,11 +337,11 @@ onBeforeUnmount(() => {
   overflow-wrap: anywhere;
 }
 
-.ds-tolbi-ai-answer__words :deep(:is(p, ul, ol, h2, h3, h4, blockquote, pre, table)) {
+.ds-tolbi-ai-answer__words :deep(:is(p, ul, ol, h1, h2, h3, h4, h5, h6, blockquote, pre, table, hr)) {
   margin: 0;
 }
 
-.ds-tolbi-ai-answer__words :deep(:is(p, ul, ol, h2, h3, h4, blockquote, pre, table) + :is(p, ul, ol, h2, h3, h4, blockquote, pre, table)) {
+.ds-tolbi-ai-answer__words :deep(:is(p, ul, ol, h1, h2, h3, h4, h5, h6, blockquote, pre, table, hr) + :is(p, ul, ol, h1, h2, h3, h4, h5, h6, blockquote, pre, table, hr)) {
   margin-top: 10px;
 }
 
@@ -349,7 +349,7 @@ onBeforeUnmount(() => {
   padding-left: var(--ds-spacing-xl);
 }
 
-.ds-tolbi-ai-answer__words :deep(li + li) {
+.ds-tolbi-ai-answer__words :deep(:is(li + li, li > ul, li > ol)) {
   margin-top: 10px;
 }
 
@@ -362,9 +362,109 @@ onBeforeUnmount(() => {
   color: var(--ds-text-strong);
 }
 
-.ds-tolbi-ai-answer__words :deep(:is(h2, h3, h4)) {
+/*
+  Every level of heading is the answer's emphasis, not a page's title: the
+  page has its one heading (ADR-0051), and a browser's own `h1` is twice the
+  size in a Bold the catalogue does not have (ADR-0003).
+*/
+.ds-tolbi-ai-answer__words :deep(:is(h1, h2, h3, h4, h5, h6)) {
   font: var(--ds-font-body-md-emphasis);
   color: var(--ds-text-strong);
+}
+
+/*
+  The rest of what markdown writes, on the same type and rhythm, so nothing in
+  an answer falls back to the browser's defaults. A link is the brand's ink
+  and always underlined — colour alone cannot say « link » (WCAG 1.4.1) — with
+  the catalogue's ring, instant (ADR-0022).
+*/
+.ds-tolbi-ai-answer__words :deep(a) {
+  border-radius: var(--ds-radius-inner-sm);
+  color: var(--ds-text-brand);
+  text-decoration: underline;
+  text-decoration-thickness: var(--ds-border-width-default);
+  text-underline-offset: 0.2em;
+  outline: none;
+  transition:
+    color      var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
+}
+
+.ds-tolbi-ai-answer__words :deep(a:hover) {
+  color: var(--ds-text-brand-hover);
+}
+
+.ds-tolbi-ai-answer__words :deep(a:focus-visible) {
+  box-shadow: var(--ds-focus-ring-brand);
+}
+
+/* Code is `code-md`, the one role in JetBrains Mono (ADR-0003): 13px on the
+   answer's 20px line box, so a word of code never moves the line. */
+.ds-tolbi-ai-answer__words :deep(code) {
+  font: var(--ds-font-code-md);
+  padding: 0 var(--ds-spacing-xs);
+  border-radius: var(--ds-radius-inner-sm);
+  background: var(--ds-bg-neutral);
+  color: var(--ds-text-strong);
+}
+
+/* A block of code keeps its lines: it scrolls sideways rather than wrapping. */
+.ds-tolbi-ai-answer__words :deep(pre) {
+  font: var(--ds-font-code-md);
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-surface-sm);
+  background: var(--ds-bg-neutral-subtle);
+  overflow-x: auto;
+  overflow-wrap: normal;
+  white-space: pre;
+}
+
+.ds-tolbi-ai-answer__words :deep(pre code) {
+  padding: 0;
+  background: none;
+  color: var(--ds-text-default);
+}
+
+.ds-tolbi-ai-answer__words :deep(blockquote) {
+  padding-left: var(--ds-spacing-lg);
+  border-left: var(--ds-border-width-strong) solid var(--ds-border-default);
+  color: var(--ds-text-subtle);
+}
+
+/* A table reads in the smaller body, figures aligned, rows ruled. */
+.ds-tolbi-ai-answer__words :deep(table) {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--ds-font-body-sm);
+}
+
+.ds-tolbi-ai-answer__words :deep(:is(th, td)) {
+  padding: var(--ds-spacing-sm) var(--ds-spacing-md);
+  border-bottom: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  text-align: left;
+  vertical-align: top;
+}
+
+.ds-tolbi-ai-answer__words :deep(th) {
+  font: var(--ds-font-body-sm-emphasis);
+  color: var(--ds-text-strong);
+}
+
+.ds-tolbi-ai-answer__words :deep(td) {
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-tolbi-ai-answer__words :deep(hr) {
+  height: 0;
+  border: 0;
+  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+}
+
+.ds-tolbi-ai-answer__words :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--ds-radius-surface-sm);
 }
 
 /*
