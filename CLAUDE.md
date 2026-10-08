@@ -749,6 +749,8 @@ Before working on any component, read:
   presentational, dismissed on press) **under** the buttons (the clip would cut one above) and **ending
   at their right** — centred, « Fermer » lost 7.7px to the panel's edge — so `Tooltip` gains
   **`top-left` / `top-right`**, mirrors of the bottom pair.
+  **Amended again**: the head says **no name** — the bar's entry above already says « Tolbi AI »; `title`
+  stays the region's `aria-label`, the head is `ALPHA` + the actions (still 61px).
 - **ADR-0063**: the awakening is the exception — it departs from ADR-0002 (3.2s, a choreography, a
   decoration) and from the charter (a glow), **accepted by the owner for this one moment**: the
   panel's first opening. `TolbiAiSpark` `state="awakening"`: **transcribed from Figma's Motion data,

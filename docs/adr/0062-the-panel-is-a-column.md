@@ -54,6 +54,14 @@ bottom row has three), so it gains **`top-left`** and **`top-right`**, the mirro
 `bottom-right`: 12px in from the edge. Measured docked and expanded, in both modes: no tooltip cut, the
 arrow's tip on the button's centre to 0.01px. Figma's local set has no `Tooltip` component to follow.
 
+**Amended again (8 Oct.):** the head says no name. Removed at the owner's request — it added little, and
+the head is quieter without it: the bar's entry above the panel already says « Tolbi AI », and carries the
+current item's mark while the panel is open. `title` stays the region's accessible name (`aria-label` on
+the `<aside>`), so a screen reader still meets « Tolbi AI ». The head is the `ALPHA` badge and the four
+actions, which keep its end with or without the badge; its height does not change — 61px, the actions
+were the tallest thing in it. In Figma the name was already a hidden layer of `TolbiAI/En-tête`; it is
+deleted. That component shows the sign at 24px beside `ALPHA`, which the code has never drawn.
+
 ### The pieces
 
 All of them exist only inside the panel, so they are titled under it (ADR-0007):
@@ -162,3 +170,5 @@ assistant at all.
   `surface` or `neutral`; the composer's « Arrêter » is a pill.
 - **Narrow screens.** 400px beside the page assumes a desktop; there is no breakpoint in the system
   (ADR-0020) and no decision for a phone.
+- **The sign in the head.** Figma's `TolbiAI/En-tête` shows the sign at 24px beside `ALPHA`, where the
+  name used to be; the code shows the badge alone.
