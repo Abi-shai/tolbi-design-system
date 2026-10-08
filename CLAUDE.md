@@ -745,6 +745,10 @@ Before working on any component, read:
   takes the thread's arrival — it arrives under its own light. **Amended**: the focus goes back to the
   field only when the control that held it is **gone from the document** — re-homing whenever it landed
   on the body made every click away (the answer, the page, the map) put it back: a focus held hostage.
+  **Amended**: the head's four actions take **tooltips** (ADR-0066's rule: 400ms, hover or focus,
+  presentational, dismissed on press) **under** the buttons (the clip would cut one above) and **ending
+  at their right** — centred, « Fermer » lost 7.7px to the panel's edge — so `Tooltip` gains
+  **`top-left` / `top-right`**, mirrors of the bottom pair.
 - **ADR-0063**: the awakening is the exception — it departs from ADR-0002 (3.2s, a choreography, a
   decoration) and from the charter (a glow), **accepted by the owner for this one moment**: the
   panel's first opening. `TolbiAiSpark` `state="awakening"`: **transcribed from Figma's Motion data,

@@ -43,6 +43,17 @@ close — `IconButton`s, ClickUp's and Notion's order. The handoff names the sig
 shows the name alone. The sign opens the welcome instead: **64px** in the docked panel, **96px** once
 expanded — Figma's « accueil agrandi », the reason 96 joined the ladder (ADR-0056).
 
+**Amended (8 Oct.):** the four actions say what they do in a `Tooltip` — the answer's rule (ADR-0066):
+after 400ms on hover or focus, through `SurfaceTransition`, presentational, since each button's name
+already says it. Pressing an action dismisses its tooltip, and closing the panel takes it along. The
+tooltips sit **under** the buttons, as the bar's do: the head is the panel's top edge, and the panel's
+clip (ADR-0064) would cut one above it. They end **at the button's right**, all four, because the
+panel's edge is close on that side — centred, « Fermer » lost 7.7px to it, the answer's « centred, the
+panel's edge cut the first one » mirrored. `Tooltip` had no arrow for that (`top-center` only, where the
+bottom row has three), so it gains **`top-left`** and **`top-right`**, the mirrors of `bottom-left` and
+`bottom-right`: 12px in from the edge. Measured docked and expanded, in both modes: no tooltip cut, the
+arrow's tip on the button's centre to 0.01px. Figma's local set has no `Tooltip` component to follow.
+
 ### The pieces
 
 All of them exist only inside the panel, so they are titled under it (ADR-0007):
