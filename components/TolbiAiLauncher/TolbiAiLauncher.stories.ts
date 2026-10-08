@@ -16,7 +16,8 @@ const meta: Meta<typeof TolbiAiLauncher> = {
           'au-dessus de la page (Figma `2308:2429`, ADR-0070) — plus dans la barre, qui parle de l’application. ' +
           'Il ouvre le panneau ancré et s’efface tant que celui-ci est ouvert ; la fermeture du panneau le ' +
           'ramène, le focus avec. ⌘J (Ctrl+J ailleurs) fait comme le clic. Une infobulle dit ce qu’il fait ' +
-          'après 400 ms.',
+          'après 400 ms, et le signe fait un tour quand le pointeur arrive — le tour de l’éveil, seul ' +
+          '(ADR-0071).',
       },
     },
   },
@@ -25,7 +26,7 @@ const meta: Meta<typeof TolbiAiLauncher> = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Au repos, sur une page : survolez-le pour l’infobulle, tabulez dessus pour l’anneau. */
+/** Au repos, sur une page : survolez-le pour le tour et l’infobulle, tabulez dessus pour l’anneau. */
 export const Default: Story = {
   name: 'Sur la page',
   render: () => ({

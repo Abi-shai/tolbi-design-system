@@ -9,7 +9,8 @@ import { Tooltip } from '../Tooltip'
  * of the screen, over the page (Figma `2308:2429`, ADR-0070) — not in the bar,
  * which is about the app. It opens the docked panel (ADR-0062) and gives way
  * while the panel is open, whose own close brings it back. ⌘J (Ctrl+J
- * elsewhere) does what a click does, from anywhere on the page.
+ * elsewhere) does what a click does, from anywhere on the page. When the
+ * pointer arrives, the sign turns once to meet it (ADR-0071).
  *
  * Put it once in the page, beside the panel; `v-model:open` is the panel's.
  *
@@ -40,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 const open = defineModel<boolean>('open', { default: false })
 
 const button = ref<HTMLButtonElement>()
+const spark = ref<InstanceType<typeof TolbiAiSpark>>()
 
 /* ── The shortcut ─────────────────────────────────────────────────────── */
 const apple = ref(false)
@@ -67,12 +69,18 @@ onBeforeUnmount(() => {
   leaves the focus on something about to be hidden. It comes back here, to the
   control that opens it again, once the launcher is back on the page.
 */
+let handingBack = false
+
 watch(open, (now, was) => {
   if (now || !was) return
   const panel = props.controls ? document.getElementById(props.controls) : null
   const active = document.activeElement
   if (!active || active === document.body || panel?.contains(active)) {
-    void nextTick(() => button.value?.focus({ preventScroll: true }))
+    void nextTick(() => {
+      handingBack = true
+      button.value?.focus({ preventScroll: true })
+      handingBack = false
+    })
   }
 })
 
@@ -95,6 +103,23 @@ function toggle() {
   tipAway()
   open.value = !open.value
 }
+
+/*
+  The sign turns to meet the pointer — or the keyboard's focus, hover's other
+  input (ADR-0044) — with the awakening's turn, alone: one turn, nothing
+  dimmed, from rest to rest (ADR-0071). The sign keeps the count: an approach
+  during a turn does not restart it. Not when the focus is handed back as the
+  panel closes: the disc is arriving then, and one movement is enough.
+*/
+function onEnter() {
+  tipSoon()
+  spark.value?.turn()
+}
+
+function onFocus() {
+  tipSoon()
+  if (!handingBack && button.value?.matches(':focus-visible')) spark.value?.turn()
+}
 </script>
 
 <template>
@@ -109,12 +134,12 @@ function toggle() {
         :aria-controls="controls"
         :aria-keyshortcuts="shortcut ? ariaKeys : undefined"
         @click="toggle"
-        @pointerenter="tipSoon"
+        @pointerenter="onEnter"
         @pointerleave="tipAway"
-        @focus="tipSoon"
+        @focus="onFocus"
         @blur="tipAway"
       >
-        <TolbiAiSpark :size="32" :aria-label="null" />
+        <TolbiAiSpark ref="spark" :size="32" :aria-label="null" />
       </button>
       <SurfaceTransition>
         <Tooltip
