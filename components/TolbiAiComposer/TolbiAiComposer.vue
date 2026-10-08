@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
+import { useDelayedTooltip } from '../../composables/useDelayedTooltip'
 import { Icon, type IconName } from '../Icon'
 import { IconButton } from '../IconButton'
 import { Button } from '../Button'
@@ -156,7 +157,8 @@ const emit = defineEmits<{
   'send-voice': [recording: VoiceRecording]
   /**
    * The recording was deleted. Show « Vocal supprimé » with « Annuler » — a
-   * `Toast` with an action stays 8s — and call `undoDelete()` on « Annuler ».
+   * `Toast` with an action — and call `undoDelete()` on « Annuler ». The
+   * recording waits for as long as the toast offers it.
    */
   'delete-voice': []
 }>()
@@ -251,14 +253,15 @@ onMounted(() => (supported.value = voiceSupported()))
 const micShown = computed(() => props.voice && supported.value)
 
 /*
-  A deleted recording is kept for as long as its « Annuler » can be pressed —
-  `Toast` keeps a toast with an action for 8s — and then let go. Restored, it
-  comes back paused: it can be heard and sent, not extended, because the
-  microphone was released when it was deleted.
+  A deleted recording is kept until something takes its place — a new
+  recording, or the composer leaving the page — so its « Annuler » works for as
+  long as the toast offers it. The toast owns that time, and it pauses while
+  the pointer or the focus is on it (ADR-0052): an 8s clock of the composer's
+  own let the button outlive the recording. Restored, it comes back paused: it
+  can be heard and sent, not extended, because the microphone was released
+  when it was deleted.
 */
-const UNDO_MS = 8000
 let deleted: VoiceRecording | null = null
-let deletedTimer: ReturnType<typeof setTimeout> | undefined
 const held = ref<VoiceRecording | null>(null)
 
 const recordingNow = computed(() => recorder.status.value === 'recording')
@@ -333,14 +336,11 @@ async function deleteVoice() {
   const recording = await finish()
   show('text')
   if (!recording) return
-  forgetDeleted()
   deleted = recording
-  deletedTimer = setTimeout(forgetDeleted, UNDO_MS)
   emit('delete-voice')
 }
 
 function forgetDeleted() {
-  clearTimeout(deletedTimer)
   deleted = null
 }
 
@@ -544,19 +544,7 @@ function onLineKeydown(event: KeyboardEvent) {
 }
 
 /* ── The microphone's tooltip, after a beat ───────────────────────────── */
-const TIP_DELAY = 400
-const tip = ref(false)
-let tipTimer: ReturnType<typeof setTimeout> | undefined
-
-function tipSoon() {
-  clearTimeout(tipTimer)
-  tipTimer = setTimeout(() => (tip.value = true), TIP_DELAY)
-}
-
-function tipAway() {
-  clearTimeout(tipTimer)
-  tip.value = false
-}
+const { shown: tip, soon: tipSoon, away: tipAway } = useDelayedTooltip()
 
 watch([micShown, pending], ([shown, busy]) => (!shown || busy) && tipAway())
 
@@ -660,7 +648,7 @@ function messageAct() {
                   class="ds-tolbi-ai-composer__mic"
                   @pointerenter="!pending && tipSoon()"
                   @pointerleave="tipAway"
-                  @focusin="tipSoon"
+                  @focusin="tipSoon()"
                   @focusout="tipAway"
                 >
                   <IconButton
