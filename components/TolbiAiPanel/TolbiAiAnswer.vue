@@ -2,7 +2,6 @@
 import { IconButton } from '../IconButton'
 import type { IconName } from '../Icon'
 import TolbiAiSource from './TolbiAiSource.vue'
-import TolbiAiSuggestion from './TolbiAiSuggestion.vue'
 
 export interface TolbiAiSourceItem {
   label: string
@@ -11,24 +10,18 @@ export interface TolbiAiSourceItem {
   href?: string
 }
 
-export interface TolbiAiFollowUp {
-  label: string
-  icon?: IconName
-}
-
 /** How the answer was judged, if at all. */
 export type TolbiAiFeedback = 'up' | 'down' | null
 
 /**
- * Tolbi AI's answer: the words, the dated sources they stand on, what can be
- * done with them, and where to go next (ADR-0062). The words are the product's
- * to render — markdown, in the default slot — and take the answer's type here.
+ * Tolbi AI's answer: the words, the dated sources they stand on, and what can
+ * be done with them (ADR-0062). The words are the product's to render —
+ * markdown, in the default slot — and take the answer's type here. It does not
+ * guess what the user asks next: the next question is theirs, in the composer.
  */
 interface Props {
   sources?: TolbiAiSourceItem[]
-  followUps?: TolbiAiFollowUp[]
   sourcesLabel?: string
-  followUpsLabel?: string
   copyLabel?: string
   upLabel?: string
   downLabel?: string
@@ -37,9 +30,7 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
   sources: () => [],
-  followUps: () => [],
   sourcesLabel: 'Sources',
-  followUpsLabel: 'Pour continuer',
   copyLabel: 'Copier',
   upLabel: 'Réponse utile',
   downLabel: 'Réponse non utile',
@@ -49,7 +40,6 @@ withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   copy: []
   regenerate: []
-  'follow-up': [followUp: TolbiAiFollowUp]
 }>()
 
 /* A second press takes the judgement back. */
@@ -86,17 +76,6 @@ const judge = (value: 'up' | 'down') => (feedback.value = feedback.value === val
       />
       <IconButton icon="refresh-cw" :ariaLabel="regenerateLabel" @click="emit('regenerate')" />
     </div>
-
-    <section v-if="followUps.length" class="ds-tolbi-ai-answer__group ds-tolbi-ai-answer__group--follow">
-      <p class="ds-tolbi-ai-answer__heading">{{ followUpsLabel }}</p>
-      <TolbiAiSuggestion
-        v-for="followUp in followUps"
-        :key="followUp.label"
-        :label="followUp.label"
-        :icon="followUp.icon"
-        @click="emit('follow-up', followUp)"
-      />
-    </section>
   </div>
 </template>
 
@@ -153,10 +132,6 @@ const judge = (value: 'up' | 'down') => (feedback.value = feedback.value === val
   display: flex;
   flex-direction: column;
   gap: var(--ds-spacing-sm);
-}
-
-.ds-tolbi-ai-answer__group--follow {
-  gap: var(--ds-spacing-md);
 }
 
 .ds-tolbi-ai-answer__heading {

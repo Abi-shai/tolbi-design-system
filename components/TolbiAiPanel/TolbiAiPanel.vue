@@ -76,8 +76,8 @@ const content = ref<HTMLElement>()
 /* ── The thread follows what arrives ──────────────────────────────────── */
 /*
   An answer arrives whole — the Yield API does not stream it — so following it
-  to the bottom would land the reader on « Pour continuer » with the answer's
-  first lines scrolled away above. What arrives is brought into view instead:
+  to the bottom would land the reader on its sources and actions with the
+  answer's first lines scrolled away above. What arrives is brought into view instead:
   all of it when it fits, and when it does not, **the question it answers at
   the top** — the question, then the answer's first lines, which is where
   reading starts.
@@ -208,7 +208,7 @@ watch(open, (now) => {
 })
 
 /*
-  A control that asks — a suggestion, a follow-up — is often gone once it has:
+  A control that asks — a suggestion — is often gone once it has:
   the welcome makes way for the thread. When the focus falls out of the panel
   with the element that held it, it lands in the field, where the next
   question goes, rather than on the page.

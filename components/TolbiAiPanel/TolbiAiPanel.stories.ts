@@ -12,7 +12,7 @@ import { TolbiAiNavButton } from '../TolbiAiNavButton'
 import { HorizontalNavigation } from '../HorizontalNavigation'
 import { SideNavigation, SideNavItem } from '../SideNavigation'
 import { WorkspaceSelector } from '../WorkspaceSelector'
-import type { TolbiAiFollowUp, TolbiAiSourceItem } from './TolbiAiAnswer.vue'
+import type { TolbiAiSourceItem } from './TolbiAiAnswer.vue'
 import type { TolbiAiVoiceRecording } from '../TolbiAiComposer'
 
 const SUGGESTIONS = [
@@ -36,11 +36,6 @@ const SOURCES: TolbiAiSourceItem[] = [
   { icon: 'satellite', label: 'Rendement estimé', date: '5 nov. 2025' },
   { icon: 'leaf', label: 'Phénologie', date: '5 nov. 2025' },
   { icon: 'land-plot', label: '5 parcelles déclarées' },
-]
-
-const FOLLOW_UPS: TolbiAiFollowUp[] = [
-  { icon: 'map-pin', label: 'Montrer ces parcelles sur la carte' },
-  { icon: 'calendar-range', label: 'Comparer avec la campagne 2024' },
 ]
 
 const meta: Meta<typeof TolbiAiPanel> = {
@@ -93,14 +88,14 @@ export const Conversation: Story = {
   name: 'Conversation',
   render: () => ({
     components: { TolbiAiPanel, TolbiAiThread, TolbiAiQuestion, TolbiAiAnswer, TolbiAiComposer },
-    setup: () => ({ open: ref(true), question: ref(''), feedback: ref(null), ANSWER, SOURCES, FOLLOW_UPS, STAGE }),
+    setup: () => ({ open: ref(true), question: ref(''), feedback: ref(null), ANSWER, SOURCES, STAGE }),
     template: `
       <div :style="STAGE">
         <div style="flex:1; min-width:0;" />
         <TolbiAiPanel v-model:open="open">
           <TolbiAiThread>
             <TolbiAiQuestion key="q" text="Expliquer les résultats de ce projet" />
-            <TolbiAiAnswer key="a" v-model:feedback="feedback" :sources="SOURCES" :follow-ups="FOLLOW_UPS">
+            <TolbiAiAnswer key="a" v-model:feedback="feedback" :sources="SOURCES">
               <div v-html="ANSWER" />
             </TolbiAiAnswer>
           </TolbiAiThread>
@@ -174,7 +169,7 @@ const inThePage = ({ open: startOpen = false, expanded: startExpanded = false } 
     }
     return {
       section, navCollapsed, open, expanded, awoken, question, status, items, panel, ask, askVoice, stop, restart,
-      WORKSPACES, SUGGESTIONS, ANSWER, SOURCES, FOLLOW_UPS,
+      WORKSPACES, SUGGESTIONS, ANSWER, SOURCES,
     }
   },
   template: `
@@ -233,7 +228,7 @@ const inThePage = ({ open: startOpen = false, expanded: startExpanded = false } 
                   language="Français"
                   transcript="Explique-moi les résultats de ce projet."
                 />
-                <TolbiAiAnswer v-else :sources="SOURCES" :follow-ups="FOLLOW_UPS" @follow-up="(f) => ask(f.label)">
+                <TolbiAiAnswer v-else :sources="SOURCES">
                   <div v-html="ANSWER" />
                 </TolbiAiAnswer>
               </template>

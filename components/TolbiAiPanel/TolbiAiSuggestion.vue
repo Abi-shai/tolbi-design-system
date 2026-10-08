@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { Icon, type IconName } from '../Icon'
-
 /**
  * Something to ask, ready to send: one per line, left-aligned, and it wraps —
  * a long suggestion is a long question, not an overflow (ADR-0062). The welcome
- * lists four; under an answer, « Pour continuer » lists what follows from it,
- * each with the glyph of where it leads.
+ * lists four. Nothing is suggested under an answer any more, and the glyph of
+ * where a suggestion led went with it.
  */
 interface Props {
   label: string
-  icon?: IconName
 }
 
 defineProps<Props>()
@@ -18,8 +15,7 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 
 <template>
   <button type="button" class="ds-tolbi-ai-suggestion" @click="emit('click', $event)">
-    <Icon v-if="icon" :name="icon" :size="20" class="ds-tolbi-ai-suggestion__icon" />
-    <span>{{ label }}</span>
+    {{ label }}
   </button>
 </template>
 
@@ -29,9 +25,7 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   The 10s are control padding, off the spacing ramp (ADR-0013).
 */
 .ds-tolbi-ai-suggestion {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  display: block;
   width: 100%;
   box-sizing: border-box;
   padding: 10px var(--ds-spacing-lg);
@@ -61,9 +55,5 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   outline: none;
   border-color: var(--ds-border-default);
   box-shadow: var(--ds-focus-ring-gray);
-}
-
-.ds-tolbi-ai-suggestion__icon {
-  flex-shrink: 0;
 }
 </style>

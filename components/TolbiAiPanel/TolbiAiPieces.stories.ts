@@ -28,8 +28,6 @@ export const Suggestion: Story = {
     template: `
       <TolbiAiSuggestion label="Expliquer les résultats de ce projet" />
       <TolbiAiSuggestion label="Quelles stratégies recommandez-vous pour améliorer les rendements ?" />
-      <TolbiAiSuggestion icon="map-pin" label="Montrer ces parcelles sur la carte" />
-      <TolbiAiSuggestion icon="calendar-range" label="Comparer avec la campagne 2024" />
     `,
   }),
 }
@@ -71,7 +69,6 @@ export const Answer: Story = {
       <TolbiAiAnswer
         v-model:feedback="feedback"
         :sources="[{ icon: 'satellite', label: 'Rendement estimé', date: '5 nov. 2025' }, { icon: 'leaf', label: 'Phénologie', date: '5 nov. 2025' }]"
-        :follow-ups="[{ icon: 'map-pin', label: 'Montrer ces parcelles sur la carte' }]"
       >
         <p>Le projet atteint un rendement estimé de <strong>1,9 t/ha</strong> sur 152 ha.</p>
         <ul><li><strong>+15 %</strong> par rapport à la campagne précédente</li><li>De <strong>1,5</strong> à <strong>2,1 t/ha</strong> selon les parcelles</li></ul>
