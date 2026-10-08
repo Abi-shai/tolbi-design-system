@@ -35,8 +35,12 @@ import { TOLBI_AI_PANEL } from './context'
 interface Props {
   /** For the bar's entry to point at — `aria-controls`. */
   id?: string
+  /**
+   * The panel's name, for assistive technology — the region's label. Not
+   * shown: the bar's entry above the panel already says it (ADR-0062).
+   */
   title?: string
-  /** Beside the name — « ALPHA ». `null` hides it. */
+  /** At the head's start — « ALPHA ». `null` hides it. */
   badge?: string | null
   historyLabel?: string
   newConversationLabel?: string
@@ -280,10 +284,7 @@ defineExpose({ scrollToEnd })
   >
     <div ref="surface" class="ds-tolbi-ai-panel__surface" @focusout="onFocusOut">
       <header class="ds-tolbi-ai-panel__head">
-        <div class="ds-tolbi-ai-panel__identity">
-          <span class="ds-tolbi-ai-panel__title">{{ title }}</span>
-          <Badge v-if="badge" :label="badge" tone="success" size="sm" />
-        </div>
+        <Badge v-if="badge" :label="badge" tone="success" size="sm" />
         <div class="ds-tolbi-ai-panel__actions">
           <span
             v-for="action in actions"
@@ -402,29 +403,18 @@ defineExpose({ scrollToEnd })
 .ds-tolbi-ai-panel__head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--ds-spacing-md);
   padding: var(--ds-spacing-lg) var(--ds-spacing-md) var(--ds-spacing-lg) var(--ds-spacing-xl);
   border-bottom: var(--ds-border-width-default) solid var(--ds-border-subtle);
 }
 
-.ds-tolbi-ai-panel__identity {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-md);
-  min-width: 0;
-}
-
-.ds-tolbi-ai-panel__title {
-  font: var(--ds-font-label-lg-strong);
-  color: var(--ds-text-strong);
-  white-space: nowrap;
-}
-
+/* The head says no name (ADR-0062): the actions keep its end, with or
+   without the badge before them. */
 .ds-tolbi-ai-panel__actions {
   display: flex;
   align-items: center;
   flex: none;
+  margin-left: auto;
 }
 
 .ds-tolbi-ai-panel__action {

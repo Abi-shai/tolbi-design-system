@@ -43,8 +43,8 @@ const meta: Meta<typeof TolbiAiPanel> = {
         component:
           'Tolbi AI ancré dans la page : une colonne de 400 px, la hauteur de la surface, que la page ' +
           'laisse passer au lieu de la recouvrir. Elle ne flotte pas : s\'ouvrir est une largeur qui ' +
-          'voyage (ADR-0037). En-tête (le nom, ALPHA, historique, nouvelle conversation, agrandir, ' +
-          'fermer), le fil qui défile et suit son dernier message, la saisie en pied (ADR-0062).\n\n' +
+          'voyage (ADR-0037). En-tête (ALPHA, historique, nouvelle conversation, agrandir, fermer — ' +
+          'sans le nom, que l\'entrée de la barre dit déjà), le fil qui défile et suit son dernier message, la saisie en pied (ADR-0062).\n\n' +
           '« Agrandir » lui donne la surface de la page — barre et navigation intactes — et une colonne ' +
           'de lecture de 720 px. La page reste dessous, telle quelle : « Réduire » la rend comme on ' +
           'l\'a laissée (ADR-0064). Elle doit être son propre contexte d\'empilement ' +
