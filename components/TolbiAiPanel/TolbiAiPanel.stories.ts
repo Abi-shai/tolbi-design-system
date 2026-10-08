@@ -8,7 +8,7 @@ import TolbiAiAnswer from './TolbiAiAnswer.vue'
 import { TolbiAiComposer } from '../TolbiAiComposer'
 import { TolbiAiThinkingLine } from '../TolbiAiThinkingLine'
 import { TolbiAiVoiceNote } from '../TolbiAiVoiceNote'
-import { TolbiAiNavButton } from '../TolbiAiNavButton'
+import { TolbiAiLauncher } from '../TolbiAiLauncher'
 import { HorizontalNavigation } from '../HorizontalNavigation'
 import { SideNavigation, SideNavItem } from '../SideNavigation'
 import { WorkspaceSelector } from '../WorkspaceSelector'
@@ -330,7 +330,7 @@ const WORKSPACES = [{ id: 'kaolack', name: 'Coopérative de Kaolack' }]
   its own stacking context, as the panel asks.
 */
 const inThePage = ({ open: startOpen = false, expanded: startExpanded = false, empty = false, slowList = false } = {}) => ({
-  components: { SideNavigation, SideNavItem, WorkspaceSelector, HorizontalNavigation, TolbiAiNavButton, ...PANEL_PIECES },
+  components: { SideNavigation, SideNavItem, WorkspaceSelector, HorizontalNavigation, TolbiAiLauncher, ...PANEL_PIECES },
   setup() {
     const section = ref('projets')
     const navCollapsed = ref(false)
@@ -362,11 +362,7 @@ const inThePage = ({ open: startOpen = false, expanded: startExpanded = false, e
         <SideNavItem value="parametres" icon="settings" label="Paramètres" />
       </SideNavigation>
       <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:var(--ds-spacing-lg); padding:var(--ds-spacing-lg) var(--ds-spacing-lg) 0 var(--ds-spacing-md);">
-        <HorizontalNavigation module="Yield" :breadcrumbs="[{ label: 'Projets' }, { label: 'Rendement Arachide Nord' }]" user-initials="AY">
-          <template #assistant>
-            <TolbiAiNavButton v-model:open="open" controls="tolbi-ai-panel" />
-          </template>
-        </HorizontalNavigation>
+        <HorizontalNavigation module="Yield" :breadcrumbs="[{ label: 'Projets' }, { label: 'Rendement Arachide Nord' }]" user-initials="AY" />
         <div style="flex:1; min-height:0; display:flex;">
           <main style="flex:1; min-width:0; isolation:isolate; display:flex; flex-direction:column;">
             <div style="flex:1; display:flex; flex-direction:column; gap:var(--ds-spacing-xl); border-radius:var(--ds-radius-surface) var(--ds-radius-surface) 0 0; background:var(--ds-bg-default); padding:var(--ds-spacing-2xl);">
@@ -396,6 +392,7 @@ const inThePage = ({ open: startOpen = false, expanded: startExpanded = false, e
               <TolbiAiComposer v-model="question" :status="status" @send="ask" @send-voice="askVoice" @stop="stop" />
             </template>
           </TolbiAiPanel>
+          <TolbiAiLauncher v-model:open="open" controls="tolbi-ai-panel" />
         </div>
       </div>
     </div>
@@ -403,8 +400,9 @@ const inThePage = ({ open: startOpen = false, expanded: startExpanded = false, e
 })
 
 /**
- * Le parcours, dans la page : l'entrée de la barre ouvre le panneau (⌘J aussi) —
- * la première fois, le signe s'éveille —
+ * Le parcours, dans la page : le bouton flottant en bas à droite ouvre le
+ * panneau (⌘J aussi) et s'efface tant qu'il est ouvert (ADR-0070) — la première
+ * fois, le signe s'éveille —
  * la page se resserre ; une suggestion ou une question part dans le fil, la ligne
  * d'attente la suit, la réponse prend sa place. Le titre en tête ouvre les autres
  * conversations du projet (ADR-0069). « Agrandir » donne au panneau la surface de

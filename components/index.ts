@@ -59,7 +59,7 @@ export {
   TolbiAiSuggestion,
 } from './TolbiAiPanel'
 export type { TolbiAiFeedback, TolbiAiConversation, TolbiAiHistoryLabels } from './TolbiAiPanel'
-export { TolbiAiNavButton } from './TolbiAiNavButton'
+export { TolbiAiLauncher } from './TolbiAiLauncher'
 
 export { ModulesList } from './ModulesList'
 export type { ModulesListItem } from './ModulesList'

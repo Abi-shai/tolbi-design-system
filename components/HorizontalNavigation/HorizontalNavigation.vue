@@ -458,14 +458,6 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
       -->
       <div class="ds-hnav__actions">
 
-        <!--
-          The page's assistant — `TolbiAiNavButton` (ADR-0062). The first of the
-          controls: it is about this page, where the others are about the app,
-          and it stands above where its panel opens. The bar decides the place,
-          the product decides whether the page has one.
-        -->
-        <slot name="assistant" />
-
         <!-- The real Button, not a re-implementation (ADR-0001). `lg-compact`
              is the 36px control the bar needs; `lg` at 44px does not fit. -->
         <Button
