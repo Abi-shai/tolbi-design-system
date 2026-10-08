@@ -29,8 +29,12 @@ product's frame at 1512 × 920: 50 × 50, 52px from the right, 40px from the bot
 On white no tint can say hover (ADR-0044), so hover steps the contour up to `border-default`, as
 `IconButton`'s white disc does; the focus ring joins the disc's own shadow (`focus-ring-gray-shadow-xs`)
 rather than replacing it, at `instant` (ADR-0022). Its name is « Tolbi AI » — the disc shows only the sign —
-and after 400ms on hover or focus a tooltip says what it does, « Interroger Tolbi AI sur ce projet · ⌘J »,
-to its left: below and to the right is the screen's edge.
+and after 400ms on hover or focus a tooltip says what it does, « Interroger Tolbi xAI », to its left: below
+and to the right is the screen's edge.
+
+**Amended (8 Oct.)**: the tooltip first read « Interroger Tolbi AI sur ce projet · ⌘J »; the owner cut it to
+« Interroger Tolbi xAI » and nothing else. The shortcut is no longer written on the screen — it still works,
+and `aria-keyshortcuts` still declares it.
 
 ### It gives way to the panel
 
@@ -61,5 +65,7 @@ first consumer.
 - **Whatever else lives in that corner** — a map's attribution, toasts placed bottom right — meets the
   disc there; the page decides, the launcher does not move for them.
 - **In dark** the sign's leaves stay 2.44:1 on `bg-default` (ADR-0056).
+- **The name**: the tooltip says « Tolbi xAI », the owner's words; the button's name, the panel's and the
+  waiting line's still say « Tolbi AI ». One of the two is the product's name.
 - **Figma**: `TolbiAI/Lanceur` is the frame's button made a component; `Nav/TolbiAI` leaves the retained
   components.

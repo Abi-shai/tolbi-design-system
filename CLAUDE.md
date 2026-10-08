@@ -844,7 +844,8 @@ Before working on any component, read:
   corner, `spacing-5xl` in from both of the page's edges (the page's right edge being the column's 12px
   margin, ADR-0047): 52 / 40 from the screen where Figma says 54 / 38. Hover steps the **contour** to
   `border-default` (no tint reads on white, ADR-0044); focus = `focus-ring-gray-shadow-xs` (ring + its own
-  shadow), instant. Tooltip after 400ms **to its left**: « Interroger Tolbi AI sur ce projet · ⌘J ». It
+  shadow), instant. Tooltip after 400ms **to its left**: « Interroger Tolbi xAI », **nothing else** —
+  the owner's words; ⌘J still works and is declared (`aria-keyshortcuts`), not written. It
   **gives way** while the panel is open (`SurfaceTransition`, exit) and returns **one `enter` late** — the
   panel closes over `enter`, and an arrival waits for its place (ADR-0049); the focus comes back to it; ⌘J
   moves to it. `TolbiAiNavButton` and `HorizontalNavigation`'s `#assistant` are **deleted**; `Button`'s
