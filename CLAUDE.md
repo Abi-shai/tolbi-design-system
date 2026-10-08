@@ -741,7 +741,8 @@ Before working on any component, read:
   `followUps`, the `follow-up` event, `TolbiAiFollowUp` and `TolbiAiSuggestion.icon` are gone. Then the
   **sources** — they named the product's own data, which is noise: `sources`, `TolbiAiSource` and
   `TolbiAiSourceItem` are deleted, the answer is its words and its actions, and the composer's
-  disclaimer drops « Veuillez vérifier les sources citées ».
+  disclaimer drops « Veuillez vérifier les sources citées ». **Amended by ADR-0068**: an answer no longer
+  takes the thread's arrival — it arrives under its own light.
 - **ADR-0063**: the awakening is the exception — it departs from ADR-0002 (3.2s, a choreography, a
   decoration) and from the charter (a glow), **accepted by the owner for this one moment**: the
   panel's first opening. `TolbiAiSpark` `state="awakening"`: **transcribed from Figma's Motion data,
@@ -796,6 +797,20 @@ Before working on any component, read:
   to the arriver's — a cut threw the microphone 53px; filmed ×10: < 1px a frame, no reversal. A lock reads
   the **seen** size before cancelling a running glide (cancelled, it reports the destination — 6px jump),
   box included. `IconButton` now transitions its **ink with its ground**.
+- **ADR-0068**: the answer arrives **under a passing light** — the second exception after ADR-0063,
+  chosen by the owner from three filmed tracks (Figma section 13, `2459:14722`). Others reveal because
+  they **stream** (Gemini's fading fragments, Sana's pale last words); ours arrives **whole**, so it can be
+  staged once. A line in the **sign's inks** (`accent/400` → `brand/500`, the spark's primitives, glowing —
+  outside the charter, accepted) travels down the answer, as a satellite passes over a field. **What moves
+  is the sight, not the words**: the text is laid out at full opacity from frame 1 (the accessibility tree
+  holds it all with nothing seen); a `mask-image` edge — a registered `@property` `<length>`, WAAPI — goes
+  0 → height + a **three-line fall**, and the line rides **half a fall behind it**, inside the mask. Filmed
+  ×0.1: line ≤ 1.01px from its place, no reversal, no rise. **Its values are its own**: **1.1s** (past
+  `ambient`; shorter reads as a flash) on `cubic-bezier(0.45, 0, 0.25, 1)` — in-out but later to start —
+  private values read off the cascade. **Once, on arrival**: `TolbiAiThread` provides `settled`; an answer
+  mounted after it passes, a reopened conversation does not, nothing outside a thread; the thread's 8px
+  arrival **leaves answers out** (one movement at a time). Reduced motion: **nothing passes** — WAAPI is
+  outside `motion.css`'s reach, so the component asks itself.
 
 ## Architecture
 

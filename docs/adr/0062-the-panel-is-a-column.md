@@ -80,6 +80,10 @@ from `TolbiAI/Panneau`, the ten `TolbiAI/Saisie` states lose the sentence, and `
 **Amended by ADR-0066:** the actions under an answer step back — `IconButton xs`, a receding ink, 8px under
 the words, a tooltip per action, and a copy that confirms itself with a check.
 
+**Amended by ADR-0068:** an answer no longer takes the thread's arrival — it arrives under a light of its
+own, a line in the sign's inks passing down it, once. Questions, voice notes and the waiting line keep the
+8px and the fade; the thread now tells its children whether they arrived (`settled`).
+
 ### The thread follows what arrives — its top, not its bottom
 
 An answer arrives whole: the Yield API does not stream it. Following it to the bottom, as a chat
