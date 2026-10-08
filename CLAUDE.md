@@ -785,6 +785,13 @@ Before working on any component, read:
   stamps into a check through `MarkTransition` (via `IconButton`'s new glyph slot), the tooltip says
   « Réponse copiée », a status region announces it, 2s; the button keeps its name. The text (14/20) does
   not change. Figma section 11 (`2450:14477`), track B.
+- **ADR-0067**: the voice and the text **sit side by side** — amends ADR-0059's one action and ADR-0061's
+  microphone-in-send's-place: the owner chose Notion's arrangement (Figma section 12). The microphone
+  (`IconButton xs subtle`) then send (`xs primary`), **4px apart**, always — nothing moves as the user
+  types. Send is **disabled (grey) on an empty box** and turns green with the text; while an answer comes,
+  « Arrêter » takes send's place and the microphone is **disabled**. A written question **waits in the
+  field** while a note is recorded (it is the product's `v-model`; measured: back with the focus after
+  Escape). Without voice, send alone.
 
 ## Architecture
 

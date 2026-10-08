@@ -13,6 +13,9 @@ The product asks Tolbi AI through Nuxt UI's `UChatPrompt` and `UChatPromptSubmit
 composer for everything, voice included: a scope chip on top, a field that grows, and a single
 action on the right. This step ships its text half.
 
+**Amended by ADR-0067 (8 Oct.):** the right of the box now holds two controls — the microphone and send,
+side by side, always; send greyed until there is text, « Arrêter » in its place while an answer comes.
+
 ## Decisions
 
 ### One action, and it is decided, not chosen

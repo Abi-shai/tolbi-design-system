@@ -49,6 +49,9 @@ Perplexity, Copilot, Notion and Langdock draw the microphone as a grey glyph; th
 arriving with the text, or ChatGPT's voice mode, in black. One action still holds the right of the box
 (ADR-0059), and the green now arrives with send: the hierarchy rises when there is something to send.
 
+**Amended again by ADR-0067:** the microphone no longer holds send's place — the two sit side by side,
+always, and a question written waits in the field while a note is recorded.
+
 ### One line, and it holds the focus
 
 Recording, the box is one line: delete, the red dot and the timer, the live waveform (`tail`, in the
