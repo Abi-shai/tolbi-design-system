@@ -152,6 +152,10 @@ this page where the others are about the app, and it stands above where its pane
 than a prop, ADR-0053's shape: the bar decides the place, the product decides whether the page has an
 assistant at all.
 
+**Superseded by ADR-0070:** the entry is not in the bar. A floating disc at the bottom right of the screen,
+`TolbiAiLauncher`, opens the panel; `TolbiAiNavButton` and the `#assistant` slot are deleted. `Button`'s
+`#leading` and `selected` stay.
+
 ### Smaller additions
 
 - `Scrollbar` exposes its `viewport`, for a parent that has to move it, and exports `ScrollbarProps`:

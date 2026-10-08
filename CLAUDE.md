@@ -752,6 +752,8 @@ Before working on any component, read:
   **Amended again**: the head says **no name** — the bar's entry above already says « Tolbi AI »; `title`
   stays the region's `aria-label`, the head is `ALPHA` + the actions (still 61px).
   **Amended by ADR-0069**: the head names the **conversation** — its title is the switcher; the clock is gone.
+  **Superseded by ADR-0070** for the entry: no longer in the bar — `TolbiAiNavButton` and `#assistant` are
+  deleted; a floating `TolbiAiLauncher` opens the panel.
 - **ADR-0063**: the awakening is the exception — it departs from ADR-0002 (3.2s, a choreography, a
   decoration) and from the charter (a glow), **accepted by the owner for this one moment**: the
   panel's first opening. `TolbiAiSpark` `state="awakening"`: **transcribed from Figma's Motion data,
@@ -836,6 +838,17 @@ Before working on any component, read:
   body swaps through **`SwapTransition`** (key the thread by conversation), lands on the **last exchange**
   (ADR-0062's `follow`; measured 25px under the top), focus to the field; nothing replays. Filmed: head and
   composer still, skeleton and thread never share a frame. Delete/rename not in a menu (still open).
+- **ADR-0070**: Tolbi AI **floats in the corner** — the owner's frame (`2308:2429`): the entry is not in the
+  bar. `TolbiAiLauncher` is Figma's disc — the sign at 32, `spacing-md` around, a `border-subtlest`
+  hairline, **50px** declared, `bg-default` + `elevation-control` — **fixed** over the page's bottom-right
+  corner, `spacing-5xl` in from both of the page's edges (the page's right edge being the column's 12px
+  margin, ADR-0047): 52 / 40 from the screen where Figma says 54 / 38. Hover steps the **contour** to
+  `border-default` (no tint reads on white, ADR-0044); focus = `focus-ring-gray-shadow-xs` (ring + its own
+  shadow), instant. Tooltip after 400ms **to its left**: « Interroger Tolbi AI sur ce projet · ⌘J ». It
+  **gives way** while the panel is open (`SurfaceTransition`, exit) and returns **one `enter` late** — the
+  panel closes over `enter`, and an arrival waits for its place (ADR-0049); the focus comes back to it; ⌘J
+  moves to it. `TolbiAiNavButton` and `HorizontalNavigation`'s `#assistant` are **deleted**; `Button`'s
+  `#leading` / `selected` stay.
 
 ## Architecture
 
