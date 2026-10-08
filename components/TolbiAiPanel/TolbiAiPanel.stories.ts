@@ -12,6 +12,7 @@ import { TolbiAiNavButton } from '../TolbiAiNavButton'
 import { HorizontalNavigation } from '../HorizontalNavigation'
 import { SideNavigation, SideNavItem } from '../SideNavigation'
 import { WorkspaceSelector } from '../WorkspaceSelector'
+import { Button } from '../Button'
 import type { TolbiAiVoiceRecording } from '../TolbiAiComposer'
 
 const SUGGESTIONS = [
@@ -91,6 +92,48 @@ export const Conversation: Story = {
             <TolbiAiAnswer key="a" v-model:feedback="feedback">
               <div v-html="ANSWER" />
             </TolbiAiAnswer>
+          </TolbiAiThread>
+          <template #composer><TolbiAiComposer v-model="question" /></template>
+        </TolbiAiPanel>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * La réponse arrive (ADR-0068) : une ligne de lumière, aux deux encres de
+ * l'étincelle, descend la réponse et la laisse voir — comme le passage d'un
+ * satellite sur une parcelle. Une fois, à l'arrivée ; « Rejouer » relance la
+ * question. Une conversation rouverte ne rejoue rien.
+ */
+export const Arrival: Story = {
+  name: 'La réponse arrive',
+  render: () => ({
+    components: { TolbiAiPanel, TolbiAiThread, TolbiAiQuestion, TolbiAiAnswer, TolbiAiThinkingLine, TolbiAiComposer, Button },
+    setup() {
+      const run = ref(0)
+      const answered = ref(false)
+      const question = ref('')
+      let timer: ReturnType<typeof setTimeout> | undefined
+      const play = () => {
+        clearTimeout(timer)
+        answered.value = false
+        run.value++
+        timer = setTimeout(() => (answered.value = true), 1600)
+      }
+      play()
+      return { run, answered, question, play, ANSWER, STAGE }
+    },
+    template: `
+      <div :style="STAGE">
+        <div style="flex:1; min-width:0; padding:var(--ds-spacing-2xl);">
+          <Button label="Rejouer" variant="secondary-gray" size="sm" icon-leading="refresh-cw" @click="play" />
+        </div>
+        <TolbiAiPanel :open="true">
+          <TolbiAiThread :key="run">
+            <TolbiAiQuestion key="q" text="Expliquer les résultats de ce projet" />
+            <TolbiAiThinkingLine v-if="!answered" key="waiting" />
+            <TolbiAiAnswer v-else key="a"><div v-html="ANSWER" /></TolbiAiAnswer>
           </TolbiAiThread>
           <template #composer><TolbiAiComposer v-model="question" /></template>
         </TolbiAiPanel>

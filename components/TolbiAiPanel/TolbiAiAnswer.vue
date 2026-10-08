@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from 'vue'
+import { inject, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { Icon } from '../Icon'
 import { IconButton } from '../IconButton'
 import { MarkTransition } from '../MarkTransition'
 import { SurfaceTransition } from '../SurfaceTransition'
 import { Tooltip } from '../Tooltip'
+import { TOLBI_AI_THREAD } from './context'
 
 /** How the answer was judged, if at all. */
 export type TolbiAiFeedback = 'up' | 'down' | null
@@ -19,6 +20,10 @@ export type TolbiAiFeedback = 'up' | 'down' | null
  * The actions step back (ADR-0066): 32px with a 16px glyph, in a receding ink,
  * 8px under the words — each one saying what it does in a tooltip, and the copy
  * confirming itself with a check.
+ *
+ * Arriving in a thread, the answer passes under a light (ADR-0068): a line in
+ * the sign's two inks travels down it and lets it be seen, the way a satellite
+ * passes over a field. Once, on arrival — never when a conversation reopens.
  */
 interface Props {
   copyLabel?: string
@@ -95,14 +100,67 @@ function tipAway() {
   tip.value = null
 }
 
+/*
+  The pass (ADR-0068) — the exception the awakening opened (ADR-0063): longer
+  than the scale's longest step and on its own curve, both declared in the
+  stylesheet and read off the cascade, the one place to change them. The mask
+  and the line share one duration and one curve, so the line rides the edge it
+  draws: the edge goes from 0 to the answer's height plus a soft fall of three
+  lines, and the line sits half a fall behind it. The words are all in the DOM
+  from the first frame; only their sight is staged.
+*/
+const thread = inject(TOLBI_AI_THREAD, null)
+const root = ref<HTMLElement>()
+const light = ref<HTMLElement>()
+const passing = ref(false)
+let sweep: Animation | undefined
+
+async function pass() {
+  const el = root.value
+  if (!el || typeof el.animate !== 'function') return
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const fall = 3 * (parseFloat(getComputedStyle(words.value ?? el).lineHeight) || 20)
+  el.style.setProperty('--tolbi-ai-answer-fall', `${fall}px`)
+  passing.value = true
+  await nextTick()
+  const style = getComputedStyle(el)
+  const duration = parseFloat(style.getPropertyValue('--tolbi-ai-answer-pass')) || 1100
+  const easing = style.getPropertyValue('--tolbi-ai-answer-pass-easing').trim() || 'ease-in-out'
+  const height = el.getBoundingClientRect().height
+  sweep = el.animate(
+    [{ '--tolbi-ai-answer-edge': '0px' }, { '--tolbi-ai-answer-edge': `${height + fall}px` }] as Keyframe[],
+    { duration, easing, fill: 'both' },
+  )
+  light.value?.animate(
+    [
+      { transform: `translateY(${-fall / 2}px)`, opacity: 0 },
+      { opacity: 1, offset: 0.08 },
+      { opacity: 1, offset: 0.82 },
+      { transform: `translateY(${height + fall / 2}px)`, opacity: 0 },
+    ],
+    { duration, easing, fill: 'both' },
+  )
+  sweep.onfinish = () => {
+    passing.value = false
+    sweep?.cancel()
+    sweep = undefined
+    el.style.removeProperty('--tolbi-ai-answer-fall')
+  }
+}
+
+onMounted(() => {
+  if (thread?.settled.value) void pass()
+})
+
 onBeforeUnmount(() => {
   clearTimeout(copiedTimer)
   clearTimeout(tipTimer)
+  sweep?.cancel()
 })
 </script>
 
 <template>
-  <div class="ds-tolbi-ai-answer">
+  <div ref="root" class="ds-tolbi-ai-answer" :class="{ 'ds-tolbi-ai-answer--passing': passing }">
     <div ref="words" class="ds-tolbi-ai-answer__words"><slot /></div>
 
     <div class="ds-tolbi-ai-answer__actions">
@@ -218,16 +276,65 @@ onBeforeUnmount(() => {
     </div>
 
     <span class="ds-tolbi-ai-answer__status" role="status">{{ announcement }}</span>
+    <span v-if="passing" ref="light" class="ds-tolbi-ai-answer__light" aria-hidden="true" />
   </div>
 </template>
 
 <style scoped>
 /* The actions belong to the answer: 8px under its words, not a block away. */
 .ds-tolbi-ai-answer {
+  /*
+    The pass's own values (ADR-0068): 1.1s, past the scale's 600ms ceiling, on
+    a curve that starts later than `easing-in-out` — the light gathers before
+    it travels — and settles as long. An exception borrows nothing from the
+    scale it departs from (ADR-0063).
+  */
+  --tolbi-ai-answer-pass: 1100ms;
+  --tolbi-ai-answer-pass-easing: cubic-bezier(0.45, 0, 0.25, 1);
+  /*
+    The light is the sign's: its two inks, bound to the same primitives — the
+    categorical clause of ADR-0010, as in TolbiAiSpark.
+  */
+  /* token-lint-disable-next-line no-raw-primitive — artwork ink: the sign's spark, the light the pass casts (ADR-0068) */
+  --tolbi-ai-answer-light-accent: var(--ds-color-accent-400);
+  /* token-lint-disable-next-line no-raw-primitive — artwork ink: the sign's leaves, the light the pass casts (ADR-0068) */
+  --tolbi-ai-answer-light-brand: var(--ds-color-brand-500);
+
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--ds-spacing-md);
   min-width: 0;
+}
+
+/* The edge of what can be seen, travelling down the answer. Registered, so it
+   can be animated; 0 is everything hidden. */
+@property --tolbi-ai-answer-edge {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+.ds-tolbi-ai-answer--passing {
+  -webkit-mask-image: linear-gradient(to bottom, currentColor calc(var(--tolbi-ai-answer-edge) - var(--tolbi-ai-answer-fall)), transparent var(--tolbi-ai-answer-edge));
+  mask-image: linear-gradient(to bottom, currentColor calc(var(--tolbi-ai-answer-edge) - var(--tolbi-ai-answer-fall)), transparent var(--tolbi-ai-answer-edge));
+}
+
+/*
+  The line of light: yellow into green across the answer, glowing. It is inside
+  the mask it draws, half a fall behind the edge — where the words are half
+  seen, so is the light, and the mask cuts it at the answer's sides.
+*/
+.ds-tolbi-ai-answer__light {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--ds-border-width-strong);
+  border-radius: var(--ds-radius-pill);
+  background: linear-gradient(90deg, transparent, var(--tolbi-ai-answer-light-accent) 25%, var(--tolbi-ai-answer-light-brand) 75%, transparent);
+  box-shadow: 0 0 14px 2px color-mix(in srgb, var(--tolbi-ai-answer-light-accent) 55%, transparent);
+  pointer-events: none;
 }
 
 /*
