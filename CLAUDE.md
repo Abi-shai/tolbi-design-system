@@ -773,6 +773,17 @@ Before working on any component, read:
   size. The sign stays 16 in a **`1lh` box**, centred — on the first line whether the words wrap or not
   (`Toast`'s pattern). Motion unchanged: eight of eleven animate a sign, not the words; shimmer still
   declined. Figma section 10 (`2441:14556`), track B; the component follows.
+- **ADR-0066**: the answer's actions **step back** — measured against nine products and two libraries:
+  elsewhere the icon draws 14–15px in a 28–32px button, one every 30–34px, in a receding ink; ours drew
+  17–19px every 36px in the text's ink (10.5:1), with no tooltip and a copy that confirmed nothing. Now
+  `IconButton xs` (32/16), touching, **8px under the words**, in a new **`subtle`** variant (`text-subtle`,
+  forward to `text-default` on hover and when judged). **A tooltip per action** after 400ms on hover or
+  focus (the mic's timing), presentational, names that explain (« Copier la réponse », « Générer une autre
+  réponse »); it opens **above and from the left** — centred, the panel's edge cut the first one; below,
+  the scroll area would clip it. **The copy copies the slot's own text**, so the check is a fact: the glyph
+  stamps into a check through `MarkTransition` (via `IconButton`'s new glyph slot), the tooltip says
+  « Réponse copiée », a status region announces it, 2s; the button keeps its name. The text (14/20) does
+  not change. Figma section 11 (`2450:14477`), track B.
 
 ## Architecture
 

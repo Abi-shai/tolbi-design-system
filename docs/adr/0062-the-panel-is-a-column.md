@@ -77,6 +77,9 @@ les sources citées », which pointed at nothing, and balances its two lines. In
 from `TolbiAI/Panneau`, the ten `TolbiAI/Saisie` states lose the sentence, and `TolbiAI/Source` moves to
 « Explorations — non retenues », where nine exploration frames still use it.
 
+**Amended by ADR-0066:** the actions under an answer step back — `IconButton xs`, a receding ink, 8px under
+the words, a tooltip per action, and a copy that confirms itself with a check.
+
 ### The thread follows what arrives — its top, not its bottom
 
 An answer arrives whole: the Yield API does not stream it. Following it to the bottom, as a chat
