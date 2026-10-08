@@ -54,11 +54,11 @@ import {
  *     </div>
  */
 interface Props {
-  /** For the bar's entry to point at — `aria-controls`. */
+  /** For the launcher to point at — `TolbiAiLauncher`'s `controls` (ADR-0070). */
   id?: string
   /**
    * The panel's name, for assistive technology — the region's label. Not
-   * shown: the bar's entry above the panel already says it (ADR-0062).
+   * shown: the head names the conversation instead (ADR-0069).
    */
   title?: string
   /** After the conversation's title — « ALPHA ». `null` hides it. */
