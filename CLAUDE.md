@@ -737,6 +737,8 @@ Before working on any component, read:
   `TolbiAiNavButton` is a `Button` — which gains **`#leading`** and **`selected`** (ADR-0050's mark) —
   with ⌘J/Ctrl+J; `HorizontalNavigation` gains **`#assistant`**, first of the controls (page before
   app); a slot, ADR-0053's shape: the bar decides the place, the product decides presence.
+  **Amended (8 Oct.)**: « Pour continuer » is removed — the answer does not guess the next steps;
+  `followUps`, the `follow-up` event, `TolbiAiFollowUp` and `TolbiAiSuggestion.icon` are gone.
 - **ADR-0063**: the awakening is the exception — it departs from ADR-0002 (3.2s, a choreography, a
   decoration) and from the charter (a glow), **accepted by the owner for this one moment**: the
   panel's first opening. `TolbiAiSpark` `state="awakening"`: **transcribed from Figma's Motion data,

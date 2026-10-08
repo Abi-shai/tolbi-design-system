@@ -62,6 +62,13 @@ All of them exist only inside the panel, so they are titled under it (ADR-0007):
   it mounts does not move, so reopening a conversation does not replay it. This is where the voice
   note's entrance lives (ADR-0061 left it here).
 
+**Amended (8 Oct.):** « Pour continuer » is gone — the answer no longer guesses the steps the user might
+take next. Removed at the owner's request, the first of several removals from the experience.
+`TolbiAiAnswer` loses `followUps`, `followUpsLabel`, the `follow-up` event and the `TolbiAiFollowUp` type;
+`TolbiAiSuggestion` loses `icon`, which only the follow-ups used. The answer ends on its sources and its
+actions, and the next question is the user's, in the composer. Figma's `TolbiAI/Panneau` (Conversation)
+follows.
+
 ### The thread follows what arrives — its top, not its bottom
 
 An answer arrives whole: the Yield API does not stream it. Following it to the bottom, as a chat
