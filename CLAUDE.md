@@ -729,16 +729,18 @@ Before working on any component, read:
   The head says the **name alone** (Figma's sign there is a hidden layer; the handoff said 24 — the
   frames win); the welcome sign is **64, 96 expanded** (« accueil agrandi »). Pieces titled under it:
   `TolbiAiWelcome`, `TolbiAiSuggestion` (wraps; hover darkens the contour), `TolbiAiQuestion`,
-  `TolbiAiAnswer` (product's markdown in the slot, `v-model:feedback`), `TolbiAiSource` (a citation,
-  not a Badge; `href` makes it a link), `TolbiAiThread` (arrivals 8px up + fade; history does not
-  replay). Answers arrive **whole** (no streaming), so the thread follows **the top of what arrives —
-  the question at the top**, not the bottom; the first anchor was the waiting line still leaving and
-  took 32px with it. Opening focuses the field; closing returns focus to the entry.
+  `TolbiAiAnswer` (product's markdown in the slot, `v-model:feedback`), `TolbiAiThread` (arrivals 8px
+  up + fade; history does not replay). Answers arrive **whole** (no streaming), so the thread follows
+  **the top of what arrives — the question at the top**, not the bottom; the first anchor was the
+  waiting line still leaving and took 32px with it. Opening focuses the field; closing returns focus to the entry.
   `TolbiAiNavButton` is a `Button` — which gains **`#leading`** and **`selected`** (ADR-0050's mark) —
   with ⌘J/Ctrl+J; `HorizontalNavigation` gains **`#assistant`**, first of the controls (page before
   app); a slot, ADR-0053's shape: the bar decides the place, the product decides presence.
   **Amended (8 Oct.)**: « Pour continuer » is removed — the answer does not guess the next steps;
-  `followUps`, the `follow-up` event, `TolbiAiFollowUp` and `TolbiAiSuggestion.icon` are gone.
+  `followUps`, the `follow-up` event, `TolbiAiFollowUp` and `TolbiAiSuggestion.icon` are gone. Then the
+  **sources** — they named the product's own data, which is noise: `sources`, `TolbiAiSource` and
+  `TolbiAiSourceItem` are deleted, the answer is its words and its actions, and the composer's
+  disclaimer drops « Veuillez vérifier les sources citées ».
 - **ADR-0063**: the awakening is the exception — it departs from ADR-0002 (3.2s, a choreography, a
   decoration) and from the charter (a glow), **accepted by the owner for this one moment**: the
   panel's first opening. `TolbiAiSpark` `state="awakening"`: **transcribed from Figma's Motion data,

@@ -69,6 +69,14 @@ take next. Removed at the owner's request, the first of several removals from th
 actions, and the next question is the user's, in the composer. Figma's `TolbiAI/Panneau` (Conversation)
 follows.
 
+**Amended again (8 Oct.):** the sources are gone too. They named the product's own data — « Rendement
+estimé · 5 nov. 2025 » — not an outside world the user might want to check, so citing them was noise.
+`TolbiAiAnswer` loses `sources` and `sourcesLabel`; `TolbiAiSource` and the `TolbiAiSourceItem` type are
+deleted. The answer is now its words and its actions. The composer's disclaimer loses « Veuillez vérifier
+les sources citées », which pointed at nothing, and balances its two lines. In Figma the block is deleted
+from `TolbiAI/Panneau`, the ten `TolbiAI/Saisie` states lose the sentence, and `TolbiAI/Source` moves to
+« Explorations — non retenues », where nine exploration frames still use it.
+
 ### The thread follows what arrives — its top, not its bottom
 
 An answer arrives whole: the Yield API does not stream it. Following it to the bottom, as a chat
