@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 import { useDelayedTooltip } from '../../composables/useDelayedTooltip'
+import { readDuration } from '../../composables/cssTime'
 import { Icon, type IconName } from '../Icon'
 import { IconButton } from '../IconButton'
 import { Button } from '../Button'
@@ -455,7 +456,7 @@ function glideHeight() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
   if (reduced || from === to) return unlock()
   glide = el.animate([{ height: `${from}px` }, { height: `${to}px` }], {
-    duration: parseFloat(style.getPropertyValue('--ds-motion-duration-enter')) || 200,
+    duration: readDuration(el, '--ds-motion-duration-enter'),
     easing: style.getPropertyValue('--ds-motion-easing-out').trim() || 'ease-out',
   })
   glide.onfinish = glide.oncancel = () => {
@@ -507,7 +508,7 @@ function glideWidth() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
   if (reduced || from === to) return unlockWidth()
   goGlide = el.animate([{ width: `${from}px` }, { width: `${to}px` }], {
-    duration: parseFloat(style.getPropertyValue('--ds-motion-duration-enter')) || 200,
+    duration: readDuration(el, '--ds-motion-duration-enter'),
     easing: style.getPropertyValue('--ds-motion-easing-out').trim() || 'ease-out',
   })
   goGlide.onfinish = goGlide.oncancel = () => {

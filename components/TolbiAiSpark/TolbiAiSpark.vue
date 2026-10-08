@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useId, watch } from 'vue'
 import type { ArtworkSize } from '../artwork-size'
+import { readDuration } from '../../composables/cssTime'
 import { leaves, spark, viewBox } from './art'
 
 /**
@@ -112,10 +113,9 @@ function turn() {
   if (!g || typeof g.animate !== 'function' || props.state !== 'rest') return
   if (turning?.playState === 'running') return
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  const style = getComputedStyle(g)
   turning = g.animate([{ rotate: '0deg' }, { rotate: '360deg' }], {
-    duration: parseFloat(style.getPropertyValue('--tolbi-ai-spark-turn')),
-    easing: style.getPropertyValue('--tolbi-ai-spark-turn-curve').trim(),
+    duration: readDuration(g, '--tolbi-ai-spark-turn'),
+    easing: getComputedStyle(g).getPropertyValue('--tolbi-ai-spark-turn-curve').trim(),
   })
 }
 

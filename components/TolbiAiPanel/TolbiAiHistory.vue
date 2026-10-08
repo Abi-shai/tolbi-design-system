@@ -7,6 +7,7 @@ import { Skeleton } from '../Skeleton'
 import { SurfaceTransition } from '../SurfaceTransition'
 import { Tooltip } from '../Tooltip'
 import { useDelayedTooltip } from '../../composables/useDelayedTooltip'
+import { readDuration } from '../../composables/cssTime'
 import {
   HISTORY_GROUPS,
   describe,
@@ -161,7 +162,7 @@ function travel(el: Element, done: () => void, from: number, to: number, duratio
       { height: `${from}px`, opacity: from ? 1 : 0 },
       { height: `${to}px`, opacity: to ? 1 : 0 },
     ],
-    { duration: parseFloat(cascade(duration)) || 0, easing: cascade(easing) || 'ease' },
+    { duration: readDuration(document.documentElement, duration), easing: cascade(easing) || 'ease' },
   )
   const end = () => {
     glide.onfinish = glide.oncancel = null

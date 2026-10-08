@@ -6,6 +6,7 @@ import {
 import { IconButton } from '../IconButton'
 import { Skeleton } from '../Skeleton'
 import SideNavList from './SideNavList.vue'
+import { readDuration } from '../../composables/cssTime'
 
 /**
  * The product's left-hand navigation column.
@@ -198,11 +199,7 @@ let travelTimer: ReturnType<typeof setTimeout> | undefined
  */
 function travelMs() {
   const el = navRef.value
-  if (!el) return 0
-  const v = getComputedStyle(el).getPropertyValue('--ds-motion-duration-enter').trim()
-  const n = parseFloat(v)
-  if (Number.isNaN(n)) return 0
-  return v.endsWith('ms') ? n : n * 1000
+  return el ? readDuration(el, '--ds-motion-duration-enter') : 0
 }
 
 /** The curve, off the cascade for the same reason as the length above. */

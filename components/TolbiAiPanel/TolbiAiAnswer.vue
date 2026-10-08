@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { inject, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useDelayedTooltip } from '../../composables/useDelayedTooltip'
+import { readDuration } from '../../composables/cssTime'
 import { Icon } from '../Icon'
 import { IconButton } from '../IconButton'
 import { MarkTransition } from '../MarkTransition'
@@ -113,7 +114,7 @@ async function pass() {
   passing.value = true
   await nextTick()
   const style = getComputedStyle(el)
-  const duration = parseFloat(style.getPropertyValue('--tolbi-ai-answer-pass')) || 1100
+  const duration = readDuration(el, '--tolbi-ai-answer-pass')
   const easing = style.getPropertyValue('--tolbi-ai-answer-pass-easing').trim() || 'ease-in-out'
   const height = el.getBoundingClientRect().height
   sweep = el.animate(
