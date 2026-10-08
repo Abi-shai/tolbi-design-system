@@ -74,6 +74,16 @@ The hairline has the same weight in both modes without either having been aimed 
 > **These five pairs are derived, not read off Figma.** If the Figma variable collection defines its
 > own `dark-subtle` / `dark-border`, those win — replace the ten hexes and nothing else moves.
 
+**Amended (8 Oct.), by an audit of the Tolbi AI family:** Figma now defines all ten, and five differed
+by one to four units — `brand/dark-subtle`, `brand/dark-border`, `accent/dark-subtle`,
+`accent/dark-border`, `error/dark-subtle`. Figma's are adopted, as the rule above says; on the same
+targets they measure the same (1.144–1.153 and 1.549–1.550 on `bg-default`, the hairline 1.344–1.354 on
+its tint). The other direction had drifted too: Figma's *Sombre* mode aliased 25 semantic variables to
+other steps than the code — the solids moved up to 500, the tone borders took the dark-border mints, the
+subtle hovers had primitives of their own, `text-placeholder` sat at 3:1. Code is the source of truth
+there (ADR-0031's usage table, the contrast tests), so *Sombre* now aliases the code's primitives:
+compared variable by variable, 77 colours × 2 modes and 33 dimensions, no difference left.
+
 ### The mode is an attribute, never `prefers-color-scheme`
 
 `[data-theme="dark"]`, opt-in, for the reason ADR-0003 gave for the mobile type scale: the OS

@@ -154,7 +154,10 @@ Before working on any component, read:
   `dark-mode-parity` and `mode-neutral-ramp`. A focus ring keeps its **alpha** and swaps only the
   base it is taken from. The component pass was three `white` literals (`CloseButton`,
   `ProgressSteps`, `Avatar`) — white is the one literal a second mode breaks — and the linter could
-  not see them, so `no-colour-literal` now covers keywords too.
+  not see them, so `no-colour-literal` now covers keywords too. **Amended (8 Oct.)**: Figma now
+  defines the ten minted tints and five differed (≤ 4 units) — **Figma's win**, as written; and Figma's
+  *Sombre* had drifted on 25 semantic aliases (solids at 500, tone borders on the mints) — realigned on
+  the code: 77 colours × 2 modes + 33 dimensions, **0 differences**.
 - **ADR-0030**: In dark, **elevation stops being what separates**. 100% black — the strongest shadow
   `gray-forest/900` can physically hold — is 1.262:1, and `border-subtle` is already **1.644:1**;
   every elevated surface in the catalogue already carries that border, so the roles swap and the
@@ -717,7 +720,8 @@ Before working on any component, read:
   The red dot breathes (1s, still under reduced motion; the waveform keeps moving — it is information).
   Last 15s: timer + « Encore N s » in warning ink. Permission, blocked, silence (loudest level < 0.12)
   are **messages in the box**, no modal. Delete → product toast (8s), `undoDelete()` restores it
-  **paused, not extendable** (the mic was released). The box keeps its height through a swap, then
+  **paused, not extendable** (the mic was released); **kept until a new recording** — the toast's time
+  pauses on hover and focus, so the composer counts nothing (amended: its own 8s broke « Annuler »). The box keeps its height through a swap, then
   **glides** (WAAPI off the cascade); the defect: **cancelling a finished Animation queues its `cancel`
   event**, which unlocked the box mid-swap — 30px in one frame. `IconButton` gains **`neutral`**. The
   build now fails on a dropped `.d.ts` and on a declaration pointing outside `dist/`. **Amended**:
@@ -792,7 +796,7 @@ Before working on any component, read:
   17–19px every 36px in the text's ink (10.5:1), with no tooltip and a copy that confirmed nothing. Now
   `IconButton xs` (32/16), touching, **8px under the words**, in a new **`subtle`** variant (`text-subtle`,
   forward to `text-default` on hover and when judged). **A tooltip per action** after 400ms on hover or
-  focus (the mic's timing), presentational, names that explain (« Copier la réponse », « Générer une autre
+  focus (the mic's timing — one `useDelayedTooltip` since, shared by four components), presentational, names that explain (« Copier la réponse », « Générer une autre
   réponse »); it opens **above and from the left** — centred, the panel's edge cut the first one; below,
   the scroll area would clip it. **The copy copies the slot's own text**, so the check is a fact: the glyph
   stamps into a check through `MarkTransition` (via `IconButton`'s new glyph slot), the tooltip says

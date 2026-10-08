@@ -84,6 +84,11 @@ background hum sits below that, a quiet voice above 0.2.
 
 Delete emits `delete-voice`; the product shows « Vocal supprimé » with « Annuler » — a `Toast` with an
 action stays 8s — and calls `undoDelete()` on it. The composer keeps the recording exactly that long.
+
+**Amended (8 Oct.):** it no longer counts. The toast's time pauses while the pointer or the focus is on
+it (ADR-0052), so an 8s clock of the composer's own let « Annuler » outlive the recording — the button
+that a keyboard user takes longest to reach did nothing. The recording is now kept until a new one starts
+or the composer leaves the page; measured, a toast held for 9s still brings it back.
 Restored, it comes back paused: it can be heard and sent, not extended, because the microphone was
 released when it was deleted. Privacy over completeness.
 

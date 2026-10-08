@@ -41,6 +41,9 @@ A tooltip after 400ms on hover or focus — the microphone's timing (ADR-0061) �
 the button's name already says it: « Copier la réponse », « Réponse utile », « Réponse non utile »,
 « Générer une autre réponse ». The names explain rather than label: « Régénérer » said what, not what for.
 
+**Amended (8 Oct.):** the 400ms is written once — `useDelayedTooltip` (internal, `composables/`), which
+the answer, the panel's head, the microphone and the launcher share. It had been copied into all four.
+
 It opens **above** the action and **starts at its left**. The panel's edge is close on that side, and a
 centred tooltip over the first icon was cut by it; the arrow's tip lands on the icon's centre to the pixel.
 Above, not below: under the last answer, the scroll area would clip it.
