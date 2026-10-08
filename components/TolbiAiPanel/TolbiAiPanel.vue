@@ -105,6 +105,10 @@ const emit = defineEmits<{
   /** The switcher opened — fetch the list now if it is not there yet. */
   history: []
   'new-conversation': []
+  /** A row was renamed in place (ADR-0072); the product keeps the new title. */
+  'rename-conversation': [id: string, title: string]
+  /** A row's delete was pressed (ADR-0072); the product removes it and offers « Annuler ». */
+  'delete-conversation': [id: string]
 }>()
 
 const open = defineModel<boolean>('open', { default: false })
@@ -366,7 +370,13 @@ defineExpose({ scrollToEnd })
   >
     <div ref="surface" class="ds-tolbi-ai-panel__surface" @focusout="onFocusOut">
       <header class="ds-tolbi-ai-panel__head">
-        <Dropdown v-if="conversations" v-model:open="historyOpen" class="ds-tolbi-ai-panel__switcher">
+        <Dropdown
+          v-if="conversations"
+          v-model:open="historyOpen"
+          class="ds-tolbi-ai-panel__switcher"
+          role="dialog"
+          :label="labels.title"
+        >
           <template #trigger="{ open: listed, toggle }">
             <DropdownTrigger
               chrome="ghost"
@@ -374,6 +384,7 @@ defineExpose({ scrollToEnd })
               chevron
               :open="listed"
               class="ds-tolbi-ai-panel__switch"
+              aria-haspopup="dialog"
               :aria-describedby="switchHint"
               @click="toggleHistory(toggle)"
               @pointerenter="titleTipSoon"
@@ -407,6 +418,8 @@ defineExpose({ scrollToEnd })
             :now="now"
             :locale="locale"
             @select="choose"
+            @rename="(id, title) => emit('rename-conversation', id, title)"
+            @remove="(id) => emit('delete-conversation', id)"
           />
         </Dropdown>
         <Badge v-if="badge" class="ds-tolbi-ai-panel__badge" :label="badge" tone="success" size="sm" />

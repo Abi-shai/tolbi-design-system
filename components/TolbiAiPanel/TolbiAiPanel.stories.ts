@@ -13,6 +13,7 @@ import { HorizontalNavigation } from '../HorizontalNavigation'
 import { SideNavigation, SideNavItem } from '../SideNavigation'
 import { WorkspaceSelector } from '../WorkspaceSelector'
 import { Button } from '../Button'
+import { Toast, ToastRegion } from '../Toast'
 import type { TolbiAiVoiceRecording } from '../TolbiAiComposer'
 import type { TolbiAiConversation } from './history'
 
@@ -203,8 +204,60 @@ function useConversations({ empty = false, slowList = false } = {}) {
 
   const restart = () => (conversation.value = null)
 
-  return { conversations, conversation, loading, listLoading, question, items, pending, status, fetchList, choose, ask, askVoice, stop, restart }
+  /* Renamed in the row: the product keeps the title (ADR-0072). */
+  const rename = (id: string, title: string) => {
+    const c = find(id)
+    if (c) c.title = title
+  }
+
+  /*
+    Deleted at once, with « Annuler » in a toast for as long as it stays (8s
+    with an action, ADR-0052): the conversation comes back where it was, and
+    is current again if it was. Deleting the current one opens a new one.
+  */
+  type Removed = { key: number; item: TolbiAiConversation; index: number; wasCurrent: boolean }
+  const removed = ref<Removed[]>([])
+  let removedKey = 1
+
+  const remove = (id: string) => {
+    const index = conversations.value.findIndex((c) => c.id === id)
+    if (index < 0) return
+    const [item] = conversations.value.splice(index, 1)
+    const wasCurrent = item.id === conversation.value
+    removed.value.push({ key: removedKey++, item, index, wasCurrent })
+    if (wasCurrent) conversation.value = null
+  }
+
+  const undo = (r: Removed) => {
+    conversations.value.splice(Math.min(r.index, conversations.value.length), 0, r.item)
+    if (r.wasCurrent && conversation.value === null) conversation.value = r.item.id
+    removed.value = removed.value.filter((x) => x.key !== r.key)
+  }
+
+  const forget = (key: number) => (removed.value = removed.value.filter((x) => x.key !== key))
+
+  return {
+    conversations, conversation, loading, listLoading, question, items, pending, status,
+    fetchList, choose, ask, askVoice, stop, restart, rename, remove, removed, undo, forget,
+  }
 }
+
+/* The product's toasts: a deleted conversation and the way back. */
+const TOASTS = `
+  <ToastRegion>
+    <Toast
+      v-for="r in removed"
+      :key="r.key"
+      message="Conversation supprimée"
+      :detail="r.item.title"
+      @dismiss="forget(r.key)"
+    >
+      <template #actions>
+        <Button label="Annuler" variant="link" size="sm" @click="undo(r)" />
+      </template>
+    </Toast>
+  </ToastRegion>
+`
 
 /* The panel's body, the same in every story that keeps a history. */
 const BODY = `
@@ -235,7 +288,10 @@ const BODY = `
   </TolbiAiThread>
 `
 
-const PANEL_PIECES = { TolbiAiPanel, TolbiAiWelcome, TolbiAiThread, TolbiAiQuestion, TolbiAiAnswer, TolbiAiThinkingLine, TolbiAiVoiceNote, TolbiAiComposer }
+const PANEL_PIECES = {
+  TolbiAiPanel, TolbiAiWelcome, TolbiAiThread, TolbiAiQuestion, TolbiAiAnswer, TolbiAiThinkingLine, TolbiAiVoiceNote, TolbiAiComposer,
+  Toast, ToastRegion, Button,
+}
 
 const withHistory = ({ empty = false } = {}) => () => ({
   components: PANEL_PIECES,
@@ -253,12 +309,15 @@ const withHistory = ({ empty = false } = {}) => () => ({
         @update:conversation="choose"
         @history="fetchList"
         @new-conversation="restart"
+        @rename-conversation="rename"
+        @delete-conversation="remove"
       >
         ${BODY}
         <template #composer>
           <TolbiAiComposer v-model="question" :status="status" @send="ask" @send-voice="askVoice" @stop="stop" />
         </template>
       </TolbiAiPanel>
+      ${TOASTS}
     </div>
   `,
 })
@@ -386,6 +445,8 @@ const inThePage = ({ open: startOpen = false, expanded: startExpanded = false, e
             @update:conversation="choose"
             @history="fetchList"
             @new-conversation="restart"
+            @rename-conversation="rename"
+            @delete-conversation="remove"
           >
             ${BODY}
             <template #composer>
@@ -393,6 +454,7 @@ const inThePage = ({ open: startOpen = false, expanded: startExpanded = false, e
             </template>
           </TolbiAiPanel>
           <TolbiAiLauncher v-model:open="open" controls="tolbi-ai-panel" />
+          ${TOASTS}
         </div>
       </div>
     </div>

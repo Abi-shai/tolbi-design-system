@@ -31,6 +31,14 @@ export interface TolbiAiHistoryLabels {
   pending: string
   /** The name of the skeleton that holds a conversation's place. */
   loading: string
+  /** The history's own name, said when it opens. */
+  title: string
+  /** A row's two actions — said with the row's title after them — and the renaming field's name. */
+  rename: string
+  delete: string
+  renameField: string
+  save: string
+  cancel: string
 }
 
 export const HISTORY_LABELS: TolbiAiHistoryLabels = {
@@ -44,6 +52,12 @@ export const HISTORY_LABELS: TolbiAiHistoryLabels = {
   noMatch: 'Aucune conversation ne correspond à « {query} ».',
   pending: 'En cours',
   loading: 'Chargement de la conversation',
+  title: 'Conversations du projet',
+  rename: 'Renommer',
+  delete: 'Supprimer',
+  renameField: 'Nom de la conversation',
+  save: 'Enregistrer',
+  cancel: 'Annuler',
 }
 
 /** From this many conversations on, the list can be searched. */
