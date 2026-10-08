@@ -65,6 +65,7 @@ state, the launcher would have to set it, hear its end, and reset it whenever th
 hidden CSS animation is cancelled and never ends; as a call, it asks, and the sign keeps the count.
 
 `turn()` is Web Animations on the leaves' group. Its duration and curve are read off the cascade —
+through `readDuration()` since ADR-0073, because a minifier writes `1650ms` as `1.65s` —
 `--tolbi-ai-spark-turn` (1650ms) and `--tolbi-ai-spark-turn-curve` — written once more beside the
 awakening, whose keyframes hold the same values as literals because a `var()` there is dropped (ADR-0057);
 the two must stay equal. Only a sign at `rest` turns, and a state that moves the leaves itself cancels a

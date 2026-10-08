@@ -54,7 +54,8 @@ holding it, focused.
 ### What does not change
 
 The recording line, its messages (permission, blocked, silence), the undo. Without voice — `voice: false`
-or a browser that cannot record — send stands alone.
+or a browser that cannot record — send stands alone. **Amended by ADR-0073:** `voice` is opt-in — it
+defaults to `false`, since a microphone whose recording goes nowhere is worse than none.
 
 ## What changes
 

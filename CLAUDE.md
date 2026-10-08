@@ -880,6 +880,17 @@ Before working on any component, read:
   **as long as the toast offers it** (its time pauses, ADR-0052); undone, it opens back over `enter`
   where it was. Deleting the current one opens a new conversation. Only what the product changes moves —
   the search filters at once.
+- **ADR-0073**: what the **first integration** found (etolbi, 0.55.1). **A duration read from CSS must
+  survive a minifier**: the minifier writes `1650ms` as `1.65s`, a bare `parseFloat` read 1.65, and the
+  launcher's turn and the answer's light ran in 1.65ms / 1.1ms — invisible, only in the built package; a
+  product's build does it to the tokens too (`200ms` → `.2s`). One parser, **`readDuration()`**
+  (`composables/cssTime.ts`, `ms` and `s`, unreadable = 0); `scripts/css-time.test.mjs` minifies every
+  declared time with esbuild and forbids `parseFloat(…getPropertyValue…)` — mutation-checked. **The opened
+  panel focuses the field once it is visible** (reduced motion's 0.01ms makes the visibility flip a
+  transition: hidden two frames). **`voice` is opt-in** (default `false`: a microphone whose recording goes
+  nowhere is worse than none). **The answer styles all of markdown** — every heading at
+  `body-md-emphasis`, links `text-brand` always underlined, `code-md`, code blocks that scroll, quotes,
+  tables in `body-sm`, rules, images.
 
 ## Architecture
 

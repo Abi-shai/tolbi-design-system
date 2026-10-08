@@ -77,7 +77,7 @@ All of them exist only inside the panel, so they are titled under it (ADR-0007):
   darkens with it.
 - `TolbiAiQuestion` — a question as typed, on the user's side, the text counterpart of the voice note.
 - `TolbiAiAnswer` — the words are the product's to render (markdown, in the slot; it takes the answer's
-  type through `:deep()`), then the dated sources, copy / useful / not useful / regenerate, and the
+  type through `:deep()` — every element markdown writes, since ADR-0073), then the dated sources, copy / useful / not useful / regenerate, and the
   follow-ups. The judgement is `v-model:feedback`; a second press takes it back.
 - `TolbiAiSource` — « Rendement estimé · 5 nov. 2025 »: the kind of data, what it is, when. A
   citation, not a status, so not a `Badge`; with `href`, a link to the source.
@@ -121,7 +121,8 @@ the nearest question or voice note before the answer.
 
 ### Focus
 
-Opened, the panel focuses the field: it is where the question is asked. Closed from inside, the focus
+Opened, the panel focuses the field: it is where the question is asked — **once it can hold it**
+(amended by ADR-0073: under reduced motion the panel is still hidden for two frames when it opens). Closed from inside, the focus
 returns to the bar's entry. A control that asks and then disappears — a suggestion, as the welcome
 makes way for the thread — hands the focus to the field rather than dropping it on the page.
 
