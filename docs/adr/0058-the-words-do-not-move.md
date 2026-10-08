@@ -26,6 +26,10 @@ read. The line sits where the answer will appear, and the answer takes its place
 The sign aligns to the line's start, not its centre, so if the words wrap it stays on the first line
 — it is exactly one 16px line box tall.
 
+**Amended by ADR-0065:** the words are `body-md` / `text-subtle` — the answer's size, a receding ink —
+after a measured benchmark found this line the smallest of twelve products, and among the palest. The
+sign keeps 16 and sits in a box one line tall (`1lh`), centred.
+
 ### Two texts, and the second one is a fact about time
 
 `label` (« Je lis les données du projet… ») and `longWaitLabel` (« Encore un instant… ») after

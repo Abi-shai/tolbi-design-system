@@ -666,7 +666,8 @@ Before working on any component, read:
   where in-out says 0.389) — the curve lives on the element. No yellow while thinking (`accent`
   ignored); reduced motion is `off` then `rest`, said with `animation: none`, not left to `motion.css`.
 - **ADR-0058**: the waiting line — `TolbiAiThinkingLine` is the thinking sign at 16 and a few words in
-  `body-sm` / `text-subtlest` (Figma `2317:4909`, same ink box to the pixel at 3×). **The words do not
+  `body-sm` / `text-subtlest` (Figma `2317:4909`, same ink box to the pixel at 3×) — **amended by
+  ADR-0065** to `body-md` / `text-subtle`. **The words do not
   move** — no shimmer, no animated ellipsis; one movement at a time. `label`, then `longWaitLabel`
   after `longWaitAfter` (10 000ms, from the line's appearance; `null` keeps the first) — Figma's copy
   verbatim as defaults, props so the product localises; the change is a **cut**. The status is
@@ -759,6 +760,15 @@ Before working on any component, read:
   The covered siblings are **`inert`**, handed back on reduce. The page must be **its own stacking
   context** (`isolation: isolate`): a map's controls (`z-index` 2) would paint through, and raising
   the panel would cover the rail's tooltips or the bar's menus.
+- **ADR-0065**: the wait is read **at the answer's size** — measured, not described: the waiting
+  text's x-height over the answer's **in the same capture** (so the ratio holds across fonts and capture
+  scales), on twelve products (Gemini live; the rest on Mobbin web captures, 1920px = 1440 CSS; ChatGPT,
+  Perplexity, Grok blocked live by a bot check or a sign-up wall). Six of nine write it at the answer's
+  size, three one step down (0.87–0.92); ours was **0.86 and 4.97:1 — the smallest, among the palest**.
+  So `TolbiAiThinkingLine` is `body-md` / **`text-subtle`** (7.69:1): the ink says « not yet », not the
+  size. The sign stays 16 in a **`1lh` box**, centred — on the first line whether the words wrap or not
+  (`Toast`'s pattern). Motion unchanged: eight of eleven animate a sign, not the words; shimmer still
+  declined. Figma section 10 (`2441:14556`), track B; the component follows.
 
 ## Architecture
 
