@@ -107,8 +107,10 @@ interface Props {
   /** The field's accessible name — a placeholder is not one. */
   inputLabel?: string
   /**
-   * Offer to speak the question. The microphone takes send's place while the
-   * box is empty — where the browser can record at all.
+   * Offer to speak the question: the microphone beside send, where the
+   * browser can record at all. **Opt-in** — set it once the product can do
+   * something with `send-voice` (upload, transcribe): a microphone whose
+   * recording goes nowhere is worse than none.
    */
   voice?: boolean
   /**
@@ -133,7 +135,7 @@ const props = withDefaults(defineProps<Props>(), {
   sendLabel: 'Envoyer',
   stopLabel: 'Arrêter',
   inputLabel: 'Demander à Tolbi AI',
-  voice: true,
+  voice: false,
   voiceLimit: 120,
   voiceLabels: () => ({}),
 })

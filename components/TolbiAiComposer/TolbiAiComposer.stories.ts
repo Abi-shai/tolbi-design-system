@@ -45,7 +45,7 @@ const meta: Meta<typeof TolbiAiComposer> = {
     scope: { control: 'text', table: { category: 'Contenu', type: { summary: 'string | null' } } },
     disclaimer: { control: 'text', table: { category: 'Contenu', type: { summary: 'string | null' } } },
   },
-  args: { modelValue: '', status: 'ready' },
+  args: { modelValue: '', status: 'ready', voice: true },
   decorators: [() => ({ template: '<div style="width:368px"><story /></div>' })],
 }
 
@@ -179,7 +179,7 @@ const voiceDemo = (mic: FakeMicrophone | null, extra: Record<string, unknown> = 
           transcript="Combien d’hectares sont en sénescence ?"
         />
       </div>
-      <TolbiAiComposer ref="composer" v-model="question" v-bind="extra" @send-voice="sendVoice" @delete-voice="deleted" />
+      <TolbiAiComposer ref="composer" v-model="question" voice v-bind="extra" @send-voice="sendVoice" @delete-voice="deleted" />
       <ToastRegion>
         <Toast v-for="t in toasts" :key="t.id" tone="neutral" message="Vocal supprimé" @dismiss="dismiss(t.id)">
           <template #actions>

@@ -314,7 +314,7 @@ const withHistory = ({ empty = false } = {}) => () => ({
       >
         ${BODY}
         <template #composer>
-          <TolbiAiComposer v-model="question" :status="status" @send="ask" @send-voice="askVoice" @stop="stop" />
+          <TolbiAiComposer v-model="question" :status="status" voice @send="ask" @send-voice="askVoice" @stop="stop" />
         </template>
       </TolbiAiPanel>
       ${TOASTS}
@@ -450,7 +450,7 @@ const inThePage = ({ open: startOpen = false, expanded: startExpanded = false, e
           >
             ${BODY}
             <template #composer>
-              <TolbiAiComposer v-model="question" :status="status" @send="ask" @send-voice="askVoice" @stop="stop" />
+              <TolbiAiComposer v-model="question" :status="status" voice @send="ask" @send-voice="askVoice" @stop="stop" />
             </template>
           </TolbiAiPanel>
           <TolbiAiLauncher v-model:open="open" controls="tolbi-ai-panel" />
