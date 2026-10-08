@@ -169,14 +169,14 @@
         "$type": "color"
       },
       "dark-subtle": {
-        "$value": "#152E21",
+        "$value": "#142E22",
         "$type": "color",
-        "$description": "dark mode only — brand/500 blended into gray-forest/900 to 1.15:1, the tinted ground"
+        "$description": "dark mode only — brand/500 blended into gray-forest/900 to 1.15:1, the tinted ground (exact value from Figma, which wins here — ADR-0029)"
       },
       "dark-border": {
-        "$value": "#0F472B",
+        "$value": "#0E472B",
         "$type": "color",
-        "$description": "dark mode only — brand/500 blended into gray-forest/900 to 1.55:1, the hairline on brand/dark-subtle"
+        "$description": "dark mode only — brand/500 blended into gray-forest/900 to 1.55:1, the hairline on brand/dark-subtle (exact value from Figma, which wins here — ADR-0029)"
       }
     },
     "accent": {
@@ -230,14 +230,14 @@
         "$type": "color"
       },
       "dark-subtle": {
-        "$value": "#272B1C",
+        "$value": "#292B1A",
         "$type": "color",
-        "$description": "dark mode only — accent/400 blended into gray-forest/900 to 1.15:1, the tinted ground"
+        "$description": "dark mode only — accent/400 blended into gray-forest/900 to 1.15:1, the tinted ground (exact value from Figma, which wins here — ADR-0029)"
       },
       "dark-border": {
-        "$value": "#413F1D",
+        "$value": "#453E18",
         "$type": "color",
-        "$description": "dark mode only — accent/400 blended into gray-forest/900 to 1.55:1, the hairline on accent/dark-subtle"
+        "$description": "dark mode only — accent/400 blended into gray-forest/900 to 1.55:1, the hairline on accent/dark-subtle (exact value from Figma, which wins here — ADR-0029)"
       }
     },
     "error": {
@@ -291,9 +291,9 @@
         "$type": "color"
       },
       "dark-subtle": {
-        "$value": "#382520",
+        "$value": "#372520",
         "$type": "color",
-        "$description": "dark mode only — error/500 blended into gray-forest/900 to 1.15:1, the tinted ground"
+        "$description": "dark mode only — error/500 blended into gray-forest/900 to 1.15:1, the tinted ground (exact value from Figma, which wins here — ADR-0029)"
       },
       "dark-border": {
         "$value": "#652D26",
