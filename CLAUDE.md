@@ -710,7 +710,8 @@ Before working on any component, read:
   and a declaration may only point at what ships. Permission read before asked (`permissions.query`
   authoritative); levels = RMS every 100ms (×3.5, √); time measured; **the cap pauses, it does not
   stop**; the mic is **released** on send, delete and unmount; the audio context is resumed (a
-  suspended one feeds silence). The mic holds send's place while empty (tooltip after 400ms). One
+  suspended one feeds silence). The mic holds send's place while empty (tooltip after 400ms) —
+  **amended**: a `subtle` ghost, not the brand disc, which arrives with send (Figma section 12). One
   line holds the focus — **Enter sends, Escape deletes, Space pauses** (Space/Enter only on the line
   itself, so its buttons keep theirs); pause and resume trade places, so the focus returns to the line.
   The red dot breathes (1s, still under reduced motion; the waveform keeps moving — it is information).

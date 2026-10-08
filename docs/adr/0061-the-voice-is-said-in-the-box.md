@@ -42,6 +42,13 @@ While the box is empty and the browser can record, the action is the microphone 
 `primary`); typing brings send back. Its tooltip, « Envoyer un vocal », arrives after 400ms through
 `Tooltip` and `SurfaceTransition`, and is presentational: the button's own name already says it.
 
+**Amended (8 Oct.):** the microphone loses the brand fill — it is `IconButton xs subtle`, no ground, in
+`text-subtle`. The brand disc gave recording a weight it does not have on an empty box. Compared in
+Figma (« Tolbi xAI exploration », `12 · La saisie — le micro sans la marque`, `2455:14524`): Claude,
+Perplexity, Copilot, Notion and Langdock draw the microphone as a grey glyph; the filled disc is send,
+arriving with the text, or ChatGPT's voice mode, in black. One action still holds the right of the box
+(ADR-0059), and the green now arrives with send: the hierarchy rises when there is something to send.
+
 ### One line, and it holds the focus
 
 Recording, the box is one line: delete, the red dot and the timer, the live waveform (`tail`, in the
