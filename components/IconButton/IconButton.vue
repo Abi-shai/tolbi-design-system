@@ -24,7 +24,8 @@ export type IconButtonSize = 'xs' | 'sm'
  *
  * `subtle` — a ghost whose ink recedes, `text-subtle` until the pointer or the
  * judgement comes to it: the actions riding under a Tolbi AI answer, which
- * belong to the content rather than to a bar (ADR-0066).
+ * belong to the content rather than to a bar (ADR-0066), and the composer's
+ * microphone on an empty box, a tool rather than the action (ADR-0061).
  */
 export type IconButtonVariant = 'ghost' | 'primary' | 'surface' | 'neutral' | 'subtle'
 

@@ -608,9 +608,12 @@ function messageAct() {
                   @focusin="tipSoon"
                   @focusout="tipAway"
                 >
+                  <!-- A tool in a receding ink, not the brand disc: on an empty box
+                       nothing is ready to go, and the green arrives with send
+                       (ADR-0061, amended). -->
                   <IconButton
                     icon="mic"
-                    variant="primary"
+                    variant="subtle"
                     size="xs"
                     :ariaLabel="labels.record"
                     @click="openMic"
