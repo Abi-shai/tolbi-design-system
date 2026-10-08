@@ -21,7 +21,7 @@ const meta: Meta<typeof Tooltip> = {
     },
     arrow: {
       control: 'select',
-      options: ['none', 'bottom-center', 'bottom-left', 'bottom-right', 'top-center', 'left', 'right'],
+      options: ['none', 'bottom-center', 'bottom-left', 'bottom-right', 'top-center', 'top-left', 'top-right', 'left', 'right'],
       table: { category: 'Apparence', defaultValue: { summary: "'none'" } },
     },
   },
@@ -63,6 +63,16 @@ export const TopCenter: Story = {
   args: { arrow: 'top-center' },
 }
 
+export const TopLeft: Story = {
+  name: 'Flèche — top left',
+  args: { arrow: 'top-left' },
+}
+
+export const TopRight: Story = {
+  name: 'Flèche — top right',
+  args: { arrow: 'top-right' },
+}
+
 export const Left: Story = {
   name: 'Flèche — left',
   args: { arrow: 'left' },
@@ -85,6 +95,8 @@ export const AllArrows: Story = {
         <Tooltip title="bottom-left"   arrow="bottom-left" />
         <Tooltip title="bottom-right"  arrow="bottom-right" />
         <Tooltip title="top-center"    arrow="top-center" />
+        <Tooltip title="top-left"      arrow="top-left" />
+        <Tooltip title="top-right"     arrow="top-right" />
         <Tooltip title="left"          arrow="left" />
         <Tooltip title="right"         arrow="right" />
       </div>
@@ -107,6 +119,8 @@ export const AllArrowsRich: Story = {
         <Tooltip title="This is a tooltip" :supporting-text="supporting" arrow="bottom-left" />
         <Tooltip title="This is a tooltip" :supporting-text="supporting" arrow="bottom-right" />
         <Tooltip title="This is a tooltip" :supporting-text="supporting" arrow="top-center" />
+        <Tooltip title="This is a tooltip" :supporting-text="supporting" arrow="top-left" />
+        <Tooltip title="This is a tooltip" :supporting-text="supporting" arrow="top-right" />
         <div style="display:flex;gap:32px;">
           <Tooltip title="This is a tooltip" :supporting-text="supporting" arrow="left" />
           <Tooltip title="This is a tooltip" :supporting-text="supporting" arrow="right" />

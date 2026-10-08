@@ -5,6 +5,8 @@ export type TooltipArrow =
   | 'bottom-left'
   | 'bottom-right'
   | 'top-center'
+  | 'top-left'
+  | 'top-right'
   | 'left'
   | 'right'
 
@@ -22,8 +24,12 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
     class="ds-tooltip"
     :class="[`ds-tooltip--${arrow}`, { 'ds-tooltip--rich': !!supportingText }]"
   >
-    <!-- ▲ top-center (au-dessus du contenu) -->
-    <div v-if="arrow === 'top-center'" class="ds-tooltip__arrow ds-tooltip__arrow--top" />
+    <!-- ▲ top-* (au-dessus du contenu) -->
+    <div
+      v-if="arrow === 'top-center' || arrow === 'top-left' || arrow === 'top-right'"
+      class="ds-tooltip__arrow ds-tooltip__arrow--top"
+      :class="`ds-tooltip__arrow--${arrow}`"
+    />
 
     <!-- ◀ left (à gauche du contenu) -->
     <div v-if="arrow === 'left'" class="ds-tooltip__arrow ds-tooltip__arrow--left" />
@@ -69,8 +75,10 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
 
 .ds-tooltip--left,
 .ds-tooltip--right  { flex-direction: row; align-items: center; }
-.ds-tooltip--bottom-left  { align-items: flex-start; }
-.ds-tooltip--bottom-right { align-items: flex-end; }
+.ds-tooltip--bottom-left,
+.ds-tooltip--top-left     { align-items: flex-start; }
+.ds-tooltip--bottom-right,
+.ds-tooltip--top-right    { align-items: flex-end; }
 
 /* ── Contenu ──────────────────────────────────────────────────────── */
 .ds-tooltip__content {
@@ -129,7 +137,7 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
 .ds-tooltip__arrow--bottom-left  { align-self: flex-start; margin-left: var(--ds-spacing-lg); }
 .ds-tooltip__arrow--bottom-right { align-self: flex-end;   margin-right: var(--ds-spacing-lg); }
 
-/* ▲ Top center — 16px large × 6px haut */
+/* ▲ Top — 16px large × 6px haut */
 .ds-tooltip__arrow--top {
   width: 0;
   height: 0;
@@ -137,6 +145,9 @@ withDefaults(defineProps<Props>(), { arrow: 'none' })
   border-right:  8px solid transparent;
   border-bottom: 6px solid var(--ds-bg-inverse);
 }
+
+.ds-tooltip__arrow--top-left  { align-self: flex-start; margin-left: var(--ds-spacing-lg); }
+.ds-tooltip__arrow--top-right { align-self: flex-end;   margin-right: var(--ds-spacing-lg); }
 
 /* ◀ Left — 6px large × 16px haut */
 .ds-tooltip__arrow--left {
