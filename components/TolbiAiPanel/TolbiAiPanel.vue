@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, provide, ref, toRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, toRef, watch } from 'vue'
 import { Badge } from '../Badge'
+import type { IconName } from '../Icon'
 import { IconButton } from '../IconButton'
 import { Scrollbar } from '../Scrollbar'
+import { SurfaceTransition } from '../SurfaceTransition'
+import { Tooltip } from '../Tooltip'
 import { TOLBI_AI_PANEL } from './context'
 
 /**
@@ -223,6 +226,47 @@ function onFocusOut(event: FocusEvent) {
   })
 }
 
+/*
+  The head's actions say what they do in a tooltip, after 400ms on hover or
+  focus — as the answer's actions and the microphone do (ADR-0066).
+  Presentational: each button's own name already says it to a screen reader.
+  Pressed, the action has answered the question the tooltip asked, so the
+  tooltip goes; closing takes it with the panel.
+*/
+const TIP_DELAY = 400
+const tip = ref<string | null>(null)
+let tipTimer: ReturnType<typeof setTimeout> | undefined
+
+function tipSoon(action: string) {
+  clearTimeout(tipTimer)
+  tipTimer = setTimeout(() => (tip.value = action), TIP_DELAY)
+}
+
+function tipAway() {
+  clearTimeout(tipTimer)
+  tip.value = null
+}
+
+watch(open, (now) => !now && tipAway())
+onBeforeUnmount(() => clearTimeout(tipTimer))
+
+const actions = computed<{ key: string; icon: IconName; label: string; run: () => void }[]>(() => [
+  { key: 'history', icon: 'history', label: props.historyLabel, run: () => emit('history') },
+  { key: 'new', icon: 'square-pen', label: props.newConversationLabel, run: () => emit('new-conversation') },
+  {
+    key: 'size',
+    icon: expanded.value ? 'minimize-2' : 'maximize-2',
+    label: expanded.value ? props.collapseLabel : props.expandLabel,
+    run: () => (expanded.value = !expanded.value),
+  },
+  { key: 'close', icon: 'x', label: props.closeLabel, run: () => (open.value = false) },
+])
+
+function act(run: () => void) {
+  tipAway()
+  run()
+}
+
 defineExpose({ scrollToEnd })
 </script>
 
@@ -241,14 +285,26 @@ defineExpose({ scrollToEnd })
           <Badge v-if="badge" :label="badge" tone="success" size="sm" />
         </div>
         <div class="ds-tolbi-ai-panel__actions">
-          <IconButton icon="history" :ariaLabel="historyLabel" @click="emit('history')" />
-          <IconButton icon="square-pen" :ariaLabel="newConversationLabel" @click="emit('new-conversation')" />
-          <IconButton
-            :icon="expanded ? 'minimize-2' : 'maximize-2'"
-            :ariaLabel="expanded ? collapseLabel : expandLabel"
-            @click="expanded = !expanded"
-          />
-          <IconButton icon="x" :ariaLabel="closeLabel" @click="open = false" />
+          <span
+            v-for="action in actions"
+            :key="action.key"
+            class="ds-tolbi-ai-panel__action"
+            @pointerenter="tipSoon(action.key)"
+            @pointerleave="tipAway"
+            @focusin="tipSoon(action.key)"
+            @focusout="tipAway"
+          >
+            <IconButton :icon="action.icon" :ariaLabel="action.label" @click="act(action.run)" />
+            <SurfaceTransition>
+              <Tooltip
+                v-if="tip === action.key"
+                class="ds-tolbi-ai-panel__tip"
+                :title="action.label"
+                arrow="top-right"
+                role="presentation"
+              />
+            </SurfaceTransition>
+          </span>
         </div>
       </header>
 
@@ -369,6 +425,30 @@ defineExpose({ scrollToEnd })
   display: flex;
   align-items: center;
   flex: none;
+}
+
+.ds-tolbi-ai-panel__action {
+  position: relative;
+  display: inline-flex;
+}
+
+/*
+  Under the action, as every tooltip in the bar — the head is the panel's top
+  edge, and the clip would cut one above it (ADR-0064) — and ending at its
+  right: the panel's edge is close on that side, and centred under the close
+  button « Fermer » lost 7.7px to it. The arrow's tip sits 20px in from the
+  tooltip's right edge (`spacing-lg` plus its 8px half-width) and the action's
+  centre half the action in from its own, so the tooltip ends 2px past the
+  action and the tip lands on the centre.
+*/
+.ds-tolbi-ai-panel__tip {
+  position: absolute;
+  top: calc(100% + var(--ds-spacing-sm));
+  right: calc(50% - var(--ds-spacing-lg) - 8px);
+  z-index: var(--ds-z-popover);
+  white-space: nowrap;
+  pointer-events: none;
+  transform-origin: top right;
 }
 
 /* The thread scrolls; the head and the composer stay. */
