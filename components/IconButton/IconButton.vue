@@ -21,8 +21,12 @@ export type IconButtonSize = 'xs' | 'sm'
  * `neutral` — the same disc the other way round, tinted on a white ground: the
  * composer's « Réécouter » (ADR-0061). A disc stands off its ground; which
  * variant is the one that does depends on the ground.
+ *
+ * `subtle` — a ghost whose ink recedes, `text-subtle` until the pointer or the
+ * judgement comes to it: the actions riding under a Tolbi AI answer, which
+ * belong to the content rather than to a bar (ADR-0066).
  */
-export type IconButtonVariant = 'ghost' | 'primary' | 'surface' | 'neutral'
+export type IconButtonVariant = 'ghost' | 'primary' | 'surface' | 'neutral' | 'subtle'
 
 interface Props {
   /** The glyph. Mirrors the `Icône` instance-swap on the Figma component. */
@@ -71,7 +75,9 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
     :class="[`ds-icon-button--${size}`, `ds-icon-button--${variant}`, { 'ds-icon-button--active': active }]"
     @click="emit('click', $event)"
   >
-    <Icon :name="icon" :size="iconSize" />
+    <!-- The glyph, by default. A composite that animates its glyph — a check
+         stamping in after a copy (ADR-0066) — fills the slot, at this size. -->
+    <slot :size="iconSize"><Icon :name="icon" :size="iconSize" /></slot>
   </button>
 </template>
 
@@ -119,6 +125,19 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 .ds-icon-button:disabled {
   cursor: not-allowed;
   color: var(--ds-text-disabled);
+}
+
+/* ── Subtle: a ghost whose ink recedes ─────────────────────────────── */
+.ds-icon-button--subtle {
+  color: var(--ds-text-subtle);
+  transition:
+    background var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    color      var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+}
+
+.ds-icon-button--subtle:hover:not(:disabled),
+.ds-icon-button--subtle.ds-icon-button--active {
+  color: var(--ds-text-default);
 }
 
 /* ── Primary: the brand fill, as Button's primary ─────────────────── */

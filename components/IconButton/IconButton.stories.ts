@@ -31,11 +31,11 @@ const meta: Meta<typeof IconButton> = {
     },
     variant: {
       control: 'inline-radio',
-      options: ['ghost', 'primary', 'surface', 'neutral'],
+      options: ['ghost', 'primary', 'surface', 'neutral', 'subtle'],
       description:
         '`ghost` prend la surface derrière lui. `primary` porte le remplissage brand : ' +
         'l\'action autour de laquelle un composite est construit (la saisie de Tolbi AI).',
-      table: { category: 'Apparence', type: { summary: "'ghost' | 'primary' | 'surface' | 'neutral'" }, defaultValue: { summary: "'ghost'" } },
+      table: { category: 'Apparence', type: { summary: "'ghost' | 'primary' | 'surface' | 'neutral' | 'subtle'" }, defaultValue: { summary: "'ghost'" } },
     },
     active:    { control: 'boolean', table: { category: 'État', defaultValue: { summary: 'false' } } },
     disabled:  { control: 'boolean', table: { category: 'État', defaultValue: { summary: 'false' } } },
@@ -126,6 +126,22 @@ export const Neutral: Story = {
         <IconButton icon="play" ariaLabel="Réécouter" size="xs" variant="neutral" />
         <IconButton icon="pause" ariaLabel="Arrêter l’écoute" size="xs" variant="neutral" />
         <IconButton icon="play" ariaLabel="Réécouter" size="xs" variant="neutral" active />
+      </div>
+    `,
+  }),
+}
+
+/** `subtle` : un ghost dont l'encre se retire — les actions sous une réponse de Tolbi AI, qui appartiennent au contenu (ADR-0066). L'encre revient au survol et quand le jugement est posé. */
+export const Subtle: Story = {
+  name: 'Subtle',
+  render: () => ({
+    components: { IconButton },
+    template: `
+      <div style="display:flex;align-items:center;">
+        <IconButton icon="copy" ariaLabel="Copier la réponse" size="xs" variant="subtle" />
+        <IconButton icon="thumbs-up" ariaLabel="Réponse utile" size="xs" variant="subtle" active />
+        <IconButton icon="thumbs-down" ariaLabel="Réponse non utile" size="xs" variant="subtle" />
+        <IconButton icon="refresh-cw" ariaLabel="Générer une autre réponse" size="xs" variant="subtle" />
       </div>
     `,
   }),
