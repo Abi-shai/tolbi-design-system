@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { ref } from 'vue'
 import TolbiAiSuggestion from './TolbiAiSuggestion.vue'
-import TolbiAiSource from './TolbiAiSource.vue'
 import TolbiAiQuestion from './TolbiAiQuestion.vue'
 import TolbiAiAnswer from './TolbiAiAnswer.vue'
 import TolbiAiWelcome from './TolbiAiWelcome.vue'
@@ -32,21 +31,6 @@ export const Suggestion: Story = {
   }),
 }
 
-/** Le type de donnée, ce que c'est, sa date. Avec `href`, un lien vers la source. */
-export const Source: Story = {
-  name: 'Source',
-  render: () => ({
-    components: { TolbiAiSource },
-    template: `
-      <div style="display:flex; flex-wrap:wrap; gap:var(--ds-spacing-sm);">
-        <TolbiAiSource icon="satellite" label="Rendement estimé" date="5 nov. 2025" />
-        <TolbiAiSource icon="leaf" label="Phénologie" date="5 nov. 2025" />
-        <TolbiAiSource icon="land-plot" label="5 parcelles déclarées" href="#" />
-      </div>
-    `,
-  }),
-}
-
 export const Question: Story = {
   name: 'Question',
   render: () => ({
@@ -68,7 +52,6 @@ export const Answer: Story = {
     template: `
       <TolbiAiAnswer
         v-model:feedback="feedback"
-        :sources="[{ icon: 'satellite', label: 'Rendement estimé', date: '5 nov. 2025' }, { icon: 'leaf', label: 'Phénologie', date: '5 nov. 2025' }]"
       >
         <p>Le projet atteint un rendement estimé de <strong>1,9 t/ha</strong> sur 152 ha.</p>
         <ul><li><strong>+15 %</strong> par rapport à la campagne précédente</li><li>De <strong>1,5</strong> à <strong>2,1 t/ha</strong> selon les parcelles</li></ul>

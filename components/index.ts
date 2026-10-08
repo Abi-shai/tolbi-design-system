@@ -57,9 +57,8 @@ export {
   TolbiAiQuestion,
   TolbiAiAnswer,
   TolbiAiSuggestion,
-  TolbiAiSource,
 } from './TolbiAiPanel'
-export type { TolbiAiSourceItem, TolbiAiFeedback } from './TolbiAiPanel'
+export type { TolbiAiFeedback } from './TolbiAiPanel'
 export { TolbiAiNavButton } from './TolbiAiNavButton'
 
 export { ModulesList } from './ModulesList'

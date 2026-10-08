@@ -1,27 +1,17 @@
 <script setup lang="ts">
 import { IconButton } from '../IconButton'
-import type { IconName } from '../Icon'
-import TolbiAiSource from './TolbiAiSource.vue'
-
-export interface TolbiAiSourceItem {
-  label: string
-  date?: string
-  icon?: IconName
-  href?: string
-}
 
 /** How the answer was judged, if at all. */
 export type TolbiAiFeedback = 'up' | 'down' | null
 
 /**
- * Tolbi AI's answer: the words, the dated sources they stand on, and what can
- * be done with them (ADR-0062). The words are the product's to render —
- * markdown, in the default slot — and take the answer's type here. It does not
- * guess what the user asks next: the next question is theirs, in the composer.
+ * Tolbi AI's answer: the words, and what can be done with them (ADR-0062). The
+ * words are the product's to render — markdown, in the default slot — and take
+ * the answer's type here. It cites no sources — the data is the product's own,
+ * so naming it says nothing — and it does not guess what the user asks next:
+ * the next question is theirs, in the composer.
  */
 interface Props {
-  sources?: TolbiAiSourceItem[]
-  sourcesLabel?: string
   copyLabel?: string
   upLabel?: string
   downLabel?: string
@@ -29,8 +19,6 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  sources: () => [],
-  sourcesLabel: 'Sources',
   copyLabel: 'Copier',
   upLabel: 'Réponse utile',
   downLabel: 'Réponse non utile',
@@ -50,13 +38,6 @@ const judge = (value: 'up' | 'down') => (feedback.value = feedback.value === val
 <template>
   <div class="ds-tolbi-ai-answer">
     <div class="ds-tolbi-ai-answer__words"><slot /></div>
-
-    <section v-if="sources.length" class="ds-tolbi-ai-answer__group">
-      <p class="ds-tolbi-ai-answer__heading">{{ sourcesLabel }}</p>
-      <div class="ds-tolbi-ai-answer__sources">
-        <TolbiAiSource v-for="source in sources" :key="source.label" v-bind="source" />
-      </div>
-    </section>
 
     <div class="ds-tolbi-ai-answer__actions">
       <IconButton icon="copy" :ariaLabel="copyLabel" @click="emit('copy')" />
@@ -126,24 +107,6 @@ const judge = (value: 'up' | 'down') => (feedback.value = feedback.value === val
 .ds-tolbi-ai-answer__words :deep(:is(h2, h3, h4)) {
   font: var(--ds-font-body-md-emphasis);
   color: var(--ds-text-strong);
-}
-
-.ds-tolbi-ai-answer__group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-sm);
-}
-
-.ds-tolbi-ai-answer__heading {
-  margin: 0;
-  font: var(--ds-font-label-md-strong);
-  color: var(--ds-text-subtlest);
-}
-
-.ds-tolbi-ai-answer__sources {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-spacing-sm);
 }
 
 .ds-tolbi-ai-answer__actions {

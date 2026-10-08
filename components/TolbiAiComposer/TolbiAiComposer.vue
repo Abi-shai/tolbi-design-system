@@ -123,8 +123,9 @@ const props = withDefaults(defineProps<Props>(), {
   placeholder: 'Demander à Tolbi AI…',
   pendingPlaceholder: 'Tolbi AI répond…',
   scope: 'Tout votre projet',
-  disclaimer:
-    'Tolbi AI est une intelligence artificielle, et peut faire des erreurs. Veuillez vérifier les sources citées.',
+  /* No « Veuillez vérifier les sources citées » — the answer cites none
+     since it stopped naming the product's own data (ADR-0062, amended). */
+  disclaimer: 'Tolbi AI est une intelligence artificielle, et peut faire des erreurs.',
   failedMessage: 'Tolbi AI n’a pas pu répondre pour le moment.',
   retryLabel: 'Réessayer',
   sendLabel: 'Envoyer',
@@ -1012,11 +1013,13 @@ function messageAct() {
   }
 }
 
+/* Two balanced lines in the docked panel, never one word left alone. */
 .ds-tolbi-ai-composer__disclaimer {
   margin: 0;
   font: var(--ds-font-body-sm);
   color: var(--ds-text-subtlest);
   text-align: center;
+  text-wrap: balance;
 }
 
 /* Visually hidden, still announced — never display:none. */
