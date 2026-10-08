@@ -18,10 +18,12 @@ const meta: Meta<typeof TolbiAiComposer> = {
       description: {
         component:
           'La saisie de Tolbi AI — la seule. La pastille dit le périmètre (« Tout votre projet »), ' +
-          'la zone de texte grandit avec la question, une seule action à droite : Envoyer quand il y ' +
-          'a du texte, « Arrêter » pendant la réponse. L\'échec se dit au-dessus de la saisie et la ' +
-          'question y reste. Entrée envoie, Maj + Entrée va à la ligne (ADR-0059).\n\n' +
-          '**La voix** (ADR-0061) : tant que la saisie est vide, le micro tient la place d\'Envoyer. ' +
+          'la zone de texte grandit avec la question. À droite, le micro et Envoyer côte à côte, ' +
+          'toujours : Envoyer s\'allume avec le texte, « Arrêter » prend sa place pendant la réponse ' +
+          '(ADR-0067). L\'échec se dit au-dessus de la saisie et la question y reste. Entrée envoie, ' +
+          'Maj + Entrée va à la ligne (ADR-0059).\n\n' +
+          '**La voix** (ADR-0061) : le micro est là même quand une question est écrite — elle attend ' +
+          'dans le champ le temps du vocal. ' +
           'L\'enregistrement tient sur une ligne — supprimer, le point rouge, le minuteur, l\'onde en ' +
           'direct, pause, envoyer ; Entrée envoie, Échap supprime, Espace met en pause. L\'autorisation, ' +
           'le micro bloqué et le silence se disent dans la saisie, sans fenêtre. Les histoires « Vocal » ' +

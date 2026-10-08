@@ -242,10 +242,13 @@ const recorder = useVoiceRecorder({ maxSeconds: props.voiceLimit })
 const supported = ref(false)
 onMounted(() => (supported.value = voiceSupported()))
 
-/* The microphone holds send's place while there is nothing to send. */
-const micShown = computed(
-  () => props.voice && supported.value && !pending.value && props.modelValue.trim() === '',
-)
+/*
+  The microphone and send sit side by side and never trade places (ADR-0067):
+  what can be done does not depend on what has been typed. The microphone is
+  there whenever the browser can record — with a question written, a note can
+  still be recorded, and the question waits in the field for it.
+*/
+const micShown = computed(() => props.voice && supported.value)
 
 /*
   A deleted recording is kept for as long as its « Annuler » can be pressed —
@@ -499,7 +502,7 @@ function tipAway() {
   tip.value = false
 }
 
-watch(micShown, (shown) => !shown && tipAway())
+watch([micShown, pending], ([shown, busy]) => (!shown || busy) && tipAway())
 
 /* ── What a screen reader hears ───────────────────────────────────────── */
 const announcement = ref('')
@@ -592,30 +595,24 @@ function messageAct() {
               />
 
               <div class="ds-tolbi-ai-composer__foot">
-                <Button
-                  v-if="pending"
-                  variant="secondary-gray"
-                  size="xs"
-                  icon-leading="x"
-                  :label="stopLabel"
-                  @click="stop"
-                />
+                <!-- The microphone, then send: side by side, always (ADR-0067). The
+                     microphone is a tool in a receding ink; the green is send's,
+                     and lights up with the text (ADR-0061, amended). While an
+                     answer is coming nothing new can start, so it is disabled. -->
                 <span
-                  v-else-if="micShown"
+                  v-if="micShown"
                   class="ds-tolbi-ai-composer__mic"
-                  @pointerenter="tipSoon"
+                  @pointerenter="!pending && tipSoon()"
                   @pointerleave="tipAway"
                   @focusin="tipSoon"
                   @focusout="tipAway"
                 >
-                  <!-- A tool in a receding ink, not the brand disc: on an empty box
-                       nothing is ready to go, and the green arrives with send
-                       (ADR-0061, amended). -->
                   <IconButton
                     icon="mic"
                     variant="subtle"
                     size="xs"
                     :ariaLabel="labels.record"
+                    :disabled="pending"
                     @click="openMic"
                   />
                   <SurfaceTransition>
@@ -628,6 +625,14 @@ function messageAct() {
                     />
                   </SurfaceTransition>
                 </span>
+                <Button
+                  v-if="pending"
+                  variant="secondary-gray"
+                  size="xs"
+                  icon-leading="x"
+                  :label="stopLabel"
+                  @click="stop"
+                />
                 <IconButton
                   v-else
                   icon="arrow-up"
@@ -841,10 +846,13 @@ function messageAct() {
   color: var(--ds-text-placeholder);
 }
 
+/* Two 32px controls 4px apart — one every 36px, where Notion, Perplexity and
+   Langdock put their microphone and send 30 to 39px apart. */
 .ds-tolbi-ai-composer__foot {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  gap: var(--ds-spacing-xs);
 }
 
 /* ── The microphone and its tooltip ───────────────────────────────── */
