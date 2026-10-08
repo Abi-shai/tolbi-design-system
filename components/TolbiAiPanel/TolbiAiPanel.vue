@@ -258,8 +258,23 @@ onBeforeUnmount(() => {
 /* Opened, the panel is where the question is asked: the field takes the focus. */
 const focusField = () => surface.value?.querySelector<HTMLElement>('textarea')?.focus({ preventScroll: true })
 
+/*
+  …once the field can hold it. The panel's `visibility` comes back with the
+  opening, and under reduced motion the global `transition-duration: 0.01ms`
+  turns that instant flip into a transition: the panel stays hidden a frame or
+  two after the class lands, and focusing a hidden field does nothing — the
+  focus stayed on the page. So it waits for the field to be visible, a frame
+  at a time, a few frames at most, and gives up if the panel closes meanwhile.
+*/
+function focusWhenShown(frames = 10) {
+  const field = surface.value?.querySelector<HTMLElement>('textarea')
+  if (!open.value || !field) return
+  if (getComputedStyle(field).visibility === 'visible') return void field.focus({ preventScroll: true })
+  if (frames > 0) requestAnimationFrame(() => focusWhenShown(frames - 1))
+}
+
 watch(open, (now) => {
-  if (now) void nextTick(focusField)
+  if (now) void nextTick(() => focusWhenShown())
 })
 
 /*
