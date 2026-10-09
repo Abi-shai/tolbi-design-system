@@ -28,10 +28,18 @@ It floats as anything does (ADR-0021): scale from 0.96 and fade, the exit faster
 entrance takes `considered` (400ms), the step minted for heavy surfaces and the first time it is used; the
 exit takes `exit` (100ms). The scrim is `bg-overlay` and fades on the same two timings. The surface is
 `bg-default` with `elevation-overlay` and the `border-subtle` every elevated surface carries — in dark it is
-the border that separates (ADR-0030) — inside a 25rem ceiling, 24px in.
+the border that separates (ADR-0030).
+
+**It has the product's modal format** — amended the same day, from the owner: « that's not how we do the
+dialog in the product, a modal format ». The first version was an alert box: a title, a sentence and the
+buttons under them, in one block 25rem wide. The product's modals (its own clear-history confirmation, on
+Nuxt UI) have three parts: a head with the title and a close, the body, and a foot with the actions on the
+right, each part ruled off from the next. So does `Dialog` now: the head carries the title (`heading-md`) and
+`CloseButton sm`, then the body, then the foot, separated by `border-subtle`, inside a 32rem ceiling — the
+product's modal width. The close is the fourth way to cancel, and it goes with `dismissible`.
 
 Opening moves the focus in — to `[data-autofocus]`, else the first control. Tab and Shift+Tab go round inside
-it. Escape and a click on the scrim cancel (`dismissible`), and closing hands the focus back to what opened it
+it. The close, Escape and a click on the scrim cancel (`dismissible`), and closing hands the focus back to what opened it
 (`restoreFocus`). It is rendered where it is used, not teleported: in the top layer its place in the DOM does
 not decide what covers what, and inside a popover a click on it is still a click inside, so the popover stays
 open behind it. The Escape it handles stops at the dialog, or the popover behind would close too.
@@ -40,8 +48,8 @@ open behind it. The Escape it handles stops at the dialog, or the popover behind
 
 A `Dialog` with a title, one sentence, the action and the way out, as an `alertdialog`. With `tone="danger"`
 the action is `Button danger`, and the focus starts on « Annuler », so a stray Enter cancels rather than
-destroys (WAI-ARIA's alert dialog). Only the confirmation emits `confirm`; the button, Escape and the scrim
-emit `cancel`.
+destroys (WAI-ARIA's alert dialog). Only the confirmation emits `confirm`; « Annuler », the close, Escape
+and the scrim emit `cancel`.
 
 ### Deleting a conversation asks first
 

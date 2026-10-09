@@ -9,8 +9,8 @@ import Dialog from './Dialog.vue'
  * starts on the way out, so a stray Enter cancels rather than destroys
  * (WAI-ARIA's alert dialog); otherwise on the action.
  *
- * Only the confirmation emits `confirm`. Cancelling — the button, Escape, the
- * scrim — emits `cancel` and hands the focus back where it was.
+ * Only the confirmation emits `confirm`. Cancelling — the button, the close,
+ * Escape, the scrim — emits `cancel` and hands the focus back where it was.
  */
 interface Props {
   title: string
@@ -22,6 +22,8 @@ interface Props {
   tone?: 'danger' | 'brand'
   /** Hand the focus back to what opened it — off when the confirmation removes that element. */
   restoreFocus?: boolean
+  /** The close's name, in the head. */
+  closeLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -29,6 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
   cancelLabel: 'Annuler',
   tone: 'danger',
   restoreFocus: true,
+  closeLabel: 'Fermer',
 })
 
 const open = defineModel<boolean>('open', { default: false })
@@ -58,6 +61,7 @@ function cancel() {
     :description="message"
     role="alertdialog"
     :restore-focus="restoreFocus"
+    :close-label="closeLabel"
     @cancel="emit('cancel')"
     @closed="emit('closed')"
   >

@@ -13,7 +13,8 @@ const meta: Meta<typeof Dialog> = {
     docs: {
       description: {
         component:
-          'Une boîte de dialogue modale (ADR-0075) : le `<dialog>` natif, ouvert en modal — il passe au-dessus de ' +
+          'Une modale (ADR-0075), au format des modales du produit : un en-tête avec le titre et la fermeture, le ' +
+          'corps, un pied avec les actions à droite, séparés par un filet. Le `<dialog>` natif, ouvert en modal — il passe au-dessus de ' +
           'tout, page inerte derrière. Elle arrive comme tout ce qui flotte (échelle et fondu, ADR-0021) sur ' +
           '`considered`, la durée des surfaces lourdes, et repart plus vite. Le focus entre, tourne à l’intérieur ' +
           '(Tab, Maj+Tab) et revient à ce qui l’a ouverte ; Échap et le voile annulent. `ConfirmDialog` est sa ' +

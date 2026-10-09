@@ -913,7 +913,9 @@ Before working on any component, read:
   z-index** and makes the page inert, so `z-overlay` is not what a modal needs. It floats as anything does
   (ADR-0021: scale + fade), entering over **`considered`** — the step minted for « modals, destructive
   confirmations », used for the first time — and leaving over `exit`; scrim `bg-overlay`; surface `bg-default`
-  + `elevation-overlay` + `border-subtle`, 25rem ceiling. Focus goes in (`[data-autofocus]`), **goes round**
+  + `elevation-overlay` + `border-subtle`. **The product's modal format** (amended, the owner: « a modal
+  format », not an alert box): a **head** (title `heading-md` + `CloseButton sm`), the **body**, a **foot**
+  with the actions on the right, ruled off by `border-subtle`, **32rem** ceiling. Focus goes in (`[data-autofocus]`), **goes round**
   (Tab/Shift+Tab), and comes back to the opener; Escape and the scrim cancel. **Rendered where it is used**:
   inside a popover a click on it stays inside, and its Escape stops at the dialog. `ConfirmDialog` is the
   `alertdialog`: title, sentence, `danger` action, focus starting on « Annuler ». The history's « Supprimer »

@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { nextTick, ref, useId, useSlots, watch } from 'vue'
+import { CloseButton } from '../CloseButton'
 import { SurfaceTransition } from '../SurfaceTransition'
 
 /**
- * A modal dialog: a surface over the page that keeps the focus until it is
- * answered (ADR-0075). It is the native `<dialog>`, opened modal — the top
+ * A modal: a surface over the page that keeps the focus until it is answered
+ * (ADR-0075). In the product's modal format — a head with the title and the
+ * close, the body, a foot with the actions, each part ruled off from the next.
+ * It is the native `<dialog>`, opened modal — the top
  * layer puts it over everything, popovers and clipped panels included, with no
  * z-index, and makes the page behind it inert.
  *
@@ -15,7 +18,8 @@ import { SurfaceTransition } from '../SurfaceTransition'
  *
  * Opening moves the focus in — to `[data-autofocus]`, else the first control —
  * Tab and Shift+Tab go round inside, and closing hands it back to what opened
- * it. Escape and a click on the scrim cancel, unless `dismissible` is off.
+ * it. The close, Escape and a click on the scrim cancel, unless `dismissible`
+ * is off — then there is no close either.
  * Render it where it is used: in the top layer its place in the DOM does not
  * decide what covers what, and inside a popover a click on it is still a click
  * inside, so the popover stays open behind it.
@@ -29,8 +33,10 @@ interface Props {
   role?: 'dialog' | 'alertdialog'
   /** Hand the focus back to what opened it once it has closed. */
   restoreFocus?: boolean
-  /** Escape and a click on the scrim cancel. */
+  /** The close, Escape and a click on the scrim cancel. Off, there is no close. */
   dismissible?: boolean
+  /** The close's name. */
+  closeLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -38,12 +44,13 @@ const props = withDefaults(defineProps<Props>(), {
   role: 'dialog',
   restoreFocus: true,
   dismissible: true,
+  closeLabel: 'Fermer',
 })
 
 const open = defineModel<boolean>('open', { default: false })
 
 const emit = defineEmits<{
-  /** Dismissed — Escape or the scrim — rather than answered. */
+  /** Dismissed — the close, Escape or the scrim — rather than answered. */
   cancel: []
   /** Gone: the exit is over and the focus handed back. */
   closed: []
@@ -139,14 +146,17 @@ function onClick(event: MouseEvent) {
     </Transition>
     <SurfaceTransition @after-leave="afterLeave">
       <div v-if="shown" ref="surface" class="ds-dialog__surface" tabindex="-1">
-        <div class="ds-dialog__text">
+        <header class="ds-dialog__head">
           <h2 :id="titleId" class="ds-dialog__title">{{ title }}</h2>
+          <CloseButton v-if="dismissible" size="sm" :ariaLabel="closeLabel" @click="dismiss" />
+        </header>
+        <div v-if="slots.default || description" class="ds-dialog__body">
           <div v-if="slots.default" :id="descriptionId" class="ds-dialog__description"><slot /></div>
-          <p v-else-if="description" :id="descriptionId" class="ds-dialog__description">{{ description }}</p>
+          <p v-else :id="descriptionId" class="ds-dialog__description">{{ description }}</p>
         </div>
-        <div v-if="slots.actions" class="ds-dialog__actions">
+        <footer v-if="slots.actions" class="ds-dialog__foot">
           <slot name="actions" />
-        </div>
+        </footer>
       </div>
     </SurfaceTransition>
   </dialog>
@@ -192,25 +202,49 @@ function onClick(event: MouseEvent) {
 /*
   The surface floats: `bg-default` with the overlay's elevation, and the
   `border-subtle` every elevated surface carries — in dark it is the border,
-  not the shadow, that separates (ADR-0030). 25rem is a ceiling, not a size
-  (ADR-0031): on a narrow screen it takes what there is.
+  not the shadow, that separates (ADR-0030). 32rem — the product's modals' —
+  is a ceiling, not a size (ADR-0031): on a narrow screen it takes what there
+  is. A long body scrolls; the head and the foot stay.
 */
 .ds-dialog__surface {
   position: relative;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-3xl);
   width: 100%;
-  max-width: 25rem;
+  max-width: 32rem;
   max-height: 100%;
-  overflow-y: auto;
-  padding: var(--ds-spacing-3xl);
+  overflow: hidden;
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
   background: var(--ds-bg-default);
   box-shadow: var(--ds-elevation-overlay);
   outline: none;
+}
+
+/* The three parts, ruled off from each other with the surface's own hairline. */
+.ds-dialog__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-spacing-xl);
+  padding: var(--ds-spacing-xl) var(--ds-spacing-xl) var(--ds-spacing-xl) var(--ds-spacing-3xl);
+}
+
+.ds-dialog__body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--ds-spacing-3xl);
+  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+}
+
+.ds-dialog__foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--ds-spacing-md);
+  padding: var(--ds-spacing-xl) var(--ds-spacing-3xl);
+  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
 }
 
 /* A heavy surface arrives over `considered`; it leaves as fast as any other. */
@@ -231,12 +265,6 @@ function onClick(event: MouseEvent) {
   opacity: 0;
 }
 
-.ds-dialog__text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-md);
-}
-
 .ds-dialog__title {
   margin: 0;
   font: var(--ds-font-heading-md);
@@ -251,10 +279,4 @@ function onClick(event: MouseEvent) {
   overflow-wrap: anywhere;
 }
 
-.ds-dialog__actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--ds-spacing-md);
-}
 </style>
