@@ -171,7 +171,7 @@ if (panel) watch(panel.open, (open) => !open && stopReading())
   composer's microphone does the same (ADR-0061). Presentational: the button's
   own name already says it to a screen reader.
 */
-const { shown: tip, soon: tipSoon, away: tipAway } = useDelayedTooltip<string>()
+const { shown: tip, soon: tipSoon, soonOnFocus: tipOnFocus, away: tipAway } = useDelayedTooltip<string>()
 
 /*
   The pass (ADR-0068) — the exception the awakening opened (ADR-0063): longer
@@ -243,7 +243,7 @@ onBeforeUnmount(() => {
         class="ds-tolbi-ai-answer__action"
         @pointerenter="tipSoon('copy')"
         @pointerleave="tipAway"
-        @focusin="tipSoon('copy')"
+        @focusin="tipOnFocus($event, 'copy')"
         @focusout="tipAway"
       >
         <IconButton
@@ -274,7 +274,7 @@ onBeforeUnmount(() => {
         class="ds-tolbi-ai-answer__action"
         @pointerenter="tipSoon('read')"
         @pointerleave="tipAway"
-        @focusin="tipSoon('read')"
+        @focusin="tipOnFocus($event, 'read')"
         @focusout="tipAway"
       >
         <IconButton
@@ -306,7 +306,7 @@ onBeforeUnmount(() => {
         class="ds-tolbi-ai-answer__action"
         @pointerenter="tipSoon('up')"
         @pointerleave="tipAway"
-        @focusin="tipSoon('up')"
+        @focusin="tipOnFocus($event, 'up')"
         @focusout="tipAway"
       >
         <IconButton
@@ -333,7 +333,7 @@ onBeforeUnmount(() => {
         class="ds-tolbi-ai-answer__action"
         @pointerenter="tipSoon('down')"
         @pointerleave="tipAway"
-        @focusin="tipSoon('down')"
+        @focusin="tipOnFocus($event, 'down')"
         @focusout="tipAway"
       >
         <IconButton
@@ -360,7 +360,7 @@ onBeforeUnmount(() => {
         class="ds-tolbi-ai-answer__action"
         @pointerenter="tipSoon('regenerate')"
         @pointerleave="tipAway"
-        @focusin="tipSoon('regenerate')"
+        @focusin="tipOnFocus($event, 'regenerate')"
         @focusout="tipAway"
       >
         <IconButton

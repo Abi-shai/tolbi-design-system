@@ -303,7 +303,7 @@ function onFocusOut(event: FocusEvent) {
   Pressed, the action has answered the question the tooltip asked, so the
   tooltip goes; closing takes it with the panel.
 */
-const { shown: tip, soon: tipSoon, away: tipAway } = useDelayedTooltip<string>()
+const { shown: tip, soon: tipSoon, soonOnFocus: tipOnFocus, away: tipAway } = useDelayedTooltip<string>()
 
 watch(open, (now) => !now && tipAway())
 
@@ -354,9 +354,14 @@ const conversationWhen = computed(() => {
   return `${labels.value[group]} · ${meta}`
 })
 
+const titleCut = () => !!titleEl.value && titleEl.value.scrollWidth > titleEl.value.clientWidth
+
 function titleTipSoon() {
-  const el = titleEl.value
-  if (el && el.scrollWidth > el.clientWidth) tipSoon('title')
+  if (titleCut()) tipSoon('title')
+}
+
+function titleTipOnFocus(event: FocusEvent) {
+  if (titleCut()) tipOnFocus(event, 'title')
 }
 
 const actions = computed<{ key: string; icon: IconName; label: string; run: () => void }[]>(() => [
@@ -407,7 +412,7 @@ defineExpose({ scrollToEnd })
               @click="toggleHistory(toggle)"
               @pointerenter="titleTipSoon"
               @pointerleave="tipAway"
-              @focusin="titleTipSoon"
+              @focusin="titleTipOnFocus"
               @focusout="tipAway"
             >
               <span ref="titleEl" class="ds-tolbi-ai-panel__title">{{ conversationTitle }}</span>
@@ -448,7 +453,7 @@ defineExpose({ scrollToEnd })
             class="ds-tolbi-ai-panel__action"
             @pointerenter="tipSoon(action.key)"
             @pointerleave="tipAway"
-            @focusin="tipSoon(action.key)"
+            @focusin="tipOnFocus($event, action.key)"
             @focusout="tipAway"
           >
             <IconButton :icon="action.icon" :ariaLabel="action.label" @click="act(action.run)" />

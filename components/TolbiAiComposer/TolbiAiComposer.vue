@@ -555,7 +555,7 @@ function onLineKeydown(event: KeyboardEvent) {
 }
 
 /* ── The microphone's tooltip, after a beat ───────────────────────────── */
-const { shown: tip, soon: tipSoon, away: tipAway } = useDelayedTooltip()
+const { shown: tip, soon: tipSoon, soonOnFocus: tipOnFocus, away: tipAway } = useDelayedTooltip()
 
 /* ── The project's name, whole, when the chip has to cut it ───────────── */
 const scopeName = ref<HTMLElement>()
@@ -684,7 +684,7 @@ function messageAct() {
                   class="ds-tolbi-ai-composer__mic"
                   @pointerenter="!pending && tipSoon()"
                   @pointerleave="tipAway"
-                  @focusin="tipSoon()"
+                  @focusin="tipOnFocus($event)"
                   @focusout="tipAway"
                 >
                   <IconButton

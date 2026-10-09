@@ -162,7 +162,7 @@ function asked() {
 }
 
 /* ── Each action says what it does (ADR-0066) ─────────────────────────── */
-const { shown: tip, soon: tipSoon, away: tipAway } = useDelayedTooltip<string>()
+const { shown: tip, soon: tipSoon, soonOnFocus: tipOnFocus, away: tipAway } = useDelayedTooltip<string>()
 
 /* ── A row that leaves closes its height; one that comes back opens it ── */
 /*
@@ -266,7 +266,7 @@ function close(el: Element, done: () => void) {
                     class="ds-tolbi-ai-history__action"
                     @pointerenter="tipSoon(`${c.id}:${action}`)"
                     @pointerleave="tipAway"
-                    @focusin="tipSoon(`${c.id}:${action}`)"
+                    @focusin="tipOnFocus($event, `${c.id}:${action}`)"
                     @focusout="tipAway"
                   >
                     <IconButton
