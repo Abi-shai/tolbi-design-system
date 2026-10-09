@@ -84,7 +84,7 @@ watch(open, (now, was) => {
   }
 })
 
-/* ── Saying what it does: after a beat on hover or focus (ADR-0066) ───── */
+/* ── Saying what it does: after a beat, on hover or a keyboard focus ──── */
 const { shown: tip, soon: tipSoon, away: tipAway } = useDelayedTooltip()
 
 function toggle() {
@@ -104,9 +104,16 @@ function onEnter() {
   spark.value?.turn()
 }
 
+/*
+  A focus is an approach only from the keyboard (`:focus-visible`), and never
+  when the launcher takes the focus back as the panel closes — from « Fermer »
+  or ⌘J, the pointer is elsewhere, and a tooltip 400ms after every close would
+  answer a question nobody asked. Hover still says it (ADR-0066).
+*/
 function onFocus() {
+  if (handingBack || !button.value?.matches(':focus-visible')) return
   tipSoon()
-  if (!handingBack && button.value?.matches(':focus-visible')) spark.value?.turn()
+  spark.value?.turn()
 }
 </script>
 
