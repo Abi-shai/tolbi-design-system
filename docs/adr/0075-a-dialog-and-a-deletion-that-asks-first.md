@@ -8,6 +8,8 @@ the toast's)
 **Source:** product decision of 9 Oct.: the product owner wants a confirmation before a conversation is
 deleted. ChatGPT, Claude and Gemini all confirm, and none offers an undo after.
 **Status:** Accepted
+**Amended:** 9 Oct., twice — the product's modal format; then the question asked in the panel (Figma section 18,
+track C1)
 
 ## Context
 
@@ -40,9 +42,10 @@ product's modal width. The close is the fourth way to cancel, and it goes with `
 
 Opening moves the focus in — to `[data-autofocus]`, else the first control. Tab and Shift+Tab go round inside
 it. The close, Escape and a click on the scrim cancel (`dismissible`), and closing hands the focus back to what opened it
-(`restoreFocus`). It is rendered where it is used, not teleported: in the top layer its place in the DOM does
-not decide what covers what, and inside a popover a click on it is still a click inside, so the popover stays
-open behind it. The Escape it handles stops at the dialog, or the popover behind would close too.
+(`restoreFocus`). Over the page it is rendered where it is used, not teleported: in the top layer its place in
+the DOM does not decide what covers what, and inside a popover a click on it is still a click inside, so the
+popover stays open behind it. The Escape it handles stops at the dialog, or the popover behind would close too.
+(Within a region it is teleported — see the second amendment below.)
 
 ### `ConfirmDialog`: the question before what cannot be undone
 
@@ -68,15 +71,57 @@ conversation opens a new one.
 With the question asked first, an undo is a second safeguard for the same mistake — none of the three
 assistants offers one. The product says « Conversation supprimée » in a toast, without an action.
 
+### Amended (9 Oct.): the question is asked in the panel — Figma section 18, track C1
+
+Shown the modal over the page (section 17), the owner asked for other ways, benchmarked on Mobbin (section 18,
+`2521:14778`). Of 22 AI assistants that delete a conversation, the box hardly varies — a question for a title, the
+conversation named, « Annuler » / « Supprimer » — but the place does: 18 ask at the page's centre (15 alerts, 3
+three-part modals), 3 never ask, and 1 — Google Ads' Advisor, the only one docked in a panel like ours — asks
+inside its panel. Nearly all have the assistant full-page, where the page's centre *is* the assistant; ours is a
+column beside the map, and the centre of the page is the map. Three tracks were drawn in the panel with the
+history open, light and dark — A in the row, B against the trash, C in the panel. **The owner chose C**, and for
+the expanded panel **C1**, the question rising at the bottom of the reading column, over C2, centred in the panel.
+
+So `Dialog` gains **`within`**, the region the question belongs to. Given, the dialog is **teleported to the
+region's end** and drawn inside it: the scrim covers the region only and takes its corners; the surface rises
+from the region's bottom, 12px in from its edges, centred — `100%` of the padded region under the 32rem ceiling,
+which gives **376px docked and 512 expanded**, centred on the 720 reading column (measured: 0.0px off). One rule
+for both widths, as the column is (ADR-0064). It is not modal to the page — `show()`, not `showModal()`: the
+region's other children are made **inert** while it is open, and handed back before the focus is; the page beside
+stays usable (measured: a page button is hit and is not inert). Outside the top layer the browser sends no
+`cancel`, so the dialog answers Escape itself. It sits above whatever the region floats of its own — the popover it
+was opened from — at **`z-overlay`**: the overlay that is not in the top layer, which this ADR had kept the token
+for. The surface grows from the edge it rises from (`transform-origin: bottom center`, ADR-0021): sampled every
+frame, its bottom edge holds 12px above the panel's on every frame, with no reversal.
+
+`TolbiAiPanel` hands its surface — positioned, and clipped by the panel — to what it holds
+(`TOLBI_AI_PANEL.layer`); the history asks there. Outside a panel, the history would ask over the page.
+
+A teleported dialog is outside the popover it was opened from, so a click in it had become a click outside:
+**`Dropdown` now ignores a click in a dialog that does not hold it** — the list stays open behind the question —
+while a dropdown inside a dialog still closes on a click elsewhere in that dialog.
+
+Measured in the panel: Escape, « Annuler » and the scrim leave 12 rows of 12, the list open and the focus on the
+row's « Supprimer »; confirming leaves 11, the list open, the focus on the next row and nothing inert. Closing the
+panel (⌘J) while the question is open takes it away and leaves nothing inert.
+
+**The foot has no rule**: the owner took it out of the Figma component (the `Pied`'s top stroke hidden). The head
+is ruled off from the body; the body's 24px parts it from the actions.
+
 ## What changes
 
 - New: `Dialog` and `ConfirmDialog` (`Superposition/Dialog`).
-- `TolbiAiPanel`: `delete-conversation` now fires after a confirmation; `historyLabels` gains `deleteTitle`,
-  `deleteBody` (with `{title}`), `deleteConfirm` and `deleteCancel`.
-- In the product: remove the conversation on `delete-conversation`, and drop « Annuler » from the toast.
+- `Dialog` / `ConfirmDialog`: `within` — the region the question belongs to; the foot loses its rule.
+- `Dropdown`: a click in a dialog that does not hold it is not a click outside.
+- `TolbiAiPanel`: `delete-conversation` now fires after a confirmation, asked **in the panel**; `historyLabels`
+  gains `deleteTitle`, `deleteBody` (with `{title}`), `deleteConfirm` and `deleteCancel`; `TOLBI_AI_PANEL`
+  carries `layer`.
+- In the product: remove the conversation on `delete-conversation`, and drop « Annuler » from the toast. Nothing
+  else — the panel places the question.
 
 ## Still open
 
 - **The page does not stop scrolling** behind the dialog. The top layer covers it and makes it inert, which is
   what matters here.
+- **Within a region, the page is not held**, by design: a click on the map leaves the question open in the panel.
 - **No screen reader has heard** the alert dialog.

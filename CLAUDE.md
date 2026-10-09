@@ -920,7 +920,12 @@ Before working on any component, read:
   inside a popover a click on it stays inside, and its Escape stops at the dialog. `ConfirmDialog` is the
   `alertdialog`: title, sentence, `danger` action, focus starting on « Annuler ». The history's « Supprimer »
   opens it; only the confirmation emits `delete-conversation`; the focus then goes to the next row.
-  **No « Annuler » toast** after a confirmation (ChatGPT, Claude, Gemini).
+  **No « Annuler » toast** after a confirmation (ChatGPT, Claude, Gemini). **Amended (9 Oct.)**: the question is
+  asked **in the panel** (Figma section 18, track C1 — of 22 assistants, the one docked in a panel asks there):
+  `Dialog` gains **`within`** — teleported into the region, the region's own scrim, rising from its bottom at
+  `min(100% − 24px, 32rem)` (376 docked, 512 expanded, centred on the column), the region inert, the page usable,
+  at `z-overlay`; `Dropdown` ignores a click in a dialog that does not hold it; the foot has **no rule** (the
+  owner's Figma change).
 
 ## Architecture
 
