@@ -46,8 +46,9 @@ note and the microphone stop a reading; closing the panel stops it; no speech sy
 ### The chip names the project
 
 `scope` takes the project's name as the product knows it — « Rendement Arachide Nord » — and « Tout votre
-projet » stays only as the fallback for a product that cannot name it. The folder glyph already says it is
-a project. A name too long for the box is cut rather than let past it, and given whole in a tooltip
+projet » stays only as the fallback for a product that cannot name it. Its glyph is the project's own: the
+closed `folder` the product draws everywhere a project is named — each module's « Projets », the
+sidebar's recent projects — where the chip had an open one (`folder-open`), a second glyph for one thing. A name too long for the box is cut rather than let past it, and given whole in a tooltip
 when it is cut — ADR-0069's rule for the conversation's title — with a line saying what the chip means
 (« Vos questions portent sur ce projet. », `scopeHint`), in `Tooltip`'s two-line form, which wraps at
 320px where a one-line tooltip would run past the panel. The field's description reads the whole name.

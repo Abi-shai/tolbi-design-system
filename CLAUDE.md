@@ -898,7 +898,8 @@ Before working on any component, read:
   default (`readAloud`), **no button where the browser cannot speak**. **One sound at a time**:
   `now-playing.ts` now keeps one sound — a voice note or a reading — and **the microphone hushes the
   panel** before recording; a reading stops when its answer leaves or the panel closes. **The chip names
-  the project** — `scope` takes its name (« Tout votre projet » is only the fallback); a long name is cut,
+  the project** — `scope` takes its name (« Tout votre projet » is only the fallback), under the project's
+  own glyph, the closed `folder` the product uses everywhere (was `folder-open`); a long name is cut,
   and given whole in `Tooltip`'s two-line form with `scopeHint` (one line would run past the panel).
 
 ## Architecture

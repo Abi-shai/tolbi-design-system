@@ -639,7 +639,7 @@ function messageAct() {
             @pointerenter="onScopeEnter"
             @pointerleave="scopeTipAway"
           >
-            <Icon name="folder-open" :size="16" />
+            <Icon name="folder" :size="16" />
             <span ref="scopeName" class="ds-tolbi-ai-composer__scope-name">{{ scope }}</span>
             <SurfaceTransition>
               <Tooltip
