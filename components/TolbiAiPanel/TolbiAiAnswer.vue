@@ -199,18 +199,19 @@ async function pass() {
   const style = getComputedStyle(el)
   const duration = readDuration(el, '--tolbi-ai-answer-pass')
   const easing = style.getPropertyValue('--tolbi-ai-answer-pass-easing').trim() || 'ease-in-out'
-  const height = el.getBoundingClientRect().height
+  /*
+    The course runs 0 → 1, and the stylesheet turns it into a place on the
+    answer's own height — the mask's edge and the light's line both — so an
+    answer that grows during the pass (a slot that fills late, an image, a
+    font) is still uncovered by the end, rather than measured once at the
+    start and left under the mask to pop in when the pass is over.
+  */
   sweep = el.animate(
-    [{ '--tolbi-ai-answer-edge': '0px' }, { '--tolbi-ai-answer-edge': `${height + fall}px` }] as Keyframe[],
+    [{ '--tolbi-ai-answer-course': '0' }, { '--tolbi-ai-answer-course': '1' }] as Keyframe[],
     { duration, easing, fill: 'both' },
   )
   light.value?.animate(
-    [
-      { transform: `translateY(${-fall / 2}px)`, opacity: 0 },
-      { opacity: 1, offset: 0.08 },
-      { opacity: 1, offset: 0.82 },
-      { transform: `translateY(${height + fall / 2}px)`, opacity: 0 },
-    ],
+    [{ opacity: 0 }, { opacity: 1, offset: 0.08 }, { opacity: 1, offset: 0.82 }, { opacity: 0 }],
     { duration, easing, fill: 'both' },
   )
   sweep.onfinish = () => {
@@ -413,15 +414,21 @@ onBeforeUnmount(() => {
   min-width: 0;
 }
 
-/* The edge of what can be seen, travelling down the answer. Registered, so it
-   can be animated; 0 is everything hidden. */
-@property --tolbi-ai-answer-edge {
-  syntax: '<length>';
-  inherits: false;
-  initial-value: 0px;
+/*
+  How far the pass has come, 0 to 1. Registered, so it can be animated, and
+  inherited, so the light reads it too. The edge of what can be seen is that
+  share of the answer's height plus a fall — `100%` is the box as it is now,
+  so the course follows an answer that grows during the pass.
+*/
+@property --tolbi-ai-answer-course {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
 }
 
 .ds-tolbi-ai-answer--passing {
+  --tolbi-ai-answer-edge: calc(var(--tolbi-ai-answer-course) * (100% + var(--tolbi-ai-answer-fall)));
+
   -webkit-mask-image: linear-gradient(to bottom, currentColor calc(var(--tolbi-ai-answer-edge) - var(--tolbi-ai-answer-fall)), transparent var(--tolbi-ai-answer-edge));
   mask-image: linear-gradient(to bottom, currentColor calc(var(--tolbi-ai-answer-edge) - var(--tolbi-ai-answer-fall)), transparent var(--tolbi-ai-answer-edge));
 }
@@ -433,7 +440,7 @@ onBeforeUnmount(() => {
 */
 .ds-tolbi-ai-answer__light {
   position: absolute;
-  top: 0;
+  top: calc(var(--tolbi-ai-answer-course) * (100% + var(--tolbi-ai-answer-fall)) - var(--tolbi-ai-answer-fall) / 2);
   left: 0;
   right: 0;
   height: var(--ds-border-width-strong);
@@ -462,8 +469,24 @@ onBeforeUnmount(() => {
   margin-top: 10px;
 }
 
+/*
+  The bullets are said here, not left to the browser: a reset (Tailwind's
+  preflight sets `list-style: none`) would otherwise take them away.
+*/
 .ds-tolbi-ai-answer__words :deep(:is(ul, ol)) {
   padding-left: var(--ds-spacing-xl);
+}
+
+.ds-tolbi-ai-answer__words :deep(ul) {
+  list-style: disc outside;
+}
+
+.ds-tolbi-ai-answer__words :deep(ol) {
+  list-style: decimal outside;
+}
+
+.ds-tolbi-ai-answer__words :deep(:is(ul, ol) ul) {
+  list-style-type: circle;
 }
 
 .ds-tolbi-ai-answer__words :deep(:is(li + li, li > ul, li > ol)) {
