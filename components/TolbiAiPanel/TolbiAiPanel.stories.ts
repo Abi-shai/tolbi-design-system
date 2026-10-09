@@ -314,7 +314,7 @@ const withHistory = ({ empty = false } = {}) => () => ({
       >
         ${BODY}
         <template #composer>
-          <TolbiAiComposer v-model="question" :status="status" voice @send="ask" @send-voice="askVoice" @stop="stop" />
+          <TolbiAiComposer v-model="question" :status="status" voice scope="Rendement Arachide Nord" @send="ask" @send-voice="askVoice" @stop="stop" />
         </template>
       </TolbiAiPanel>
       ${TOASTS}
@@ -374,7 +374,7 @@ export const Arrival: Story = {
             <TolbiAiThinkingLine v-if="!answered" key="waiting" />
             <TolbiAiAnswer v-else key="a"><div v-html="ANSWER" /></TolbiAiAnswer>
           </TolbiAiThread>
-          <template #composer><TolbiAiComposer v-model="question" /></template>
+          <template #composer><TolbiAiComposer v-model="question" scope="Rendement Arachide Nord" /></template>
         </TolbiAiPanel>
       </div>
     `,
@@ -450,7 +450,7 @@ const inThePage = ({ open: startOpen = false, expanded: startExpanded = false, e
           >
             ${BODY}
             <template #composer>
-              <TolbiAiComposer v-model="question" :status="status" voice @send="ask" @send-voice="askVoice" @stop="stop" />
+              <TolbiAiComposer v-model="question" :status="status" voice scope="Rendement Arachide Nord" @send="ask" @send-voice="askVoice" @stop="stop" />
             </template>
           </TolbiAiPanel>
           <TolbiAiLauncher v-model:open="open" controls="tolbi-ai-panel" />

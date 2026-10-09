@@ -8,6 +8,7 @@ import { Button } from '../Button'
 import { Tooltip } from '../Tooltip'
 import { SurfaceTransition } from '../SurfaceTransition'
 import { TolbiAiWaveform } from '../TolbiAiWaveform'
+import { hush } from '../TolbiAiVoiceNote/now-playing'
 import {
   readVoicePermission,
   useVoiceRecorder,
@@ -93,11 +94,15 @@ interface Props {
   /** The placeholder while an answer is on its way. */
   pendingPlaceholder?: string
   /**
-   * What every question is asked about — « Tout votre projet ». A statement,
-   * not a control: each question goes out with the whole project. `null` hides
-   * it.
+   * What every question is asked about — **the project's name**, as the
+   * product knows it (« Rendement Arachide Nord »): a statement, not a control,
+   * each question going out with the whole project (ADR-0074). « Tout votre
+   * projet » is only the fallback for a product that cannot name it. A long
+   * name is cut, and given whole in a tooltip. `null` hides it.
    */
   scope?: string | null
+  /** Under the project's whole name, in the tooltip a cut name opens. */
+  scopeHint?: string
   /** The line under the box. `null` hides it. */
   disclaimer?: string | null
   failedMessage?: string
@@ -127,6 +132,7 @@ const props = withDefaults(defineProps<Props>(), {
   placeholder: 'Demander à Tolbi AI…',
   pendingPlaceholder: 'Tolbi AI répond…',
   scope: 'Tout votre projet',
+  scopeHint: 'Vos questions portent sur ce projet.',
   /* No « Veuillez vérifier les sources citées » — the answer cites none
      since it stopped naming the product's own data (ADR-0062, amended). */
   disclaimer: 'Tolbi AI est une intelligence artificielle, et peut faire des erreurs.',
@@ -292,6 +298,8 @@ async function openMic() {
 async function record() {
   held.value = null
   forgetDeleted()
+  /* The microphone hears the room: nothing of the panel's may be sounding. */
+  hush()
   const ok = await recorder.start()
   if (!ok) return show('denied')
   show('recording')
@@ -549,6 +557,14 @@ function onLineKeydown(event: KeyboardEvent) {
 /* ── The microphone's tooltip, after a beat ───────────────────────────── */
 const { shown: tip, soon: tipSoon, away: tipAway } = useDelayedTooltip()
 
+/* ── The project's name, whole, when the chip has to cut it ───────────── */
+const scopeName = ref<HTMLElement>()
+const { shown: scopeTip, soon: scopeTipSoon, away: scopeTipAway } = useDelayedTooltip()
+function onScopeEnter() {
+  const el = scopeName.value
+  if (el && el.scrollWidth > el.clientWidth) scopeTipSoon()
+}
+
 watch([micShown, pending], ([shown, busy]) => (!shown || busy) && tipAway())
 
 /* ── What a screen reader hears ───────────────────────────────────────── */
@@ -615,9 +631,26 @@ function messageAct() {
             Read as the field's description, so it is heard where the question
             is typed — and hidden as text, or a reader would meet it twice.
           -->
-          <span v-if="scope" :id="scopeId" class="ds-tolbi-ai-composer__scope" aria-hidden="true">
+          <span
+            v-if="scope"
+            :id="scopeId"
+            class="ds-tolbi-ai-composer__scope"
+            aria-hidden="true"
+            @pointerenter="onScopeEnter"
+            @pointerleave="scopeTipAway"
+          >
             <Icon name="folder-open" :size="16" />
-            {{ scope }}
+            <span ref="scopeName" class="ds-tolbi-ai-composer__scope-name">{{ scope }}</span>
+            <SurfaceTransition>
+              <Tooltip
+                v-if="scopeTip"
+                class="ds-tolbi-ai-composer__scope-tip"
+                :title="scope"
+                :supporting-text="scopeHint"
+                arrow="bottom-left"
+                role="presentation"
+              />
+            </SurfaceTransition>
           </span>
 
           <Transition
@@ -870,16 +903,37 @@ function messageAct() {
 }
 
 .ds-tolbi-ai-composer__scope {
+  position: relative;
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: var(--ds-spacing-xs);
+  box-sizing: border-box;
+  max-width: 100%;
   padding: var(--ds-spacing-xxs) var(--ds-spacing-md) var(--ds-spacing-xxs) var(--ds-spacing-sm);
   border-radius: var(--ds-radius-control);
   background: var(--ds-bg-neutral);
   font: var(--ds-font-label-md);
   color: var(--ds-text-default);
   white-space: nowrap;
+}
+
+/* The project's name is cut rather than the chip let past the box (ADR-0074). */
+.ds-tolbi-ai-composer__scope-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Above the chip and from its left, as the answer's tooltips open. */
+.ds-tolbi-ai-composer__scope-tip {
+  position: absolute;
+  bottom: calc(100% + var(--ds-spacing-xs));
+  left: 0;
+  z-index: var(--ds-z-popover);
+  white-space: normal;
+  pointer-events: none;
+  transform-origin: bottom left;
 }
 
 .ds-tolbi-ai-composer__field {

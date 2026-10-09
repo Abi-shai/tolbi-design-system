@@ -89,6 +89,7 @@ function toggle() {
     return
   }
   if (nowPlaying.audio && nowPlaying.audio !== el) nowPlaying.audio.pause()
+  nowPlaying.stopReading?.()
   nowPlaying.audio = el
   el.play().catch(() => (playing.value = false))
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useDelayedTooltip } from '../../composables/useDelayedTooltip'
 import { readDuration } from '../../composables/cssTime'
 import { Icon } from '../Icon'
@@ -7,7 +7,8 @@ import { IconButton } from '../IconButton'
 import { MarkTransition } from '../MarkTransition'
 import { SurfaceTransition } from '../SurfaceTransition'
 import { Tooltip } from '../Tooltip'
-import { TOLBI_AI_THREAD } from './context'
+import { TOLBI_AI_PANEL, TOLBI_AI_THREAD } from './context'
+import { hush, nowPlaying } from '../TolbiAiVoiceNote/now-playing'
 
 /** How the answer was judged, if at all. */
 export type TolbiAiFeedback = 'up' | 'down' | null
@@ -21,7 +22,8 @@ export type TolbiAiFeedback = 'up' | 'down' | null
  *
  * The actions step back (ADR-0066): 32px with a 16px glyph, in a receding ink,
  * 8px under the words — each one saying what it does in a tooltip, and the copy
- * confirming itself with a check.
+ * confirming itself with a check. Where the browser can speak, the answer can
+ * also be read aloud (ADR-0074).
  *
  * Arriving in a thread, the answer passes under a light (ADR-0068): a line in
  * the sign's two inks travels down it and lets it be seen, the way a satellite
@@ -34,6 +36,17 @@ interface Props {
   upLabel?: string
   downLabel?: string
   regenerateLabel?: string
+  readLabel?: string
+  /** What the read-aloud button says while it reads. */
+  stopReadingLabel?: string
+  /** The language the answer is read in — the voice is chosen for it. */
+  lang?: string
+  /**
+   * Offer to read the answer aloud, with the browser's own voice. On by
+   * default, since it needs nothing of the product; where the browser cannot
+   * speak there is no button anyway.
+   */
+  readAloud?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -42,11 +55,17 @@ const props = withDefaults(defineProps<Props>(), {
   upLabel: 'Réponse utile',
   downLabel: 'Réponse non utile',
   regenerateLabel: 'Générer une autre réponse',
+  readLabel: 'Lire la réponse',
+  stopReadingLabel: 'Arrêter la lecture',
+  lang: 'fr-FR',
+  readAloud: true,
 })
 
 const emit = defineEmits<{
   /** The answer's text, as copied. */
   copy: [text: string]
+  /** The answer's text, as it starts being read aloud. */
+  read: [text: string]
   regenerate: []
 }>()
 
@@ -82,6 +101,70 @@ async function copy() {
   }
   emit('copy', text)
 }
+
+/*
+  Read aloud (ADR-0074): the browser's voice reads the words as they read — the
+  slot's text, as the copy takes it — one block at a time, because Chrome cuts
+  a long utterance off after about fifteen seconds. One sound at a time in the
+  panel: reading stops a voice note or another answer's reading, and opening
+  the microphone stops it. While it reads, the button says « Arrêter la
+  lecture » and stops it; it also stops when the answer leaves or the panel
+  closes. Where the browser cannot speak, there is no button.
+*/
+const speakable = ref(false)
+const reading = ref(false)
+let reads = 0
+
+function settleReading() {
+  reading.value = false
+  if (nowPlaying.stopReading === stopReading) nowPlaying.stopReading = null
+}
+
+function stopReading() {
+  if (!reading.value) return
+  reads++
+  settleReading()
+  speechSynthesis.cancel()
+}
+
+function voiceFor(lang: string) {
+  const voices = speechSynthesis.getVoices()
+  const want = lang.toLowerCase()
+  const base = want.split('-')[0]
+  return voices.find((v) => v.lang.toLowerCase() === want) ?? voices.find((v) => v.lang.toLowerCase().startsWith(base))
+}
+
+function read() {
+  if (reading.value) return stopReading()
+  const text = words.value?.innerText.trim() ?? ''
+  const blocks = text.split(/\n+/).map((block) => block.trim()).filter(Boolean)
+  if (!blocks.length) return
+  hush()
+  const busy = speechSynthesis.speaking || speechSynthesis.pending
+  speechSynthesis.cancel()
+  const run = ++reads
+  const voice = voiceFor(props.lang)
+  reading.value = true
+  nowPlaying.stopReading = stopReading
+  const queue = () => {
+    if (run !== reads) return
+    blocks.forEach((block, i) => {
+      const utterance = new SpeechSynthesisUtterance(block)
+      utterance.lang = props.lang
+      if (voice) utterance.voice = voice
+      if (i === blocks.length - 1) utterance.onend = () => run === reads && settleReading()
+      utterance.onerror = () => run === reads && settleReading()
+      speechSynthesis.speak(utterance)
+    })
+  }
+  /* Chrome drops what is spoken in the same task as a cancel that stopped something. */
+  if (busy) setTimeout(queue, 50)
+  else queue()
+  emit('read', text)
+}
+
+const panel = inject(TOLBI_AI_PANEL, null)
+if (panel) watch(panel.open, (open) => !open && stopReading())
 
 /*
   Each icon says what it does, in a tooltip after 400ms on hover or focus — the
@@ -139,11 +222,13 @@ async function pass() {
 }
 
 onMounted(() => {
+  speakable.value = 'speechSynthesis' in window && typeof SpeechSynthesisUtterance === 'function'
   if (thread?.settled.value) void pass()
 })
 
 onBeforeUnmount(() => {
   clearTimeout(copiedTimer)
+  stopReading()
   sweep?.cancel()
 })
 </script>
@@ -178,6 +263,38 @@ onBeforeUnmount(() => {
             v-if="tip === 'copy'"
             class="ds-tolbi-ai-answer__tip"
             :title="copied ? copiedLabel : copyLabel"
+            arrow="bottom-left"
+            role="presentation"
+          />
+        </SurfaceTransition>
+      </span>
+      <span
+        v-if="readAloud && speakable"
+        class="ds-tolbi-ai-answer__action"
+        @pointerenter="tipSoon('read')"
+        @pointerleave="tipAway"
+        @focusin="tipSoon('read')"
+        @focusout="tipAway"
+      >
+        <IconButton
+          icon="volume-2"
+          size="xs"
+          variant="subtle"
+          :ariaLabel="reading ? stopReadingLabel : readLabel"
+          :active="reading"
+          @click="read"
+        >
+          <template #default="{ size }">
+            <MarkTransition>
+              <Icon :key="reading ? 'square' : 'volume-2'" :name="reading ? 'square' : 'volume-2'" :size="size" />
+            </MarkTransition>
+          </template>
+        </IconButton>
+        <SurfaceTransition>
+          <Tooltip
+            v-if="tip === 'read'"
+            class="ds-tolbi-ai-answer__tip"
+            :title="reading ? stopReadingLabel : readLabel"
             arrow="bottom-left"
             role="presentation"
           />

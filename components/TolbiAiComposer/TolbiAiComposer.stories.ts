@@ -45,7 +45,7 @@ const meta: Meta<typeof TolbiAiComposer> = {
     scope: { control: 'text', table: { category: 'Contenu', type: { summary: 'string | null' } } },
     disclaimer: { control: 'text', table: { category: 'Contenu', type: { summary: 'string | null' } } },
   },
-  args: { modelValue: '', status: 'ready', voice: true },
+  args: { modelValue: '', status: 'ready', voice: true, scope: 'Rendement Arachide Nord' },
   decorators: [() => ({ template: '<div style="width:368px"><story /></div>' })],
 }
 
@@ -224,6 +224,12 @@ export const VoiceLimit: Story = {
 export const VoiceReal: Story = {
   name: 'Vocal — vrai micro',
   render: voiceDemo(null),
+}
+
+/** Un nom de projet trop long pour la saisie : il est coupé, et donné entier au survol (ADR-0074). */
+export const LongScope: Story = {
+  name: 'Nom de projet long',
+  args: { scope: 'Rendement Arachide Nord — campagne d’hivernage 2025, coopérative de Kaolack' },
 }
 
 /** Sans voix : la saisie vide garde Envoyer, éteint. */
