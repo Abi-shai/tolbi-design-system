@@ -47,6 +47,10 @@ it — as the products that rename in place do. An empty or unchanged name chang
 42px and the row 40, so it overhangs by 1px each way rather than growing the row: the rows below do not
 move. The panel emits `rename-conversation`; the product keeps the title.
 
+**Amended by ADR-0075 (9 Oct.):** deleting now asks first — a `ConfirmDialog`, « Supprimer la conversation ? »
+— and only the confirmation emits `delete-conversation`. The toast says it was done, without « Annuler ». What
+follows describes the first version.
+
 ### Deleting is at once, and the way back is the toast's
 
 No confirmation: the system has no modal, and « Annuler » catches the mistake without slowing the

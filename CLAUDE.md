@@ -879,7 +879,8 @@ Before working on any component, read:
   the focus goes to the next row; the product shows « Conversation supprimée » + « Annuler » and holds it
   **as long as the toast offers it** (its time pauses, ADR-0052); undone, it opens back over `enter`
   where it was. Deleting the current one opens a new conversation. Only what the product changes moves —
-  the search filters at once.
+  the search filters at once. **Amended by ADR-0075**: deleting **asks first** in a `ConfirmDialog`, and the toast has
+  no « Annuler ».
 - **ADR-0073**: what the **first integration** found (etolbi, 0.55.1). **A duration read from CSS must
   survive a minifier**: the minifier writes `1650ms` as `1.65s`, a bare `parseFloat` read 1.65, and the
   launcher's turn and the answer's light ran in 1.65ms / 1.1ms — invisible, only in the built package; a
@@ -907,6 +908,17 @@ Before working on any component, read:
   the project** — `scope` takes its name (« Tout votre projet » is only the fallback), under the project's
   own glyph, the closed `folder` the product uses everywhere (was `folder-open`); a long name is cut,
   and given whole in `Tooltip`'s two-line form with `scopeHint` (one line would run past the panel).
+- **ADR-0075**: a **dialog**, and a deletion that **asks first** (product decision, 9 Oct.). `Dialog` is the
+  **native `<dialog>` opened modal** — the top layer covers everything (popovers, the panel's clip) with **no
+  z-index** and makes the page inert, so `z-overlay` is not what a modal needs. It floats as anything does
+  (ADR-0021: scale + fade), entering over **`considered`** — the step minted for « modals, destructive
+  confirmations », used for the first time — and leaving over `exit`; scrim `bg-overlay`; surface `bg-default`
+  + `elevation-overlay` + `border-subtle`, 25rem ceiling. Focus goes in (`[data-autofocus]`), **goes round**
+  (Tab/Shift+Tab), and comes back to the opener; Escape and the scrim cancel. **Rendered where it is used**:
+  inside a popover a click on it stays inside, and its Escape stops at the dialog. `ConfirmDialog` is the
+  `alertdialog`: title, sentence, `danger` action, focus starting on « Annuler ». The history's « Supprimer »
+  opens it; only the confirmation emits `delete-conversation`; the focus then goes to the next row.
+  **No « Annuler » toast** after a confirmation (ChatGPT, Claude, Gemini).
 
 ## Architecture
 

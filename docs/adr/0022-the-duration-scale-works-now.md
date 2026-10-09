@@ -75,3 +75,6 @@ Twenty tests, and the rule was mutation-checked like the rest — neutralising i
   150ms is right for colour — and it should fall further as movement is added, which is item 1 of the
   agenda and the next piece of work.
 - **`considered` has no consumer**, deliberately, until a modal exists.
+
+**Amended by ADR-0075 (9 Oct.):** the modal exists — `Dialog`. `considered` is its entrance and `bg-overlay`
+its scrim. It is the native dialog in the top layer, so `z-overlay` is not what it needs.
