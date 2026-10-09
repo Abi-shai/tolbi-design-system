@@ -103,3 +103,6 @@ and Figma's 28px send in that one state, where every other state draws 32.
   `IconButton`'s no `primary`.
 - **No disabled composer.** The product disables its prompt while the history loads; nothing here
   does yet.
+
+**Amended by ADR-0074 (9 Oct.):** the scope chip names the project — `scope` takes the project's name as the
+product knows it, « Tout votre projet » is only the fallback; a long name is cut and given whole in a tooltip.

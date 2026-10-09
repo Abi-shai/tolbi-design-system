@@ -891,6 +891,15 @@ Before working on any component, read:
   nowhere is worse than none). **The answer styles all of markdown** — every heading at
   `body-md-emphasis`, links `text-brand` always underlined, `code-md`, code blocks that scroll, quotes,
   tables in `body-sm`, rules, images.
+- **ADR-0074**: two comments from the IT department. **The answer is read aloud** — a fifth action after
+  the copy (« Lire la réponse », `volume-2`): the browser's voice reads the slot's text in `lang` (default
+  `fr-FR`), **one block at a time** (Chrome cuts a long utterance after ~15s); reading, the glyph turns to
+  a square, the button is `active` and says « Arrêter la lecture » — the same button stops it. On by
+  default (`readAloud`), **no button where the browser cannot speak**. **One sound at a time**:
+  `now-playing.ts` now keeps one sound — a voice note or a reading — and **the microphone hushes the
+  panel** before recording; a reading stops when its answer leaves or the panel closes. **The chip names
+  the project** — `scope` takes its name (« Tout votre projet » is only the fallback); a long name is cut,
+  and given whole in `Tooltip`'s two-line form with `scopeHint` (one line would run past the panel).
 
 ## Architecture
 

@@ -41,6 +41,9 @@ A tooltip after 400ms on hover or focus — the microphone's timing (ADR-0061) �
 the button's name already says it: « Copier la réponse », « Réponse utile », « Réponse non utile »,
 « Générer une autre réponse ». The names explain rather than label: « Régénérer » said what, not what for.
 
+**Amended by ADR-0074:** a fifth action, after the copy — « Lire la réponse » reads the answer aloud with the
+browser's voice, and the same button stops it.
+
 **Amended (8 Oct.):** the 400ms is written once — `useDelayedTooltip` (internal, `composables/`), which
 the answer, the panel's head, the microphone and the launcher share. It had been copied into all four.
 
