@@ -39,6 +39,10 @@ and `aria-keyshortcuts` still declares it.
 **Amended by ADR-0071:** the pointer's arrival — or the keyboard's focus — also turns the sign once: the
 awakening's turn, alone, from rest to rest; not when the focus is handed back as the panel closes.
 
+**Amended by ADR-0073 (9 Oct.):** the tooltip follows the turn's rule — on hover, or on a keyboard focus
+(`:focus-visible`), and never on the focus handed back as the panel closes: closing from « Fermer » or ⌘J
+left the pointer elsewhere, and « Interroger Tolbi xAI » appeared 400ms after every close.
+
 ### It gives way to the panel
 
 Open, the panel stands where the disc floats; so the disc leaves as anything that floats does — scale and

@@ -90,6 +90,15 @@ did. The note now aligns itself — the rule belongs to the piece, not to the th
 have to know its children's classes. Measured in the page: the note and the question both end flush with
 the thread's right edge, the note at its 296px ceiling, with no style from the product.
 
+### Fourth round (9 Oct.)
+
+**The launcher's tooltip opened after every close.** Closing from inside the panel hands the focus back to
+the launcher, and its focus handler showed the tooltip unconditionally — only the sign's turn was gated —
+so « Interroger Tolbi xAI » appeared 400ms later, with the pointer on « Fermer » or nowhere near. A focus
+is now an approach only from the keyboard (`:focus-visible`) and never when handed back; hover still says
+it. Checked: closed by « Fermer » with the mouse or by ⌘J from the field, the launcher has the focus and
+no tooltip; Tab onto it, the tooltip and the turn; hover, the tooltip.
+
 ## What changes
 
 - New: `composables/cssTime.ts` (`cssTime`, `readDuration`), internal; `scripts/css-time.test.mjs`.
