@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
+import { ConfirmDialog } from '../Dialog'
 import { DropdownGroup, DropdownItem } from '../Dropdown'
 import { IconButton } from '../IconButton'
 import { InputField } from '../InputField'
@@ -24,7 +25,7 @@ import {
  *
  * Each row carries its two actions (ADR-0072): under the pointer or the
  * focus, renaming and deleting take the time's place. Renaming happens in
- * the row; deleting is at once, and the product offers the way back.
+ * the row; deleting asks first, in a confirmation (ADR-0075).
  */
 const props = defineProps<{
   conversations: TolbiAiConversation[]
@@ -116,19 +117,41 @@ function onEscape(event: KeyboardEvent) {
   cancel()
 }
 
-/* ── Deleting, at once ────────────────────────────────────────────────── */
+/* ── Deleting, once confirmed ─────────────────────────────────────────── */
 /*
-  The row goes; the focus goes to the next one — the one before, when it was
-  the last — so a keyboard stays in the list. The product removes it and
-  offers « Annuler » (a toast, as for a voice note, ADR-0061).
+  A deletion asks first (ADR-0075): « Supprimer la conversation ? », the
+  conversation named in the sentence. Only the confirmation emits `remove`;
+  the row then closes and the focus goes to the next one — the one before,
+  when it was the last — so a keyboard stays in the list. Cancelling leaves
+  the list as it was and hands the focus back to the button that asked.
 */
+const doomed = ref<TolbiAiConversation | null>(null)
+const asking = ref(false)
+const confirmed = ref(false)
+let after: string | undefined
+
 function remove(c: TolbiAiConversation) {
   tipAway()
+  doomed.value = c
+  confirmed.value = false
+  asking.value = true
+}
+
+function confirmRemove() {
+  const c = doomed.value
+  if (!c) return
   const order = groups.value.flatMap((g) => g.rows.map((r) => r.id))
   const at = order.indexOf(c.id)
-  const next = order[at + 1] ?? order[at - 1]
+  after = order[at + 1] ?? order[at - 1]
+  confirmed.value = true
   emit('remove', c.id)
-  if (next) focusRow(next)
+}
+
+function asked() {
+  if (confirmed.value && after) focusRow(after)
+  doomed.value = null
+  confirmed.value = false
+  after = undefined
 }
 
 /* ── Each action says what it does (ADR-0066) ─────────────────────────── */
@@ -264,6 +287,18 @@ function close(el: Element, done: () => void) {
       </TransitionGroup>
       <p v-if="hint" class="ds-tolbi-ai-history__hint">{{ hint }}</p>
     </template>
+
+    <ConfirmDialog
+      v-model:open="asking"
+      :title="labels.deleteTitle"
+      :message="labels.deleteBody.replace('{title}', doomed?.title ?? '')"
+      :confirm-label="labels.deleteConfirm"
+      :cancel-label="labels.deleteCancel"
+      tone="danger"
+      :restore-focus="!confirmed"
+      @confirm="confirmRemove"
+      @closed="asked"
+    />
   </div>
 </template>
 

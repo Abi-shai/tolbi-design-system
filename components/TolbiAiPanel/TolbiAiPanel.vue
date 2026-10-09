@@ -107,7 +107,10 @@ const emit = defineEmits<{
   'new-conversation': []
   /** A row was renamed in place (ADR-0072); the product keeps the new title. */
   'rename-conversation': [id: string, title: string]
-  /** A row's delete was pressed (ADR-0072); the product removes it and offers « Annuler ». */
+  /**
+   * A row's deletion was confirmed (ADR-0075); the product removes it. A toast
+   * may say so — without « Annuler »: the confirmation was the safeguard.
+   */
   'delete-conversation': [id: string]
 }>()
 

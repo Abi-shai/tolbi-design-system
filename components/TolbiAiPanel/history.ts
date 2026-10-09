@@ -39,6 +39,11 @@ export interface TolbiAiHistoryLabels {
   renameField: string
   save: string
   cancel: string
+  /** The confirmation a deletion asks for: its title, its sentence (`{title}` is the conversation's), its two answers. */
+  deleteTitle: string
+  deleteBody: string
+  deleteConfirm: string
+  deleteCancel: string
 }
 
 export const HISTORY_LABELS: TolbiAiHistoryLabels = {
@@ -58,6 +63,10 @@ export const HISTORY_LABELS: TolbiAiHistoryLabels = {
   renameField: 'Nom de la conversation',
   save: 'Enregistrer',
   cancel: 'Annuler',
+  deleteTitle: 'Supprimer la conversation ?',
+  deleteBody: 'La conversation « {title} » sera supprimée définitivement.',
+  deleteConfirm: 'Supprimer',
+  deleteCancel: 'Annuler',
 }
 
 /** From this many conversations on, the list can be searched. */

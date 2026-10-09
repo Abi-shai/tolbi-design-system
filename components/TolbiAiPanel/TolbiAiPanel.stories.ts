@@ -211,11 +211,11 @@ function useConversations({ empty = false, slowList = false } = {}) {
   }
 
   /*
-    Deleted at once, with « Annuler » in a toast for as long as it stays (8s
-    with an action, ADR-0052): the conversation comes back where it was, and
-    is current again if it was. Deleting the current one opens a new one.
+    Deleted once confirmed (ADR-0075): the panel asks before emitting, so the
+    product removes it and says so in a toast — without « Annuler », the
+    confirmation was the safeguard. Deleting the current one opens a new one.
   */
-  type Removed = { key: number; item: TolbiAiConversation; index: number; wasCurrent: boolean }
+  type Removed = { key: number; item: TolbiAiConversation }
   const removed = ref<Removed[]>([])
   let removedKey = 1
 
@@ -223,26 +223,19 @@ function useConversations({ empty = false, slowList = false } = {}) {
     const index = conversations.value.findIndex((c) => c.id === id)
     if (index < 0) return
     const [item] = conversations.value.splice(index, 1)
-    const wasCurrent = item.id === conversation.value
-    removed.value.push({ key: removedKey++, item, index, wasCurrent })
-    if (wasCurrent) conversation.value = null
-  }
-
-  const undo = (r: Removed) => {
-    conversations.value.splice(Math.min(r.index, conversations.value.length), 0, r.item)
-    if (r.wasCurrent && conversation.value === null) conversation.value = r.item.id
-    removed.value = removed.value.filter((x) => x.key !== r.key)
+    if (item.id === conversation.value) conversation.value = null
+    removed.value.push({ key: removedKey++, item })
   }
 
   const forget = (key: number) => (removed.value = removed.value.filter((x) => x.key !== key))
 
   return {
     conversations, conversation, loading, listLoading, question, items, pending, status,
-    fetchList, choose, ask, askVoice, stop, restart, rename, remove, removed, undo, forget,
+    fetchList, choose, ask, askVoice, stop, restart, rename, remove, removed, forget,
   }
 }
 
-/* The product's toasts: a deleted conversation and the way back. */
+/* The product's toast: a deleted conversation, said — the confirmation came first. */
 const TOASTS = `
   <ToastRegion>
     <Toast
@@ -251,11 +244,7 @@ const TOASTS = `
       message="Conversation supprimée"
       :detail="r.item.title"
       @dismiss="forget(r.key)"
-    >
-      <template #actions>
-        <Button label="Annuler" variant="link" size="sm" @click="undo(r)" />
-      </template>
-    </Toast>
+    />
   </ToastRegion>
 `
 
