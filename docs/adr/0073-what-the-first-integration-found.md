@@ -82,6 +82,14 @@ so a reset — Tailwind's preflight, `list-style: none` — took them away. The 
 `decimal`, and `circle` for a nested list. Checked under Tailwind v3's unlayered preflight and v4's
 `@layer base`: bullets, padding, links, headings and code all hold.
 
+### Third round (9 Oct.)
+
+**The voice note did not align itself.** In a thread it is the user's side, like the question, but only
+`TolbiAiQuestion` set `align-self: flex-end`: the product had to write it on the note itself, as the story
+did. The note now aligns itself — the rule belongs to the piece, not to the thread, which would otherwise
+have to know its children's classes. Measured in the page: the note and the question both end flush with
+the thread's right edge, the note at its 296px ceiling, with no style from the product.
+
 ## What changes
 
 - New: `composables/cssTime.ts` (`cssTime`, `readDuration`), internal; `scripts/css-time.test.mjs`.

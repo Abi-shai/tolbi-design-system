@@ -893,7 +893,8 @@ Before working on any component, read:
   tables in `body-sm`, rules, images. **Second round**: the pass is a registered `<number>` 0 → 1 placed on
   the box **as it is now** (`100%`), so an answer that grows during it is uncovered with the rest (it was
   measured once and popped in at the end); the bullets are **declared** (`disc` / `decimal` / `circle`),
-  or a reset like Tailwind's preflight removes them.
+  or a reset like Tailwind's preflight removes them. **Third round**: `TolbiAiVoiceNote` **aligns itself** to the
+  user's side (`align-self: flex-end`, as `TolbiAiQuestion` does) — the product no longer places it.
 - **ADR-0074**: two comments from the IT department. **The answer is read aloud** — a fifth action after
   the copy (« Lire la réponse », `volume-2`): the browser's voice reads the slot's text in `lang` (default
   `fr-FR`), **one block at a time** (Chrome cuts a long utterance after ~15s); reading, the glyph turns to

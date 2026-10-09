@@ -73,6 +73,9 @@ words, in italic and the softer ink: the product passes it, since it names the l
   hovered button that has the focus shows both.
 - **`pause`** joins the icon manifest. Figma drew its own; the code takes Lucide's.
 
+**Amended by ADR-0073 (9 Oct.):** the note aligns itself to the user's side — `align-self: flex-end`, as
+`TolbiAiQuestion` does — so a product puts it in a thread without placing it.
+
 ## What changes
 
 - New `TolbiAiVoiceNote` (`Identité & média/TolbiAiVoiceNote`, `wip`): `state`, `src`, `duration`,
