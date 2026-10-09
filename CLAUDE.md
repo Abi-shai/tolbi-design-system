@@ -928,6 +928,15 @@ Before working on any component, read:
   `min(100% − 24px, 32rem)` (376 docked, 512 expanded, centred on the column), the region inert, the page usable,
   at `z-overlay`; `Dropdown` ignores a click in a dialog that does not hold it; the foot has **no rule** (the
   owner's Figma change).
+- **ADR-0076**: the product's confirmation is **form B** (Figma section 19, `2541:16182`; of 60+ Mobbin modals the
+  box hardly varies — what it says about the action does): the product's modal format, **signed** — `Dialog` gains
+  `icon` + `tone` (`danger | neutral`), a 36px tile (the close's box) on the tone's tint with its exact ink, the
+  glyph naming the action. Brand is not a tone, so a confirmation that is not a danger is **neutral**, with the
+  primary action (`tone="brand"` still means it). **Three levels, the product's call**: confirm; **`consequences`**
+  (what goes — a glyph and a number per line, part of the description); **`requireText`** (type the exact text, in
+  the label and the placeholder; the action off until then, the focus in the field, Enter only once typed — a
+  `FormField` in `Dialog`'s new `#form` slot, outside the description). The action **names itself** (« Supprimer le
+  projet »). Tolbi AI's deletion question is signed too (`trash-2`).
 
 ## Architecture
 
