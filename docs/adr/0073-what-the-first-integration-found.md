@@ -99,6 +99,20 @@ is now an approach only from the keyboard (`:focus-visible`) and never when hand
 it. Checked: closed by « Fermer » with the mouse or by ⌘J from the field, the launcher has the focus and
 no tooltip; Tab onto it, the tooltip and the turn; hover, the tooltip.
 
+### Fifth round (9 Oct., 0.59.0)
+
+**The row's « Supprimer » tooltip opened after a confirmation dismissed with the mouse.** « Annuler », the
+cross or the scrim hand the focus back to the row's delete button — rightly — and its `focusin` scheduled the
+tooltip, which opened 400ms later and stayed over the row's title, though `:focus-visible` was false: the
+fourth round's defect in another component. So the launcher's rule becomes the catalogue's: `useDelayedTooltip`
+gains **`soonOnFocus`**, which schedules the tooltip on focus **only when the focused element is
+`:focus-visible`** — a keyboard's. Every focus-triggered tooltip of the Tolbi AI family goes through it: the
+history row's actions, the panel head's actions and its cut title, the answer's actions, the microphone. A
+focus handed back after Escape is visible — a key was pressed — and the tooltip comes, as it should. Checked:
+dismissed by « Annuler », the cross or the scrim, the focus is on the button and no tooltip opens; by Escape,
+or with the keyboard all the way, it does; hover still opens it everywhere; the copy's « Réponse copiée » still
+follows Enter.
+
 ## What changes
 
 - New: `composables/cssTime.ts` (`cssTime`, `readDuration`), internal; `scripts/css-time.test.mjs`.
@@ -107,6 +121,8 @@ no tooltip; Tab onto it, the tooltip and the turn; hover, the tooltip.
 - `TolbiAiPanel` focuses the field once it is visible.
 - `TolbiAiComposer`: **`voice` defaults to `false`** — a product that wants the microphone passes `voice`.
 - `TolbiAiAnswer` styles the whole markdown vocabulary.
+- `useDelayedTooltip` (internal) gains `soonOnFocus`: a tooltip asked for by a focus waits for
+  `:focus-visible`; the history's, the panel head's, the answer's and the microphone's use it.
 
 ## Still open
 

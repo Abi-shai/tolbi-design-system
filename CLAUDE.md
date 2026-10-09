@@ -897,7 +897,9 @@ Before working on any component, read:
   or a reset like Tailwind's preflight removes them. **Third round**: `TolbiAiVoiceNote` **aligns itself** to the
   user's side (`align-self: flex-end`, as `TolbiAiQuestion` does) — the product no longer places it. **Fourth
   round**: the launcher's **tooltip follows the turn's rule** — hover or keyboard focus, never the focus
-  handed back on close (it opened after every « Fermer » and ⌘J).
+  handed back on close (it opened after every « Fermer » and ⌘J). **Fifth round**: the rule is the catalogue's —
+  `useDelayedTooltip.soonOnFocus` opens a tooltip on focus **only when `:focus-visible`**, for every Tolbi AI tip
+  (the row's « Supprimer » opened after a confirmation dismissed with the mouse; after Escape it opens, rightly).
 - **ADR-0074**: two comments from the IT department. **The answer is read aloud** — a fifth action after
   the copy (« Lire la réponse », `volume-2`): the browser's voice reads the slot's text in `lang` (default
   `fr-FR`), **one block at a time** (Chrome cuts a long utterance after ~15s); reading, the glyph turns to
