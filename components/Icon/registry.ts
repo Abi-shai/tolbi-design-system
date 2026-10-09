@@ -168,6 +168,7 @@ import Sparkle             from './icons/sparkle.vue'
 import Sparkles            from './icons/sparkles.vue'
 import SprayCan            from './icons/spray-can.vue'
 import Sprout              from './icons/sprout.vue'
+import Square              from './icons/square.vue'
 import SquarePen           from './icons/square-pen.vue'
 import Sun                 from './icons/sun.vue'
 import SunDim              from './icons/sun-dim.vue'
@@ -191,6 +192,7 @@ import UserCog             from './icons/user-cog.vue'
 import UserMinus           from './icons/user-minus.vue'
 import UserPlus            from './icons/user-plus.vue'
 import Users               from './icons/users.vue'
+import Volume2             from './icons/volume-2.vue'
 import Warehouse           from './icons/warehouse.vue'
 import Wheat               from './icons/wheat.vue'
 import Wifi                from './icons/wifi.vue'
@@ -363,6 +365,7 @@ export const icons = {
   'sparkles':               Sparkles,
   'spray-can':              SprayCan,
   'sprout':                 Sprout,
+  'square':                 Square,
   'square-pen':             SquarePen,
   'sun':                    Sun,
   'sun-dim':                SunDim,
@@ -386,6 +389,7 @@ export const icons = {
   'user-minus':             UserMinus,
   'user-plus':              UserPlus,
   'users':                  Users,
+  'volume-2':               Volume2,
   'warehouse':              Warehouse,
   'wheat':                  Wheat,
   'wifi':                   Wifi,

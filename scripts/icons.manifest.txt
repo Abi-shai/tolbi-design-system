@@ -169,6 +169,7 @@ sparkle
 sparkles
 spray-can
 sprout
+square
 square-pen
 sun
 sun-dim
@@ -192,6 +193,7 @@ user-cog
 user-minus
 user-plus
 users
+volume-2
 warehouse
 wheat
 wifi
