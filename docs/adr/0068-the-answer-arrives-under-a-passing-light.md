@@ -43,6 +43,11 @@ gradient from opaque to transparent over a fall of three lines — whose edge is
 property (`@property`, `<length>`), animated from 0 to the answer's height plus the fall. The answer's
 actions are inside it, so they arrive last, under the same light.
 
+**Amended by ADR-0073 (9 Oct.):** the course is no longer measured once — the height taken at the start left
+whatever grew during the pass (a late slot, an image, a font) under the mask, to pop in at the end. A
+registered `<number>` runs 0 → 1, and the stylesheet places the edge and the line on the box as it is now
+(`100%`), so the growth is uncovered with the rest.
+
 ### The line rides the edge it draws
 
 The mask and the line run one duration and one curve, and the line sits half a fall behind the edge, where

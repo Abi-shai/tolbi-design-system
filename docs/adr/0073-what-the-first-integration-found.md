@@ -67,6 +67,21 @@ twice the size of the answer. Now all of it takes the answer's type and rhythm, 
 
 Story: « Réponse — tout le markdown ».
 
+### Second round (9 Oct.)
+
+Two more, after 0.57.0. **The pass measured the answer once**, at mount: an answer that grew during it — a
+slot filling late, an image, a font — kept its new lines under the mask until the end, and they popped in
+as the pass finished. The course is now a registered `<number>` running 0 → 1, and the stylesheet turns it
+into a place on the answer's height as it is now (`100%` in the mask's gradient, `top` in % for the line),
+so whatever grows is uncovered with the rest — no observer, nothing to re-measure. Measured: an answer
+growing 300 → 450px 400ms in was whole at 760ms, before the pass ended at 1085ms; the line stayed within
+0.5px of the edge it draws.
+
+**The bullets were the browser's**: the answer coloured `li::marker` and left `list-style-type` alone,
+so a reset — Tailwind's preflight, `list-style: none` — took them away. The answer now says `disc`,
+`decimal`, and `circle` for a nested list. Checked under Tailwind v3's unlayered preflight and v4's
+`@layer base`: bullets, padding, links, headings and code all hold.
+
 ## What changes
 
 - New: `composables/cssTime.ts` (`cssTime`, `readDuration`), internal; `scripts/css-time.test.mjs`.
