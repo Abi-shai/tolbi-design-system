@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { CloseButton } from '../CloseButton'
+import { Icon, type IconName } from '../Icon'
 import { SurfaceTransition } from '../SurfaceTransition'
 
 /**
  * A modal: a surface that keeps the focus until it is answered (ADR-0075). In
  * the product's modal format — a head with the title and the close, ruled off
- * from the body, then a foot with the actions, which is not.
+ * from the body, then a foot with the actions, which is not. Given an `icon`,
+ * the head is **signed** (ADR-0076): a tile on its tone's tint, the glyph of
+ * what the dialog does, before the title — a tone never says it alone
+ * (ADR-0006).
  *
  * Over the page, it is the native `<dialog>` opened modal — the top layer puts
  * it over everything, popovers and clipped panels included, with no z-index,
@@ -35,6 +39,13 @@ interface Props {
   title: string
   /** The sentence under the title. The default slot takes its place for more. */
   description?: string
+  /**
+   * The sign before the title: the glyph of what the dialog does — `trash-2`,
+   * `user-minus`, `coins`. Absent, the head has none.
+   */
+  icon?: IconName
+  /** The sign's tint: `danger` on the error tint, `neutral` on the neutral one. */
+  tone?: 'danger' | 'neutral'
   /** `alertdialog` for a question that interrupts and waits (`ConfirmDialog`). */
   role?: 'dialog' | 'alertdialog'
   /** Hand the focus back to what opened it once it has closed. */
@@ -52,6 +63,8 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   description: undefined,
+  icon: undefined,
+  tone: 'neutral',
   role: 'dialog',
   restoreFocus: true,
   dismissible: true,
@@ -72,8 +85,10 @@ const emit = defineEmits<{
    of `slots` made their type depend on itself, and the declaration build
    dropped the component (TS7022). */
 const slots = defineSlots<{
-  /** The body, in place of `description`. */
+  /** The body, in place of `description` — read as the dialog's description. */
   default?: () => unknown
+  /** What the body asks for after it has said what will happen — a field. Not read as the description. */
+  form?: () => unknown
   /** The actions, in the foot, on the right. */
   actions?: () => unknown
 }>()
@@ -206,12 +221,16 @@ function onClick(event: MouseEvent) {
       <SurfaceTransition @after-leave="afterLeave">
         <div v-if="shown" ref="surface" class="ds-dialog__surface" tabindex="-1">
           <header class="ds-dialog__head">
+            <span v-if="icon" class="ds-dialog__sign" :class="`ds-dialog__sign--${tone}`" aria-hidden="true">
+              <Icon :name="icon" :size="20" />
+            </span>
             <h2 :id="titleId" class="ds-dialog__title">{{ title }}</h2>
             <CloseButton v-if="dismissible" size="sm" :ariaLabel="closeLabel" @click="dismiss" />
           </header>
-          <div v-if="slots.default || description" class="ds-dialog__body">
+          <div v-if="slots.default || description || slots.form" class="ds-dialog__body">
             <div v-if="slots.default" :id="descriptionId" class="ds-dialog__description"><slot /></div>
-            <p v-else :id="descriptionId" class="ds-dialog__description">{{ description }}</p>
+            <p v-else-if="description" :id="descriptionId" class="ds-dialog__description">{{ description }}</p>
+            <slot name="form" />
           </div>
           <footer v-if="slots.actions" class="ds-dialog__foot">
             <slot name="actions" />
@@ -288,12 +307,39 @@ function onClick(event: MouseEvent) {
 .ds-dialog__head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-spacing-xl);
+  gap: var(--ds-spacing-lg);
   padding: var(--ds-spacing-xl) var(--ds-spacing-xl) var(--ds-spacing-xl) var(--ds-spacing-3xl);
 }
 
+/*
+  The sign (ADR-0076): the close's box — `CloseButton sm`, 36px — so the head's
+  two ends are one size; `radius-control`, a glyph at 20 on its tone's tint
+  and that tint's exact ink (ADR-0009). Brand is not a tone (it is
+  interactive-only): a confirmation that is not a danger is neutral.
+*/
+.ds-dialog__sign {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ds-radius-control);
+}
+
+.ds-dialog__sign--danger {
+  background: var(--ds-bg-error-subtle);
+  color: var(--ds-text-on-error-subtle);
+}
+
+.ds-dialog__sign--neutral {
+  background: var(--ds-bg-neutral-subtle);
+  color: var(--ds-text-subtle);
+}
+
 .ds-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-xl);
   min-height: 0;
   overflow-y: auto;
   padding: var(--ds-spacing-3xl);
@@ -361,6 +407,8 @@ function onClick(event: MouseEvent) {
 }
 
 .ds-dialog__title {
+  flex: 1;
+  min-width: 0;
   margin: 0;
   font: var(--ds-font-heading-md);
   color: var(--ds-text-strong);

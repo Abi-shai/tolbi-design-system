@@ -302,6 +302,7 @@ function close(el: Element, done: () => void) {
       :confirm-label="labels.deleteConfirm"
       :cancel-label="labels.deleteCancel"
       tone="danger"
+      icon="trash-2"
       :restore-focus="!confirmed"
       :within="panel?.layer.value ?? null"
       @confirm="confirmRemove"

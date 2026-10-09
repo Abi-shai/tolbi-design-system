@@ -182,6 +182,7 @@ export type { EmptyStateSize } from './EmptyState'
 
 export { Toast, ToastRegion } from './Toast'
 export { Dialog, ConfirmDialog } from './Dialog'
+export type { ConfirmDialogConsequence } from './Dialog'
 export type { ToastTone, ToastRegionPlacement } from './Toast'
 
 export { StatTile } from './StatTile'
