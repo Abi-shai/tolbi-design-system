@@ -62,10 +62,19 @@ function close() {
   emit('update:open', false)
 }
 
+/*
+  A click in a dialog that does not hold this dropdown is not a click outside
+  it: a question asked from a row — teleported to the region it belongs to
+  (ADR-0075) — is still part of the gesture that began here, and the list
+  stays open behind it. A dropdown inside a dialog still closes on a click
+  elsewhere in that dialog.
+*/
 function onClickOutside(e: MouseEvent) {
-  if (rootEl.value && !rootEl.value.contains(e.target as Node)) {
-    close()
-  }
+  const target = e.target as Element | null
+  if (!rootEl.value || rootEl.value.contains(target)) return
+  const dialog = target?.closest?.('.ds-dialog')
+  if (dialog && !dialog.contains(rootEl.value)) return
+  close()
 }
 
 /*

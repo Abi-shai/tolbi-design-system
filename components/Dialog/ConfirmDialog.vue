@@ -24,6 +24,8 @@ interface Props {
   restoreFocus?: boolean
   /** The close's name, in the head. */
   closeLabel?: string
+  /** The region the question belongs to — `Dialog`'s `within`. */
+  within?: HTMLElement | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,6 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
   tone: 'danger',
   restoreFocus: true,
   closeLabel: 'Fermer',
+  within: null,
 })
 
 const open = defineModel<boolean>('open', { default: false })
@@ -62,6 +65,7 @@ function cancel() {
     role="alertdialog"
     :restore-focus="restoreFocus"
     :close-label="closeLabel"
+    :within="within"
     @cancel="emit('cancel')"
     @closed="emit('closed')"
   >

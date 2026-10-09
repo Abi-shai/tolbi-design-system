@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, inject, nextTick, ref, watch } from 'vue'
 import { ConfirmDialog } from '../Dialog'
 import { DropdownGroup, DropdownItem } from '../Dropdown'
 import { IconButton } from '../IconButton'
@@ -9,6 +9,7 @@ import { SurfaceTransition } from '../SurfaceTransition'
 import { Tooltip } from '../Tooltip'
 import { useDelayedTooltip } from '../../composables/useDelayedTooltip'
 import { readDuration } from '../../composables/cssTime'
+import { TOLBI_AI_PANEL } from './context'
 import {
   HISTORY_GROUPS,
   describe,
@@ -124,7 +125,13 @@ function onEscape(event: KeyboardEvent) {
   the row then closes and the focus goes to the next one — the one before,
   when it was the last — so a keyboard stays in the list. Cancelling leaves
   the list as it was and hands the focus back to the button that asked.
+
+  The question belongs to the panel, not to the page: it is asked inside the
+  panel's surface, under the panel's own scrim, rising from its bottom — the
+  map beside it stays as it is (Figma section 18, track C1). Outside a panel,
+  it is asked over the page.
 */
+const panel = inject(TOLBI_AI_PANEL, null)
 const doomed = ref<TolbiAiConversation | null>(null)
 const asking = ref(false)
 const confirmed = ref(false)
@@ -296,6 +303,7 @@ function close(el: Element, done: () => void) {
       :cancel-label="labels.deleteCancel"
       tone="danger"
       :restore-focus="!confirmed"
+      :within="panel?.layer.value ?? null"
       @confirm="confirmRemove"
       @closed="asked"
     />

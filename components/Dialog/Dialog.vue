@@ -1,15 +1,22 @@
 <script setup lang="ts">
-import { nextTick, ref, useId, useSlots, watch } from 'vue'
+import { nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { CloseButton } from '../CloseButton'
 import { SurfaceTransition } from '../SurfaceTransition'
 
 /**
- * A modal: a surface over the page that keeps the focus until it is answered
- * (ADR-0075). In the product's modal format — a head with the title and the
- * close, the body, a foot with the actions, each part ruled off from the next.
- * It is the native `<dialog>`, opened modal — the top
- * layer puts it over everything, popovers and clipped panels included, with no
- * z-index, and makes the page behind it inert.
+ * A modal: a surface that keeps the focus until it is answered (ADR-0075). In
+ * the product's modal format — a head with the title and the close, ruled off
+ * from the body, then a foot with the actions, which is not.
+ *
+ * Over the page, it is the native `<dialog>` opened modal — the top layer puts
+ * it over everything, popovers and clipped panels included, with no z-index,
+ * and makes the page behind it inert.
+ *
+ * **Within a region** — `within`, a panel — the question stays where it
+ * belongs: drawn inside the region, under the region's own scrim, rising from
+ * its bottom at `min(100% − 24px, 32rem)`, the region inert behind it and the
+ * rest of the page left as it is. The region must be a positioned box; the
+ * dialog is teleported to its end.
  *
  * It arrives as anything that floats does (ADR-0021: scale and fade, the exit
  * faster than the entrance), over the time the scale keeps for heavy surfaces,
@@ -20,9 +27,8 @@ import { SurfaceTransition } from '../SurfaceTransition'
  * Tab and Shift+Tab go round inside, and closing hands it back to what opened
  * it. The close, Escape and a click on the scrim cancel, unless `dismissible`
  * is off — then there is no close either.
- * Render it where it is used: in the top layer its place in the DOM does not
- * decide what covers what, and inside a popover a click on it is still a click
- * inside, so the popover stays open behind it.
+ * Render it where it is used: a popover it was opened from stays open behind
+ * it, and the Escape it handles stops at the dialog.
  */
 interface Props {
   /** Its name: the title, read when it opens. */
@@ -37,6 +43,11 @@ interface Props {
   dismissible?: boolean
   /** The close's name. */
   closeLabel?: string
+  /**
+   * The region the question belongs to — a positioned box, a panel. Given, the
+   * dialog is drawn inside it rather than over the page.
+   */
+  within?: HTMLElement | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -45,6 +56,7 @@ const props = withDefaults(defineProps<Props>(), {
   restoreFocus: true,
   dismissible: true,
   closeLabel: 'Fermer',
+  within: null,
 })
 
 const open = defineModel<boolean>('open', { default: false })
@@ -56,7 +68,15 @@ const emit = defineEmits<{
   closed: []
 }>()
 
-const slots = useSlots()
+/* Declared rather than inferred: inside the `<Teleport>`, the template's use
+   of `slots` made their type depend on itself, and the declaration build
+   dropped the component (TS7022). */
+const slots = defineSlots<{
+  /** The body, in place of `description`. */
+  default?: () => unknown
+  /** The actions, in the foot, on the right. */
+  actions?: () => unknown
+}>()
 const el = ref<HTMLDialogElement>()
 const surface = ref<HTMLElement>()
 const shown = ref(false)
@@ -69,24 +89,52 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 const focusables = () => [...(surface.value?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? [])]
 
+/*
+  Within a region, the browser makes nothing inert — the dialog is not modal
+  to the page, only to the region. So the region's other children are made
+  inert while it is open, and only what was made inert here is handed back.
+*/
+let held: HTMLElement[] = []
+
+function hold(on: boolean) {
+  for (const node of held) node.inert = false
+  held = []
+  const region = props.within
+  if (!on || !region) return
+  for (const node of region.children) {
+    if (node === el.value || !(node instanceof HTMLElement) || node.inert) continue
+    node.inert = true
+    held.push(node)
+  }
+}
+
 async function show() {
   opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
   shown.value = true
   await nextTick()
-  if (el.value && !el.value.open) el.value.showModal()
+  if (el.value && !el.value.open) {
+    if (props.within) {
+      el.value.show()
+      hold(true)
+    } else el.value.showModal()
+  }
   const first = surface.value?.querySelector<HTMLElement>('[data-autofocus]') ?? focusables()[0] ?? surface.value
   first?.focus({ preventScroll: true })
 }
 
-/* The surface leaves first; the dialog closes when it is gone. */
+/* The surface leaves first; the dialog closes when it is gone — and the region
+   is handed back before the focus, or it would land on an inert element. */
 function afterLeave() {
   if (el.value?.open) el.value.close()
+  hold(false)
   if (props.restoreFocus && opener?.isConnected) opener.focus({ preventScroll: true })
   opener = null
   emit('closed')
 }
 
 watch(open, (now) => (now ? void show() : (shown.value = false)), { immediate: true })
+
+onBeforeUnmount(() => hold(false))
 
 function dismiss() {
   if (!props.dismissible) return
@@ -106,8 +154,17 @@ function onClose() {
 }
 
 function onKeydown(event: KeyboardEvent) {
-  /* The popover behind listens for Escape on the document: this one is ours. */
-  if (event.key === 'Escape') return event.stopPropagation()
+  /* The popover behind listens for Escape on the document: this one is ours.
+     Over the page, the browser turns it into `cancel`; within a region the
+     dialog is not modal and gets no `cancel`, so it answers it here. */
+  if (event.key === 'Escape') {
+    event.stopPropagation()
+    if (props.within) {
+      event.preventDefault()
+      dismiss()
+    }
+    return
+  }
   if (event.key !== 'Tab') return
   const items = focusables()
   if (!items.length) return event.preventDefault()
@@ -129,37 +186,40 @@ function onClick(event: MouseEvent) {
 </script>
 
 <template>
-  <dialog
-    ref="el"
-    class="ds-dialog"
-    :role="role"
-    aria-modal="true"
-    :aria-labelledby="titleId"
-    :aria-describedby="description || slots.default ? descriptionId : undefined"
-    @cancel="onCancel"
-    @close="onClose"
-    @keydown="onKeydown"
-    @click="onClick"
-  >
-    <Transition name="ds-dialog-scrim">
-      <div v-if="shown" class="ds-dialog__scrim" />
-    </Transition>
-    <SurfaceTransition @after-leave="afterLeave">
-      <div v-if="shown" ref="surface" class="ds-dialog__surface" tabindex="-1">
-        <header class="ds-dialog__head">
-          <h2 :id="titleId" class="ds-dialog__title">{{ title }}</h2>
-          <CloseButton v-if="dismissible" size="sm" :ariaLabel="closeLabel" @click="dismiss" />
-        </header>
-        <div v-if="slots.default || description" class="ds-dialog__body">
-          <div v-if="slots.default" :id="descriptionId" class="ds-dialog__description"><slot /></div>
-          <p v-else :id="descriptionId" class="ds-dialog__description">{{ description }}</p>
+  <Teleport :to="within ?? 'body'" :disabled="!within">
+    <dialog
+      ref="el"
+      class="ds-dialog"
+      :class="{ 'ds-dialog--within': within }"
+      :role="role"
+      aria-modal="true"
+      :aria-labelledby="titleId"
+      :aria-describedby="description || slots.default ? descriptionId : undefined"
+      @cancel="onCancel"
+      @close="onClose"
+      @keydown="onKeydown"
+      @click="onClick"
+    >
+      <Transition name="ds-dialog-scrim">
+        <div v-if="shown" class="ds-dialog__scrim" />
+      </Transition>
+      <SurfaceTransition @after-leave="afterLeave">
+        <div v-if="shown" ref="surface" class="ds-dialog__surface" tabindex="-1">
+          <header class="ds-dialog__head">
+            <h2 :id="titleId" class="ds-dialog__title">{{ title }}</h2>
+            <CloseButton v-if="dismissible" size="sm" :ariaLabel="closeLabel" @click="dismiss" />
+          </header>
+          <div v-if="slots.default || description" class="ds-dialog__body">
+            <div v-if="slots.default" :id="descriptionId" class="ds-dialog__description"><slot /></div>
+            <p v-else :id="descriptionId" class="ds-dialog__description">{{ description }}</p>
+          </div>
+          <footer v-if="slots.actions" class="ds-dialog__foot">
+            <slot name="actions" />
+          </footer>
         </div>
-        <footer v-if="slots.actions" class="ds-dialog__foot">
-          <slot name="actions" />
-        </footer>
-      </div>
-    </SurfaceTransition>
-  </dialog>
+      </SurfaceTransition>
+    </dialog>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -222,7 +282,9 @@ function onClick(event: MouseEvent) {
   outline: none;
 }
 
-/* The three parts, ruled off from each other with the surface's own hairline. */
+/* The head is ruled off from the body with the surface's own hairline; the
+   foot is not — the owner took its rule out of the Figma component (9 Oct.),
+   and the body's 24px is what parts it from the actions. */
 .ds-dialog__head {
   display: flex;
   align-items: center;
@@ -244,7 +306,6 @@ function onClick(event: MouseEvent) {
   justify-content: flex-end;
   gap: var(--ds-spacing-md);
   padding: var(--ds-spacing-xl) var(--ds-spacing-3xl);
-  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
 }
 
 /* A heavy surface arrives over `considered`; it leaves as fast as any other. */
@@ -263,6 +324,40 @@ function onClick(event: MouseEvent) {
 .ds-dialog-scrim-enter-from,
 .ds-dialog-scrim-leave-to {
   opacity: 0;
+}
+
+/*
+  Within a region (Figma section 18, track C1): the dialog covers the region
+  only — its scrim takes the region's corners — and the surface rises from the
+  region's bottom, 12px in from its edges, centred. One rule for every width:
+  the surface's `100%` of the padded region under its 32rem ceiling gives 376px
+  in a docked Tolbi AI panel and 512 on the expanded one, centred on the
+  reading column. Above anything the region floats of its own — the popover
+  it was opened from — and not in the top layer: this is what `z-overlay` was
+  kept for.
+*/
+.ds-dialog--within {
+  position: absolute;
+  z-index: var(--ds-z-overlay);
+  padding: var(--ds-spacing-lg);
+  border-radius: inherit;
+}
+
+.ds-dialog--within[open] {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.ds-dialog--within .ds-dialog__scrim {
+  position: absolute;
+  border-radius: inherit;
+}
+
+/* It grows from the edge it rises from (ADR-0021: the surface sets its own origin). */
+.ds-dialog--within .ds-dialog__surface {
+  transform-origin: bottom center;
 }
 
 .ds-dialog__title {

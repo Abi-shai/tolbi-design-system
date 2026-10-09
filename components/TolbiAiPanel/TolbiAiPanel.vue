@@ -124,10 +124,10 @@ const expanded = defineModel<boolean>('expanded', { default: false })
 /** The current conversation's id; `null` while it has no question yet. */
 const conversation = defineModel<string | null>('conversation', { default: null })
 
-provide(TOLBI_AI_PANEL, { open: toRef(() => open.value), expanded: toRef(() => expanded.value) })
-
 const root = ref<HTMLElement>()
 const surface = ref<HTMLElement>()
+
+provide(TOLBI_AI_PANEL, { open: toRef(() => open.value), expanded: toRef(() => expanded.value), layer: surface })
 const scroller = ref<InstanceType<typeof Scrollbar>>()
 const content = ref<HTMLElement>()
 
@@ -557,8 +557,11 @@ defineExpose({ scrollToEnd })
 /*
   Figma's surface: `bg-default`, `radius-surface` on the top corners only — it
   runs to the bottom of the screen — and no shadow: it sits in the page.
+  Positioned, because a question that belongs to the panel is drawn inside it
+  (a `Dialog` `within` it, ADR-0075) — and the panel's clip keeps it there.
 */
 .ds-tolbi-ai-panel__surface {
+  position: relative;
   display: flex;
   flex-direction: column;
   flex: none;

@@ -4,6 +4,11 @@ import type { InjectionKey, Ref } from 'vue'
 export interface TolbiAiPanelContext {
   open: Ref<boolean>
   expanded: Ref<boolean>
+  /**
+   * The panel's surface, for a question that belongs to the panel — a
+   * `Dialog`'s `within` (ADR-0075): drawn inside it, the page left as it is.
+   */
+  layer: Ref<HTMLElement | undefined>
 }
 
 export const TOLBI_AI_PANEL: InjectionKey<TolbiAiPanelContext> = Symbol('TolbiAiPanel')
