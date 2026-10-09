@@ -207,11 +207,13 @@ const time = computed(() =>
 
 <style scoped>
 /*
-  The user's side of the thread: `bg-neutral`, Figma's 10px / 12px inset. The
-  296px Figma draws is a ceiling, not a size (ADR-0031): in a narrower thread
-  the bubble narrows and the waveform folds into fewer bars.
+  The user's side of the thread: `bg-neutral`, Figma's 10px / 12px inset, and
+  aligned to the right on its own, as `TolbiAiQuestion` is — the product does
+  not place it. The 296px Figma draws is a ceiling, not a size (ADR-0031): in a
+  narrower thread the bubble narrows and the waveform folds into fewer bars.
 */
 .ds-tolbi-ai-voice-note {
+  align-self: flex-end;
   display: flex;
   flex-direction: column;
   gap: var(--ds-spacing-md);

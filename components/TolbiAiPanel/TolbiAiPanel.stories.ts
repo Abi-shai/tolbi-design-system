@@ -274,7 +274,6 @@ const BODY = `
       <TolbiAiQuestion v-if="item.kind === 'question'" :text="item.text" />
       <TolbiAiVoiceNote
         v-else-if="item.kind === 'voice'"
-        style="align-self:flex-end"
         :src="item.src"
         :duration="item.recording.duration"
         :levels="item.recording.levels"
