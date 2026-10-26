@@ -26,7 +26,7 @@ const meta: Meta<typeof Dialog> = {
           'Maj+Tab) et revient à ce qui l’a ouverte ; Échap et le voile annulent. `ConfirmDialog` est sa forme de ' +
           'confirmation, en trois niveaux : confirmer, montrer ce qui part, taper le nom. **Sur le côté** ' +
           '(`placement="side"`, ADR-0079), c’est le panneau latéral : même voile, même focus, posé à 12 px des bords, ' +
-          'les filets suivant le défilement. `size` vaut pour les deux formes : `sm` 24rem, `md` 32rem, `lg` 45rem, ' +
+          'filets en retrait, fondu quand il reste du contenu dessous. `size` vaut pour les deux formes : `sm` 24rem, `md` 32rem, `lg` 45rem, ' +
           '`xl` 60rem, `full`.',
       },
     },
@@ -178,19 +178,15 @@ export const Within: Story = {
 /* ── At the side — the side panel (ADR-0079) ─────────────────────────── */
 
 const PROJECTS = ['Référence carbone — Gripazo', 'Suivi carbone — Gripazo 2025', 'Suivi carbone — Gripazo 2026']
-const SECTION = 'display:flex; flex-direction:column; gap:var(--ds-spacing-xl);'
-const SECTION_HEAD = 'display:flex; flex-direction:column; gap:var(--ds-spacing-xs);'
-const SECTION_TITLE = 'margin:0; font:var(--ds-font-label-lg-strong); color:var(--ds-text-strong);'
-const SECTION_HINT = 'margin:0; font:var(--ds-font-body-sm); color:var(--ds-text-subtle);'
-const RULE = 'margin:var(--ds-spacing-md) calc(-1 * var(--ds-spacing-3xl)); border:0; border-top:var(--ds-border-width-default) solid var(--ds-border-subtle);'
-const ZONE = 'height:144px; border-radius:var(--ds-radius-control); background:var(--ds-bg-neutral-subtle);'
+const CHOICES = 'display:flex; gap:var(--ds-spacing-2xl);'
+const ZONE = 'height:200px; border-radius:var(--ds-radius-control); background:var(--ds-bg-neutral-subtle);'
 
 /**
  * Le panneau latéral (Figma « Panneau latéral », piste B, tranchée le 21 oct.) : `placement="side"`. Même voile,
  * même focus, même fermeture que la modale ; la surface se pose à 12 px des bords de l’écran, sur toute la hauteur.
- * L’en-tête — titre et description — et le pied restent ; le corps défile entre eux, et les filets suivent le
- * défilement : au repos en haut, un seul, celui du pied. Sous 40rem, plein écran, le pied empilé. Le corps est au
- * produit : ici, deux sections séparées d’un filet.
+ * L’en-tête — titre et description — et le pied restent, chacun fermé par un filet en retrait ; le corps défile
+ * entre eux, à 20 px des bords, et un fondu sur ses 64 derniers pixels dit qu’il en reste dessous. Sous 40rem, plein
+ * écran, le pied empilé. Le corps est au produit.
  */
 export const Side: Story = {
   name: 'Panneau latéral',
@@ -198,7 +194,7 @@ export const Side: Story = {
     components: { Dialog, Button, FormField, InputField, Checkbox },
     setup: () => ({
       open: ref(false), name: ref('Référence carbone — Soubré 2025'), kind: ref('reference'), period: ref('single'),
-      PAGE, PROJECTS, SECTION, SECTION_HEAD, SECTION_TITLE, SECTION_HINT, RULE, ZONE,
+      PAGE, PROJECTS, CHOICES, ZONE,
     }),
     template: `
       <div :style="PAGE">
@@ -210,42 +206,30 @@ export const Side: Story = {
           title="Créer un projet"
           description="Remplissez les informations requises et créez votre projet."
         >
-          <section :style="SECTION">
-            <div :style="SECTION_HEAD">
-              <h3 :style="SECTION_TITLE">Le projet</h3>
-              <p :style="SECTION_HINT">Son nom, tel qu’il paraîtra dans la liste et dans le rapport.</p>
+          <FormField label="Nom du projet" required>
+            <InputField v-model="name" data-autofocus />
+          </FormField>
+          <FormField label="Type de projet" hint="Choisissez ce que le projet mesure.">
+            <div :style="CHOICES">
+              <Checkbox type="radio" name="kind" value="reference" :model-value="kind === 'reference'" @update:model-value="kind = 'reference'" label="Référence" />
+              <Checkbox type="radio" name="kind" value="follow" :model-value="kind === 'follow'" @update:model-value="kind = 'follow'" label="Suivi" />
             </div>
-            <FormField label="Nom du projet" required>
-              <InputField v-model="name" data-autofocus />
-            </FormField>
-          </section>
-          <hr :style="RULE" />
-          <section :style="SECTION">
-            <div :style="SECTION_HEAD">
-              <h3 :style="SECTION_TITLE">L’analyse</h3>
-              <p :style="SECTION_HINT">Ce qui est mesuré, quand, et sur quelle zone. Ne se modifie plus une fois le projet créé.</p>
+          </FormField>
+          <FormField label="Période de l’analyse" hint="Une analyse à une date, ou sur une plage de dates.">
+            <div :style="CHOICES">
+              <Checkbox type="radio" name="period" value="single" :model-value="period === 'single'" @update:model-value="period = 'single'" label="Date unique" />
+              <Checkbox type="radio" name="period" value="range" :model-value="period === 'range'" @update:model-value="period = 'range'" label="Plage de dates" />
             </div>
-            <FormField label="Type de projet" hint="Choisissez ce que le projet mesure.">
-              <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-lg);">
-                <Checkbox type="radio" name="kind" value="reference" :model-value="kind === 'reference'" @update:model-value="kind = 'reference'"
-                  label="Référence" supporting-text="Évaluez l’état de référence de la zone sur une période, avant le début de votre intervention." />
-                <Checkbox type="radio" name="kind" value="follow" :model-value="kind === 'follow'" @update:model-value="kind = 'follow'"
-                  label="Suivi" supporting-text="Suivez les performances du projet à partir d’une date de début, une analyse par an." />
-              </div>
-            </FormField>
-            <FormField label="Période de l’analyse" hint="Une analyse à une date, ou sur une plage de dates.">
-              <div style="display:flex; gap:var(--ds-spacing-2xl);">
-                <Checkbox type="radio" name="period" value="single" :model-value="period === 'single'" @update:model-value="period = 'single'" label="Date unique" />
-                <Checkbox type="radio" name="period" value="range" :model-value="period === 'range'" @update:model-value="period = 'range'" label="Plage de dates" />
-              </div>
-            </FormField>
-            <FormField label="Zone du projet" required>
-              <div :style="ZONE" />
-            </FormField>
-          </section>
+          </FormField>
+          <FormField label="Date de l’analyse">
+            <InputField model-value="15 janv. 2025" />
+          </FormField>
+          <FormField label="Zone du projet" required>
+            <div :style="ZONE" />
+          </FormField>
           <template #actions>
-            <Button label="Annuler" variant="secondary-gray" @click="open = false" />
-            <Button label="Créer le projet" variant="primary" @click="open = false" />
+            <Button label="Annuler" variant="secondary-gray" size="sm" @click="open = false" />
+            <Button label="Créer le projet" variant="primary" size="sm" @click="open = false" />
           </template>
         </Dialog>
       </div>

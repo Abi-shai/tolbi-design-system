@@ -965,7 +965,9 @@ Before working on any component, read:
   **`size`** scale for both placements: `sm` 24rem, `md` 32rem (default), `lg` 45rem, `xl` 60rem, `full`
   (the product's « lg ≈ 60rem » is `xl`). At the side: full height, 12px off the edges; the **description
   sits in the fixed head**, and the default slot is **not** the description (a form read out whole);
-  the **rules follow the scroll** (head once something passed under, foot while something is below);
+  the owner's drawing (26 Oct.): **20px** between head, body and foot and in from the sides, the head and
+  the foot each ruled off by an **inset** rule, always — the scroll gets a **64px fade** over the body's
+  foot while content is left below;
   under **40rem** — a **container query**, not a breakpoint — full screen, foot stacked, action on top.
   Entrance **C** of three filmed: the fade with **24px of travel** from the right (A, the scale, says
   nothing about the edge; B, a 524px drawer, crosses half a screen), over `considered` / `exit`. Filming

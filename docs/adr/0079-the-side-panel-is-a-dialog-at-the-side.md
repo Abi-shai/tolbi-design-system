@@ -42,18 +42,24 @@ centre. The width is a ceiling (ADR-0031); `--dialog-width` is a variant switch,
 - **The head holds the description**, under the title, and stays. In the centre the description is the
   body's first paragraph; at the side the body is a form, so the default slot is **not** read as the
   description — a form announced as a description is read out whole.
-- **The rules follow the scroll**: the head is ruled off once something has passed under it, the foot
-  while something is left below — at rest at the top, one rule, the foot's, and only if the body
-  overflows. Measured on scroll and on the size of the body and of what it holds (a field's error grows
-  the content, not the box). In the centre the head's rule stays as it was drawn.
+- **The spacing and the rules are the owner's drawing (26 Oct.)**, made on the first variant of the
+  Figma component and applied to every one: head, body and foot stand **20px apart** and **20px in**
+  from the sides (the head 16 / 16 / 0 / 20); the head and the foot are each ruled off by an **inset**
+  rule — it ends where their content does — 16px from that content, **always**. The board had the rules
+  following the scroll; the drawing keeps them and gives the scroll a **fade** instead: the body's last
+  64px (`spacing-7xl`) fade to the surface while content is left below — measured on scroll and on the
+  size of the body and of what it holds (a field's error grows the content, not the box). The body keeps
+  4px above and below, taken back by its margin, so a field's focus ring is not clipped. In the centre
+  the dialog is as it was drawn.
 - **Under 40rem** the panel takes the whole screen — no inset, corner, border or shadow — and the foot
   stacks, the action on top, both full width. A **container query** on the dialog, not a breakpoint:
   what decides is the room the panel has (ADR-0020 still has no breakpoints).
 - The slot's blocks are the body's own rows (`display: contents`), so they take its rhythm.
 
-Measured against the board: 512 × 876 at 12px from the top and right of a 1440 × 900 screen; on 640px
-of height the rules go foot-only → both → head-only as the body scrolls; on 390px, 390 × 760 edge to
-edge with the foot stacked; the focus on the first field.
+Measured against the drawing, at `sm` on a 983px screen: surface 384 × 959, head 107, the body's content
+20px under the head's rule, the rules inset 20 / 16 (head) and 20 / 20 (foot) — the foot 2px taller with
+the catalogue's `sm` buttons, which are bordered (ADR-0033). On 390px, 390 × 760 edge to edge with the
+foot stacked; the focus on the first field.
 
 ### The entrance: from its edge, without crossing the screen
 
@@ -73,5 +79,6 @@ to show a field still on its way in, so the surface was pulled into place on the
 ## Still open
 
 - **The entrance** is C until the owner has watched the film.
+- The drawing puts a field's hint **under its label**; `FormField` puts it under the control.
 - The board's UX tour (section 5) — the question on dismissing a filled form, the submitting state,
   ⌘↵ in the foot — is the product's, built from `Dialog within`, `Button loading` and the foot's slot.

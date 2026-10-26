@@ -37,10 +37,11 @@ import { SurfaceTransition } from '../SurfaceTransition'
  *
  * **At the side** — `placement="side"` — it is the side panel (ADR-0079): the
  * same scrim, focus and dismissal, the surface standing 12px off the screen's
- * right edge at full height, its description in the fixed head, and its two
- * rules **following the scroll** — the head's only once content has passed
- * under it, the foot's only while there is content left below. Under 40rem it
- * takes the whole screen and the foot stacks, the action on top.
+ * right edge at full height, its description in the fixed head. The head and
+ * the foot are each ruled off by an **inset** rule, always; what follows the
+ * scroll is a fade over the body's last 64px, there while content is left
+ * below. Under 40rem it takes the whole screen and the foot stacks, the
+ * action on top.
  *
  * `size` is one scale for both: `sm` 24rem, `md` 32rem (the default), `lg`
  * 45rem, `xl` 60rem — each a width the catalogue already used — and `full`.
@@ -214,18 +215,15 @@ function afterLeave() {
 watch(open, (now) => (now ? void show() : (shown.value = false)), { immediate: true })
 
 /*
-  The rules follow the scroll (ADR-0079): the head is ruled off once something
-  has passed under it, the foot while something is left below it. Measured on
-  scroll and whenever the body or what it holds changes size — a field's error
-  opening grows the content, not the box.
+  At the side, a fade over the body's foot says there is more below (ADR-0079):
+  measured on scroll and whenever the body or what it holds changes size — a
+  field's error opening grows the content, not the box.
 */
-const under = ref(false)
 const below = ref(false)
 
 function measureScroll() {
   const b = body.value
   if (!b) return
-  under.value = b.scrollTop > 0
   below.value = Math.ceil(b.scrollTop + b.clientHeight) < b.scrollHeight
 }
 
@@ -321,7 +319,7 @@ function onClick(event: MouseEvent) {
           v-if="shown"
           ref="surface"
           class="ds-dialog__surface"
-          :class="{ 'ds-dialog__surface--under': under, 'ds-dialog__surface--below': below }"
+          :class="{ 'ds-dialog__surface--below': below }"
           tabindex="-1"
         >
           <header class="ds-dialog__head">
@@ -541,8 +539,10 @@ function onClick(event: MouseEvent) {
   At the side (ADR-0079, Figma « Panneau latéral » track B): a surface set on
   the page, 12px off its edges, at full height — the same family as the
   dialog, so the same frame. The head holds the description and stays; the
-  body scrolls between them; the rules follow the scroll, so at rest at the
-  top there is one, the foot's, and only if something is below.
+  body scrolls between them. Head, body and foot stand 20px apart, 20px in
+  from the sides; the head and the foot are each ruled off by an inset rule,
+  16px from their content, always — and a fade over the body's last 64px says
+  there is more below (the owner's drawing, 26 Oct.).
 
   The dialog is the container its surface is measured against: under 40rem
   the panel takes the whole screen, edge to edge — no inset, corner or shadow
@@ -564,6 +564,7 @@ function onClick(event: MouseEvent) {
   height: calc(100% - 2 * var(--ds-spacing-lg));
   max-height: none;
   margin: var(--ds-spacing-lg);
+  gap: var(--ds-spacing-2xl);
 }
 
 /*
@@ -577,8 +578,28 @@ function onClick(event: MouseEvent) {
   transform: translateX(var(--ds-spacing-3xl));
 }
 
+/* The rule is inset — it ends where the head's content does — and the head
+   makes room for it under its 16px. */
 .ds-dialog--side .ds-dialog__head {
+  position: relative;
   align-items: flex-start;
+  padding:
+    var(--ds-spacing-xl) var(--ds-spacing-xl)
+    calc(var(--ds-spacing-xl) + var(--ds-border-width-default)) var(--ds-spacing-2xl);
+}
+
+.ds-dialog--side .ds-dialog__head::after,
+.ds-dialog--side .ds-dialog__foot::after {
+  content: '';
+  position: absolute;
+  height: var(--ds-border-width-default);
+  background: var(--ds-border-subtle);
+}
+
+.ds-dialog--side .ds-dialog__head::after {
+  right: var(--ds-spacing-xl);
+  bottom: 0;
+  left: var(--ds-spacing-2xl);
 }
 
 /* The panel's body is the product's: its blocks are the body's own rows, on
@@ -603,20 +624,50 @@ function onClick(event: MouseEvent) {
   overflow-wrap: anywhere;
 }
 
+/* 20px in, 20px between its blocks. The 4px of padding above and below, taken
+   back by the margin, is room for a field's focus ring — the body clips. */
 .ds-dialog--side .ds-dialog__body {
   flex: 1 1 auto;
-  border-top-color: transparent;
-  transition: border-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+  gap: var(--ds-spacing-2xl);
+  margin-block: calc(-1 * var(--ds-spacing-xs));
+  padding: var(--ds-spacing-xs) var(--ds-spacing-2xl);
+  border-top: 0;
 }
 
 .ds-dialog--side .ds-dialog__foot {
-  border-top: var(--ds-border-width-default) solid transparent;
-  transition: border-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+  position: relative;
+  padding:
+    calc(var(--ds-spacing-xl) + var(--ds-border-width-default)) var(--ds-spacing-2xl)
+    var(--ds-spacing-xl);
 }
 
-.ds-dialog--side .ds-dialog__surface--under .ds-dialog__body,
-.ds-dialog--side .ds-dialog__surface--below .ds-dialog__foot {
-  border-top-color: var(--ds-border-subtle);
+.ds-dialog--side .ds-dialog__foot::after {
+  top: 0;
+  right: var(--ds-spacing-2xl);
+  left: var(--ds-spacing-2xl);
+}
+
+/* The fade sits on the foot and reaches up over the body's last 64px. */
+.ds-dialog--side .ds-dialog__foot::before {
+  content: '';
+  position: absolute;
+  right: var(--ds-spacing-2xl);
+  bottom: 100%;
+  left: var(--ds-spacing-2xl);
+  height: var(--ds-spacing-7xl);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--ds-bg-default) 0%, transparent),
+    color-mix(in srgb, var(--ds-bg-default) 70%, transparent) 45%,
+    var(--ds-bg-default)
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+}
+
+.ds-dialog--side .ds-dialog__surface--below .ds-dialog__foot::before {
+  opacity: 1;
 }
 
 @container (max-width: 40rem) {
