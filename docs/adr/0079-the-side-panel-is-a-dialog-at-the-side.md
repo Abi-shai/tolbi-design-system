@@ -6,7 +6,7 @@
 **Source:** etolbi, EUDR inventory item 1 (create or edit a project, a DDR, a folder — 32 uses across
 EUDR, Carbone and Yield) and item 11 (Dialog sizes). Figma « ↪ Sprint 21 — Panneau latéral »
 (`2780:1427`), section 4, decided on 21 Oct.
-**Status:** Accepted — the entrance (track C) awaits the owner's look at the film
+**Status:** Accepted — the entrance (track C) validated by the owner on 26 Oct.
 
 ## Context
 
@@ -87,7 +87,6 @@ to show a field still on its way in, so the surface was pulled into place on the
 
 ## Still open
 
-- **The entrance** is C until the owner has watched the film.
 - The drawing puts a field's hint **under its label**; `FormField` puts it under the control.
 - The board's UX tour (section 5) — the question on dismissing a filled form, the submitting state,
   ⌘↵ in the foot — is the product's, built from `Dialog within`, `Button loading` and the foot's slot.
