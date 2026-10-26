@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SurfaceTransition } from '../SurfaceTransition'
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useAnchoredSurface } from '../../composables/useAnchoredSurface'
 import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
 import { Scrollbar } from '../Scrollbar'
@@ -14,6 +15,12 @@ import DropdownTrigger from './DropdownTrigger.vue'
  * three of them.
  */
 export type DropdownTriggerVariant = 'button' | 'icon' | 'avatar'
+
+/**
+ * The trigger's edge the panel lines up with. Declared here, not taken from
+ * the composable that places it: a public type may only point at what ships.
+ */
+export type DropdownAlign = 'start' | 'end'
 
 interface Props {
   trigger?:    DropdownTriggerVariant
@@ -38,6 +45,12 @@ interface Props {
   role?:       'menu' | 'dialog'
   /** The panel's accessible name; a `dialog` needs one. */
   label?:      string
+  /**
+   * The trigger's edge the panel lines up with. `end` for a trigger at the end
+   * of a bar (the account menu); `start` for one that heads a column or a line
+   * of text (the workspace switcher, a conversation's title).
+   */
+  align?:      DropdownAlign
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -46,6 +59,7 @@ const props = withDefaults(defineProps<Props>(), {
   buttonLabel: 'Account',
   role:        'menu',
   label:       undefined,
+  align:       'end',
 })
 
 const emit = defineEmits<{
@@ -53,6 +67,11 @@ const emit = defineEmits<{
 }>()
 
 const rootEl = ref<HTMLElement | null>(null)
+const panelEl = ref<HTMLElement | null>(null)
+
+/* In the top layer, placed on the trigger (ADR-0078): a panel inside a box
+   that scrolls no longer grows its scroll. */
+useAnchoredSurface(rootEl, panelEl, { align: () => props.align })
 
 function toggle() {
   emit('update:open', !props.open)
@@ -92,6 +111,20 @@ function onKeyDown(e: KeyboardEvent) {
   close()
 }
 
+/*
+  An Escape from inside the dropdown is the dropdown's, and stops there. Inside
+  a dialog it used to travel on — the dialog takes its own Escape on the way
+  up — and closed the whole dialog with the list (ADR-0078). Held on the root,
+  so it is heard before the dialog; cancelled, so the browser does not turn it
+  into the dialog's `cancel` either.
+*/
+function onRootKeyDown(e: KeyboardEvent) {
+  if (e.key !== 'Escape' || !props.open) return
+  e.stopPropagation()
+  e.preventDefault()
+  onKeyDown(e)
+}
+
 onMounted(() => {
   document.addEventListener('click', onClickOutside, true)
   document.addEventListener('keydown', onKeyDown)
@@ -104,7 +137,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="ds-dropdown" ref="rootEl">
+  <div class="ds-dropdown" ref="rootEl" @keydown="onRootKeyDown">
     <!--
       A slotted trigger wins over the three built-ins. This is safe to open up
       only because `DropdownTrigger` exists: a consumer slots that and inherits
@@ -154,6 +187,8 @@ onUnmounted(() => {
     <SurfaceTransition>
     <div
       v-if="open"
+      ref="panelEl"
+      popover="manual"
       class="ds-dropdown__panel"
       :role="role"
       :aria-label="label"
@@ -252,16 +287,21 @@ onUnmounted(() => {
 }
 
 /* ── Panel ────────────────────────────────────────────────────────── */
-/* Pinned under the trigger's right edge, so it grows from that corner
-   (ADR-0021: the surface scales from its anchor). It said `top left`, and the
-   right edge — the one under the trigger — travelled 9.6px on every entrance. */
+/* In the top layer, placed by `useAnchoredSurface` (ADR-0078): under the
+   trigger's `align` edge — or over it, when the room below is short — and it
+   grows from that corner (ADR-0021). It once said `top left` while pinned
+   right, and the edge under the trigger travelled 9.6px on every entrance.
+   The gap is the margin: the panel is placed by its margin box. The rest
+   undoes what the browser gives a popover. */
 .ds-dropdown__panel {
-  transform-origin: top right;
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
+  position: fixed;
+  inset: auto;
+  margin: var(--ds-spacing-md) 0;
+  padding: 0;
+  color: inherit;
   z-index: var(--ds-z-popover);
   width: 240px;
+  max-height: var(--anchor-room, none);
   background-color: var(--ds-bg-default);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-control);

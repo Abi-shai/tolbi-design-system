@@ -126,6 +126,7 @@ function select(w: Workspace) {
 <template>
   <Dropdown
     v-model:open="open"
+    align="start"
     class="ds-workspace-selector"
     :class="{ 'ds-workspace-selector--collapsed': collapsed }"
   >
@@ -344,30 +345,28 @@ function select(w: Workspace) {
 }
 
 /*
-  `Dropdown`'s panel is pinned to `right: 0`, which is right for a trigger
-  floating in a toolbar and wrong in a column, where it hangs off the left edge.
-  So it opens under the mark instead, aligned to its leading edge — 8px below,
-  and scaling from the corner it now hangs from, `top left`.
+  `Dropdown`'s panel lines up with the trigger's end, which is right for a
+  trigger floating in a toolbar and wrong in a column, where it hangs off the
+  left edge. So it opens under the mark instead, aligned to its leading edge
+  (`align="start"`) — 8px below, and scaling from the corner it hangs from.
 
   Its width is `Dropdown`'s too — 240px, **never narrower than the trigger**.
   It used to *be* the trigger's width: right for the 228px box it was drawn in,
   wrong once the toggle came to share the row, where at 184px the footer's
   « Créer une organisation » was cut. One width for every panel in the
-  catalogue, and a floor for the trigger that is wider than it (ADR-0050).
+  catalogue, and a floor for the trigger that is wider than it (ADR-0050). The
+  floor reads `--anchor-width`, not `100%`: the panel is in the top layer now
+  (ADR-0078), where a percentage would be the screen's.
 
-  Which makes the two forms **one rule**. Collapsed, 100% of a 36px mark is 36px,
-  so the 240 opens and overhangs the rail — as an overlay may, and as the
-  expanded panel now covers the toggle beside its trigger. The collapsed
-  override, and the declaration order it depended on, are gone.
+  Which makes the two forms **one rule**. Collapsed, the floor of a 36px mark
+  is 36px, so the 240 opens and overhangs the rail — as an overlay may, and as
+  the expanded panel now covers the toggle beside its trigger.
 
   (It once opened *beside* the rail — `left: 100%`, `top: 0` — a second placement
   and a second gesture, and so a second component to anyone using it.)
 */
 .ds-workspace-selector :deep(.ds-dropdown__panel) {
-  right: auto;
-  left: 0;
-  min-width: 100%;
-  transform-origin: top left;
+  min-width: var(--anchor-width);
 
   /*
     The rows' leading column is the avatars' — `Avatar xs`, 24px — so the

@@ -194,3 +194,49 @@ export const Placeholder: Story = {
     `,
   }),
 }
+
+// ── In a box that scrolls ────────────────────────────────────────────
+
+const statuses: InputDropdownOption[] = [
+  { value: 'all',       label: 'Tous' },
+  { value: 'done',      label: 'Terminé' },
+  { value: 'running',   label: 'En cours' },
+  { value: 'failed',    label: 'Échoué' },
+  { value: 'draft',     label: 'Brouillon' },
+]
+
+export const InAScrollingBox: Story = {
+  name: 'Dans une boîte qui défile',
+  parameters: {
+    layout: 'padded',
+    docs: {
+      description: {
+        story:
+          'La liste est dans la couche supérieure, placée sur le champ (ADR-0078) : au bas du corps d\'un ' +
+          'panneau latéral ou d\'une fenêtre, elle passe par-dessus au lieu d\'allonger son défilement, et ' +
+          's\'ouvre au-dessus du champ quand la place manque en dessous. Dans une barre de filtres en ' +
+          '`overflow`, elle n\'est plus coupée.',
+      },
+    },
+  },
+  render: () => ({
+    components: { InputDropdown, FormField },
+    setup: () => ({ statuses, a: ref(null), b: ref('all') }),
+    template: `
+      <div style="display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap;">
+        <div data-box style="width: 360px; height: 280px; overflow: auto; border: 1px solid var(--ds-border-subtle); border-radius: 12px; padding: 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px;">
+          <p style="margin: 0; font: var(--ds-font-body-md); color: var(--ds-text-subtle);">Le corps d'un panneau latéral : il défile, et le dernier champ est en bas.</p>
+          <div style="height: 120px; flex-shrink: 0; border-radius: 8px; background: var(--ds-bg-neutral-subtle);" />
+          <FormField label="Statut">
+            <InputDropdown placeholder="Choisir un statut" :options="statuses" v-model="a" />
+          </FormField>
+        </div>
+        <div data-bar style="width: 360px; overflow-x: auto; display: flex; gap: 12px; padding: 4px; border-bottom: 1px solid var(--ds-border-subtle);">
+          <div style="width: 160px; flex-shrink: 0;"><InputDropdown :options="statuses" v-model="b" /></div>
+          <div style="width: 160px; flex-shrink: 0;"><InputDropdown placeholder="Norme" :options="statuses" /></div>
+          <div style="width: 160px; flex-shrink: 0;"><InputDropdown placeholder="Année" :options="statuses" /></div>
+        </div>
+      </div>
+    `,
+  }),
+}

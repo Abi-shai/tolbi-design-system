@@ -1,5 +1,5 @@
 export { default as Dropdown } from './Dropdown.vue'
-export type { DropdownTriggerVariant } from './Dropdown.vue'
+export type { DropdownTriggerVariant, DropdownAlign } from './Dropdown.vue'
 
 export { default as DropdownTrigger } from './DropdownTrigger.vue'
 export type { DropdownTriggerSize, DropdownTriggerChrome } from './DropdownTrigger.vue'

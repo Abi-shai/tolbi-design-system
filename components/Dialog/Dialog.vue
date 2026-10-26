@@ -17,10 +17,11 @@ import { SurfaceTransition } from '../SurfaceTransition'
  * and makes the page behind it inert.
  *
  * **Within a region** — `within`, a panel — the question stays where it
- * belongs: drawn inside the region, under the region's own scrim, rising from
+ * belongs: drawn over the region, under the region's own scrim, rising from
  * its bottom at `min(100% − 24px, 32rem)`, the region inert behind it and the
- * rest of the page left as it is. The region must be a positioned box; the
- * dialog is teleported to its end.
+ * rest of the page left as it is. The dialog is teleported to the region's end
+ * and painted in the top layer on the region's rectangle (ADR-0078) — so it is
+ * above the popover it was opened from, which is in the top layer too.
  *
  * It arrives as anything that floats does (ADR-0021: scale and fade, the exit
  * faster than the entrance), over the time the scale keeps for heavy surfaces,
@@ -111,6 +112,44 @@ const focusables = () => [...(surface.value?.querySelectorAll<HTMLElement>(FOCUS
 */
 let held: HTMLElement[] = []
 
+/*
+  Within a region, the dialog is a popover on the region's rectangle (ADR-0078).
+  The list it was opened from is in the top layer, and only something opened
+  after it there can cover it — `z-overlay`, which this used to take, cannot.
+  It follows the region while open: a panel that is resized or scrolled.
+*/
+let regionFrame = 0
+let regionObserver: ResizeObserver | null = null
+
+function cover() {
+  regionFrame = 0
+  const region = props.within
+  const dialog = el.value
+  if (!region || !dialog) return
+  const r = region.getBoundingClientRect()
+  dialog.style.top = `${r.top}px`
+  dialog.style.left = `${r.left}px`
+  dialog.style.width = `${r.width}px`
+  dialog.style.height = `${r.height}px`
+}
+
+function scheduleCover() {
+  if (!regionFrame) regionFrame = requestAnimationFrame(cover)
+}
+
+function follow(on: boolean) {
+  window.removeEventListener('scroll', scheduleCover, { capture: true })
+  window.removeEventListener('resize', scheduleCover)
+  regionObserver?.disconnect()
+  regionObserver = null
+  if (!on || !props.within) return
+  cover()
+  window.addEventListener('scroll', scheduleCover, { capture: true, passive: true })
+  window.addEventListener('resize', scheduleCover, { passive: true })
+  regionObserver = new ResizeObserver(scheduleCover)
+  regionObserver.observe(props.within)
+}
+
 function hold(on: boolean) {
   for (const node of held) node.inert = false
   held = []
@@ -130,6 +169,8 @@ async function show() {
   if (el.value && !el.value.open) {
     if (props.within) {
       el.value.show()
+      if (typeof el.value.showPopover === 'function') el.value.showPopover()
+      follow(true)
       hold(true)
     } else el.value.showModal()
   }
@@ -140,7 +181,9 @@ async function show() {
 /* The surface leaves first; the dialog closes when it is gone — and the region
    is handed back before the focus, or it would land on an inert element. */
 function afterLeave() {
+  if (el.value?.matches(':popover-open')) el.value.hidePopover()
   if (el.value?.open) el.value.close()
+  follow(false)
   hold(false)
   if (props.restoreFocus && opener?.isConnected) opener.focus({ preventScroll: true })
   opener = null
@@ -149,7 +192,10 @@ function afterLeave() {
 
 watch(open, (now) => (now ? void show() : (shown.value = false)), { immediate: true })
 
-onBeforeUnmount(() => hold(false))
+onBeforeUnmount(() => {
+  follow(false)
+  hold(false)
+})
 
 function dismiss() {
   if (!props.dismissible) return
@@ -206,6 +252,7 @@ function onClick(event: MouseEvent) {
       ref="el"
       class="ds-dialog"
       :class="{ 'ds-dialog--within': within }"
+      :popover="within ? 'manual' : undefined"
       :role="role"
       aria-modal="true"
       :aria-labelledby="titleId"
@@ -378,12 +425,13 @@ function onClick(event: MouseEvent) {
   region's bottom, 12px in from its edges, centred. One rule for every width:
   the surface's `100%` of the padded region under its 32rem ceiling gives 376px
   in a docked Tolbi AI panel and 512 on the expanded one, centred on the
-  reading column. Above anything the region floats of its own — the popover
-  it was opened from — and not in the top layer: this is what `z-overlay` was
-  kept for.
+  reading column. Above the popover it was opened from: both are in the top
+  layer, and the dialog came second (ADR-0078). Its box is the region's
+  rectangle, set as it opens and followed; `z-overlay` is what it falls back
+  to where the top layer is not offered.
 */
 .ds-dialog--within {
-  position: absolute;
+  inset: auto;
   z-index: var(--ds-z-overlay);
   padding: var(--ds-spacing-lg);
   border-radius: inherit;

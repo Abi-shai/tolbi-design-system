@@ -396,6 +396,7 @@ defineExpose({ scrollToEnd })
         <Dropdown
           v-if="conversations"
           v-model:open="historyOpen"
+          align="start"
           class="ds-tolbi-ai-panel__switcher"
           role="dialog"
           :label="labels.title"
@@ -617,12 +618,9 @@ defineExpose({ scrollToEnd })
   white-space: nowrap;
 }
 
-/* Under the title, from its start, 320 wide: its rows are sentences. */
+/* Under the title, from its start (`align="start"`), 320 wide: its rows are sentences. */
 .ds-tolbi-ai-panel__switcher :deep(.ds-dropdown__panel) {
-  right: auto;
-  left: 0;
   width: 320px;
-  transform-origin: top left;
 }
 
 /* The whole title, under the cut one — from its start, as the list opens. */

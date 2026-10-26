@@ -24,6 +24,15 @@ const meta: Meta<typeof Dropdown> = {
       options: ['button', 'icon', 'avatar'],
       table: { category: 'Apparence', defaultValue: { summary: "'button'" } },
     },
+    align: {
+      control: 'inline-radio',
+      options: ['end', 'start'],
+      description:
+        'Le bord du déclencheur sur lequel le panneau s\'aligne. Le panneau est dans la couche supérieure, ' +
+        'placé sur le déclencheur (ADR-0078) : il passe par-dessus ce qui défile et s\'ouvre au-dessus ' +
+        'quand la place manque en dessous.',
+      table: { category: 'Apparence', type: { summary: "'end' | 'start'" }, defaultValue: { summary: "'end'" } },
+    },
     open: {
       control: 'boolean',
       table: { category: 'État', defaultValue: { summary: 'false' } },

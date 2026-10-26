@@ -7,6 +7,7 @@ import { Scrollbar } from '../Scrollbar'
 import { Avatar } from '../Avatar'
 import type { IconName } from '../Icon'
 import DropdownSelectItem from './DropdownSelectItem.vue'
+import { useAnchoredSurface } from '../../composables/useAnchoredSurface'
 import type { DropdownSelectItemType } from './DropdownSelectItem.vue'
 
 export type InputDropdownType = 'default' | 'icon-leading' | 'avatar-leading' | 'dot-leading' | 'search'
@@ -59,6 +60,13 @@ const open = ref(false)
 const searchQuery = ref('')
 const rootEl = ref<HTMLElement | null>(null)
 const searchInputEl = ref<HTMLInputElement | null>(null)
+const wrapEl = ref<HTMLElement | null>(null)
+const panelEl = ref<HTMLElement | null>(null)
+
+/* The list floats in the top layer, at the field's width (ADR-0078): at the
+   bottom of a side panel or a dialog, it opens over the box instead of
+   growing its scroll — and above the field when the room below is short. */
+useAnchoredSurface(wrapEl, panelEl, { align: () => 'start', matchWidth: true })
 
 const selectedOption = computed(() =>
   props.modelValue === null || props.modelValue === undefined
@@ -118,6 +126,15 @@ function onKeyDown(e: KeyboardEvent) {
   if (e.key === 'Escape' && open.value) close()
 }
 
+/* An Escape from inside the field is the list's, and stops there — inside a
+   dialog it closed the dialog with it (ADR-0078). */
+function onRootKeyDown(e: KeyboardEvent) {
+  if (e.key !== 'Escape' || !open.value) return
+  e.stopPropagation()
+  e.preventDefault()
+  close()
+}
+
 onMounted(() => {
   document.addEventListener('click', onClickOutside, true)
   document.addEventListener('keydown', onKeyDown)
@@ -130,10 +147,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="ds-input-dropdown" ref="rootEl">
+  <div class="ds-input-dropdown" ref="rootEl" @keydown="onRootKeyDown">
     <!-- Field group. Label and message live on FormField — see ADR-0008. -->
     <div class="ds-input-dropdown__field-group">
-      <div class="ds-input-dropdown__input-wrap">
+      <div ref="wrapEl" class="ds-input-dropdown__input-wrap">
         <!-- ── Search type ──────────────────────────────────────────── -->
         <div
           v-if="type === 'search'"
@@ -232,7 +249,7 @@ onUnmounted(() => {
 
         <!-- ── Dropdown panel ──────────────────────────────────────── -->
         <SurfaceTransition>
-          <div v-if="open" class="ds-input-dropdown__panel" role="listbox">
+          <div v-if="open" ref="panelEl" popover="manual" class="ds-input-dropdown__panel" role="listbox">
             <Scrollbar max-height="320px">
               <div class="ds-input-dropdown__panel-items">
                 <DropdownSelectItem
@@ -277,7 +294,7 @@ onUnmounted(() => {
 }
 
 /* ── Label ─────────────────────────────────────────────────────────── */
-/* ── Input wrap (relative anchor for the panel) ────────────────────── */
+/* ── Input wrap (the panel's anchor) ───────────────────────────────── */
 .ds-input-dropdown__input-wrap {
   position: relative;
   width: 100%;
@@ -405,13 +422,20 @@ onUnmounted(() => {
 }
 
 /* ── Dropdown panel ────────────────────────────────────────────────── */
+/* In the top layer, placed and sized on the field (ADR-0078); the gap is the
+   margin, and the rest undoes what the browser gives a popover. */
 .ds-input-dropdown__panel {
-  transform-origin: top left;
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  right: 0;
+  position: fixed;
+  inset: auto;
+  box-sizing: border-box;
+  margin: var(--ds-spacing-md) 0;
+  padding: 0;
+  color: inherit;
   z-index: var(--ds-z-popover);
+  /* A column, so the list's scroll shrinks to the room it has (ADR-0078). */
+  display: flex;
+  flex-direction: column;
+  max-height: var(--anchor-room, none);
   background-color: var(--ds-bg-default);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-control);
