@@ -87,7 +87,10 @@ function handleClick(event: MouseEvent) {
   padding: var(--ds-spacing-md) var(--ds-spacing-xl);
   border: none;
   border-right: var(--ds-border-width-default) solid var(--ds-border-default);
-  background-color: var(--ds-bg-default);
+  /* Transparent: the group paints the ground and the selection under it. An
+     item that painted bg-default covered the indicator, so no segment ever
+     showed as chosen. */
+  background-color: transparent;
   font: var(--ds-font-label-lg-strong);
   color: var(--ds-text-default);
   white-space: nowrap;

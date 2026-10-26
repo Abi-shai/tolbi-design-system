@@ -71,6 +71,28 @@ export const NoColour: Story = {
   },
 }
 
+export const GroundColour: Story = {
+  name: 'Couleur du fond',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'La couleur d\'une série est celle de l\'appelant, et elle peut être celle du fond — sur une ' +
+          'carte, la déforestation confirmée est blanche. Chaque marque porte le filet translucide de ' +
+          '`Avatar` (`border-inset`) : il dessine le bord d\'une couleur claire, et ne change presque rien ' +
+          'à une couleur saturée. En sombre, il éclaircit.',
+      },
+    },
+  },
+  args: {
+    items: [
+      { key: 'confirmed', label: 'Déforestation confirmée', color: 'var(--ds-bg-default)', value: '12,4 ha' },
+      { key: 'suspected', label: 'Déforestation suspectée', color: 'var(--ds-chart-categorical-3)', value: '3,1 ha' },
+      { key: 'forest', label: 'Forêt 2020', color: 'var(--ds-chart-categorical-1)', value: '84,0 ha' },
+    ],
+  },
+}
+
 export const Interactive: Story = {
   name: 'Interactive',
   parameters: { docs: { description: { story: 'Cliquer une entrée bascule son état — le graphique reste piloté par le produit.' } } },

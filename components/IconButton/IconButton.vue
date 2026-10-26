@@ -32,7 +32,14 @@ export type IconButtonVariant = 'ghost' | 'primary' | 'surface' | 'neutral' | 's
 interface Props {
   /** The glyph. Mirrors the `Icône` instance-swap on the Figma component. */
   icon: IconName
-  /** Required: the button has no text, so nothing else can name it. */
+  /**
+   * Required: the button has no text, so nothing else can name it.
+   *
+   * Write it `ariaLabel`, not `aria-label`. Both reach the prop at runtime, but
+   * vue-tsc keeps every `aria-*` as an HTML attribute (its `htmlAttributes`
+   * default) and never camelizes it, so `aria-label` reports this prop as
+   * missing. No declaration can match both spellings without breaking one.
+   */
   ariaLabel: string
   /**
    * The button holds a surface open — a dropdown, a panel. Reads as hovered

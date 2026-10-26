@@ -112,7 +112,15 @@ button.ds-chart-legend__entry:focus-visible {
 /* Dim the whole entry, mark included, so "off" is unmistakable. */
 .ds-chart-legend__entry--off { opacity: 0.4; }
 
-.ds-chart-legend__mark { flex-shrink: 0; }
+/* The series colour is the caller's, so it can be the ground's own — a white
+   series on a white card had no edge at all. The avatar's hairline is drawn
+   for exactly that: translucent, so it darkens a light swatch's edge in light
+   mode, lightens a dark one's in dark, and leaves a saturated one as it is.
+   Inset, over the colour, so the mark keeps its size. */
+.ds-chart-legend__mark {
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-border-inset);
+}
 .ds-chart-legend__mark--dot  { width: 8px; height: 8px; border-radius: var(--ds-radius-pill); }
 .ds-chart-legend__mark--line { width: 14px; height: 3px; border-radius: var(--ds-radius-pill); }
 

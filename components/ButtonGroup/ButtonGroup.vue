@@ -75,6 +75,7 @@ watch(values, async () => { await nextTick(); measure() }, { deep: true })
   align-items: stretch;
   border: var(--ds-border-width-default) solid var(--ds-border-default);
   border-radius: var(--ds-radius-control);
+  background-color: var(--ds-bg-default);
   box-shadow: var(--ds-elevation-control);
   overflow: hidden;
   isolation: isolate;

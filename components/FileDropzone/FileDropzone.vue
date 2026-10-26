@@ -27,6 +27,14 @@ interface Props {
   supportingText?: string
   icon?: IconName
   files?: DropzoneFile[]
+  /** The call to action, in the screen's language. */
+  actionLabel?: string
+  /** What follows it, in a receding ink — the other way to give a file. */
+  dragLabel?: string
+  /** Prefixes each file's name on its remove button: « Retirer rapport.pdf ». */
+  removeLabel?: string
+  /** Formats the sizes — `2,4 Mo` in `fr-FR`, `2.4 MB` in `en-US`. */
+  locale?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -34,6 +42,10 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   icon: 'cloud-upload',
   files: () => [],
+  actionLabel: 'Cliquer pour téléverser',
+  dragLabel: 'ou glisser-déposer',
+  removeLabel: 'Retirer',
+  locale: 'fr-FR',
 })
 
 const field = useFormField()
@@ -70,11 +82,16 @@ function onLeave(event: DragEvent) {
   if (!root.contains(event.relatedTarget as Node)) dragging.value = false
 }
 
+/* `Intl` names the units in the screen's language (o / ko / Mo, B / kB / MB)
+   and writes the decimal the way it reads there — `2,4 Mo`, not `2.4 Mo`. */
 function formatSize(bytes?: number) {
   if (bytes === undefined) return ''
-  if (bytes < 1024) return `${bytes} o`
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} Ko`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`
+  const { value, unit, digits } =
+    bytes < 1024        ? { value: bytes,             unit: 'byte',     digits: 0 }
+    : bytes < 1024 ** 2 ? { value: bytes / 1024,      unit: 'kilobyte', digits: 0 }
+    :                     { value: bytes / 1024 ** 2, unit: 'megabyte', digits: 1 }
+  return new Intl.NumberFormat(props.locale, { style: 'unit', unit, maximumFractionDigits: digits })
+    .format(value)
 }
 </script>
 
@@ -115,8 +132,8 @@ function formatSize(bytes?: number) {
 
         <span class="ds-dropzone__text">
           <span class="ds-dropzone__cta">
-            Cliquer pour téléverser
-            <span class="ds-dropzone__cta-muted">ou glisser-déposer</span>
+            {{ actionLabel }}
+            <span v-if="dragLabel" class="ds-dropzone__cta-muted">{{ dragLabel }}</span>
           </span>
           <span v-if="supportingText" class="ds-dropzone__supporting">{{ supportingText }}</span>
         </span>
@@ -150,7 +167,7 @@ function formatSize(bytes?: number) {
 
         <CloseButton
           size="sm"
-          :aria-label="`Retirer ${file.name}`"
+          :aria-label="`${removeLabel} ${file.name}`"
           @click="emit('remove', file.id)"
         />
       </li>
