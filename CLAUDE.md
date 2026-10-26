@@ -947,6 +947,19 @@ Before working on any component, read:
   name is spelt **`ariaLabel`**: vue-tsc keeps `aria-*` as HTML attributes (`htmlAttributes`) and never
   camelizes them, so no declaration matches both spellings. Still open: the segment's contrast (three
   tracks to draw), `Tooltip` anchoring, a deletion `IconButton`.
+- **ADR-0078**: **what floats is painted in the top layer**. `Dropdown` / `InputDropdown` opened
+  `position: absolute` in the flow, so at the bottom of anything that scrolls (a side panel's body, a
+  dialog, an `overflow` filter bar) the list **grew the scroll**. Now `popover="manual"` — the layer a
+  modal `<dialog>` lives in — and **not a Teleport**: the panel stays in the DOM, so click-outside, focus
+  order, Escape and consumers' `:deep()` still work. Its place is computed by `useAnchoredSurface`
+  (internal): below, **flips above** when short, else the larger side **capped** (`--anchor-room` =
+  `max-height`, the border counted); the gap is the panel's `margin-block`; `align: 'end' | 'start'`
+  (`DropdownAlign`, declared in `Dropdown` — a public type may only point at what ships);
+  `transform-origin` follows the side; `--anchor-width` replaces `100%` for a floor (`WorkspaceSelector`).
+  Ten panels measured **identical to the pixel**. A dialog **`within`** a region now joins the top layer
+  on the region's rectangle — the list it was opened from is there, and `z-overlay` cannot cover it.
+  An **Escape from inside a dropdown stops there** (it used to close the dialog around it, list and all).
+  Still open: `HorizontalNavigation`'s module list, `Breadcrumbs`' collapsed crumbs, tooltips.
 
 ## Architecture
 
