@@ -432,11 +432,13 @@ function onClick(event: MouseEvent) {
 /* The head is ruled off from the body with the surface's own hairline; the
    foot is not — the owner took its rule out of the Figma component (9 Oct.),
    and the body's 24px is what parts it from the actions. */
+/* The title and the body's text start 20px in — the side panel's edge, so the
+   two placements share one (the owner's drawing, 26 Oct.). The foot keeps 24. */
 .ds-dialog__head {
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-lg);
-  padding: var(--ds-spacing-xl) var(--ds-spacing-xl) var(--ds-spacing-xl) var(--ds-spacing-3xl);
+  padding: var(--ds-spacing-xl) var(--ds-spacing-xl) var(--ds-spacing-xl) var(--ds-spacing-2xl);
 }
 
 /*
@@ -470,7 +472,7 @@ function onClick(event: MouseEvent) {
   gap: var(--ds-spacing-xl);
   min-height: 0;
   overflow-y: auto;
-  padding: var(--ds-spacing-3xl);
+  padding: var(--ds-spacing-3xl) var(--ds-spacing-2xl);
   border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
 }
 

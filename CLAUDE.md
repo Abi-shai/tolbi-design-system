@@ -967,7 +967,7 @@ Before working on any component, read:
   sits in the fixed head**, and the default slot is **not** the description (a form read out whole);
   the owner's drawing (26 Oct.): **20px** between head, body and foot and in from the sides, the head and
   the foot each ruled off by an **inset** rule, always — the scroll gets a **64px fade** over the body's
-  foot while content is left below;
+  foot while content is left below; the **centre** takes the same 20px text edge (the foot keeps 24);
   under **40rem** — a **container query**, not a breakpoint — full screen, foot stacked, action on top.
   Entrance **C** of three filmed: the fade with **24px of travel** from the right (A, the scale, says
   nothing about the edge; B, a 524px drawer, crosses half a screen), over `considered` / `exit`. Filming

@@ -61,6 +61,15 @@ Measured against the drawing, at `sm` on a 983px screen: surface 384 × 959, hea
 the catalogue's `sm` buttons, which are bordered (ADR-0033). On 390px, 390 × 760 edge to edge with the
 foot stacked; the focus on the first field.
 
+### The centre takes the same edge
+
+The owner moved the centred dialog's text edge on the Figma component the same day: the title (and its
+sign) and the body's text start **20px** in, where the side panel's do, instead of 24 — one edge for both
+placements. The body is 20px on both sides (the component's `sm`; `md`–`xl` had kept 24 on the right,
+aligned to it). The foot keeps its 24px, the close its 16, the head's rule its full width. `ConfirmDialog`
+inherits it. Measured: sign and description at 20px from the surface's inner edge, the last button 24px
+from the right, the close 16px.
+
 ### The entrance: from its edge, without crossing the screen
 
 Three tracks, filmed at a tenth of the speed and sampled every frame: **A**, the house entrance (scale
