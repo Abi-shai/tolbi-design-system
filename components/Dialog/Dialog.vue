@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { CloseButton } from '../CloseButton'
 import { Icon, type IconName } from '../Icon'
 import { SurfaceTransition } from '../SurfaceTransition'
@@ -34,7 +34,20 @@ import { SurfaceTransition } from '../SurfaceTransition'
  * is off — then there is no close either.
  * Render it where it is used: a popover it was opened from stays open behind
  * it, and the Escape it handles stops at the dialog.
+ *
+ * **At the side** — `placement="side"` — it is the side panel (ADR-0079): the
+ * same scrim, focus and dismissal, the surface standing 12px off the screen's
+ * right edge at full height, its description in the fixed head, and its two
+ * rules **following the scroll** — the head's only once content has passed
+ * under it, the foot's only while there is content left below. Under 40rem it
+ * takes the whole screen and the foot stacks, the action on top.
+ *
+ * `size` is one scale for both: `sm` 24rem, `md` 32rem (the default), `lg`
+ * 45rem, `xl` 60rem — each a width the catalogue already used — and `full`.
  */
+export type DialogPlacement = 'centre' | 'side'
+export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | 'full'
+
 interface Props {
   /** Its name: the title, read when it opens. */
   title: string
@@ -60,6 +73,10 @@ interface Props {
    * dialog is drawn inside it rather than over the page.
    */
   within?: HTMLElement | null
+  /** Over the page's centre, or at its side — the side panel. */
+  placement?: DialogPlacement
+  /** The surface's width — a ceiling, not a size: a narrow screen gives less. */
+  size?: DialogSize
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -71,6 +88,8 @@ const props = withDefaults(defineProps<Props>(), {
   dismissible: true,
   closeLabel: 'Fermer',
   within: null,
+  placement: 'centre',
+  size: 'md',
 })
 
 const open = defineModel<boolean>('open', { default: false })
@@ -95,9 +114,11 @@ const slots = defineSlots<{
 }>()
 const el = ref<HTMLDialogElement>()
 const surface = ref<HTMLElement>()
+const body = ref<HTMLElement>()
 const shown = ref(false)
 const id = useId()
 const titleId = `ds-dialog-title-${id}`
+const side = computed(() => props.placement === 'side')
 const descriptionId = `ds-dialog-description-${id}`
 let opener: HTMLElement | null = null
 
@@ -192,6 +213,36 @@ function afterLeave() {
 
 watch(open, (now) => (now ? void show() : (shown.value = false)), { immediate: true })
 
+/*
+  The rules follow the scroll (ADR-0079): the head is ruled off once something
+  has passed under it, the foot while something is left below it. Measured on
+  scroll and whenever the body or what it holds changes size — a field's error
+  opening grows the content, not the box.
+*/
+const under = ref(false)
+const below = ref(false)
+
+function measureScroll() {
+  const b = body.value
+  if (!b) return
+  under.value = b.scrollTop > 0
+  below.value = Math.ceil(b.scrollTop + b.clientHeight) < b.scrollHeight
+}
+
+let bodyObserver: ResizeObserver | null = null
+
+watch(body, (b) => {
+  bodyObserver?.disconnect()
+  bodyObserver = null
+  if (!b) return
+  bodyObserver = new ResizeObserver(measureScroll)
+  bodyObserver.observe(b)
+  for (const child of b.children) bodyObserver.observe(child)
+  measureScroll()
+}, { flush: 'post' })
+
+onBeforeUnmount(() => bodyObserver?.disconnect())
+
 onBeforeUnmount(() => {
   follow(false)
   hold(false)
@@ -251,12 +302,12 @@ function onClick(event: MouseEvent) {
     <dialog
       ref="el"
       class="ds-dialog"
-      :class="{ 'ds-dialog--within': within }"
+      :class="[`ds-dialog--${placement}`, `ds-dialog--${size}`, { 'ds-dialog--within': within }]"
       :popover="within ? 'manual' : undefined"
       :role="role"
       aria-modal="true"
       :aria-labelledby="titleId"
-      :aria-describedby="description || slots.default ? descriptionId : undefined"
+      :aria-describedby="description || (slots.default && !side) ? descriptionId : undefined"
       @cancel="onCancel"
       @close="onClose"
       @keydown="onKeydown"
@@ -266,17 +317,29 @@ function onClick(event: MouseEvent) {
         <div v-if="shown" class="ds-dialog__scrim" />
       </Transition>
       <SurfaceTransition @after-leave="afterLeave">
-        <div v-if="shown" ref="surface" class="ds-dialog__surface" tabindex="-1">
+        <div
+          v-if="shown"
+          ref="surface"
+          class="ds-dialog__surface"
+          :class="{ 'ds-dialog__surface--under': under, 'ds-dialog__surface--below': below }"
+          tabindex="-1"
+        >
           <header class="ds-dialog__head">
             <span v-if="icon" class="ds-dialog__sign" :class="`ds-dialog__sign--${tone}`" aria-hidden="true">
               <Icon :name="icon" :size="20" />
             </span>
-            <h2 :id="titleId" class="ds-dialog__title">{{ title }}</h2>
+            <!-- At the side, the description stays with the title in the fixed head. -->
+            <div v-if="side" class="ds-dialog__heading">
+              <h2 :id="titleId" class="ds-dialog__title">{{ title }}</h2>
+              <p v-if="description" :id="descriptionId" class="ds-dialog__subtitle">{{ description }}</p>
+            </div>
+            <h2 v-else :id="titleId" class="ds-dialog__title">{{ title }}</h2>
             <CloseButton v-if="dismissible" size="sm" :ariaLabel="closeLabel" @click="dismiss" />
           </header>
-          <div v-if="slots.default || description || slots.form" class="ds-dialog__body">
-            <div v-if="slots.default" :id="descriptionId" class="ds-dialog__description"><slot /></div>
-            <p v-else-if="description" :id="descriptionId" class="ds-dialog__description">{{ description }}</p>
+          <div v-if="slots.default || (description && !side) || slots.form" ref="body" class="ds-dialog__body" @scroll="measureScroll">
+            <!-- At the side, the slot is the panel's body — a form — and describes nothing. -->
+            <div v-if="slots.default" :id="side ? undefined : descriptionId" :class="side ? 'ds-dialog__content' : 'ds-dialog__description'"><slot /></div>
+            <p v-else-if="description && !side" :id="descriptionId" class="ds-dialog__description">{{ description }}</p>
             <slot name="form" />
           </div>
           <footer v-if="slots.actions" class="ds-dialog__foot">
@@ -308,6 +371,11 @@ function onClick(event: MouseEvent) {
   border: 0;
   background: transparent;
   color: inherit;
+  /* Never a scroller: the body is what scrolls. The browser's `overflow:
+     auto` let opening — which focuses the first field — scroll the dialog
+     itself to show it, and a surface still on its way in was pulled into
+     place on the first frame (ADR-0079). */
+  overflow: clip;
 }
 
 .ds-dialog[open] {
@@ -338,7 +406,7 @@ function onClick(event: MouseEvent) {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 32rem;
+  max-width: var(--dialog-width);
   max-height: 100%;
   overflow: hidden;
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
@@ -346,6 +414,21 @@ function onClick(event: MouseEvent) {
   background: var(--ds-bg-default);
   box-shadow: var(--ds-elevation-overlay);
   outline: none;
+}
+
+/*
+  The widths (ADR-0079): one scale for both placements, each a width the
+  catalogue already had — 24rem, `Dialog`'s 32rem, the reading column's 45rem,
+  60rem. A variant switch, not a token (ADR-0010).
+*/
+.ds-dialog--sm { --dialog-width: 24rem; }
+.ds-dialog--md { --dialog-width: 32rem; }
+.ds-dialog--lg { --dialog-width: 45rem; }
+.ds-dialog--xl { --dialog-width: 60rem; }
+.ds-dialog--full { --dialog-width: none; }
+
+.ds-dialog--centre.ds-dialog--full .ds-dialog__surface {
+  height: 100%;
 }
 
 /* The head is ruled off from the body with the surface's own hairline; the
@@ -452,6 +535,104 @@ function onClick(event: MouseEvent) {
 /* It grows from the edge it rises from (ADR-0021: the surface sets its own origin). */
 .ds-dialog--within .ds-dialog__surface {
   transform-origin: bottom center;
+}
+
+/*
+  At the side (ADR-0079, Figma « Panneau latéral » track B): a surface set on
+  the page, 12px off its edges, at full height — the same family as the
+  dialog, so the same frame. The head holds the description and stays; the
+  body scrolls between them; the rules follow the scroll, so at rest at the
+  top there is one, the foot's, and only if something is below.
+
+  The dialog is the container its surface is measured against: under 40rem
+  the panel takes the whole screen, edge to edge — no inset, corner or shadow
+  — and the foot stacks, the action on top. A container, not a breakpoint:
+  what decides is the room the panel has.
+*/
+.ds-dialog--side {
+  padding: 0;
+  container-type: inline-size;
+}
+
+.ds-dialog--side[open] {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.ds-dialog--side .ds-dialog__surface {
+  height: calc(100% - 2 * var(--ds-spacing-lg));
+  max-height: none;
+  margin: var(--ds-spacing-lg);
+}
+
+/*
+  It arrives from its edge: the house fade, with 24px of travel in place of
+  the scale — the direction says where the panel lives, and nothing crosses
+  the screen (track C of three filmed; ADR-0079). Over `considered` in,
+  `exit` out, like the dialog.
+*/
+.ds-dialog--side .ds-dialog__surface.ds-surface-enter-from,
+.ds-dialog--side .ds-dialog__surface.ds-surface-leave-to {
+  transform: translateX(var(--ds-spacing-3xl));
+}
+
+.ds-dialog--side .ds-dialog__head {
+  align-items: flex-start;
+}
+
+/* The panel's body is the product's: its blocks are the body's own rows, on
+   the body's rhythm, not one block inside it. */
+.ds-dialog__content {
+  display: contents;
+}
+
+.ds-dialog__heading {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--ds-spacing-xs);
+  min-width: 0;
+  padding-top: var(--ds-spacing-sm);
+}
+
+.ds-dialog__subtitle {
+  margin: 0;
+  font: var(--ds-font-body-md);
+  color: var(--ds-text-subtle);
+  overflow-wrap: anywhere;
+}
+
+.ds-dialog--side .ds-dialog__body {
+  flex: 1 1 auto;
+  border-top-color: transparent;
+  transition: border-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+}
+
+.ds-dialog--side .ds-dialog__foot {
+  border-top: var(--ds-border-width-default) solid transparent;
+  transition: border-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+}
+
+.ds-dialog--side .ds-dialog__surface--under .ds-dialog__body,
+.ds-dialog--side .ds-dialog__surface--below .ds-dialog__foot {
+  border-top-color: var(--ds-border-subtle);
+}
+
+@container (max-width: 40rem) {
+  .ds-dialog--side .ds-dialog__surface {
+    height: 100%;
+    max-width: none;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .ds-dialog--side .ds-dialog__foot {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
 }
 
 .ds-dialog__title {
