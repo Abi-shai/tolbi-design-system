@@ -960,6 +960,17 @@ Before working on any component, read:
   on the region's rectangle — the list it was opened from is there, and `z-overlay` cannot cover it.
   An **Escape from inside a dropdown stops there** (it used to close the dialog around it, list and all).
   Still open: `HorizontalNavigation`'s module list, `Breadcrumbs`' collapsed crumbs, tooltips.
+- **ADR-0079**: **the side panel is `Dialog placement="side"`** — not a second component: same scrim,
+  focus, dismissal, `within`, lists over it (Figma `2780:1427`, track B floating, decided 21 Oct.). One
+  **`size`** scale for both placements: `sm` 24rem, `md` 32rem (default), `lg` 45rem, `xl` 60rem, `full`
+  (the product's « lg ≈ 60rem » is `xl`). At the side: full height, 12px off the edges; the **description
+  sits in the fixed head**, and the default slot is **not** the description (a form read out whole);
+  the **rules follow the scroll** (head once something passed under, foot while something is below);
+  under **40rem** — a **container query**, not a breakpoint — full screen, foot stacked, action on top.
+  Entrance **C** of three filmed: the fade with **24px of travel** from the right (A, the scale, says
+  nothing about the edge; B, a 524px drawer, crosses half a screen), over `considered` / `exit`. Filming
+  B found the **dialog was a scroller** (`overflow: auto` from the browser): opening focused a field and
+  scrolled the dialog to it, pulling the surface into place — `overflow: clip` now.
 
 ## Architecture
 
