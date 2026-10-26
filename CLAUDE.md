@@ -937,6 +937,16 @@ Before working on any component, read:
   the label and the placeholder; the action off until then, the focus in the field, Enter only once typed — a
   `FormField` in `Dialog`'s new `#form` slot, outside the description). The action **names itself** (« Supprimer le
   projet »). Tolbi AI's deletion question is signed too (`trash-2`).
+- **ADR-0077**: what the **EUDR adoption** found (etolbi, 0.59.1; Figma « EUDR UI Update » `3145:17812`).
+  **`ButtonGroup`'s selection was never painted** — every item laid `bg-default` over the indicator; the
+  items are transparent now and the group paints the ground (1.000 → **1.045:1** light, 1.233 dark: it
+  exists, it does not yet read — and hover shares the tint). `FileDropzone` speaks the screen's language:
+  `actionLabel`, `dragLabel`, `removeLabel`, and `locale` writes the sizes through `Intl` (`1,9 Mo` /
+  `1.9 MB`; the hand-written `1.9 Mo` was wrong in French too). A `ChartLegend` mark carries
+  `border-inset` as an inset shadow, so a series the colour of the ground keeps an edge. `IconButton`'s
+  name is spelt **`ariaLabel`**: vue-tsc keeps `aria-*` as HTML attributes (`htmlAttributes`) and never
+  camelizes them, so no declaration matches both spellings. Still open: the segment's contrast (three
+  tracks to draw), `Tooltip` anchoring, a deletion `IconButton`.
 
 ## Architecture
 
