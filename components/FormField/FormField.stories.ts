@@ -260,3 +260,30 @@ export const MessageAppears: Story = {
     `,
   }),
 }
+
+export const HintSlot: Story = {
+  name: 'Indice en slot',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Pour plus qu’une chaîne — un lien, un mot en gras — le slot `#hint`, auquel la prop sert de repli. ' +
+          'Contenu de phrase : il est lu dans un `<p>`, et décrit le contrôle comme la prop. Une erreur le remplace.',
+      },
+    },
+  },
+  render: () => ({
+    components: { FormField, InputField },
+    setup: () => ({ value: ref('') }),
+    template: `
+      <div style="width:360px">
+        <FormField label="Numéro EORI">
+          <InputField v-model="value" placeholder="CI123456789" />
+          <template #hint>
+            Celui de l’importateur, pas du producteur — <a href="#eori" style="color:var(--ds-text-brand)">où le trouver</a>.
+          </template>
+        </FormField>
+      </div>
+    `,
+  }),
+}

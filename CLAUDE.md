@@ -945,8 +945,9 @@ Before working on any component, read:
   `1.9 MB`; the hand-written `1.9 Mo` was wrong in French too). A `ChartLegend` mark carries
   `border-inset` as an inset shadow, so a series the colour of the ground keeps an edge. `IconButton`'s
   name is spelt **`ariaLabel`**: vue-tsc keeps `aria-*` as HTML attributes (`htmlAttributes`) and never
-  camelizes them, so no declaration matches both spellings. Still open: the segment's contrast (three
-  tracks to draw), `Tooltip` anchoring, a deletion `IconButton`.
+  camelizes them, so no declaration matches both spellings. Second round: `FormField` takes a **`#hint`
+  slot** (the prop its fallback; phrasing content, it describes the control). Still open: the segment's
+  contrast (three tracks to draw), `Tooltip` anchoring, a deletion `IconButton`.
 - **ADR-0078**: **what floats is painted in the top layer**. `Dropdown` / `InputDropdown` opened
   `position: absolute` in the flow, so at the bottom of anything that scrolls (a side panel's body, a
   dialog, an `overflow` filter bar) the list **grew the scroll**. Now `popover="manual"` — the layer a

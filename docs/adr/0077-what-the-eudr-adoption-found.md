@@ -54,6 +54,15 @@ kebab-case key only flips which one fails, and every consumer in the catalogue w
 prop stays required, because a button with no text has nothing else to name it, and the spelling is
 written on the prop.
 
+### Second round (27 Oct.) — a hint is more than a string
+
+Item 16: `FormField`'s `hint` was a prop, so a hint with a link (« où le trouver ») or a word in bold could
+not be written. It takes a `#hint` slot now, with the prop as its fallback — the catalogue's shape for a
+string that sometimes needs markup (`PageHeader`'s `subtitle`, `Table`'s `emptyText`). The slot counts as a
+hint: the message renders, and the control is described by it, as with the prop; an error still replaces
+it. Phrasing content only — it is read inside the message's `<p>`. Where the hint sits (under the label in
+the side panel's drawing, under the control here) is a different question, left with ADR-0079.
+
 ## Still open
 
 - **The chosen segment's contrast.** Three tracks to draw before one is applied: `Tabs`' pill (a

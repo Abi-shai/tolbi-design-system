@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { computed, provide, useId } from 'vue'
+import { computed, provide, useId, useSlots } from 'vue'
 import Icon from '../Icon/Icon.vue'
 import { FORM_FIELD_KEY } from './context'
 
 interface Props {
   /** Caption above the control. Omit it for a control that carries its own inline label (Checkbox, Toggle). */
   label?:    string
-  /** Helper text below the control. Replaced by `error` when there is one. */
+  /**
+   * Helper text below the control. Replaced by `error` when there is one. For
+   * more than a string — a link, a word in bold — the `#hint` slot, which the
+   * prop falls back to (phrasing content: it is read inside a `<p>`).
+   */
   hint?:     string
   /** Error message below the control. Its presence is what makes the field invalid. */
   error?:    string
@@ -28,9 +32,11 @@ const messageId = computed(() => `${fieldId.value}-message`)
 // A field is invalid because it has something to say, not because a flag was set.
 // That is what stops `destructive` and its message from drifting apart.
 const invalid = computed(() => Boolean(props.error))
-const message = computed(() => props.error || props.hint || '')
+const slots = useSlots()
+/* The slot counts as a hint too: the message, and the control's description, follow it. */
+const hasMessage = computed(() => invalid.value || Boolean(props.hint) || Boolean(slots.hint))
 
-const describedBy = computed(() => (message.value ? messageId.value : undefined))
+const describedBy = computed(() => (hasMessage.value ? messageId.value : undefined))
 
 provide(FORM_FIELD_KEY, {
   id:       fieldId,
@@ -61,7 +67,7 @@ provide(FORM_FIELD_KEY, {
       across the switch from hint to error.
     -->
     <Transition name="ds-field-message">
-      <div v-if="message" class="ds-form-field__message-wrap">
+      <div v-if="invalid || hint || $slots.hint" class="ds-form-field__message-wrap">
         <p
           :id="messageId"
           class="ds-form-field__message"
@@ -75,7 +81,8 @@ provide(FORM_FIELD_KEY, {
             class="ds-form-field__message-icon"
             aria-hidden="true"
           />
-          {{ message }}
+          <template v-if="invalid">{{ error }}</template>
+          <slot v-else name="hint">{{ hint }}</slot>
         </p>
       </div>
     </Transition>
