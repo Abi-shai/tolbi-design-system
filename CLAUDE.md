@@ -1057,6 +1057,24 @@ Before working on any component, read:
   `print-color-adjust`, table cells **unwrapped** in print. Print rules for the component's own elements must be
   **scoped** (unscoped ones lose to them). `printer` joins the icons.
 
+- **ADR-0090**: a **sticky header cannot share a scroll container with the body** — `position: sticky`
+  resolves against the nearest ancestor scroll container whichever axis it scrolls, and `Scrollbar`'s
+  horizontal viewport is one (measured: `overflow-y: clip` normalises to `hidden`, `visible` to `auto`;
+  only `overflow: visible` pins, and then the table is cut off). So `Table stickyHeader` draws the row a
+  **second time** outside that scroller — one markup, though: the row became internal **`TableHeaderRow`**,
+  rendered twice (ADR-0001). The copy is `aria-hidden` with `tabindex="-1"` controls and no `aria-sort` (a
+  reader meets the row once; Tab lands on the real header), carries the body's **`scrollLeft`** rather than a
+  transform (a transform leaves a fixed column nothing to stick to), and **shares one grid cell** with the
+  scroller so it covers the header it repeats and leaves with the last row. A **measured width is a
+  border-box width** — content-box made each column its own padding wider, 48px, accumulating to 288px
+  across the row. The frame is **`overflow: clip`, not `hidden`**: both cut to the radius, only `hidden`
+  makes the scroll container that is the whole defect. The offset is the product's: `--ds-table-sticky-top`
+  (public, default `0px`). The fixed column's edge rule moved from `Scrollbar`'s classes to the row's props,
+  since the copy is outside that ancestor. **The range and the selector are two things**: `pageSize` writes
+  « 1–25 sur 42 », `pageSizes` offers the choice, and **empty = no selector, range kept**; `Table`'s foot
+  rule said « more than the smallest page » and only worked for an empty list because `Math.min(...[])` is
+  `Infinity` — now written out. The default `[10, 20, 50, 100]` stays.
+
 ## Architecture
 
 - Components live in `components/<Name>/` — each has `<Name>.vue`, `<Name>.stories.ts`, and `index.ts`

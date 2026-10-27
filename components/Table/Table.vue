@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { SwapTransition } from '../SwapTransition'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue'
 import { Checkbox } from '../Checkbox'
-import { HelpIcon } from '../HelpIcon'
-import { Icon } from '../Icon'
 import { Scrollbar } from '../Scrollbar'
 import { Skeleton } from '../Skeleton'
 import { Pagination } from '../Pagination'
+import TableHeaderRow from './TableHeaderRow.vue'
+import type { TableHeaderCellSpec } from './TableHeaderRow.vue'
 
 export interface TableColumn {
   key: string
@@ -51,6 +51,10 @@ export interface TableSort {
  *   and a rule marks their edge only while something passes under it.
  * - **`visibleColumns`** hides the others — `TableColumnMenu` edits it.
  * - The foot is `Pagination`: the range, lines per page, the pages.
+ *
+ * ADR-0090 adds `stickyHeader`: the table keeps the height of its content and
+ * scrolls with the page, while the column header stays at the top of the
+ * screen.
  */
 interface Props {
   columns: TableColumn[]
@@ -66,14 +70,24 @@ interface Props {
   sort?: TableSort | null
   /** The keys shown, in no particular order; absent, every column. */
   visibleColumns?: string[]
+  /**
+   * The column header stays at the top of the screen while the page scrolls
+   * (ADR-0090). Set `--ds-table-sticky-top` on the table, or above it, to the
+   * height of whatever the product keeps at the top of the screen.
+   */
+  stickyHeader?: boolean
   /** Where a row leads. Given, the row opens as a link. */
   rowLink?: (row: TableRow) => string | undefined
   /** Declared as a prop so the table knows a row can be opened (`@row-click`). */
   onRowClick?: (row: TableRow) => void
   /** How many rows in all — the foot writes the range and counts the pages. */
   total?: number
-  /** Rows per page (`v-model:pageSize`) — the foot offers the sizes. */
+  /**
+   * Rows per page. It writes the range — « 1–25 sur 42 » — on its own; the
+   * selector is `pageSizes`' doing, and the two are separate (ADR-0090).
+   */
   pageSize?: number
+  /** The sizes offered. **Empty, no selector** — the range stays. */
   pageSizes?: number[]
   /** What the rows are, after the range: « projets ». */
   itemLabel?: string
@@ -98,6 +112,7 @@ const props = withDefaults(defineProps<Props>(), {
   totalPages: undefined,
   sort: null,
   visibleColumns: undefined,
+  stickyHeader: false,
   rowLink: undefined,
   onRowClick: undefined,
   total: undefined,
@@ -199,6 +214,10 @@ function handleRowClick(event: MouseEvent, row: TableRow) {
 */
 const tableEl = ref<HTMLTableElement>()
 const offsets = ref<Record<string, number>>({})
+/* The measured width of each header cell and of the table — what the pinned
+   copy is cut to, so its columns land on the real ones to the pixel. */
+const widths = ref<Record<string, number>>({})
+const tableWidth = ref(0)
 
 const hasFixedStart = computed(() => shown.value.some(c => c.fixed === 'start'))
 const lastStart = computed(() => [...shown.value].reverse().find(c => c.fixed === 'start')?.key)
@@ -210,10 +229,12 @@ function measure() {
   const cells = [...head]
   const keys = [...(props.selectable ? ['__select'] : []), ...shown.value.map(c => c.key)]
   const next: Record<string, number> = {}
+  const sizes: Record<string, number> = {}
   let left = 0
   keys.forEach((key, i) => {
     next[`start:${key}`] = left
-    left += cells[i]?.offsetWidth ?? 0
+    sizes[key] = cells[i]?.offsetWidth ?? 0
+    left += sizes[key]
   })
   let right = 0
   for (let i = keys.length - 1; i >= 0; i--) {
@@ -221,16 +242,54 @@ function measure() {
     right += cells[i]?.offsetWidth ?? 0
   }
   offsets.value = next
+  widths.value = sizes
+  tableWidth.value = tableEl.value?.offsetWidth ?? 0
+}
+
+/* ── The pinned header ─────────────────────────────────────────────── */
+/*
+  Measured (ADR-0090): a `position: sticky` header resolves against the nearest
+  ancestor **scroll container**, and the horizontal scroller around the table is
+  one — so a sticky `<thead>` sticks to a box that never scrolls vertically, and
+  stays where it was. `overflow-y: clip` and `overflow-y: visible` do not help:
+  beside an `auto`, both compute away. So the pinned header is a second drawing
+  of the row, outside that scroller, in the page's own scrollport — and it is
+  the same component, never a second markup (ADR-0001).
+
+  It carries the body's horizontal scroll position rather than a transform, so
+  a fixed column inside it sticks exactly as the real one does.
+*/
+const scrollbarRef = ref<InstanceType<typeof Scrollbar> | null>(null)
+const stickyEl = ref<HTMLElement>()
+const atStart = ref(true)
+const atEnd = ref(false)
+
+function viewportEl(): HTMLElement | null {
+  return scrollbarRef.value?.viewport ?? null
+}
+
+function syncScroll() {
+  const el = viewportEl()
+  if (!el) return
+  const max = el.scrollWidth - el.clientWidth
+  atStart.value = el.scrollLeft <= 1
+  atEnd.value = el.scrollLeft >= max - 1
+  if (stickyEl.value) stickyEl.value.scrollLeft = el.scrollLeft
 }
 
 let observer: ResizeObserver | null = null
 onMounted(() => {
   measure()
-  observer = new ResizeObserver(() => measure())
+  observer = new ResizeObserver(() => { measure(); syncScroll() })
   if (tableEl.value) observer.observe(tableEl.value)
+  viewportEl()?.addEventListener('scroll', syncScroll, { passive: true })
+  syncScroll()
 })
-onBeforeUnmount(() => observer?.disconnect())
-watch(shown, async () => { await nextTick(); measure() })
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  viewportEl()?.removeEventListener('scroll', syncScroll)
+})
+watch(shown, async () => { await nextTick(); measure(); syncScroll() })
 
 function fixedOf(key: string): 'start' | 'end' | undefined {
   if (key === '__select') return hasFixedStart.value ? 'start' : undefined
@@ -247,11 +306,52 @@ function fixedClass(key: string) {
   ]
 }
 
-function fixedStyle(key: string) {
+function fixedStyle(key: string): Record<string, string> | undefined {
   const f = fixedOf(key)
   if (!f) return undefined
   const v = offsets.value[`${f}:${key}`] ?? 0
   return f === 'start' ? { left: `${v}px` } : { right: `${v}px` }
+}
+
+/* ── The header row, resolved once for both drawings ───────────────── */
+/* Cast, so the names do not depend on the slots this very template declares —
+   the inference walks back into itself and the .d.ts build stops (ADR-0061's
+   rule: the build fails on a dropped declaration). */
+const slots = useSlots() as Record<string, unknown>
+const headerSlotNames = computed<string[]>(() => Object.keys(slots).filter(n => n.startsWith('header-')))
+
+function headerCells(pinned: boolean): TableHeaderCellSpec[] {
+  const size = (key: string): Record<string, string> =>
+    pinned && widths.value[key] ? { width: `${widths.value[key]}px` } : {}
+  const cells: TableHeaderCellSpec[] = []
+  if (props.selectable) {
+    cells.push({
+      key: '__select',
+      select: true,
+      cellClass: fixedClass('__select'),
+      cellStyle: { ...fixedStyle('__select'), ...size('__select') },
+    })
+  }
+  for (const col of shown.value) {
+    cells.push({
+      key: col.key,
+      label: col.label,
+      help: col.help,
+      align: col.align,
+      sortable: col.sortable,
+      ariaSort: pinned ? undefined : ariaSort(col),
+      sortDirection: sortOf(col),
+      cellClass: fixedClass(col.key),
+      cellStyle: { ...colStyle(col), ...size(col.key) },
+      column: col,
+    })
+  }
+  return cells
+}
+
+function sortByKey(key: string) {
+  const col = shown.value.find(c => c.key === key)
+  if (col) toggleSort(col)
 }
 
 /* ── Cells ─────────────────────────────────────────────────────────── */
@@ -288,64 +388,39 @@ const footLabels = computed(() => Object.fromEntries(
     .map(k => [k, props[k]]),
 ))
 
+/* A size is offered only when there is a list of them to offer (ADR-0090):
+   `pageSizes` empty is « no selector », and the range « 1–25 sur 42 » stays. */
+const offersSizes = computed(() => props.pageSize !== undefined && props.pageSizes.length > 0)
+
 /* With a size to choose, the foot stays while there is more than the
-   smallest page — or a user who picked 50 for 42 rows could not go back. */
+   smallest page — or a user who picked 50 for 42 rows could not go back.
+   With no size to choose, there is nothing to come back to: the foot shows
+   only when there is more than one page. */
 const showPagination = computed(() =>
   pageCount.value > 1
-  || (props.pageSize !== undefined && props.total !== undefined && props.total > Math.min(...props.pageSizes)),
+  || (offersSizes.value && props.total !== undefined && props.total > Math.min(...props.pageSizes)),
 )
 </script>
 
 <template>
   <div class="ds-table-container">
-    <Scrollbar :horizontal="true">
+    <div class="ds-table__frame">
+    <Scrollbar ref="scrollbarRef" :horizontal="true">
       <table ref="tableEl" class="ds-table">
         <thead>
-          <tr class="ds-table__header-row">
-            <th
-              v-if="selectable"
-              class="ds-table__th ds-table__th--select"
-              :class="fixedClass('__select')"
-              :style="fixedStyle('__select')"
-            >
-              <Checkbox
-                :model-value="allSelected"
-                :indeterminate="someSelected"
-                @update:model-value="toggleAll"
-              />
-            </th>
-            <th
-              v-for="col in shown"
-              :key="col.key"
-              class="ds-table__th"
-              :class="[col.align && `ds-table__th--${col.align}`, fixedClass(col.key)]"
-              :style="colStyle(col)"
-              :aria-sort="ariaSort(col)"
-            >
-              <slot :name="`header-${col.key}`" :column="col">
-                <div class="ds-table__th-content">
-                  <!-- A sortable header is a button; the arrow's place is kept, so nothing moves when it shows. -->
-                  <button
-                    v-if="col.sortable"
-                    type="button"
-                    class="ds-table__sort"
-                    :class="{ 'ds-table__sort--active': sortOf(col) }"
-                    @click="toggleSort(col)"
-                  >
-                    <span class="ds-table__th-label">{{ col.label }}</span>
-                    <Icon
-                      :name="sortOf(col) === 'descending' ? 'arrow-down' : 'arrow-up'"
-                      :size="16"
-                      class="ds-table__sort-icon"
-                      aria-hidden="true"
-                    />
-                  </button>
-                  <span v-else-if="col.label" class="ds-table__th-label">{{ col.label }}</span>
-                  <HelpIcon v-if="col.help" :title="col.help" placement="top" />
-                </div>
-              </slot>
-            </th>
-          </tr>
+          <TableHeaderRow
+            :cells="headerCells(false)"
+            :all-selected="allSelected"
+            :some-selected="someSelected"
+            :at-start="atStart"
+            :at-end="atEnd"
+            @toggle-all="toggleAll"
+            @sort="sortByKey"
+          >
+            <template v-for="name in headerSlotNames" :key="name" #[name]="slotProps">
+              <slot :name="name" v-bind="slotProps" />
+            </template>
+          </TableHeaderRow>
         </thead>
         <SwapTransition>
           <tbody v-if="loading">
@@ -427,6 +502,38 @@ const showPagination = computed(() =>
       </table>
     </Scrollbar>
 
+    <!--
+      The pinned copy. It sits in the same grid cell as the scroller, takes the
+      top of it, and travels no further than the table's own box — so it leaves
+      with the last row instead of floating over what comes after.
+    -->
+    <div
+      v-if="stickyHeader"
+      ref="stickyEl"
+      class="ds-table__sticky-head"
+      aria-hidden="true"
+    >
+      <table class="ds-table" :style="tableWidth ? { width: `${tableWidth}px` } : undefined">
+        <thead>
+          <TableHeaderRow
+            clone
+            :cells="headerCells(true)"
+            :all-selected="allSelected"
+            :some-selected="someSelected"
+            :at-start="atStart"
+            :at-end="atEnd"
+            @toggle-all="toggleAll"
+            @sort="sortByKey"
+          >
+            <template v-for="name in headerSlotNames" :key="name" #[name]="slotProps">
+              <slot :name="name" v-bind="slotProps" />
+            </template>
+          </TableHeaderRow>
+        </thead>
+      </table>
+    </div>
+    </div>
+
     <Pagination
       v-if="showPagination"
       :current-page="currentPage"
@@ -444,13 +551,44 @@ const showPagination = computed(() =>
 
 <style scoped>
 /* ── Container ─────────────────────────────────────────────────────── */
+/*
+  `clip`, not `hidden`: both cut the frame to its radius, but `hidden` makes a
+  scroll container, and a scroll container between the header and the page is
+  exactly what stops the header from pinning (ADR-0090). Measured: with
+  `hidden` the header travels the full scroll; with `clip` it holds.
+*/
 .ds-table-container {
   width: 100%;
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
   box-shadow: var(--ds-elevation-surface);
   background-color: var(--ds-bg-default);
+  overflow: clip;
+}
+
+/* The scroller and the pinned copy share one cell, so the copy covers the
+   header it repeats instead of taking a second row's worth of height. */
+.ds-table__frame {
+  display: grid;
+}
+
+.ds-table__frame > * {
+  grid-area: 1 / 1;
+}
+
+.ds-table__sticky-head {
+  position: sticky;
+  top: var(--ds-table-sticky-top, 0px);
+  z-index: var(--ds-z-raised);
+  align-self: start;
+  /* Not `auto`: nobody scrolls this one by hand — it carries the body's
+     position, and a fixed column inside it needs a scrollport to stick to. */
   overflow: hidden;
+  scrollbar-width: none;
+}
+
+.ds-table__sticky-head::-webkit-scrollbar {
+  display: none;
 }
 
 /* ── Table ─────────────────────────────────────────────────────────── */
@@ -461,89 +599,6 @@ const showPagination = computed(() =>
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed;
-}
-
-/* ── Header row ────────────────────────────────────────────────────── */
-.ds-table__header-row {
-  background-color: var(--ds-bg-neutral-subtle);
-}
-
-/* ── Header cell ───────────────────────────────────────────────────── */
-.ds-table__th {
-  padding: var(--ds-spacing-lg) var(--ds-spacing-3xl);
-  border-bottom: var(--ds-border-width-default) solid var(--ds-border-subtle);
-  background-color: var(--ds-bg-neutral-subtle);
-  text-align: left;
-  white-space: nowrap;
-  vertical-align: middle;
-  overflow: hidden;
-}
-
-.ds-table__th--select {
-  width: 44px;
-  padding: var(--ds-spacing-lg) var(--ds-spacing-lg) var(--ds-spacing-lg) var(--ds-spacing-3xl);
-}
-
-.ds-table__th--center { text-align: center; }
-.ds-table__th--right  { text-align: right; }
-
-.ds-table__th-content {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-spacing-xs);
-  max-width: 100%;
-}
-
-.ds-table__th-label {
-  font: var(--ds-font-label-md);
-  color: var(--ds-text-subtle);
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ── Sortable header ───────────────────────────────────────────────── */
-.ds-table__sort {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-spacing-xs);
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: var(--ds-radius-inner-sm);
-  background: none;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  outline: none;
-  transition: box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
-}
-
-.ds-table__sort:focus-visible {
-  box-shadow: var(--ds-focus-ring-brand);
-}
-
-/* The arrow of the sort a click would apply, kept in place and shown only on
-   hover and focus — the header says how the list is sorted, nothing else. */
-.ds-table__sort-icon {
-  flex-shrink: 0;
-  color: var(--ds-text-subtlest);
-  visibility: hidden;
-}
-
-.ds-table__sort:hover .ds-table__sort-icon,
-.ds-table__sort:focus-visible .ds-table__sort-icon {
-  visibility: visible;
-}
-
-.ds-table__sort--active .ds-table__th-label {
-  font: var(--ds-font-label-md-strong);
-  color: var(--ds-text-strong);
-}
-
-.ds-table__sort--active .ds-table__sort-icon {
-  color: var(--ds-text-strong);
-  visibility: visible;
 }
 
 /* ── Data row ──────────────────────────────────────────────────────── */

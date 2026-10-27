@@ -8,10 +8,17 @@ import { InputDropdown } from '../Dropdown'
  * way to the other pages (ADR-0080, track A of the table board).
  *
  * The **range on the left** — « 1–10 sur 42 projets », where the eye leaves the
- * last row — when `total` is given. On the right, **lines per page** when
- * `pageSize` is bound, then the numbered pages between two arrows: the pages
- * are what is kept from before, the words « Précédent / Suivant » became the
- * arrows' names. Changing the page size goes back to page 1.
+ * last row — when `total` and `pageSize` are given. On the right, **lines per
+ * page** when there are sizes to offer, then the numbered pages between two
+ * arrows: the pages are what is kept from before, the words « Précédent /
+ * Suivant » became the arrows' names. Changing the page size goes back to
+ * page 1.
+ *
+ * The range and the selector are **two things** (ADR-0090): `pageSize` writes
+ * the range, `pageSizes` offers the choice, and an empty `pageSizes` keeps
+ * « 1–25 sur 42 » with no selector under it — which is what the benchmark
+ * concluded (9 products of 17 carry none, and a choice made in a foot is not
+ * remembered).
  *
  * It sends nothing and fetches nothing: it emits `page-change` and
  * `update:pageSize`, and shows what it is given.
@@ -22,8 +29,9 @@ interface Props {
   totalPages?: number
   /** How many items in all. Given, the range is written and the pages counted. */
   total?: number
-  /** Items per page. Bound (`v-model:pageSize`), the size selector shows. */
+  /** Items per page. Given, the range is written: « 1–25 sur 42 ». */
   pageSize?: number
+  /** The sizes offered. **Empty, no selector** — the range stays. */
   pageSizes?: number[]
   /** What the items are, after the range: « projets », « parcelles ». */
   itemLabel?: string
@@ -90,6 +98,9 @@ const summary = computed(() => {
   return `${format(from)}–${format(to)} ${props.ofLabel} ${format(props.total)}${label}`
 })
 
+/* A size is offered only when there is a list of them to offer. */
+const offersSizes = computed(() => props.pageSize !== undefined && props.pageSizes.length > 0)
+
 const sizeOptions = computed(() => props.pageSizes.map(n => ({ value: n, label: format(n) })))
 
 function goToPage(page: number) {
@@ -111,7 +122,7 @@ const sizeLabelId = `ds-pagination-size-${useId()}`
     <p v-if="summary" class="ds-pagination__summary">{{ summary }}</p>
 
     <div class="ds-pagination__controls">
-      <div v-if="pageSize !== undefined" class="ds-pagination__size">
+      <div v-if="offersSizes" class="ds-pagination__size">
         <span :id="sizeLabelId" class="ds-pagination__size-label" aria-hidden="true">{{ pageSizeLabel }}</span>
         <InputDropdown
           size="sm"

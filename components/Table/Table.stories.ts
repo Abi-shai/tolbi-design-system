@@ -23,7 +23,9 @@ const meta: Meta<typeof Table> = {
           '`@row-click`) — un vrai lien, et un clic ailleurs sur la ligne lui est confié ; les **colonnes figées** ' +
           '(`fixed`) restent en place et un filet marque leur bord tant que du contenu passe dessous ; ' +
           '`visibleColumns` se règle avec `TableColumnMenu` ; le pied dit le rang, la taille de page et les pages. ' +
-          'Le tableau ne trie ni ne pagine lui-même : il émet, le produit charge.',
+          'Le tableau ne trie ni ne pagine lui-même : il émet, le produit charge. ADR-0090 : `stickyHeader` garde '+
+          'l’en-tête en haut de l’écran pendant que la page défile (`--ds-table-sticky-top` pour passer sous la '+
+          'barre du produit), et `pageSizes` vide retire « Lignes par page » en gardant « 1–25 sur 42 ».',
       },
     },
   },
@@ -401,6 +403,102 @@ export const InEnglish: Story = {
           </template>
         </Table>
       </div>
+    `,
+  }),
+}
+
+/**
+ * `stickyHeader` : le tableau garde la hauteur de son contenu et défile avec la page, et l’en-tête reste collé en
+ * haut de l’écran (ADR-0090). Le produit règle `--ds-table-sticky-top` sur la hauteur de ce qu’il garde en haut —
+ * ici une fausse barre de 56 px. La colonne figée et le coin colonne figée × en-tête restent au-dessus du reste.
+ */
+export const StickyHeader: Story = {
+  name: 'En-tête collé',
+  parameters: { layout: 'fullscreen' },
+  render: () => ({
+    components: { Table, Badge, IconButton },
+    setup() {
+      const sort = ref<TableSort | null>({ key: 'created', direction: 'descending' })
+      const rows = computed(() => {
+        if (!sort.value) return PROJECTS
+        const { key, direction } = sort.value
+        const sign = direction === 'ascending' ? 1 : -1
+        return [...PROJECTS].sort((a, b) => {
+          const x = a[key] as string | number | Date, y = b[key] as string | number | Date
+          return x < y ? -sign : x > y ? sign : 0
+        })
+      })
+      return {
+        columns: PROJECT_COLUMNS,
+        rows,
+        sort,
+        number: (n: number) => NUMBER.format(n),
+        date: (d: Date) => DATE.format(d),
+      }
+    },
+    template: `
+      <div style="--ds-table-sticky-top: 56px;">
+        <div style="position:sticky;top:0;z-index:200;height:56px;display:flex;align-items:center;padding:0 24px;background:var(--ds-bg-default);border-bottom:1px solid var(--ds-border-subtle);font:var(--ds-font-label-lg-strong);color:var(--ds-text-strong)">
+          Barre du produit — 56 px
+        </div>
+        <div style="padding:24px;">
+          <Table :columns="columns" :rows="rows" sticky-header v-model:sort="sort">
+            <template #cell-area="{ value }">{{ number(value) }}</template>
+            <template #cell-created="{ value }">{{ date(value) }}</template>
+            <template #cell-status="{ value }">
+              <Badge :label="value" :tone="value === 'Terminé' ? 'success' : 'warning'" size="sm" />
+            </template>
+            <template #cell-actions="{ row }">
+              <div style="display:flex; justify-content:flex-end;">
+                <IconButton icon="pencil" size="xs" variant="subtle" :ariaLabel="'Modifier ' + row.name" />
+                <IconButton icon="trash-2" size="xs" variant="subtle" :ariaLabel="'Supprimer ' + row.name" />
+              </div>
+            </template>
+          </Table>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * Le rang sans le sélecteur : `:page-sizes="[]"` retire « Lignes par page » et garde « 1–25 sur 42 projets »
+ * (ADR-0090). `pageSize` écrit le rang, `pageSizes` offre le choix — ce sont deux choses.
+ */
+export const RangeWithoutSizes: Story = {
+  name: 'Rang sans sélecteur',
+  render: () => ({
+    components: { Table, Badge },
+    setup() {
+      const PAGE_SIZE = 25
+      const currentPage = ref(1)
+      return {
+        columns: PROJECT_COLUMNS.filter(c => c.key !== 'actions'),
+        rows: computed(() => PROJECTS.slice((currentPage.value - 1) * PAGE_SIZE, currentPage.value * PAGE_SIZE)),
+        currentPage,
+        total: PROJECTS.length,
+        pageSize: PAGE_SIZE,
+        number: (n: number) => NUMBER.format(n),
+        date: (d: Date) => DATE.format(d),
+      }
+    },
+    template: `
+      <Table
+        :columns="columns"
+        :rows="rows"
+        :current-page="currentPage"
+        :total="total"
+        :page-size="pageSize"
+        :page-sizes="[]"
+        item-label="projets"
+        @page-change="p => currentPage = p"
+      >
+        <template #cell-area="{ value }">{{ number(value) }}</template>
+        <template #cell-created="{ value }">{{ date(value) }}</template>
+        <template #cell-status="{ value }">
+          <Badge :label="value" :tone="value === 'Terminé' ? 'success' : 'warning'" size="sm" />
+        </template>
+      </Table>
     `,
   }),
 }
