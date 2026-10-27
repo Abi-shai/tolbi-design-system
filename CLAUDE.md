@@ -1017,6 +1017,10 @@ Before working on any component, read:
   **capture phase** on the dialog: a target inside an open `listbox`/`menu`/`dialog`/`[popover]` the surface holds,
   or on an opener (`aria-expanded="true"` + combobox or `aria-haspopup`) — then no `cancel`, and `within` skips it.
   A disclosure's `aria-expanded` is not a layer.
+- **ADR-0084**: **`ButtonGroup`'s chosen segment rises off a rail** (item 18, track A of `3211:1427`) — no tint on
+  white reads (all ≤ 1.2:1), so the mechanism changes: rail `bg-neutral-subtle` + `border-subtle`, a `bg-default` +
+  `elevation-surface` pill that slides (ADR-0024), chosen ink `text-strong`, others `text-subtle`, hover half a
+  surface (Tabs'). The rail is 42px, a bordered control's height; segments 32px, no separators.
 
 ## Architecture
 

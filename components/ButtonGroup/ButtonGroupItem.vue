@@ -77,22 +77,22 @@ function handleClick(event: MouseEvent) {
 
 <style scoped>
 /* ── Base ─────────────────────────────────────────────────────────── */
+/* A segment on the rail (ADR-0084): no border of its own, no ground — the
+   group paints the rail and the pill under it. 32px, so the rail is 42. */
 .ds-button-group-item {
   position: relative;
+  z-index: var(--ds-z-raised);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0;
-  min-height: 40px;
-  padding: var(--ds-spacing-md) var(--ds-spacing-xl);
+  min-height: 32px;
+  padding: var(--ds-spacing-sm) var(--ds-spacing-lg);
   border: none;
-  border-right: var(--ds-border-width-default) solid var(--ds-border-default);
-  /* Transparent: the group paints the ground and the selection under it. An
-     item that painted bg-default covered the indicator, so no segment ever
-     showed as chosen. */
+  border-radius: var(--ds-radius-inner);
   background-color: transparent;
   font: var(--ds-font-label-lg-strong);
-  color: var(--ds-text-default);
+  color: var(--ds-text-subtle);
   white-space: nowrap;
   cursor: pointer;
   outline: none;
@@ -102,42 +102,36 @@ function handleClick(event: MouseEvent) {
     box-shadow       var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
-/* Remove right border on last child — container border handles the edge */
-.ds-button-group-item:last-child {
-  border-right: none;
-}
-
 /* ── Icon modes ───────────────────────────────────────────────────── */
 .ds-button-group-item--icon-only {
-  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
+  padding: var(--ds-spacing-sm);
 }
 
 .ds-button-group-item--leading-icon {
   gap: var(--ds-spacing-md);
-  padding: var(--ds-spacing-md) var(--ds-spacing-xl) var(--ds-spacing-md) 14px;
+  padding: var(--ds-spacing-sm) var(--ds-spacing-lg) var(--ds-spacing-sm) var(--ds-spacing-md);
 }
 
 /* ── States ───────────────────────────────────────────────────────── */
-.ds-button-group-item:hover:not(:disabled) {
-  background-color: var(--ds-bg-hover);
-  color: var(--ds-text-default-hover);
-  z-index: var(--ds-z-raised);
+/* Hover is half a surface and the ink steps forward — Tabs' own, clearly
+   lighter than the pill. */
+.ds-button-group-item:not(.ds-button-group-item--active):hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--ds-bg-default) 50%, transparent);
+  color: var(--ds-text-default);
 }
 
 .ds-button-group-item:focus-visible:not(:disabled) {
   box-shadow: var(--ds-focus-ring-gray);
-  z-index: var(--ds-z-raised);
 }
 
-/* The selection is painted by the group's sliding indicator (ADR-0024); the
-   item only promotes its own text. */
+/* The pill is the group's sliding indicator (ADR-0024); the item carries the
+   ink — the strong one, so the choice is also said by the text. */
 .ds-button-group-item--active {
-  color: var(--ds-text-default-hover);
+  color: var(--ds-text-strong);
 }
 
 /* ── Disabled ─────────────────────────────────────────────────────── */
 .ds-button-group-item:disabled {
-  background-color: var(--ds-bg-disabled);
   color: var(--ds-text-disabled);
   cursor: not-allowed;
 }
