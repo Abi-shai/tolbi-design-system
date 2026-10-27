@@ -130,8 +130,13 @@ onMounted(() => {
     @pointerdown="away"
   >
     <slot />
-    <!-- What the trigger is described by — there before the bubble, and read whether it shows or not. -->
-    <span :id="descriptionId" class="ds-tooltip-anchor__description">
+    <!--
+      What the trigger is described by — there before the bubble, and read
+      whether it shows or not. Hidden from the reading order itself: a
+      description is read through the reference, and read again as text
+      after the button it said « Zoomer, Zoomer ».
+    -->
+    <span :id="descriptionId" class="ds-tooltip-anchor__description" aria-hidden="true">
       {{ title }}<template v-if="supportingText">. {{ supportingText }}</template>
     </span>
     <SurfaceTransition>

@@ -213,7 +213,10 @@ export { ResizableSplit } from './ResizableSplit'
 export { ChartTooltip } from './ChartTooltip'
 export type { ChartTooltipSeries } from './ChartTooltip'
 
+export { MapOverlay, MapPanel, MapControls } from './Map'
+export type { MapOverlayPosition, MapControl } from './Map'
+
 export { ChartLegend } from './ChartLegend'
-export type { ChartLegendItem, ChartLegendShape } from './ChartLegend'
+export type { ChartLegendItem, ChartLegendShape, ChartLegendOrientation } from './ChartLegend'
 
 export { ChartFrame } from './ChartFrame'

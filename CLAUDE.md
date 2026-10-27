@@ -1034,6 +1034,13 @@ Before working on any component, read:
   `layout="grid"` (2–4 `columns`, equal height, a column dropped before one goes under 14rem) or `stack`; a
   `fieldset`; **real hidden inputs**, the card their label — the browser's keyboard. Outside a list, `href`/click:
   a row that leads, chevron, no chosen state, named by its title.
+- **ADR-0087**: **what sits on a map** (items 3, 4, 13, `3213:1427`, the owner's GIS frame as reference). `MapOverlay`
+  = a **place** (6: corners + top/bottom middle), **16px** from the edges, stacks toward the centre 8px apart,
+  only children take the pointer. `MapPanel` = the surface (`bg-default`, `border-subtle`, `elevation-raised`,
+  `radius-surface-sm`, 12px), capped at 20rem **for text** (`min-width: min-content` lets buttons widen it),
+  `collapsible` into a `Button` with focus following. `MapControls` = a stack of **`Button` icon-only
+  `secondary-gray` sm** with anchored tooltips **away from the edge**, `pressed` → `aria-pressed`. `ChartLegend`
+  gains `orientation="vertical"`. A tooltip's hidden description is `aria-hidden` (read via the reference only).
 
 ## Architecture
 

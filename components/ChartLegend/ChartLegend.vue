@@ -12,17 +12,26 @@ export interface ChartLegendItem {
 
 export type ChartLegendShape = 'dot' | 'line'
 
+/**
+ * `horizontal` wraps beside a chart. `vertical` is a list — the legend set on a
+ * map, in a `MapPanel` (ADR-0087): one entry per row, the figure at its end in
+ * the receding ink, a count read after its label.
+ */
+export type ChartLegendOrientation = 'horizontal' | 'vertical'
+
 interface Props {
   items?: ChartLegendItem[]
   shape?: ChartLegendShape
   /** Makes each entry a button that emits `toggle`. */
   interactive?: boolean
+  orientation?: ChartLegendOrientation
 }
 
 withDefaults(defineProps<Props>(), {
   items: () => [],
   shape: 'dot',
   interactive: false,
+  orientation: 'horizontal',
 })
 
 defineEmits<{ toggle: [key: string] }>()
@@ -49,7 +58,7 @@ function seriesColor(color: string | undefined, index: number): string {
 </script>
 
 <template>
-  <ul class="ds-chart-legend">
+  <ul class="ds-chart-legend" :class="`ds-chart-legend--${orientation}`">
     <li v-for="(item, i) in items" :key="item.key" class="ds-chart-legend__item">
       <!--
         A real button when interactive, so toggling a series is reachable by
@@ -134,5 +143,30 @@ button.ds-chart-legend__entry:focus-visible {
   font: var(--ds-font-body-sm-emphasis);
   color: var(--ds-text-strong);
   font-variant-numeric: tabular-nums;
+}
+
+/* ── Vertical: a list (ADR-0087) ──────────────────────────────────── */
+.ds-chart-legend--vertical {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: var(--ds-spacing-sm);
+}
+
+.ds-chart-legend--vertical .ds-chart-legend__entry {
+  display: flex;
+  width: 100%;
+}
+
+.ds-chart-legend--vertical .ds-chart-legend__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-chart-legend--vertical .ds-chart-legend__value {
+  font: var(--ds-font-body-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-subtle);
 }
 </style>
