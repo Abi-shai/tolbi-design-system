@@ -1027,6 +1027,13 @@ Before working on any component, read:
   (`option.flag`). **`multiple` + `v-model:values`** (not `modelValue`, whose type would break): tags on **one line**
   then « +N », the list stays open with boxes, a foot « N sélectionnés · Effacer », Backspace removes the last;
   `Tag` gains `closeLabel`.
+- **ADR-0086**: **`OptionCard` + `OptionList`** (item 2, `3194:1427`): media at the start (icon tile 40, `Avatar`,
+  `Flag` 24, `#media`), title + sentence, a meta, **the control at the end** (where a chevron must be). Chosen =
+  `border-brand` 2px (an inset ring, nothing moves) + `bg-selected` + control checked; hover = the contour only (a
+  ground would swallow the tile). `OptionList`: `v-model` + radios, `multiple` + `v-model:values` + boxes;
+  `layout="grid"` (2–4 `columns`, equal height, a column dropped before one goes under 14rem) or `stack`; a
+  `fieldset`; **real hidden inputs**, the card their label — the browser's keyboard. Outside a list, `href`/click:
+  a row that leads, chevron, no chosen state, named by its title.
 
 ## Architecture
 
