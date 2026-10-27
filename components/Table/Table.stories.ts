@@ -355,3 +355,52 @@ export const FixedColumns: Story = {
     `,
   }),
 }
+
+/**
+ * Tout ce que le tableau écrit se règle : le pied (`locale`, `itemLabel`, `prevLabel`, `nextLabel`, `pageSizeLabel`,
+ * `ofLabel`, passés à `Pagination` tels quels — ADR-0077, point 26), le vide (`emptyText`), et le menu des colonnes
+ * (`label`, `title`, `resetLabel`).
+ */
+export const InEnglish: Story = {
+  name: 'En anglais',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { Table, TableColumnMenu, Badge },
+    setup() {
+      const page = ref(1)
+      const size = ref(10)
+      const visible = ref(PROJECT_COLUMNS.filter(c => c.key !== 'region').map(c => c.key))
+      const rows = computed(() => PROJECTS.slice((page.value - 1) * size.value, page.value * size.value))
+      return { columns: PROJECT_COLUMNS, page, size, visible, rows, total: 1250, number: (n: number) => new Intl.NumberFormat('en-US', { minimumFractionDigits: 2 }).format(n) }
+    },
+    template: `
+      <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-xl);">
+        <div style="display:flex; justify-content:flex-end;">
+          <TableColumnMenu :columns="columns" v-model="visible" label="Columns" title="Columns to show" reset-label="Reset" />
+        </div>
+        <Table
+          :columns="columns"
+          :rows="rows"
+          :visible-columns="visible"
+          :current-page="page"
+          :total="total"
+          v-model:page-size="size"
+          item-label="projects"
+          locale="en-US"
+          prev-label="Previous"
+          next-label="Next"
+          page-size-label="Rows per page"
+          of-label="of"
+          empty-text="No projects"
+          @page-change="p => page = p"
+        >
+          <template #cell-area="{ value }">{{ number(value) }}</template>
+          <template #cell-created="{ value }">{{ value.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) }}</template>
+          <template #cell-status="{ value }">
+            <Badge :label="value === 'Terminé' ? 'Done' : 'Running'" :tone="value === 'Terminé' ? 'success' : 'warning'" size="sm" />
+          </template>
+        </Table>
+      </div>
+    `,
+  }),
+}

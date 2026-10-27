@@ -63,6 +63,22 @@ hint: the message renders, and the control is described by it, as with the prop;
 it. Phrasing content only — it is read inside the message's `<p>`. Where the hint sits (under the label in
 the side panel's drawing, under the control here) is a different question, left with ADR-0079.
 
+### Third round (27 Oct.) — the foot in English, and a click that lost its target
+
+Item 26: `Table` handed its `Pagination` neither `locale` nor the foot's words, so an English list kept
+« Précédent · Suivant · Lignes par page · sur ». `Table` takes `locale`, `prevLabel`, `nextLabel`,
+`pageSizeLabel` and `ofLabel` and passes **only what was given** — absent, `Pagination`'s French defaults
+hold. With `itemLabel` and `emptyText`, everything the table writes is now a prop; `TableColumnMenu`
+already was (`label`, `title`, `resetLabel`). Measured: « 1–10 of 1,250 projects », « Rows per page »,
+the arrows named « Previous » / « Next ».
+
+Item 23: a `Dialog` closed when a click inside it landed on something that removed itself — a button
+that hides on click. The scrim test was « whatever is not the surface », and a target that has just left
+the document is not in the surface. The dialog now dismisses on **the scrim itself** (the scrim, or the
+dialog's own padding), and only when the press **began** there too — so a selection dragged out of the
+surface does not close it either. Measured: the vanishing button and the drag keep it open; the scrim,
+Escape, and the scrim of a dialog `within` a region still close it.
+
 ## Still open
 
 - **The chosen segment's contrast.** Three tracks to draw before one is applied: `Tabs`' pill (a

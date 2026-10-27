@@ -946,7 +946,9 @@ Before working on any component, read:
   `border-inset` as an inset shadow, so a series the colour of the ground keeps an edge. `IconButton`'s
   name is spelt **`ariaLabel`**: vue-tsc keeps `aria-*` as HTML attributes (`htmlAttributes`) and never
   camelizes them, so no declaration matches both spellings. Second round: `FormField` takes a **`#hint`
-  slot** (the prop its fallback; phrasing content, it describes the control). Still open: the segment's
+  slot** (the prop its fallback; phrasing content, it describes the control). Third round: `Table` passes
+  `locale` and the foot's labels to `Pagination` (only what is given); a `Dialog` dismisses on **the scrim
+  itself, pressed there** — « not the surface » closed it on a click whose target removed itself. Still open: the segment's
   contrast (three tracks to draw), `Tooltip` anchoring, a deletion `IconButton`.
 - **ADR-0078**: **what floats is painted in the top layer**. `Dropdown` / `InputDropdown` opened
   `position: absolute` in the flow, so at the bottom of anything that scrolls (a side panel's body, a

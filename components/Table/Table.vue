@@ -77,6 +77,15 @@ interface Props {
   pageSizes?: number[]
   /** What the rows are, after the range: « projets ». */
   itemLabel?: string
+  /**
+   * The foot's words and numbers, handed to `Pagination` as they are — absent,
+   * its French defaults (ADR-0077, item 26).
+   */
+  locale?: string
+  prevLabel?: string
+  nextLabel?: string
+  pageSizeLabel?: string
+  ofLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -95,6 +104,11 @@ const props = withDefaults(defineProps<Props>(), {
   pageSize: undefined,
   pageSizes: () => [10, 20, 50, 100],
   itemLabel: '',
+  locale: undefined,
+  prevLabel: undefined,
+  nextLabel: undefined,
+  pageSizeLabel: undefined,
+  ofLabel: undefined,
 })
 
 const emit = defineEmits<{
@@ -267,6 +281,13 @@ const pageCount = computed(() => {
   return props.totalPages ?? 1
 })
 
+/* Only what was given, so Pagination's own defaults hold for the rest. */
+const footLabels = computed(() => Object.fromEntries(
+  (['locale', 'prevLabel', 'nextLabel', 'pageSizeLabel', 'ofLabel'] as const)
+    .filter(k => props[k] !== undefined)
+    .map(k => [k, props[k]]),
+))
+
 /* With a size to choose, the foot stays while there is more than the
    smallest page — or a user who picked 50 for 42 rows could not go back. */
 const showPagination = computed(() =>
@@ -414,6 +435,7 @@ const showPagination = computed(() =>
       :page-size="pageSize"
       :page-sizes="pageSizes"
       :item-label="itemLabel"
+      v-bind="footLabels"
       @page-change="emit('page-change', $event)"
       @update:page-size="emit('update:pageSize', $event)"
     />

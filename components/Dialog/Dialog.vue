@@ -289,9 +289,26 @@ function onKeydown(event: KeyboardEvent) {
   }
 }
 
-/* The dialog spans the screen; whatever is not the surface is the scrim. */
+/*
+  The scrim dismisses — the scrim itself, not « whatever is not the surface ».
+  That test read a click whose target had just left the document (a button
+  that hides itself on click) as a click outside, and closed the dialog
+  (ADR-0077). The press has to begin on the scrim too, so a selection dragged
+  out of the surface does not close it either.
+*/
+let pressedOnScrim = false
+
+function isScrim(target: EventTarget | null) {
+  return target === el.value || (target instanceof Element && target.classList.contains('ds-dialog__scrim'))
+}
+
+function onPointerDown(event: PointerEvent) {
+  pressedOnScrim = isScrim(event.target)
+}
+
 function onClick(event: MouseEvent) {
-  if (surface.value && !surface.value.contains(event.target as Node)) dismiss()
+  if (pressedOnScrim && isScrim(event.target)) dismiss()
+  pressedOnScrim = false
 }
 </script>
 
@@ -309,6 +326,7 @@ function onClick(event: MouseEvent) {
       @cancel="onCancel"
       @close="onClose"
       @keydown="onKeydown"
+      @pointerdown="onPointerDown"
       @click="onClick"
     >
       <Transition name="ds-dialog-scrim">
