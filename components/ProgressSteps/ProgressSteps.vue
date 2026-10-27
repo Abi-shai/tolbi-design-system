@@ -13,6 +13,18 @@ export interface ProgressStep {
 export type ProgressStepsType = 'icon' | 'featured-icon'
 export type ProgressStepsSize = 'sm' | 'md' | 'lg'
 
+/**
+ * `vertical` is the column of circles. `horizontal` is a row of segments, one
+ * per step, its title and sentence under it (ADR-0081 — Untitled UI « Text with
+ * line », USWDS): the steps at the head of a dialog. Done and current share the
+ * brand segment, so what is left reads at a glance; the current title also
+ * takes the strong weight — a colour never says it alone (ADR-0006). Under
+ * 40rem of its own width it keeps the segments and writes the current step
+ * alone — « Étape 2 sur 3 » over its title. `type` and `size` are the
+ * vertical form's.
+ */
+export type ProgressStepsOrientation = 'vertical' | 'horizontal'
+
 type StepStatus = 'complete' | 'current' | 'incomplete'
 
 interface Props {
@@ -20,12 +32,21 @@ interface Props {
   currentStep: number
   type?: ProgressStepsType
   size?: ProgressStepsSize
+  orientation?: ProgressStepsOrientation
+  /** The compact form's words: « Étape » 2 « sur » 3. */
+  stepLabel?: string
+  ofLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'icon',
   size: 'md',
+  orientation: 'vertical',
+  stepLabel: 'Étape',
+  ofLabel: 'sur',
 })
+
+const current = computed(() => props.steps[props.currentStep - 1])
 
 function stepStatus(i: number): StepStatus {
   if (i < props.currentStep - 1) return 'complete'
@@ -41,8 +62,35 @@ const checkSize = computed(() => {
 </script>
 
 <template>
-  <div :class="['ds-steps', `ds-steps--${type}`, `ds-steps--${size}`]">
-    <div
+  <!--
+    Horizontal (ADR-0081). An ordered list that says which step is current;
+    the compact line repeats it for the eye only, the list stays read in full.
+  -->
+  <div v-if="orientation === 'horizontal'" class="ds-steps-h">
+    <ol class="ds-steps-h__list">
+      <li
+        v-for="(step, i) in steps"
+        :key="i"
+        class="ds-steps-h__step"
+        :class="`ds-steps-h__step--${stepStatus(i)}`"
+        :aria-current="stepStatus(i) === 'current' ? 'step' : undefined"
+      >
+        <span class="ds-steps-h__segment" aria-hidden="true" />
+        <span class="ds-steps-h__text">
+          <span class="ds-steps-h__title">{{ step.title }}</span>
+          <span v-if="step.description" class="ds-steps-h__description">{{ step.description }}</span>
+        </span>
+      </li>
+    </ol>
+    <p v-if="current" class="ds-steps-h__compact" aria-hidden="true">
+      <span class="ds-steps-h__counter">{{ stepLabel }} {{ currentStep }} {{ ofLabel }} {{ steps.length }}</span>
+      <span class="ds-steps-h__title">{{ current.title }}</span>
+      <span v-if="current.description" class="ds-steps-h__description">{{ current.description }}</span>
+    </p>
+  </div>
+
+  <ol v-else :class="['ds-steps', `ds-steps--${type}`, `ds-steps--${size}`]">
+    <li
       v-for="(step, i) in steps"
       :key="i"
       class="ds-steps__step"
@@ -50,6 +98,7 @@ const checkSize = computed(() => {
         `ds-steps__step--${size}`,
         type === 'featured-icon' ? `ds-steps__step--${stepStatus(i)}` : '',
       ]"
+      :aria-current="stepStatus(i) === 'current' ? 'step' : undefined"
     >
       <!-- Left: icon + connector -->
       <div class="ds-steps__connector-wrap">
@@ -95,8 +144,8 @@ const checkSize = computed(() => {
         <span class="ds-steps__title">{{ step.title }}</span>
         <span v-if="step.description" class="ds-steps__description">{{ step.description }}</span>
       </div>
-    </div>
-  </div>
+    </li>
+  </ol>
 </template>
 
 <style scoped>
@@ -105,6 +154,9 @@ const checkSize = computed(() => {
   display: flex;
   flex-direction: column;
   width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 /* ── Step row ──────────────────────────────────────────────────────── */
@@ -258,5 +310,102 @@ const checkSize = computed(() => {
 
 .ds-steps--icon .ds-steps__text--current .ds-steps__description {
   color: var(--ds-text-brand);
+}
+
+/* ── Horizontal (ADR-0081) ─────────────────────────────────────────── */
+/* Its own width decides the compact form — a container, not a breakpoint,
+   like the side panel (ADR-0079). */
+.ds-steps-h {
+  container-type: inline-size;
+  width: 100%;
+}
+
+.ds-steps-h__list {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  column-gap: var(--ds-spacing-xl);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-steps-h__step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-lg);
+  min-width: 0;
+}
+
+/* Four pixels, Untitled UI's — twice the vertical form's connector. */
+.ds-steps-h__segment {
+  display: block;
+  height: calc(2 * var(--ds-border-width-strong));
+  border-radius: var(--ds-radius-pill);
+  background-color: var(--ds-border-subtle);
+}
+
+.ds-steps-h__step--complete .ds-steps-h__segment,
+.ds-steps-h__step--current .ds-steps-h__segment {
+  background-color: var(--ds-border-brand-solid);
+}
+
+.ds-steps-h__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-steps-h__title {
+  font: var(--ds-font-label-lg);
+  color: var(--ds-text-default);
+  overflow-wrap: anywhere;
+}
+
+.ds-steps-h__description {
+  font: var(--ds-font-body-sm);
+  color: var(--ds-text-subtle);
+  overflow-wrap: anywhere;
+}
+
+.ds-steps-h__step--current .ds-steps-h__title,
+.ds-steps-h__compact .ds-steps-h__title {
+  font: var(--ds-font-label-lg-strong);
+  color: var(--ds-text-on-brand-subtle);
+}
+
+.ds-steps-h__step--current .ds-steps-h__description,
+.ds-steps-h__compact .ds-steps-h__description {
+  color: var(--ds-text-brand);
+}
+
+.ds-steps-h__compact {
+  display: none;
+  flex-direction: column;
+  margin: var(--ds-spacing-lg) 0 0;
+}
+
+.ds-steps-h__counter {
+  font: var(--ds-font-label-md);
+  color: var(--ds-text-subtle);
+}
+
+/* Narrow: the segments stay, the titles leave the eye — never the reader —
+   and the current step is written once under them (USWDS). */
+@container (max-width: 40rem) {
+  .ds-steps-h__text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .ds-steps-h__compact {
+    display: flex;
+  }
 }
 </style>

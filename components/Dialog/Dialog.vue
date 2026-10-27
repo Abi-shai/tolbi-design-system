@@ -53,6 +53,12 @@ import { pushModal, removeModal } from '../../composables/useModalStack'
 export type DialogPlacement = 'centre' | 'side'
 export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | 'full'
 
+/** One figure of the foot's summary — « Champs liés » / « 1 champ ». */
+export interface DialogSummaryItem {
+  label: string
+  value: string
+}
+
 interface Props {
   /** Its name: the title, read when it opens. */
   title: string
@@ -82,6 +88,13 @@ interface Props {
   placement?: DialogPlacement
   /** The surface's width — a ceiling, not a size: a narrow screen gives less. */
   size?: DialogSize
+  /**
+   * What the actions will act on, at the start of the foot — « 1 champ lié ·
+   * 10 ha » (ADR-0081). The foot stays while the body scrolls, so the figures
+   * stay in sight while they change; each change is announced. The `#summary`
+   * slot takes their place for more.
+   */
+  summary?: DialogSummaryItem[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -95,6 +108,7 @@ const props = withDefaults(defineProps<Props>(), {
   within: null,
   placement: 'centre',
   size: 'md',
+  summary: undefined,
 })
 
 const open = defineModel<boolean>('open', { default: false })
@@ -116,7 +130,10 @@ const slots = defineSlots<{
   form?: () => unknown
   /** The actions, in the foot, on the right. */
   actions?: () => unknown
+  /** The foot's start, in place of `summary`. */
+  summary?: () => unknown
 }>()
+const hasSummary = computed(() => Boolean(slots.summary || props.summary?.length))
 const el = ref<HTMLDialogElement>()
 const surface = ref<HTMLElement>()
 const body = ref<HTMLElement>()
@@ -370,8 +387,21 @@ function onClick(event: MouseEvent) {
             <p v-else-if="description && !side" :id="descriptionId" class="ds-dialog__description">{{ description }}</p>
             <slot name="form" />
           </div>
-          <footer v-if="slots.actions" class="ds-dialog__foot">
-            <slot name="actions" />
+          <footer v-if="slots.actions || hasSummary" class="ds-dialog__foot">
+            <!-- A status: the figures move as the body is ticked, and say so once each time. -->
+            <div v-if="hasSummary" class="ds-dialog__summary" role="status">
+              <slot name="summary">
+                <dl class="ds-dialog__figures">
+                  <div v-for="item in summary" :key="item.label" class="ds-dialog__figure">
+                    <dt class="ds-dialog__figure-label">{{ item.label }}</dt>
+                    <dd class="ds-dialog__figure-value">{{ item.value }}</dd>
+                  </div>
+                </dl>
+              </slot>
+            </div>
+            <div v-if="slots.actions" class="ds-dialog__actions">
+              <slot name="actions" />
+            </div>
           </footer>
         </div>
       </SurfaceTransition>
@@ -509,9 +539,42 @@ function onClick(event: MouseEvent) {
 .ds-dialog__foot {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-spacing-xl) var(--ds-spacing-3xl);
+  /* The start is the body's text edge (20px), so a summary lines up with
+     what it sums; the actions keep the owner's 24 on the right. */
+  padding: var(--ds-spacing-xl) var(--ds-spacing-3xl) var(--ds-spacing-xl) var(--ds-spacing-2xl);
+}
+
+/* On the right, and still on the right when the summary sends them under it
+   (Spectrum, Polaris). */
+.ds-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--ds-spacing-md);
-  padding: var(--ds-spacing-xl) var(--ds-spacing-3xl);
+  margin-inline-start: auto;
+}
+
+/* The figures sit on the foot's own ground — the foot is a level already, a
+   tile would be a third (ADR-0048) — label over value, as the body reads. */
+.ds-dialog__figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-spacing-md) var(--ds-spacing-3xl);
+  margin: 0;
+}
+
+.ds-dialog__figure-label {
+  font: var(--ds-font-body-sm);
+  color: var(--ds-text-subtle);
+}
+
+.ds-dialog__figure-value {
+  margin: 0;
+  font: var(--ds-font-label-lg-strong);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-strong);
 }
 
 /* A heavy surface arrives over `considered`; it leaves as fast as any other. */
@@ -713,8 +776,14 @@ function onClick(event: MouseEvent) {
   }
 
   .ds-dialog--side .ds-dialog__foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ds-dialog--side .ds-dialog__actions {
     flex-direction: column-reverse;
     align-items: stretch;
+    margin-inline-start: 0;
   }
 }
 

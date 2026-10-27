@@ -269,3 +269,80 @@ export const Sizes: Story = {
     `,
   }),
 }
+
+const FIELDS = [
+  { id: 'p1', name: 'Parcelle Ndiaye 1', ha: 4.2 },
+  { id: 'p2', name: 'Parcelle Ndiaye 2', ha: 5.8 },
+  { id: 'p3', name: 'Parcelle Sow — bas-fond', ha: 2.5 },
+  { id: 'p4', name: 'Parcelle Sow — plateau', ha: 7.1 },
+  { id: 'p5', name: 'Parcelle Diallo', ha: 3.4 },
+  { id: 'p6', name: 'Parcelle Fall', ha: 6.0 },
+  { id: 'p7', name: 'Parcelle Ba', ha: 1.9 },
+  { id: 'p8', name: 'Parcelle Kane', ha: 8.3 },
+]
+
+/**
+ * ADR-0081 — un résumé au début du pied (`summary`, ou le slot `#summary`) : ce sur quoi les actions vont
+ * agir. Le pied reste quand le corps défile, donc les chiffres restent en vue pendant qu’on coche ; chaque
+ * changement est annoncé (`role="status"`). Libellé sur valeur, sans fond — le pied est déjà un niveau. Faute
+ * de place, les actions passent dessous, toujours à droite.
+ */
+export const Summary: Story = {
+  name: 'Résumé dans le pied',
+  render: () => ({
+    components: { Dialog, Button, Checkbox },
+    setup() {
+      const open = ref<'centre' | 'side' | null>(null)
+      const linked = ref<string[]>(['p1'])
+      const toggle = (id: string) => {
+        linked.value = linked.value.includes(id) ? linked.value.filter(x => x !== id) : [...linked.value, id]
+      }
+      const ha = (n: number) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 }).format(n)
+      const summary = () => {
+        const n = linked.value.length
+        const area = FIELDS.filter(f => linked.value.includes(f.id)).reduce((t, f) => t + f.ha, 0)
+        return [
+          { label: 'Champs liés', value: n + (n > 1 ? ' champs' : ' champ') },
+          { label: 'Surface occupée', value: ha(area) + ' ha' },
+        ]
+      }
+      return { open, linked, toggle, summary, FIELDS, ha, PAGE }
+    },
+    template: `
+      <div :style="PAGE">
+        <div style="display:flex; gap:var(--ds-spacing-md)">
+          <Button label="Lier des champs" variant="secondary-gray" @click="open = 'centre'" />
+          <Button label="Lier des champs — côté" variant="secondary-gray" @click="open = 'side'" />
+        </div>
+        <Dialog
+          :open="open !== null"
+          @update:open="(v) => { if (!v) open = null }"
+          :placement="open === 'side' ? 'side' : 'centre'"
+          :size="open === 'side' ? 'md' : 'lg'"
+          title="Lier des champs"
+          description="Les champs où le produit a été cultivé."
+          :summary="summary()"
+        >
+          <template #form>
+          <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-md)">
+            <Checkbox
+              v-for="f in FIELDS"
+              :key="f.id"
+              size="md"
+              :model-value="linked.includes(f.id)"
+              @update:model-value="toggle(f.id)"
+              :label="f.name"
+              :supporting-text="ha(f.ha) + ' ha'"
+            />
+          </div>
+          </template>
+          <template #actions>
+            <Button label="Annuler" variant="secondary-gray" size="sm" @click="open = null" />
+            <Button label="Lier les champs" variant="primary" size="sm" :disabled="!linked.length" @click="open = null" />
+          </template>
+        </Dialog>
+      </div>
+    `,
+  }),
+}
+

@@ -992,6 +992,19 @@ Before working on any component, read:
   (`menuitemcheckbox`, `Checkbox visualOnly`) — a menu row, not `DropdownSelectItem` (a field's option).
   **`Pagination`**: « 1–10 sur 42 projets » left, « Lignes par page » + numbered pages between arrows right;
   without `total` the pages alone. `InputDropdown size="sm"` + `ariaLabel`.
+- **ADR-0081**: **the DDR flow** (items 27–33), benchmark → canvas → validated (`3198:1427`). 31 is `Button`
+  icon-only `danger-secondary` and 32's icons existed — nothing coded. **27**: `InputField` `options` +
+  `v-model:option` + `optionLabel` — `InputDropdown chrome="none"` **in the box** (one border, one ring, the
+  box's error), hung from the box (`anchor`); `InputField` gives its children a **null FormField context**.
+  An `ariaLabel` now names a trigger **with its value** (« Lignes par page 10 »). `PhoneField`'s list sat in
+  the `aria-hidden` `#leading-text` — moved to a new **`#leading`**. **28**: `FormField` `#label-action`
+  (outside the `<label>`, wraps under it) and **`group`** (`role="group"`, no control takes the field's id).
+  **29**: `Dialog` `summary` / `#summary` at the foot's start — label over value, **no ground**, a
+  `role="status"`; actions in a wrapper, under it when narrow; the foot starts on the body's 20px.
+  **30**: `ProgressSteps orientation="horizontal"` — segments, compact « Étape 2 sur 3 » under 40rem of its
+  own width; both forms are an `<ol>` with `aria-current="step"`. **33**: **`OptionTree`** — a tree, not
+  radios (APG: a tree's arrows move), the round mark only a sign; search keeps hits with their ancestors,
+  accent-blind; the chosen path written above.
 
 ## Architecture
 

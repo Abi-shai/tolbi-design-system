@@ -108,7 +108,7 @@ export type { TagSize, TagAction } from './Tag'
 export { Dropdown, DropdownTrigger, DropdownItem, DropdownDivider, DropdownGroup, DropdownSelectItem, InputDropdown } from './Dropdown'
 export type {
   DropdownTriggerVariant, DropdownAlign, DropdownTriggerSize, DropdownTriggerChrome,
-  DropdownSelectItemType, InputDropdownType, InputDropdownOption, InputDropdownSize,
+  DropdownSelectItemType, InputDropdownType, InputDropdownOption, InputDropdownSize, InputDropdownChrome,
 } from './Dropdown'
 
 export { Scrollbar } from './Scrollbar'
@@ -149,8 +149,11 @@ export { PageHeader } from './PageHeader'
 
 export { StepDots } from './StepDots'
 
+export { OptionTree } from './OptionTree'
+export type { OptionTreeNode } from './OptionTree'
+
 export { ProgressSteps } from './ProgressSteps'
-export type { ProgressStep, ProgressStepsType, ProgressStepsSize } from './ProgressSteps'
+export type { ProgressStep, ProgressStepsType, ProgressStepsSize, ProgressStepsOrientation } from './ProgressSteps'
 
 export { Table, TableColumnMenu } from './Table'
 export type { TableColumn, TableRow, TableSort, TableSortDirection } from './Table'
@@ -182,7 +185,7 @@ export type { EmptyStateSize } from './EmptyState'
 
 export { Toast, ToastRegion } from './Toast'
 export { Dialog, ConfirmDialog } from './Dialog'
-export type { ConfirmDialogConsequence, DialogPlacement, DialogSize } from './Dialog'
+export type { ConfirmDialogConsequence, DialogPlacement, DialogSize, DialogSummaryItem } from './Dialog'
 export type { ToastTone, ToastRegionPlacement } from './Toast'
 
 export { StatTile } from './StatTile'

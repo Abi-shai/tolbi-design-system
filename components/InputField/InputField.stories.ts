@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import { ref } from 'vue'
 import InputField from './InputField.vue'
 import FormField from '../FormField/FormField.vue'
 import InputFieldDocs from './InputField.mdx'
@@ -215,3 +216,50 @@ export const AllStates: Story = {
     `,
   }),
 }
+
+/**
+ * ADR-0081 — une liste au bout du champ : ce que la valeur est, choisi avec elle. La liste du paquet, dans
+ * la même boîte : une bordure, un anneau, l’erreur et le désactivé sont ceux de la boîte. Sous le focus, le
+ * mot se souligne — comme l’indicatif de `PhoneField`. La liste a son nom (`optionLabel`), lu avec sa valeur :
+ * « Type d’identifiant TVA ».
+ */
+export const WithOptions: Story = {
+  name: 'Liste au bout du champ',
+  render: () => ({
+    components: { InputField, FormField },
+    setup: () => ({
+      number: ref(''),
+      type: ref('TVA'),
+      units: ref('243'),
+      unit: ref('SI'),
+      TYPES: [
+        { value: 'TVA', label: 'TVA' },
+        { value: 'EORI', label: 'EORI' },
+        { value: 'SIREN', label: 'SIREN' },
+        { value: 'AUTRE', label: 'Autre' },
+      ],
+      UNITS: [
+        { value: 'SI', label: 'SI' },
+        { value: 'KG', label: 'kg' },
+        { value: 'T', label: 't' },
+      ],
+    }),
+    template: `
+      <div style="width:432px; display:flex; flex-direction:column; gap:var(--ds-spacing-2xl)">
+        <FormField label="Identifiant">
+          <InputField v-model="number" v-model:option="type" :options="TYPES" option-label="Type d’identifiant" placeholder="Entrez le numéro de votre identifiant" />
+        </FormField>
+        <FormField label="Unités supplémentaires">
+          <InputField v-model="units" v-model:option="unit" :options="UNITS" option-label="Unité" type="number" />
+        </FormField>
+        <FormField label="Identifiant" error="Ce numéro TVA n’a pas le bon format.">
+          <InputField model-value="FR 40" option="TVA" :options="TYPES" option-label="Type d’identifiant" />
+        </FormField>
+        <FormField label="Identifiant" disabled>
+          <InputField model-value="FR 40 303265045" option="TVA" :options="TYPES" option-label="Type d’identifiant" />
+        </FormField>
+      </div>
+    `,
+  }),
+}
+

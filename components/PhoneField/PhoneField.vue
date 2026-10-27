@@ -90,12 +90,14 @@ const grouped = computed(() => {
       @update:model-value="emit('update:modelValue', String($event))"
     >
       <!--
-        The prefix is a native select welded into the leading slot rather than an
-        InputDropdown: it has to sit inside the same bordered box as the number,
-        and a popover cannot. It stays a real form control, so keyboard and
-        mobile pickers work as they should.
+        The prefix is a native select welded into the box rather than
+        InputField's `options`: 245 countries in two groups want the system's
+        own picker on a phone. It stays a real form control, so keyboard and
+        mobile pickers work as they should — and it sits in `#leading`, which is
+        not hidden: in `#leading-text`, which is, it took the focus unseen by a
+        screen reader (ADR-0081).
       -->
-      <template #leading-text>
+      <template #leading>
         <span class="ds-phone-field__dial">
           <select
             class="ds-phone-field__select"

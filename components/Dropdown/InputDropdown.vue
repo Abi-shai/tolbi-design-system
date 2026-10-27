@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SurfaceTransition } from '../SurfaceTransition'
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, useId } from 'vue'
 import { useFormField } from '../FormField/context'
 import { Icon } from '../Icon'
 import { Scrollbar } from '../Scrollbar'
@@ -18,6 +18,15 @@ export type InputDropdownType = 'default' | 'icon-leading' | 'avatar-leading' | 
  * field hugs its value instead of taking the line.
  */
 export type InputDropdownSize = 'sm' | 'md'
+
+/**
+ * `box` is the field. `none` is the list riding inside another control's box —
+ * `InputField`'s `options`, « TVA ⌄ » at the end of the number (ADR-0081): the
+ * word and its chevron, no border, no padding; the box around it carries the
+ * focus ring, the error and the disabled state, and the word underlines while
+ * it has the focus, as `PhoneField`'s prefix does.
+ */
+export type InputDropdownChrome = 'box' | 'none'
 
 export interface InputDropdownOption {
   /**
@@ -46,6 +55,12 @@ interface Props {
   size?: InputDropdownSize
   /** The name, outside a FormField — which otherwise gives it its label. */
   ariaLabel?: string
+  chrome?: InputDropdownChrome
+  /**
+   * The box the list hangs from, when it rides in another control's
+   * (`chrome="none"`): the gap is measured from that box, not from the word.
+   */
+  anchor?: HTMLElement | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -54,6 +69,8 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   size: 'md',
   ariaLabel: undefined,
+  chrome: 'box',
+  anchor: null,
 })
 
 const field = useFormField()
@@ -63,6 +80,13 @@ const triggerId   = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedBy.value)
 const isInvalid   = computed(() => field?.invalid.value ?? false)
 const isDisabled  = computed(() => (field?.disabled.value ?? false) || props.disabled)
+
+/* Named by `ariaLabel`, the button would say « Type d'identifiant » and not
+   which one is chosen: an `aria-label` replaces the content it names. So the
+   name is the label *and* the value — « Type d'identifiant TVA » (ADR-0081). */
+const uid     = useId()
+const nameId  = `ds-input-dropdown-name-${uid}`
+const valueId = `ds-input-dropdown-value-${uid}`
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | number | null]
@@ -78,7 +102,12 @@ const panelEl = ref<HTMLElement | null>(null)
 /* The list floats in the top layer, at the field's width (ADR-0078): at the
    bottom of a side panel or a dialog, it opens over the box instead of
    growing its scroll — and above the field when the room below is short. */
-useAnchoredSurface(wrapEl, panelEl, { align: () => 'start', matchWidth: props.size === 'md' })
+const anchorEl = computed(() => props.anchor ?? wrapEl.value)
+useAnchoredSurface(anchorEl, panelEl, {
+  /* Inside a box, the list ends under its word: the word ends the box. */
+  align: () => (props.chrome === 'none' ? 'end' : 'start'),
+  matchWidth: props.size === 'md' && props.chrome === 'box',
+})
 
 const selectedOption = computed(() =>
   props.modelValue === null || props.modelValue === undefined
@@ -163,7 +192,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="ds-input-dropdown" :class="`ds-input-dropdown--${size}`" ref="rootEl" @keydown="onRootKeyDown">
+  <div
+    class="ds-input-dropdown"
+    :class="[`ds-input-dropdown--${size}`, `ds-input-dropdown--chrome-${chrome}`]"
+    ref="rootEl"
+    @keydown="onRootKeyDown"
+  >
     <!-- Field group. Label and message live on FormField — see ADR-0008. -->
     <div class="ds-input-dropdown__field-group">
       <div ref="wrapEl" class="ds-input-dropdown__input-wrap">
@@ -221,11 +255,12 @@ onUnmounted(() => {
           :id="triggerId"
           :aria-describedby="describedBy"
           :aria-invalid="isInvalid || undefined"
-          :aria-label="ariaLabel"
+          :aria-labelledby="ariaLabel ? `${nameId} ${valueId}` : undefined"
           :aria-expanded="open"
           aria-haspopup="listbox"
           @click="toggle"
         >
+          <span v-if="ariaLabel" :id="nameId" class="ds-input-dropdown__name">{{ ariaLabel }}</span>
           <div class="ds-input-dropdown__content">
             <Icon
               v-if="type === 'icon-leading' && (selectedOption?.icon || leadingIcon)"
@@ -249,6 +284,7 @@ onUnmounted(() => {
             />
 
             <span
+              :id="valueId"
               class="ds-input-dropdown__value"
               :class="{ 'ds-input-dropdown__value--placeholder': !selectedOption }"
             >{{ selectedOption?.label || placeholder }}</span>
@@ -259,7 +295,7 @@ onUnmounted(() => {
 
           <Icon
             :name="open ? 'chevron-up' : 'chevron-down'"
-            :size="size === 'sm' ? 16 : 20"
+            :size="size === 'sm' || chrome === 'none' ? 16 : 20"
             class="ds-input-dropdown__chevron"
             aria-hidden="true"
           />
@@ -354,6 +390,19 @@ onUnmounted(() => {
 .ds-input-dropdown__trigger--disabled .ds-input-dropdown__value,
 .ds-input-dropdown__trigger--disabled .ds-input-dropdown__chevron {
   color: var(--ds-text-disabled);
+}
+
+/* The name read before the value; never seen — the field's context shows it. */
+.ds-input-dropdown__name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ── Content row ───────────────────────────────────────────────────── */
@@ -494,6 +543,60 @@ onUnmounted(() => {
 
 .ds-input-dropdown--sm .ds-input-dropdown__panel {
   min-width: var(--anchor-width);
+}
+
+/* ── Chrome none: a list inside another control's box (ADR-0081) ───── */
+/* The box is the host's — its border, its ring (`:focus-within`), its error
+   and its disabled state. What is left is the word and its chevron. */
+.ds-input-dropdown--chrome-none {
+  display: inline-flex;
+  flex: none;
+  width: auto;
+}
+
+.ds-input-dropdown--chrome-none .ds-input-dropdown__input-wrap {
+  width: auto;
+}
+
+.ds-input-dropdown--chrome-none .ds-input-dropdown__trigger {
+  width: auto;
+  gap: var(--ds-spacing-xs);
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.ds-input-dropdown--chrome-none .ds-input-dropdown__trigger--open,
+.ds-input-dropdown--chrome-none .ds-input-dropdown__trigger:focus-visible {
+  box-shadow: none;
+}
+
+.ds-input-dropdown--chrome-none .ds-input-dropdown__value {
+  font: var(--ds-font-body-lg);
+  color: var(--ds-text-default);
+  text-underline-offset: 3px;
+}
+
+/* The ring is the box's; the word says which part of the box has it. */
+.ds-input-dropdown--chrome-none .ds-input-dropdown__trigger:focus-visible .ds-input-dropdown__value {
+  color: var(--ds-text-strong);
+  text-decoration: underline;
+}
+
+.ds-input-dropdown--chrome-none .ds-input-dropdown__chevron {
+  color: var(--ds-text-subtle);
+}
+
+.ds-input-dropdown--chrome-none .ds-input-dropdown__trigger--disabled .ds-input-dropdown__value,
+.ds-input-dropdown--chrome-none .ds-input-dropdown__trigger--disabled .ds-input-dropdown__chevron {
+  color: var(--ds-text-disabled);
+}
+
+/* A list of short words (« TVA », « EORI ») still reads as a list. */
+.ds-input-dropdown--chrome-none .ds-input-dropdown__panel {
+  min-width: max(var(--anchor-width), 10rem);
 }
 
 /* ── Hint text ─────────────────────────────────────────────────────── */

@@ -18,15 +18,24 @@ interface Props {
   disabled?: boolean
   /** Id given to the wrapped control. Set it here, never on the control. */
   id?:       string
+  /**
+   * Several controls under one label — a list of identifiers (ADR-0081). The
+   * label names the group (`role="group"`) rather than pointing at a control,
+   * and the message describes the group: each control keeps its own id and is
+   * named by the product (« Identifiant TVA »).
+   */
+  group?:    boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   required: false,
   disabled: false,
+  group:    false,
 })
 
 const uid       = useId()
 const fieldId   = computed(() => props.id ?? `field-${uid}`)
+const labelId   = computed(() => `${fieldId.value}-label`)
 const messageId = computed(() => `${fieldId.value}-message`)
 
 // A field is invalid because it has something to say, not because a flag was set.
@@ -38,9 +47,11 @@ const hasMessage = computed(() => invalid.value || Boolean(props.hint) || Boolea
 
 const describedBy = computed(() => (hasMessage.value ? messageId.value : undefined))
 
+/* In a group, no control takes the field's id or its message: the label and
+   the message are the group's, and one id cannot sit on two controls. */
 provide(FORM_FIELD_KEY, {
-  id:       fieldId,
-  describedBy,
+  id:          computed(() => (props.group ? undefined : fieldId.value)),
+  describedBy: computed(() => (props.group ? undefined : describedBy.value)),
   invalid,
   required: computed(() => props.required),
   disabled: computed(() => props.disabled),
@@ -48,16 +59,38 @@ provide(FORM_FIELD_KEY, {
 </script>
 
 <template>
-  <div class="ds-form-field" :class="{ 'ds-form-field--disabled': disabled }">
-    <!-- Label — text only. An icon inside the control's box stays the control's business. -->
-    <label v-if="label" :for="fieldId" class="ds-form-field__label">
-      {{ label }}
-      <!--
-        aria-hidden: the asterisk is decoration. The control carries the native
-        `required` attribute, which is what assistive tech actually reads.
-      -->
-      <span v-if="required" class="ds-form-field__required" aria-hidden="true">*</span>
-    </label>
+  <div
+    class="ds-form-field"
+    :class="{ 'ds-form-field--disabled': disabled }"
+    :role="group ? 'group' : undefined"
+    :aria-labelledby="group && label ? labelId : undefined"
+    :aria-describedby="group ? describedBy : undefined"
+  >
+    <!--
+      The label's row. `#label-action` sits at its end — « + Ajouter un
+      identifiant » — outside the `<label>`, or a click on the action would be
+      the label's too (ADR-0081). Short of room, the action goes under it.
+    -->
+    <div v-if="label || $slots['label-action']" class="ds-form-field__label-row">
+      <!-- Label — text only. An icon inside the control's box stays the control's business. -->
+      <component
+        :is="group ? 'span' : 'label'"
+        v-if="label"
+        :id="labelId"
+        :for="group ? undefined : fieldId"
+        class="ds-form-field__label"
+      >
+        {{ label }}
+        <!--
+          aria-hidden: the asterisk is decoration. The control carries the native
+          `required` attribute, which is what assistive tech actually reads.
+        -->
+        <span v-if="required" class="ds-form-field__required" aria-hidden="true">*</span>
+      </component>
+      <span v-if="$slots['label-action']" class="ds-form-field__label-action">
+        <slot name="label-action" />
+      </span>
+    </div>
 
     <slot />
 
@@ -139,6 +172,21 @@ provide(FORM_FIELD_KEY, {
 }
 
 /* ── Label ────────────────────────────────────────────────────────── */
+/* The action ends the row; when it no longer fits, it wraps to the start of
+   the next line (EUI) rather than squeezing the label. */
+.ds-form-field__label-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-spacing-xs) var(--ds-spacing-md);
+}
+
+.ds-form-field__label-action {
+  display: inline-flex;
+  flex: none;
+}
+
 .ds-form-field__label {
   margin: 0;
   display: block;

@@ -7,10 +7,11 @@
 // les gestionnaires de mots de passe, un champ nombre sans bornes accepte
 // n'importe quoi : ce sont des régressions invisibles à la relecture.
 defineOptions({ inheritAttrs: false })
-import { computed, useId } from 'vue'
+import { computed, provide, ref, useId } from 'vue'
 import { Icon } from '../Icon'
 import { HelpIcon } from '../HelpIcon'
-import { useFormField } from '../FormField/context'
+import InputDropdown, { type InputDropdownOption } from '../Dropdown/InputDropdown.vue'
+import { FORM_FIELD_KEY, useFormField, type FormFieldContext } from '../FormField/context'
 
 export type InputFieldSize = 'sm' | 'md'
 
@@ -28,6 +29,16 @@ interface Props {
   required?:     boolean
   /** Standalone use only. Inside a FormField, set the id on the wrapper. */
   id?:           string
+  /**
+   * A list at the end of the box — « TVA ⌄ », « SI ⌄ » (ADR-0081): what kind
+   * of value this is, chosen with it. The package's list, in the same box: one
+   * border, one ring, the error and the disabled state are the box's.
+   */
+  options?:      InputDropdownOption[]
+  /** The chosen option's value (`v-model:option`). Absent, the list shows its name. */
+  option?:       string | number | null
+  /** The list's name — « Type d'identifiant », « Unité ». Read with its value. */
+  optionLabel?:  string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -41,6 +52,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | number]
+  'update:option':     [value: string | number | null]
 }>()
 
 // Un `<input>` rend toujours une chaîne, `type="number"` compris. Un contrôle
@@ -75,6 +87,14 @@ const describedBy = computed(() => field?.describedBy.value)
 const wrapperShowsError = computed(() => Boolean(field?.invalid.value && field?.describedBy.value))
 
 const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
+
+/* The list at the end hangs from the box, not from its word. */
+const wrapperEl = ref<HTMLElement | null>(null)
+
+/* What rides inside the box is the box's, not the FormField's: the field's id,
+   message and state belong to the input, and a list at its end taking them
+   too would put one id on two controls. */
+provide(FORM_FIELD_KEY, null as unknown as FormFieldContext)
 </script>
 
 <template>
@@ -82,6 +102,7 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
 
     <!-- Input wrapper. Label and message live on FormField — see ADR-0008. -->
     <div
+      ref="wrapperEl"
       class="ds-input-field__wrapper"
       :class="{
         'ds-input-field__wrapper--destructive': isInvalid,
@@ -93,6 +114,15 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
         <!-- Leading icon -->
         <span v-if="$slots['icon-leading']" class="ds-input-field__icon" aria-hidden="true">
           <slot name="icon-leading" />
+        </span>
+
+        <!--
+          A control at the start — PhoneField's prefix. Unlike the two slots
+          around it, not hidden: a control a reader cannot see still takes the
+          focus.
+        -->
+        <span v-if="$slots.leading" class="ds-input-field__leading">
+          <slot name="leading" />
         </span>
 
         <!-- Leading text (ex: "$", "https://") -->
@@ -137,6 +167,19 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
         v-else-if="helpTooltip"
         :title="helpTooltip"
         placement="top-arrow"
+      />
+
+      <!-- Last: what kind of value this is ends the box (Untitled UI, shadcn). -->
+      <InputDropdown
+        v-if="options?.length"
+        chrome="none"
+        :options="options"
+        :model-value="option ?? null"
+        :placeholder="optionLabel"
+        :aria-label="optionLabel"
+        :disabled="isDisabled"
+        :anchor="wrapperEl"
+        @update:model-value="emit('update:option', $event)"
       />
     </div>
   </div>
@@ -222,6 +265,14 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
   white-space: nowrap;
 }
 
+/* The browser's own clear button is drawn in its own blue, off every ink of
+   the system; Escape still clears a search (ADR-0081). */
+.ds-input-field__input::-webkit-search-cancel-button,
+.ds-input-field__input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .ds-input-field__input::placeholder {
   color: var(--ds-text-placeholder);
 }
@@ -242,6 +293,13 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
 .ds-input-field__error-icon {
   flex-shrink: 0;
   color: var(--ds-text-error);
+}
+
+/* ── Leading control (PhoneField's prefix) ─────────────────────────── */
+.ds-input-field__leading {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 /* ── Leading text (ex: "$", "https://") ───────────────────────────── */

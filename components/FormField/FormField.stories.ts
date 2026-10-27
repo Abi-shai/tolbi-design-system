@@ -8,6 +8,8 @@ import Checkbox from '../Checkbox/Checkbox.vue'
 import Toggle from '../Toggle/Toggle.vue'
 import Slider from '../Slider/Slider.vue'
 import PhoneField from '../PhoneField/PhoneField.vue'
+import Button from '../Button/Button.vue'
+import IconButton from '../IconButton/IconButton.vue'
 
 const meta: Meta<typeof FormField> = {
   title: 'Saisie/FormField',
@@ -287,3 +289,64 @@ export const HintSlot: Story = {
     `,
   }),
 }
+
+/**
+ * ADR-0081 — une action sur la ligne du libellé (`#label-action`), hors du `<label>` : sinon un clic sur
+ * l’action serait aussi celui du libellé. Un `Button link sm`, comme partout. Plusieurs champs sous un même
+ * libellé : `group` — le libellé nomme le groupe (`role="group"`), chaque champ garde son id et se nomme
+ * lui-même (« Identifiant TVA »). Faute de place, l’action passe sous le libellé.
+ */
+export const LabelAction: Story = {
+  name: 'Action sur la ligne du libellé',
+  render: () => ({
+    components: { FormField, InputField, Button, IconButton },
+    setup() {
+      const TYPES = [
+        { value: 'TVA', label: 'TVA' },
+        { value: 'EORI', label: 'EORI' },
+        { value: 'SIREN', label: 'SIREN' },
+      ]
+      let next = 3
+      const rows = ref([
+        { id: 1, type: 'TVA', number: '' },
+        { id: 2, type: 'EORI', number: '' },
+      ])
+      const add = () => rows.value.push({ id: next++, type: 'TVA', number: '' })
+      const remove = (id: number) => { rows.value = rows.value.filter(r => r.id !== id) }
+      return { TYPES, rows, add, remove }
+    },
+    template: `
+      <div style="display:flex; gap:var(--ds-spacing-5xl); align-items:flex-start; flex-wrap:wrap">
+        <div style="width:432px">
+          <FormField label="Identifiants" group hint="Au moins un identifiant fiscal ou douanier.">
+            <template #label-action>
+              <Button variant="link" size="sm" icon-leading="plus" label="Ajouter un identifiant" @click="add" />
+            </template>
+            <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-md)">
+              <div v-for="row in rows" :key="row.id" style="display:flex; align-items:center; gap:var(--ds-spacing-md)">
+                <InputField
+                  v-model="row.number"
+                  v-model:option="row.type"
+                  :options="TYPES"
+                  option-label="Type d’identifiant"
+                  :aria-label="'Identifiant ' + row.type"
+                  placeholder="Entrez le numéro de votre identifiant"
+                />
+                <IconButton icon="x" size="xs" variant="subtle" :ariaLabel="'Retirer l’identifiant ' + row.type" @click="remove(row.id)" />
+              </div>
+            </div>
+          </FormField>
+        </div>
+        <div style="width:240px">
+          <FormField label="Identifiants fiscaux et douaniers" group>
+            <template #label-action>
+              <Button variant="link" size="sm" icon-leading="plus" label="Ajouter" />
+            </template>
+            <InputField option="TVA" :options="TYPES" option-label="Type d’identifiant" aria-label="Identifiant TVA" />
+          </FormField>
+        </div>
+      </div>
+    `,
+  }),
+}
+

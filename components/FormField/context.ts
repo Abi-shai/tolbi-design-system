@@ -9,8 +9,11 @@ import { inject, type ComputedRef, type InjectionKey } from 'vue'
  * dependency, only an override.
  */
 export interface FormFieldContext {
-  /** Id the control must put on its focusable element, so the wrapper's `for` resolves. */
-  id:          ComputedRef<string>
+  /**
+   * Id the control must put on its focusable element, so the wrapper's `for`
+   * resolves. Undefined in a group (`FormField group`): each control keeps its own.
+   */
+  id:          ComputedRef<string | undefined>
   /** Id of the wrapper's message element, or undefined when there is no message. */
   describedBy: ComputedRef<string | undefined>
   /** The wrapper carries an error message. */

@@ -12,7 +12,10 @@ const meta: Meta<typeof ProgressSteps> = {
     docs: {
       description: {
         component:
-          'Indicateur de progression vertical. Deux types : `icon` (cercles de statut) et `featured-icon` (boîte avec icône). Trois tailles : `sm`, `md`, `lg`.',
+          'Indicateur de progression. Vertical : deux types, `icon` (cercles de statut) et `featured-icon` (boîte avec icône), trois tailles `sm`, `md`, `lg`. ' +
+          '**Horizontal** (`orientation="horizontal"`, ADR-0081) : un segment par étape, le titre et sa phrase dessous — la tête d’une fenêtre en plusieurs étapes. ' +
+          'Faites et courante partagent la couleur du segment ; le titre courant prend aussi la graisse forte. Sous 40rem de sa propre largeur, ' +
+          'il garde les segments et n’écrit que l’étape courante, « Étape 2 sur 3 ». Une liste ordonnée, `aria-current="step"`, pas cliquable.',
       },
     },
   },
@@ -133,3 +136,34 @@ export const Interactive: Story = {
     `,
   }),
 }
+
+/* ── Horizontal (ADR-0081) ─────────────────────────────────────────── */
+
+const DDR_STEPS: ProgressStep[] = [
+  { title: 'Le commerçant', description: 'Nom, pays et identifiants.' },
+  { title: 'Les produits', description: 'Les marchandises à évaluer.' },
+  { title: 'L’envoi', description: 'Relire et envoyer la déclaration.' },
+]
+
+/** Deux largeurs : la fenêtre (titres sous chaque segment), puis un panneau de 432px (forme compacte). */
+export const Horizontal: Story = {
+  name: 'Horizontal',
+  render: () => ({
+    components: { ProgressSteps },
+    setup() {
+      const current = ref(2)
+      return { current, steps: DDR_STEPS }
+    },
+    template: `
+      <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-4xl)">
+        <div style="display:flex; gap:var(--ds-spacing-md)">
+          <button type="button" @click="current = Math.max(1, current - 1)">Précédente</button>
+          <button type="button" @click="current = Math.min(steps.length, current + 1)">Suivante</button>
+        </div>
+        <div style="width:960px"><ProgressSteps :steps="steps" :current-step="current" orientation="horizontal" /></div>
+        <div style="width:432px"><ProgressSteps :steps="steps" :current-step="current" orientation="horizontal" /></div>
+      </div>
+    `,
+  }),
+}
+
