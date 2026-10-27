@@ -141,6 +141,7 @@ import PhoneIncoming       from './icons/phone-incoming.vue'
 import PhoneOff            from './icons/phone-off.vue'
 import Play                from './icons/play.vue'
 import Plus                from './icons/plus.vue'
+import Printer             from './icons/printer.vue'
 import QrCode              from './icons/qr-code.vue'
 import ReceiptText         from './icons/receipt-text.vue'
 import RefreshCcw          from './icons/refresh-ccw.vue'
@@ -338,6 +339,7 @@ export const icons = {
   'phone-off':              PhoneOff,
   'play':                   Play,
   'plus':                   Plus,
+  'printer':                Printer,
   'qr-code':                QrCode,
   'receipt-text':           ReceiptText,
   'refresh-ccw':            RefreshCcw,

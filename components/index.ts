@@ -157,6 +157,8 @@ export type { AccordionValue, AccordionHeadingLevel } from './Accordion'
 
 export { Divider } from './Divider'
 
+export { Report, ReportSection, ReportSignature } from './Report'
+
 export { Carousel } from './Carousel'
 export type { CarouselSlide } from './Carousel'
 

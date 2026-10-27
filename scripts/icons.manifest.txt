@@ -201,3 +201,4 @@ wifi-off
 wind
 x
 zap
+printer

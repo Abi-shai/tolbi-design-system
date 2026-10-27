@@ -1049,6 +1049,13 @@ Before working on any component, read:
   **`Carousel`**: our `Dialog` (gains **`hideTitle`**), 16:9 inset, `StepDots` in `#summary`, Passer → Précédent /
   Suivant → `doneLabel`, **no autoplay**, a fade over `enter`, all slides in one cell (stable height), the step
   announced.
+- **ADR-0089**: **`Report`** (item 5, `3218:1427`, track A — sober like the official DDS): a one-line head (mark,
+  status), title + reference/date, `#summary`, **`ReportSection`** numbered by a CSS counter, **`ReportSignature`**
+  (Annex II). On paper: its **own page type** (`@page ds-report`, A4, 20mm) so other printouts are untouched;
+  running head from page 2 and foot « Page n sur N » in **margin boxes** (Chrome 131+), their texts set as custom
+  properties **on `<html>`** (margin boxes read the root, not the component); no orphan titles, no cut rows, badges
+  `print-color-adjust`, table cells **unwrapped** in print. Print rules for the component's own elements must be
+  **scoped** (unscoped ones lose to them). `printer` joins the icons.
 
 ## Architecture
 
