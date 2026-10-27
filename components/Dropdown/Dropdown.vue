@@ -102,13 +102,22 @@ function onClickOutside(e: MouseEvent) {
   start again from the top of the page (the WAI-ARIA menu button's rule). The
   trigger is the first focusable element in the root: it precedes the panel.
 */
-function onKeyDown(e: KeyboardEvent) {
-  if (e.key !== 'Escape' || !props.open) return
+function escape() {
   const root = rootEl.value
   if (root?.querySelector('.ds-dropdown__panel')?.contains(document.activeElement)) {
     root.querySelector<HTMLElement>('button, a[href], [tabindex]:not([tabindex="-1"])')?.focus()
   }
   close()
+}
+
+/* Heard on the document: an Escape from elsewhere on the page. Not one someone
+   already took, nor one from a dialog that does not hold this dropdown — a
+   question asked from one of its rows (ADR-0077, item 24). */
+function onKeyDown(e: KeyboardEvent) {
+  if (e.key !== 'Escape' || !props.open || e.defaultPrevented) return
+  const dialog = (e.target as Element | null)?.closest?.('.ds-dialog')
+  if (dialog && !dialog.contains(rootEl.value)) return
+  escape()
 }
 
 /*
@@ -122,7 +131,7 @@ function onRootKeyDown(e: KeyboardEvent) {
   if (e.key !== 'Escape' || !props.open) return
   e.stopPropagation()
   e.preventDefault()
-  onKeyDown(e)
+  escape()
 }
 
 onMounted(() => {

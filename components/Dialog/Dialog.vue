@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { CloseButton } from '../CloseButton'
 import { Icon, type IconName } from '../Icon'
 import { SurfaceTransition } from '../SurfaceTransition'
+import { pushModal, removeModal } from '../../composables/useModalStack'
 
 /**
  * A modal: a surface that keeps the focus until it is answered (ADR-0075). In
@@ -33,7 +34,10 @@ import { SurfaceTransition } from '../SurfaceTransition'
  * it. The close, Escape and a click on the scrim cancel, unless `dismissible`
  * is off — then there is no close either.
  * Render it where it is used: a popover it was opened from stays open behind
- * it, and the Escape it handles stops at the dialog.
+ * it. Its Escape is not stopped — a list from another library inside it must
+ * hear the key — and it closes only on an Escape nobody else took (ADR-0077).
+ * While it is open, a `ToastRegion` moves inside it, so a toast stays visible
+ * and answers.
  *
  * **At the side** — `placement="side"` — it is the side panel (ADR-0079): the
  * same scrim, focus and dismissal, the surface standing 12px off the screen's
@@ -194,7 +198,10 @@ async function show() {
       if (typeof el.value.showPopover === 'function') el.value.showPopover()
       follow(true)
       hold(true)
-    } else el.value.showModal()
+    } else {
+      el.value.showModal()
+      pushModal(el.value)
+    }
   }
   const first = surface.value?.querySelector<HTMLElement>('[data-autofocus]') ?? focusables()[0] ?? surface.value
   first?.focus({ preventScroll: true })
@@ -205,6 +212,7 @@ async function show() {
 function afterLeave() {
   if (el.value?.matches(':popover-open')) el.value.hidePopover()
   if (el.value?.open) el.value.close()
+  if (el.value) removeModal(el.value)
   follow(false)
   hold(false)
   if (props.restoreFocus && opener?.isConnected) opener.focus({ preventScroll: true })
@@ -244,6 +252,7 @@ onBeforeUnmount(() => bodyObserver?.disconnect())
 onBeforeUnmount(() => {
   follow(false)
   hold(false)
+  if (el.value) removeModal(el.value)
 })
 
 function dismiss() {
@@ -264,15 +273,18 @@ function onClose() {
 }
 
 function onKeydown(event: KeyboardEvent) {
-  /* The popover behind listens for Escape on the document: this one is ours.
-     Over the page, the browser turns it into `cancel`; within a region the
-     dialog is not modal and gets no `cancel`, so it answers it here. */
+  /*
+    Escape is not stopped here (ADR-0077, item 24): a list from another
+    library, open in the dialog and listening on `window`, must get the key —
+    it used to be the dialog that closed. Whoever handles it first cancels it.
+    Over the page, the browser turns an Escape nobody cancelled into `cancel`;
+    within a region there is no `cancel`, so the dialog waits for every
+    listener to have had its turn, and closes only if none took the key. The
+    package's own dropdowns stop their Escape themselves, and ignore one coming
+    from a dialog that does not hold them.
+  */
   if (event.key === 'Escape') {
-    event.stopPropagation()
-    if (props.within) {
-      event.preventDefault()
-      dismiss()
-    }
+    if (props.within) setTimeout(() => { if (!event.defaultPrevented) dismiss() })
     return
   }
   if (event.key !== 'Tab') return

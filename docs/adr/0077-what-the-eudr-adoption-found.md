@@ -79,11 +79,37 @@ dialog's own padding), and only when the press **began** there too — so a sele
 surface does not close it either. Measured: the vanishing button and the drag keep it open; the scrim,
 Escape, and the scrim of a dialog `within` a region still close it.
 
+### Fourth round (27 Oct.) — the key and the toast a modal kept for itself
+
+The product's notes on 0.63 named what the third round had found from the title alone: item 23 is the
+scrim rule above, as proposed.
+
+Item 24: the dialog **stopped** Escape on its `<dialog>`, so a list or a window from another library open
+inside it, listening on `window`, never heard the key — the dialog closed instead. ADR-0075 had stopped it
+so that the dropdown a question was asked from would not close behind it. Now nothing stops it: whoever
+handles it first cancels it. Over the page, the browser turns an Escape nobody cancelled into the dialog's
+`cancel`; within a region, where there is no `cancel`, the dialog waits for every listener and closes only
+if none took the key. The package's dropdowns already stop their own Escape (ADR-0078); on the document
+they now also ignore one already taken, or one coming from a dialog that does not hold them — so the
+history list stays open behind its question. Measured: a `window` listener that takes Escape gets it and
+the side panel stays; without it, the panel closes; Escape in a package menu inside the panel closes the
+menu only; Escape in Tolbi AI's delete question closes the question and leaves the list.
+
+Item 25: a `ToastRegion` is `position: fixed` at `z-overlay`, and a modal `<dialog>` is in the top layer:
+an error toast during a side panel was painted under it. The product proposed raising the region into the
+top layer as a popover; it would have been seen and still not answered, because a modal dialog makes
+everything outside it **inert**. So `Dialog` keeps a stack of the modal dialogs open
+(`useModalStack`, internal) and the region moves **into the topmost one** while one is open — a `Teleport`,
+disabled when none is, so it stays in the product's tree (its theme included) the rest of the time.
+Measured: the toast is the element under its own centre over the panel's scrim, its close dismisses it
+with the panel still open, and the region is back in its place once the panel closes.
+
 ## Still open
 
 - **The chosen segment's contrast.** Three tracks to draw before one is applied: `Tabs`' pill (a
   recessed track, the selection raised in `bg-default`), ADR-0050's mark (`bg-selected` and its ink), or
   a stronger neutral that hover does not share.
+- **`PageHeader`, room beside the title** (item 22) — its text has not reached this record yet.
 - **`Tooltip` anchors to nothing.** The product wants it to wrap its trigger, with placement, delay and a
   disabled trigger handled — the catalogue's own consumers each re-implement that with
   `useDelayedTooltip`. An API of its own.

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { topModal } from '../../composables/useModalStack'
 
 /**
  * Where toasts live: a fixed corner of the screen, a stack, and **the motion** —
@@ -11,6 +12,13 @@ import { computed, ref } from 'vue'
  *     <ToastRegion>
  *       <Toast v-for="t in toasts" :key="t.id" v-bind="t" @dismiss="remove(t.id)" />
  *     </ToastRegion>
+ *
+ * While a modal `Dialog` is open, the region moves **into** the topmost one
+ * (ADR-0077, item 25): a modal dialog is in the top layer and makes the rest of
+ * the page inert, so a region left outside was painted under it — an error
+ * toast during a side panel could not be seen — and would not have answered a
+ * click even raised above it. Inside, it is above the scrim and alive; it
+ * comes back when the dialog closes, its toasts and their motion untouched.
  */
 export type ToastRegionPlacement = 'bottom-right' | 'bottom-center' | 'top-center'
 
@@ -134,6 +142,7 @@ const gone = () => closing(-1)
 </script>
 
 <template>
+  <Teleport :to="topModal ?? 'body'" :disabled="!topModal">
   <section ref="region" class="ds-toast-region" :class="`ds-toast-region--${placement}`" :aria-label="label">
     <TransitionGroup
       name="ds-toast"
@@ -148,6 +157,7 @@ const gone = () => closing(-1)
       <slot />
     </TransitionGroup>
   </section>
+  </Teleport>
 </template>
 
 <style scoped>

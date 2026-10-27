@@ -948,7 +948,11 @@ Before working on any component, read:
   camelizes them, so no declaration matches both spellings. Second round: `FormField` takes a **`#hint`
   slot** (the prop its fallback; phrasing content, it describes the control). Third round: `Table` passes
   `locale` and the foot's labels to `Pagination` (only what is given); a `Dialog` dismisses on **the scrim
-  itself, pressed there** — « not the surface » closed it on a click whose target removed itself. Still open: the segment's
+  itself, pressed there** — « not the surface » closed it on a click whose target removed itself. Fourth
+  round: Escape is **no longer stopped** on the `<dialog>` (another library's list inside must hear it);
+  the dialog closes only on an Escape nobody took, and the package's dropdowns ignore one from a dialog
+  that does not hold them. A `ToastRegion` **moves into the topmost modal** (`useModalStack`) — a popover
+  above it would still be inert. Still open: the segment's
   contrast (three tracks to draw), `Tooltip` anchoring, a deletion `IconButton`.
 - **ADR-0078**: **what floats is painted in the top layer**. `Dropdown` / `InputDropdown` opened
   `position: absolute` in the flow, so at the bottom of anything that scrolls (a side panel's body, a

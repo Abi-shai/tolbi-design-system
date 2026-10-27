@@ -135,7 +135,11 @@ function onClickOutside(e: MouseEvent) {
 }
 
 function onKeyDown(e: KeyboardEvent) {
-  if (e.key === 'Escape' && open.value) close()
+  if (e.key !== 'Escape' || !open.value || e.defaultPrevented) return
+  /* An Escape from a dialog that does not hold this field is that dialog's. */
+  const dialog = (e.target as Element | null)?.closest?.('.ds-dialog')
+  if (dialog && !dialog.contains(rootEl.value)) return
+  close()
 }
 
 /* An Escape from inside the field is the list's, and stops there — inside a
