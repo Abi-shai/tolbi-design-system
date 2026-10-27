@@ -97,6 +97,12 @@ interface Props {
    * slot takes their place for more.
    */
   summary?: DialogSummaryItem[]
+  /**
+   * The title names the dialog but is not shown: the body says it already — a
+   * walkthrough's slides each carry their own (`Carousel`, ADR-0088). The head
+   * keeps the close alone, and no rule falls between it and the body.
+   */
+  hideTitle?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -111,6 +117,7 @@ const props = withDefaults(defineProps<Props>(), {
   placement: 'centre',
   size: 'md',
   summary: undefined,
+  hideTitle: false,
 })
 
 const open = defineModel<boolean>('open', { default: false })
@@ -379,7 +386,7 @@ function onClick(event: MouseEvent) {
     <dialog
       ref="el"
       class="ds-dialog"
-      :class="[`ds-dialog--${placement}`, `ds-dialog--${size}`, { 'ds-dialog--within': within }]"
+      :class="[`ds-dialog--${placement}`, `ds-dialog--${size}`, { 'ds-dialog--within': within, 'ds-dialog--untitled': hideTitle }]"
       :popover="within ? 'manual' : undefined"
       :role="role"
       aria-modal="true"
@@ -533,6 +540,30 @@ function onClick(event: MouseEvent) {
   align-items: center;
   gap: var(--ds-spacing-lg);
   padding: var(--ds-spacing-xl) var(--ds-spacing-xl) var(--ds-spacing-xl) var(--ds-spacing-2xl);
+}
+
+/* The title shown elsewhere (ADR-0088): the head is the close alone, at its end,
+   and the body follows without a rule. The title stays, named but unseen. */
+.ds-dialog--untitled .ds-dialog__head {
+  justify-content: flex-end;
+  padding-bottom: 0;
+}
+
+.ds-dialog--untitled .ds-dialog__title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ds-dialog--untitled .ds-dialog__body {
+  padding-top: var(--ds-spacing-md);
+  border-top: 0;
 }
 
 /*

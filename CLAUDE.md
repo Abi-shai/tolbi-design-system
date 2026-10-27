@@ -1041,6 +1041,14 @@ Before working on any component, read:
   `collapsible` into a `Button` with focus following. `MapControls` = a stack of **`Button` icon-only
   `secondary-gray` sm** with anchored tooltips **away from the edge**, `pressed` → `aria-pressed`. `ChartLegend`
   gains `orientation="vertical"`. A tooltip's hidden description is `aria-hidden` (read via the reference only).
+- **ADR-0088**: items 6, 7, 8 (`3217:1427`, track A each). **`Accordion`/`AccordionItem`**: chevron right turning
+  over, rules between, one open (`v-model`) or `multiple` + `v-model:values`, a button in a heading
+  (`headingLevel`), no arrow keys (APG, April 2026); `0fr → 1fr` over `enter`, closes over `exit`; closed =
+  **`hidden="until-found"`** once the close has played; alone = a disclosure (`v-model:open`). **`Divider`**: a
+  `border-subtle` hairline, **no margin**; with a `label` the lines are decoration and the label plain text.
+  **`Carousel`**: our `Dialog` (gains **`hideTitle`**), 16:9 inset, `StepDots` in `#summary`, Passer → Précédent /
+  Suivant → `doneLabel`, **no autoplay**, a fade over `enter`, all slides in one cell (stable height), the step
+  announced.
 
 ## Architecture
 

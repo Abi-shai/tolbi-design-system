@@ -152,6 +152,14 @@ export { StepDots } from './StepDots'
 export { Flag, flags } from './Flag'
 export type { FlagCode, FlagSize } from './Flag'
 
+export { Accordion, AccordionItem } from './Accordion'
+export type { AccordionValue, AccordionHeadingLevel } from './Accordion'
+
+export { Divider } from './Divider'
+
+export { Carousel } from './Carousel'
+export type { CarouselSlide } from './Carousel'
+
 export { OptionCard, OptionList } from './OptionCard'
 export type { OptionValue } from './OptionCard'
 
