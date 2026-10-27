@@ -973,6 +973,18 @@ Before working on any component, read:
   nothing about the edge; B, a 524px drawer, crosses half a screen), over `considered` / `exit`. Filming
   B found the **dialog was a scroller** (`overflow: auto` from the browser): opening focused a field and
   scrolled the dialog to it, pulling the surface into place — `overflow: clip` now.
+- **ADR-0080**: **the table of the product's lists** (EUDR 9, 10, 12), benchmark → canvas → validated
+  (`3182:1427`). **Sort** shows on the sorted column only, the others preview it on hover/focus in a
+  **kept** place; `v-model:sort { key, direction: 'ascending' | 'descending' }`, ascending then descending,
+  `aria-sort`; the table **sorts nothing** (the server does). **A row opens through its name**: a real
+  `<a>` (`rowLink`) or `<button>` (`@row-click`) in the primary cell, and a click elsewhere on the row is
+  **handed to it** — not on another control, not after a selection (a stretched link would be trapped in a
+  sticky cell). **`fixed: 'start' | 'end'`**, offsets measured; the edge is a **rule only while something
+  passes under** (`Scrollbar`'s `--at-start/--at-end`), not a shadow (ADR-0030). **`visibleColumns`** +
+  `TableColumnMenu` (a « Colonnes » menu that stays open); point 12 is **`DropdownItem checked`**
+  (`menuitemcheckbox`, `Checkbox visualOnly`) — a menu row, not `DropdownSelectItem` (a field's option).
+  **`Pagination`**: « 1–10 sur 42 projets » left, « Lignes par page » + numbered pages between arrows right;
+  without `total` the pages alone. `InputDropdown size="sm"` + `ariaLabel`.
 
 ## Architecture
 
