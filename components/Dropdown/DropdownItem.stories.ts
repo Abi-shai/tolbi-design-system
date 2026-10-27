@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { fn } from '@storybook/test'
+import { ref } from 'vue'
 import DropdownItem from './DropdownItem.vue'
 import DropdownDivider from './DropdownDivider.vue'
 
@@ -25,7 +26,8 @@ const meta: Meta<typeof DropdownItem> = {
           '(`menuitemradio`), avec une icône ou un avatar en tête. Le choix courant est marqué comme tout ' +
           'élément courant du catalogue : `bg-selected`, son encre `text-on-brand-subtle`, la graisse ' +
           'forte — pas de coche. **Ne s\'utilise jamais seule** — elle attend le panneau du parent pour ' +
-          'son fond, son ombre et sa largeur. Pour l\'option d\'un champ, voir `DropdownSelectItem`.',
+          'son fond, son ombre et sa largeur. Pour l\'option d\'un champ, voir `DropdownSelectItem`. ' +
+          'Avec `checked`, une *case* (`menuitemcheckbox`) : cocher ne ferme pas le menu (ADR-0080).',
       },
     },
   },
@@ -140,4 +142,22 @@ export const Choices: Story = {
 export const WithMeta: Story = {
   name: 'Avec une méta',
   args: { label: 'Comparer avec la campagne 2024', meta: '18:10', selected: false },
+}
+
+/**
+ * Des *cases* : `checked` donné sur chaque ligne (`menuitemcheckbox`), la case de `Checkbox` en tête. Le menu
+ * reste ouvert pendant qu'on coche — `Dropdown` ne se ferme jamais sur une ligne. Une ligne obligatoire est
+ * cochée et éteinte. C'est le menu de `TableColumnMenu` (ADR-0080).
+ */
+export const Checkboxes: Story = {
+  name: 'Cases — colonnes à afficher',
+  render: () => ({
+    components: { DropdownItem },
+    setup: () => ({ cols: ref([['Nom du projet', true, true], ['Norme', true, false], ['Surface (ha)', true, false], ['Polygones', false, false], ['Créé le', true, false]]) }),
+    template: `
+      <div>
+        <DropdownItem v-for="c in cols" :key="c[0]" :label="c[0]" :checked="c[1]" :disabled="c[2]" @click="c[1] = !c[1]" />
+      </div>
+    `,
+  }),
 }

@@ -108,7 +108,7 @@ export type { TagSize, TagAction } from './Tag'
 export { Dropdown, DropdownTrigger, DropdownItem, DropdownDivider, DropdownGroup, DropdownSelectItem, InputDropdown } from './Dropdown'
 export type {
   DropdownTriggerVariant, DropdownAlign, DropdownTriggerSize, DropdownTriggerChrome,
-  DropdownSelectItemType, InputDropdownType, InputDropdownOption,
+  DropdownSelectItemType, InputDropdownType, InputDropdownOption, InputDropdownSize,
 } from './Dropdown'
 
 export { Scrollbar } from './Scrollbar'
@@ -152,8 +152,8 @@ export { StepDots } from './StepDots'
 export { ProgressSteps } from './ProgressSteps'
 export type { ProgressStep, ProgressStepsType, ProgressStepsSize } from './ProgressSteps'
 
-export { Table } from './Table'
-export type { TableColumn, TableRow } from './Table'
+export { Table, TableColumnMenu } from './Table'
+export type { TableColumn, TableRow, TableSort, TableSortDirection } from './Table'
 
 export { Breadcrumbs } from './Breadcrumbs'
 export type { BreadcrumbsItem } from './Breadcrumbs'

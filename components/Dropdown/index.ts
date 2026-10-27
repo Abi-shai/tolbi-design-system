@@ -10,4 +10,4 @@ export { default as DropdownSelectItem } from './DropdownSelectItem.vue'
 export type { DropdownSelectItemType } from './DropdownSelectItem.vue'
 
 export { default as InputDropdown } from './InputDropdown.vue'
-export type { InputDropdownType, InputDropdownOption } from './InputDropdown.vue'
+export type { InputDropdownType, InputDropdownOption, InputDropdownSize } from './InputDropdown.vue'

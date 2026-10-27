@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Avatar } from '../Avatar'
+import { Checkbox } from '../Checkbox'
 import { Icon } from '../Icon'
 import type { IconName } from '../Icon'
 
@@ -34,6 +35,14 @@ interface Props {
    */
   selected?:  boolean
   /**
+   * The row is one of several things that can each be on — the columns a table
+   * shows (ADR-0080). **Absent, it is not a checkbox row**; present, it is a
+   * `menuitemcheckbox` with its box in the leading column, `true` ticked. A
+   * click toggles it and the menu stays open: `Dropdown` never closes on a row,
+   * so ticking three columns is three clicks, not three openings.
+   */
+  checked?:   boolean
+  /**
    * `menuitem` in a menu. `button` in a `Dropdown role="dialog"`, where a row
    * may carry actions of its own — which a menu item cannot, its children
    * being presentational (ADR-0072): a real `<button>`, and the current one
@@ -45,6 +54,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   selected: undefined,
+  checked:  undefined,
   as:       'menuitem',
 })
 
@@ -53,15 +63,22 @@ const emit = defineEmits<{
 }>()
 
 const isChoice  = computed(() => props.selected !== undefined)
+const isCheck   = computed(() => props.checked !== undefined)
 const isButton  = computed(() => props.as === 'button')
 
 /* A `div` row is made a menu item by hand; a `button` row is one already. */
 const rootAttrs = computed(() =>
   isButton.value
-    ? { type: 'button', 'aria-current': props.selected ? 'true' : undefined, disabled: props.disabled || undefined }
+    ? {
+        type: 'button',
+        'aria-current': props.selected ? 'true' : undefined,
+        'aria-pressed': isCheck.value ? props.checked : undefined,
+        disabled: props.disabled || undefined,
+      }
     : {
-        role: isChoice.value ? 'menuitemradio' : 'menuitem',
-        'aria-checked': isChoice.value ? props.selected : undefined,
+        role: isCheck.value ? 'menuitemcheckbox' : isChoice.value ? 'menuitemradio' : 'menuitem',
+        'aria-checked': isCheck.value ? props.checked : isChoice.value ? props.selected : undefined,
+        'aria-disabled': props.disabled || undefined,
         tabindex: props.disabled ? -1 : 0,
       },
 )
@@ -95,9 +112,11 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
       <div class="ds-dropdown-item__icon-text">
         <!-- Decorative either way: the label beside it is the row's name, so
              the avatar's initials must not be read before it (ADR-0041). -->
-        <span v-if="hasAvatar || icon" class="ds-dropdown-item__leading" aria-hidden="true">
+        <span v-if="isCheck || hasAvatar || icon" class="ds-dropdown-item__leading" aria-hidden="true">
+          <!-- The box is `Checkbox`'s own, drawn without its input: the row is the control. -->
+          <Checkbox v-if="isCheck" visual-only :model-value="checked" :disabled="disabled" />
           <Avatar
-            v-if="hasAvatar"
+            v-else-if="hasAvatar"
             size="xs"
             :src="avatarSrc"
             :initials="avatarInitials"

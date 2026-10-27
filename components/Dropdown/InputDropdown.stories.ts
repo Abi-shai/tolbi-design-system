@@ -240,3 +240,19 @@ export const InAScrollingBox: Story = {
     `,
   }),
 }
+
+/** `sm` : un contrôle posé dans une barre — les lignes par page du pied de tableau (ADR-0080). Il épouse sa valeur ; sa liste est au moins aussi large que lui. */
+export const Small: Story = {
+  name: 'Taille sm',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { InputDropdown },
+    setup: () => ({ size: ref(10), sizes: [10, 20, 50, 100].map(n => ({ value: n, label: String(n) })) }),
+    template: `
+      <div style="display:flex; align-items:center; gap:var(--ds-spacing-md); font:var(--ds-font-body-md); color:var(--ds-text-subtle);">
+        <span aria-hidden="true">Lignes par page</span>
+        <InputDropdown size="sm" aria-label="Lignes par page" :options="sizes" v-model="size" />
+      </div>
+    `,
+  }),
+}

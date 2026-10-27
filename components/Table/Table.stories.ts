@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import Table from './Table.vue'
-import type { TableColumn, TableRow } from './Table.vue'
+import TableColumnMenu from './TableColumnMenu.vue'
+import type { TableColumn, TableRow, TableSort } from './Table.vue'
+import { IconButton } from '../IconButton'
 import { Avatar } from '../Avatar'
 import { Badge } from '../Badge'
 import { Button } from '../Button'
@@ -15,7 +17,13 @@ const meta: Meta<typeof Table> = {
     docs: {
       description: {
         component:
-          'Tableau de données avec sélection par case à cocher, cellules personnalisables via slots, et pagination intégrée.',
+          'Tableau de données avec sélection par case à cocher, cellules personnalisables via slots, et pagination ' +
+          'intégrée. ADR-0080 (planche validée le 27 oct.) : le **tri** se montre sur la colonne triée seulement, les ' +
+          'autres en donnent l’aperçu au survol et au focus ; une **ligne s’ouvre par son nom** (`rowLink` ou ' +
+          '`@row-click`) — un vrai lien, et un clic ailleurs sur la ligne lui est confié ; les **colonnes figées** ' +
+          '(`fixed`) restent en place et un filet marque leur bord tant que du contenu passe dessous ; ' +
+          '`visibleColumns` se règle avec `TableColumnMenu` ; le pied dit le rang, la taille de page et les pages. ' +
+          'Le tableau ne trie ni ne pagine lui-même : il émet, le produit charge.',
       },
     },
   },
@@ -216,6 +224,133 @@ export const LoadingHandover: Story = {
                  border-radius: var(--ds-radius-control); background: var(--ds-bg-default); cursor: pointer;"
         >{{ loading ? 'Charger' : 'Recharger' }}</button>
         <Table :columns="columns" :rows="rows" :loading="loading" />
+      </div>
+    `,
+  }),
+}
+
+/* ── The product's list (ADR-0080) ────────────────────────────────── */
+
+const PROJECT_COLUMNS: TableColumn[] = [
+  { key: 'name',     label: 'Nom du projet', width: 260, sortable: true, fixed: 'start', hideable: false },
+  { key: 'norm',     label: 'Norme',         width: 120, sortable: true },
+  { key: 'area',     label: 'Surface (ha)',  width: 150, sortable: true, align: 'right' },
+  { key: 'polygons', label: 'Polygones',     width: 140, sortable: true, align: 'right' },
+  { key: 'created',  label: 'Créé le',       width: 150, sortable: true },
+  { key: 'status',   label: 'Statut',        width: 130, sortable: true },
+  { key: 'region',   label: 'Région',        width: 160, sortable: true },
+  { key: 'actions',  label: '',              width: 104, fixed: 'end', hideable: false, align: 'right' },
+]
+
+const NAMES = ['Coops Bayan Cocoa', 'Deforestation Assessment', 'Analyse RDUE Périmètre 62590', 'Test analogue', 'Soubré — lot de 128 parcelles', 'Gripazo coopérative', 'Daloa — campagne 2025', 'Méagui Nord', 'Divo — producteurs certifiés', 'Guiglo Ouest']
+const REGIONS = ['Nawa', 'Haut-Sassandra', 'Lôh-Djiboua', 'Cavally', 'Gôh']
+const PROJECTS: TableRow[] = Array.from({ length: 42 }, (_, i) => {
+  const day = new Date(2025, 0, 5 + i * 7)
+  return {
+    id: i + 1,
+    name: `${NAMES[i % NAMES.length]}${i >= NAMES.length ? ` ${Math.floor(i / NAMES.length) + 1}` : ''}`,
+    norm: 'EUDR',
+    area: Math.round(((i * 7919) % 250000) + 50) / 100,
+    polygons: (i * 37) % 250 + 1,
+    created: day,
+    status: i % 9 === 3 ? 'En cours' : 'Terminé',
+    region: REGIONS[i % REGIONS.length],
+  }
+})
+
+const NUMBER = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+const DATE = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+
+/**
+ * La liste des projets EUDR, telle que la planche l’a tranchée : « Colonnes » à droite de la barre, tri, ligne qui
+ * s’ouvre par son nom, nom et actions figés, pied complet. Le tri et la pagination sont faits ici, dans la story —
+ * dans le produit, le serveur les fait.
+ */
+export const ProjectList: Story = {
+  name: 'Liste des projets',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { Table, TableColumnMenu, Badge, IconButton },
+    setup() {
+      const sort = ref<TableSort | null>({ key: 'created', direction: 'descending' })
+      const page = ref(1)
+      const size = ref(10)
+      const visible = ref(PROJECT_COLUMNS.filter(c => c.key !== 'region').map(c => c.key))
+      const opened = ref('—')
+      const sorted = computed(() => {
+        const s = sort.value
+        if (!s) return PROJECTS
+        const k = s.key
+        return [...PROJECTS].sort((a, b) => {
+          const x = a[k] as never, y = b[k] as never
+          const d = x < y ? -1 : x > y ? 1 : 0
+          return s.direction === 'ascending' ? d : -d
+        })
+      })
+      const rows = computed(() => sorted.value.slice((page.value - 1) * size.value, page.value * size.value))
+      return {
+        columns: PROJECT_COLUMNS, sort, page, size, visible, rows, opened, total: PROJECTS.length,
+        link: (row: TableRow) => `#projet-${row.id}`,
+        number: (n: number) => NUMBER.format(n), date: (d: Date) => DATE.format(d),
+      }
+    },
+    template: `
+      <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-xl);">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:var(--ds-spacing-lg);">
+          <span style="font:var(--ds-font-body-md); color:var(--ds-text-subtle);">Ouvert : {{ opened }}</span>
+          <TableColumnMenu :columns="columns" v-model="visible" :default-value="columns.filter(c => c.key !== 'region').map(c => c.key)" />
+        </div>
+        <Table
+          :columns="columns"
+          :rows="rows"
+          :visible-columns="visible"
+          v-model:sort="sort"
+          :row-link="link"
+          :current-page="page"
+          :total="total"
+          v-model:page-size="size"
+          item-label="projets"
+          @page-change="p => page = p"
+          @click.capture="e => { const a = e.target.closest && e.target.closest('a'); if (a) { e.preventDefault(); opened = a.textContent.trim() } }"
+        >
+          <template #cell-area="{ value }">{{ number(value) }}</template>
+          <template #cell-created="{ value }">{{ date(value) }}</template>
+          <template #cell-status="{ value }">
+            <Badge :label="value" :tone="value === 'Terminé' ? 'success' : 'warning'" size="sm" />
+          </template>
+          <template #cell-actions="{ row }">
+            <div style="display:flex; justify-content:flex-end;">
+              <IconButton icon="pencil" size="xs" variant="subtle" :ariaLabel="'Modifier ' + row.name" @click="opened = 'modifier ' + row.name" />
+              <IconButton icon="trash-2" size="xs" variant="subtle" :ariaLabel="'Supprimer ' + row.name" @click="opened = 'supprimer ' + row.name" />
+            </div>
+          </template>
+        </Table>
+      </div>
+    `,
+  }),
+}
+
+/** Dans une colonne étroite : le nom et les actions restent, le reste défile dessous ; le filet ne paraît que du côté où du contenu passe. */
+export const FixedColumns: Story = {
+  name: 'Colonnes figées',
+  render: () => ({
+    components: { Table, Badge, IconButton },
+    setup: () => ({ columns: PROJECT_COLUMNS, rows: PROJECTS.slice(0, 5), number: (n: number) => NUMBER.format(n), date: (d: Date) => DATE.format(d) }),
+    template: `
+      <div style="max-width:760px;">
+        <Table :columns="columns" :rows="rows" :sort="{ key: 'created', direction: 'descending' }">
+          <template #cell-area="{ value }">{{ number(value) }}</template>
+          <template #cell-created="{ value }">{{ date(value) }}</template>
+          <template #cell-status="{ value }">
+            <Badge :label="value" :tone="value === 'Terminé' ? 'success' : 'warning'" size="sm" />
+          </template>
+          <template #cell-actions="{ row }">
+            <div style="display:flex; justify-content:flex-end;">
+              <IconButton icon="pencil" size="xs" variant="subtle" :ariaLabel="'Modifier ' + row.name" />
+              <IconButton icon="trash-2" size="xs" variant="subtle" :ariaLabel="'Supprimer ' + row.name" />
+            </div>
+          </template>
+        </Table>
       </div>
     `,
   }),

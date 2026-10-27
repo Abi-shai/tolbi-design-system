@@ -12,6 +12,13 @@ import type { DropdownSelectItemType } from './DropdownSelectItem.vue'
 
 export type InputDropdownType = 'default' | 'icon-leading' | 'avatar-leading' | 'dot-leading' | 'search'
 
+/**
+ * `md` is the form field. `sm` is a control riding in a bar — the table's
+ * « Lignes par page » (ADR-0080): `control-padding-sm`, `label-lg`, and the
+ * field hugs its value instead of taking the line.
+ */
+export type InputDropdownSize = 'sm' | 'md'
+
 export interface InputDropdownOption {
   /**
    * Ce que l'appelant tient déjà — un identifiant de base est un nombre aussi
@@ -36,12 +43,17 @@ interface Props {
   leadingIcon?: IconName
   /** Standalone use only. Inside a FormField, the wrapper's `disabled` decides. */
   disabled?: boolean
+  size?: InputDropdownSize
+  /** The name, outside a FormField — which otherwise gives it its label. */
+  ariaLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'default',
   placeholder: 'Select...',
   disabled: false,
+  size: 'md',
+  ariaLabel: undefined,
 })
 
 const field = useFormField()
@@ -66,7 +78,7 @@ const panelEl = ref<HTMLElement | null>(null)
 /* The list floats in the top layer, at the field's width (ADR-0078): at the
    bottom of a side panel or a dialog, it opens over the box instead of
    growing its scroll — and above the field when the room below is short. */
-useAnchoredSurface(wrapEl, panelEl, { align: () => 'start', matchWidth: true })
+useAnchoredSurface(wrapEl, panelEl, { align: () => 'start', matchWidth: props.size === 'md' })
 
 const selectedOption = computed(() =>
   props.modelValue === null || props.modelValue === undefined
@@ -147,7 +159,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="ds-input-dropdown" ref="rootEl" @keydown="onRootKeyDown">
+  <div class="ds-input-dropdown" :class="`ds-input-dropdown--${size}`" ref="rootEl" @keydown="onRootKeyDown">
     <!-- Field group. Label and message live on FormField — see ADR-0008. -->
     <div class="ds-input-dropdown__field-group">
       <div ref="wrapEl" class="ds-input-dropdown__input-wrap">
@@ -163,6 +175,7 @@ onUnmounted(() => {
           :id="triggerId"
           :aria-describedby="describedBy"
           :aria-invalid="isInvalid || undefined"
+          :aria-label="ariaLabel"
           role="combobox"
           :aria-expanded="open"
           aria-haspopup="listbox"
@@ -204,6 +217,7 @@ onUnmounted(() => {
           :id="triggerId"
           :aria-describedby="describedBy"
           :aria-invalid="isInvalid || undefined"
+          :aria-label="ariaLabel"
           :aria-expanded="open"
           aria-haspopup="listbox"
           @click="toggle"
@@ -241,7 +255,7 @@ onUnmounted(() => {
 
           <Icon
             :name="open ? 'chevron-up' : 'chevron-down'"
-            :size="20"
+            :size="size === 'sm' ? 16 : 20"
             class="ds-input-dropdown__chevron"
             aria-hidden="true"
           />
@@ -450,6 +464,32 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   padding: var(--ds-spacing-xs) 0;
+}
+
+/* ── Size sm: a control in a bar (ADR-0080) ────────────────────────── */
+/* It hugs its value, and its list is at least as wide as the field — a field
+   that says « 10 » is narrower than the « 100 » in its list. */
+.ds-input-dropdown--sm {
+  display: inline-flex;
+  width: auto;
+}
+
+.ds-input-dropdown--sm .ds-input-dropdown__input-wrap {
+  width: auto;
+}
+
+.ds-input-dropdown--sm .ds-input-dropdown__trigger {
+  width: auto;
+  gap: var(--ds-spacing-sm);
+  padding: var(--ds-control-padding-sm);
+}
+
+.ds-input-dropdown--sm .ds-input-dropdown__value {
+  font: var(--ds-font-label-lg);
+}
+
+.ds-input-dropdown--sm .ds-input-dropdown__panel {
+  min-width: var(--anchor-width);
 }
 
 /* ── Hint text ─────────────────────────────────────────────────────── */
