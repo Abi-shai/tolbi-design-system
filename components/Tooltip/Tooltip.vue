@@ -1,169 +1,201 @@
 <script setup lang="ts">
-export type TooltipArrow =
-  | 'none'
-  | 'bottom-center'
-  | 'bottom-left'
-  | 'bottom-right'
-  | 'top-center'
-  | 'top-left'
-  | 'top-right'
-  | 'left'
-  | 'right'
+import { computed, onMounted, onBeforeUnmount, ref, useId, useSlots, watch } from 'vue'
+import { SurfaceTransition } from '../SurfaceTransition'
+import { useDelayedTooltip } from '../../composables/useDelayedTooltip'
+import { useAnchoredSurface, type AnchorAlign, type AnchorSide } from '../../composables/useAnchoredSurface'
+import TooltipBubble, { type TooltipArrow } from './TooltipBubble.vue'
 
+/**
+ * Where the tooltip opens first — it turns to the opposite side when the
+ * screen is short there. `-start` / `-end` line it up with the trigger's edge,
+ * for a trigger near the edge of a panel.
+ */
+export type TooltipPlacement =
+  | 'top' | 'top-start' | 'top-end'
+  | 'bottom' | 'bottom-start' | 'bottom-end'
+  | 'left' | 'right'
+
+/**
+ * A tooltip. **With a default slot**, it is anchored (ADR-0082): it wraps its
+ * trigger and opens by itself — after the catalogue's 400ms on hover, or on a
+ * keyboard's focus (`:focus-visible`, never a focus handed back after a
+ * click), gone when the pointer or the focus leaves, when the trigger is
+ * pressed, or on Escape. It is painted in the top layer at `placement`, turns
+ * when the room is short, and its arrow follows. The delay is not a prop: it
+ * is the catalogue's, so every tooltip answers at one pace (ADR-0066).
+ *
+ * Its text describes the trigger (`aria-describedby`), unless it only repeats
+ * the trigger's name — an icon button's tooltip says what `ariaLabel` already
+ * says. A **disabled** trigger still shows it: the wrapper takes the pointer a
+ * disabled control drops. (A keyboard cannot reach a disabled control — prefer
+ * `aria-disabled` when the tooltip says why.)
+ *
+ * **Without a slot** it is the bubble alone, for a component that places its
+ * own (`arrow`).
+ */
 interface Props {
   title:           string
   supportingText?: string
+  /** The bubble alone: where its arrow points. Anchored, the placement decides. */
   arrow?:          TooltipArrow
+  placement?:      TooltipPlacement
+  /** No tooltip — the trigger is left as it is. */
+  disabled?:       boolean
 }
 
-withDefaults(defineProps<Props>(), { arrow: 'none' })
+const props = withDefaults(defineProps<Props>(), {
+  supportingText: undefined,
+  arrow: 'none',
+  placement: 'top',
+  disabled: false,
+})
+
+const slots = useSlots()
+const anchored = computed(() => Boolean(slots.default))
+
+const anchorEl = ref<HTMLElement | null>(null)
+const bubbleEl = ref<HTMLElement | null>(null)
+const descriptionId = `ds-tooltip-${useId()}`
+
+const { shown, soon, soonOnFocus, away } = useDelayedTooltip()
+
+const side = computed<AnchorSide>(() => {
+  const base = props.placement.split('-')[0]
+  return base === 'top' ? 'above' : base === 'bottom' ? 'below' : base as AnchorSide
+})
+const align = computed<AnchorAlign>(() =>
+  props.placement.endsWith('-start') ? 'start' : props.placement.endsWith('-end') ? 'end' : 'center',
+)
+
+const { placed } = useAnchoredSurface(anchorEl, bubbleEl, { side: () => side.value, align: () => align.value })
+
+/* The arrow points at the trigger from wherever the bubble went. */
+const arrowFor = computed<TooltipArrow>(() => {
+  const edge = align.value === 'start' ? 'left' : align.value === 'end' ? 'right' : 'center'
+  switch (placed.value) {
+    case 'above': return `bottom-${edge}` as TooltipArrow
+    case 'below': return `top-${edge}` as TooltipArrow
+    case 'left':  return 'right'
+    default:      return 'left'
+  }
+})
+
+const axis = computed(() => (side.value === 'left' || side.value === 'right' ? 'inline' : 'block'))
+
+function enter() {
+  if (!props.disabled) soon()
+}
+
+function focus(event: FocusEvent) {
+  if (!props.disabled) soonOnFocus(event)
+}
+
+/* Escape closes the tooltip first, and only it (WCAG 1.4.13): a dialog under
+   it hears the next one. */
+function onKeydown(event: KeyboardEvent) {
+  if (event.key !== 'Escape' || shown.value === null) return
+  event.preventDefault()
+  away()
+}
+
+watch(shown, on => {
+  if (on) document.addEventListener('keydown', onKeydown, true)
+  else document.removeEventListener('keydown', onKeydown, true)
+})
+
+watch(() => props.disabled, off => { if (off) away() })
+
+onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown, true))
+
+/* The trigger is described by the text — unless the text is its name already. */
+onMounted(() => {
+  const trigger = anchorEl.value?.firstElementChild as HTMLElement | null
+  if (!trigger) return
+  const name = trigger.getAttribute('aria-label') ?? trigger.textContent?.trim()
+  if (name === props.title && !props.supportingText) return
+  const described = trigger.getAttribute('aria-describedby')
+  trigger.setAttribute('aria-describedby', described ? `${described} ${descriptionId}` : descriptionId)
+})
 </script>
 
 <template>
-  <div
-    class="ds-tooltip"
-    :class="[`ds-tooltip--${arrow}`, { 'ds-tooltip--rich': !!supportingText }]"
+  <span
+    v-if="anchored"
+    ref="anchorEl"
+    class="ds-tooltip-anchor"
+    @pointerenter="enter"
+    @pointerleave="away"
+    @focusin="focus"
+    @focusout="away"
+    @pointerdown="away"
   >
-    <!-- ▲ top-* (au-dessus du contenu) -->
-    <div
-      v-if="arrow === 'top-center' || arrow === 'top-left' || arrow === 'top-right'"
-      class="ds-tooltip__arrow ds-tooltip__arrow--top"
-      :class="`ds-tooltip__arrow--${arrow}`"
-    />
-
-    <!-- ◀ left (à gauche du contenu) -->
-    <div v-if="arrow === 'left'" class="ds-tooltip__arrow ds-tooltip__arrow--left" />
-
-    <!-- Contenu -->
-    <div class="ds-tooltip__content">
-      <div v-if="supportingText" class="ds-tooltip__text-group">
-        <p class="ds-tooltip__title">{{ title }}</p>
-        <p class="ds-tooltip__supporting">{{ supportingText }}</p>
+    <slot />
+    <!-- What the trigger is described by — there before the bubble, and read whether it shows or not. -->
+    <span :id="descriptionId" class="ds-tooltip-anchor__description">
+      {{ title }}<template v-if="supportingText">. {{ supportingText }}</template>
+    </span>
+    <SurfaceTransition>
+      <div
+        v-if="shown !== null"
+        ref="bubbleEl"
+        popover="manual"
+        class="ds-tooltip-anchor__bubble"
+        :class="`ds-tooltip-anchor__bubble--${axis}`"
+        aria-hidden="true"
+      >
+        <TooltipBubble :title="title" :supporting-text="supportingText" :arrow="arrowFor" />
       </div>
-      <p v-else class="ds-tooltip__title ds-tooltip__title--single">{{ title }}</p>
-    </div>
-
-    <!-- ▶ right (à droite du contenu) -->
-    <div v-if="arrow === 'right'" class="ds-tooltip__arrow ds-tooltip__arrow--right" />
-
-    <!-- ▼ bottom-* (sous le contenu) -->
-    <div
-      v-if="arrow === 'bottom-center' || arrow === 'bottom-left' || arrow === 'bottom-right'"
-      class="ds-tooltip__arrow ds-tooltip__arrow--bottom"
-      :class="`ds-tooltip__arrow--${arrow}`"
-    />
-  </div>
+    </SurfaceTransition>
+  </span>
+  <TooltipBubble v-else :title="title" :supporting-text="supportingText" :arrow="arrow" />
 </template>
 
 <style scoped>
-/* ── Shell ────────────────────────────────────────────────────────── */
-.ds-tooltip {
+.ds-tooltip-anchor {
   display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  /* shadow-lg */
-  /* drop-shadow() cannot consume a box-shadow token, so --ds-elevation-overlay
-     is restated here geometrically; the colour still comes from a token. */
-  filter: drop-shadow(0px 4px 6px color-mix(in srgb, var(--ds-bg-inverse) 3%, transparent))
-          drop-shadow(0px 12px 16px color-mix(in srgb, var(--ds-bg-inverse) 8%, transparent));
 }
 
-/* Largeur fixe sur le wrapper (box-sizing: border-box côté Figma) */
-.ds-tooltip--rich {
-  width: 320px;
+/* A disabled control drops the pointer; the wrapper takes it, so the tooltip
+   that says why it is disabled still comes. */
+.ds-tooltip-anchor > :deep(:is(:disabled, [aria-disabled='true'])) {
+  pointer-events: none;
 }
 
-.ds-tooltip--left,
-.ds-tooltip--right  { flex-direction: row; align-items: center; }
-.ds-tooltip--bottom-left,
-.ds-tooltip--top-left     { align-items: flex-start; }
-.ds-tooltip--bottom-right,
-.ds-tooltip--top-right    { align-items: flex-end; }
-
-/* ── Contenu ──────────────────────────────────────────────────────── */
-.ds-tooltip__content {
-  background: var(--ds-bg-inverse);
-  border-radius: var(--ds-radius-surface-sm);
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Simple : py-8px px-12px */
-.ds-tooltip:not(.ds-tooltip--rich) .ds-tooltip__content {
-  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
-}
-
-/* Rich : p-12px */
-.ds-tooltip--rich .ds-tooltip__content {
-  padding: var(--ds-spacing-lg);
-}
-
-/* ── Textes ───────────────────────────────────────────────────────── */
-.ds-tooltip__text-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-xs);
-}
-
-.ds-tooltip__title {
-  margin: 0;
-  font: var(--ds-font-label-md-strong);
-  color: var(--ds-text-on-inverse);
-}
-
-.ds-tooltip__title--single {
+/* Visually hidden, still read — never display:none. */
+.ds-tooltip-anchor__description {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
   white-space: nowrap;
-  text-align: center;
+  border: 0;
 }
 
-.ds-tooltip__supporting {
+/* In the top layer, placed on the trigger (ADR-0078); the gap is the margin
+   on the side it faces — the catalogue's 4px. It is never hovered: it names,
+   it holds nothing to reach. */
+.ds-tooltip-anchor__bubble {
+  position: fixed;
+  inset: auto;
+  z-index: var(--ds-z-popover);
+  max-width: 20rem;
   margin: 0;
-  font: var(--ds-font-body-sm);
-  color: var(--ds-text-on-inverse-subtle);
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: none;
+  color: inherit;
+  pointer-events: none;
 }
 
-/* ── Flèches CSS ──────────────────────────────────────────────────── */
-.ds-tooltip__arrow { flex-shrink: 0; }
-
-/* ▼ Bottom — 16px large × 6px haut */
-.ds-tooltip__arrow--bottom {
-  width: 0;
-  height: 0;
-  border-left:  8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top:   6px solid var(--ds-bg-inverse);
+.ds-tooltip-anchor__bubble--block {
+  margin-block: var(--ds-spacing-xs);
 }
 
-.ds-tooltip__arrow--bottom-left  { align-self: flex-start; margin-left: var(--ds-spacing-lg); }
-.ds-tooltip__arrow--bottom-right { align-self: flex-end;   margin-right: var(--ds-spacing-lg); }
-
-/* ▲ Top — 16px large × 6px haut */
-.ds-tooltip__arrow--top {
-  width: 0;
-  height: 0;
-  border-left:   8px solid transparent;
-  border-right:  8px solid transparent;
-  border-bottom: 6px solid var(--ds-bg-inverse);
-}
-
-.ds-tooltip__arrow--top-left  { align-self: flex-start; margin-left: var(--ds-spacing-lg); }
-.ds-tooltip__arrow--top-right { align-self: flex-end;   margin-right: var(--ds-spacing-lg); }
-
-/* ◀ Left — 6px large × 16px haut */
-.ds-tooltip__arrow--left {
-  width: 0;
-  height: 0;
-  border-top:    8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-right:  6px solid var(--ds-bg-inverse);
-}
-
-/* ▶ Right — 6px large × 16px haut */
-.ds-tooltip__arrow--right {
-  width: 0;
-  height: 0;
-  border-top:    8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-left:   6px solid var(--ds-bg-inverse);
+.ds-tooltip-anchor__bubble--inline {
+  margin-inline: var(--ds-spacing-xs);
 }
 </style>

@@ -1005,6 +1005,13 @@ Before working on any component, read:
   own width; both forms are an `<ol>` with `aria-current="step"`. **33**: **`OptionTree`** — a tree, not
   radios (APG: a tree's arrows move), the round mark only a sign; search keeps hits with their ancestors,
   accent-blind; the chosen path written above.
+- **ADR-0082**: **`Tooltip` anchors itself** (item 17) when its default slot holds the trigger — the catalogue's
+  rules (`useDelayedTooltip`: 400ms, `:focus-visible` only, gone on leave and press) plus **Escape**, which it
+  takes; **no delay prop** (the catalogue's). Top layer via `useAnchoredSurface`, which gains **`side`**
+  (`below | above | left | right`, each flips) and **`center`**, returning `placed` for the arrow. Without a slot
+  it is the bubble (now internal `TooltipBubble`). The text **describes** the trigger unless it repeats its name;
+  a **disabled** trigger still shows it. `FormField` hands down **`labelId`**, so a list in a field is named
+  **label + value** — the label alone while nothing is chosen.
 
 ## Architecture
 

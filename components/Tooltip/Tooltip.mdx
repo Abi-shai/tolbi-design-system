@@ -44,25 +44,24 @@ Deux modes selon la présence de `supporting-text` :
 
 ---
 
-## Positionnement
+## Ancrée à son déclencheur (ADR-0082)
 
-Ce composant expose uniquement le **visuel** du tooltip. Le positionnement flottant (ancré à un élément déclencheur) est à gérer côté app avec une librairie comme [Floating UI](https://floating-ui.com/).
+Avec un slot par défaut, l’infobulle **enveloppe son déclencheur** et s’ouvre seule : 400 ms après le survol, ou sur un
+focus clavier (`:focus-visible` — jamais un focus rendu après un clic) ; elle part quand le pointeur ou le focus partent,
+quand on appuie, ou sur Échap. Elle est peinte dans la couche supérieure à `placement` (`top`, `top-start`, `top-end`,
+`bottom…`, `left`, `right`), se retourne quand la place manque, et sa flèche suit. Le délai n’est pas une prop : c’est
+celui du catalogue.
 
-Exemple d'intégration :
 ```vue
-<div style="position: relative;">
-  <button @mouseenter="show = true" @mouseleave="show = false">Survole-moi</button>
-  <Tooltip
-    v-if="show"
-    title="Mon tooltip"
-    arrow="top-center"
-    style="position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);"
-  />
-</div>
+<Tooltip title="Exporter le rapport" placement="bottom">
+  <IconButton icon="download" ariaLabel="Exporter le rapport" />
+</Tooltip>
 ```
 
----
+Son texte décrit le déclencheur (`aria-describedby`), sauf s’il répète déjà son nom. Un déclencheur **désactivé** la
+montre encore — mais un clavier ne l’atteint pas : préférer `aria-disabled` quand l’infobulle dit pourquoi.
 
-## Props
+<Canvas of={TooltipStories.Anchored} />
+<Canvas of={TooltipStories.AtTheEdge} />
 
-<ArgTypes of={TooltipStories} />
+Sans slot, c’est la bulle seule, pour un composant qui place la sienne (`arrow`).

@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import Tooltip from './Tooltip.vue'
+import { Button } from '../Button'
+import { IconButton } from '../IconButton'
 import TooltipDocs from './Tooltip.mdx'
 
 const meta: Meta<typeof Tooltip> = {
@@ -129,3 +131,57 @@ export const AllArrowsRich: Story = {
     `,
   }),
 }
+
+/**
+ * ADR-0082 — ancrée : elle enveloppe son déclencheur et s’ouvre seule, 400 ms après le survol ou sur un focus
+ * clavier ; elle part quand le pointeur ou le focus partent, quand on appuie, ou sur Échap. Dans la couche
+ * supérieure, à `placement`, elle se retourne quand la place manque. Son texte décrit le déclencheur, sauf
+ * s’il ne fait que répéter son nom. Un déclencheur désactivé la montre encore.
+ */
+export const Anchored: Story = {
+  name: 'Ancrée à son déclencheur',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { Tooltip, Button, IconButton },
+    setup: () => ({
+      PLACEMENTS: ['top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'right'],
+    }),
+    template: `
+      <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-5xl); padding:var(--ds-spacing-7xl) var(--ds-spacing-7xl)">
+        <div style="display:flex; flex-wrap:wrap; gap:var(--ds-spacing-3xl)">
+          <Tooltip v-for="p in PLACEMENTS" :key="p" :title="'placement=' + p" :placement="p">
+            <Button :label="p" variant="secondary-gray" size="sm" />
+          </Tooltip>
+        </div>
+        <div style="display:flex; gap:var(--ds-spacing-3xl); align-items:center">
+          <Tooltip title="Exporter le rapport">
+            <IconButton icon="download" ariaLabel="Exporter le rapport" variant="neutral" />
+          </Tooltip>
+          <Tooltip title="Envoyer la déclaration" supporting-text="Disponible quand les trois étapes sont faites.">
+            <Button label="Envoyer" disabled />
+          </Tooltip>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+/** Contre le bord de l’écran, elle se retourne et reste dedans. */
+export const AtTheEdge: Story = {
+  name: 'Au bord de l’écran',
+  parameters: { layout: 'fullscreen' },
+  render: () => ({
+    components: { Tooltip, Button },
+    template: `
+      <div style="height:100vh; display:flex; justify-content:space-between; align-items:flex-start">
+        <Tooltip title="Elle s’ouvre dessous : il n’y a pas de place au-dessus" placement="top">
+          <Button label="En haut à gauche" variant="secondary-gray" size="sm" />
+        </Tooltip>
+        <Tooltip title="Elle passe à gauche : il n’y a pas de place à droite" placement="right">
+          <Button label="En haut à droite" variant="secondary-gray" size="sm" />
+        </Tooltip>
+      </div>
+    `,
+  }),
+}
+

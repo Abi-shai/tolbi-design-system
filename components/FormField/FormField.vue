@@ -52,6 +52,7 @@ const describedBy = computed(() => (hasMessage.value ? messageId.value : undefin
 provide(FORM_FIELD_KEY, {
   id:          computed(() => (props.group ? undefined : fieldId.value)),
   describedBy: computed(() => (props.group ? undefined : describedBy.value)),
+  labelId:     computed(() => (props.label && !props.group ? labelId.value : undefined)),
   invalid,
   required: computed(() => props.required),
   disabled: computed(() => props.disabled),

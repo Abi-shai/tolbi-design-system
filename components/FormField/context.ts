@@ -14,6 +14,12 @@ export interface FormFieldContext {
    * resolves. Undefined in a group (`FormField group`): each control keeps its own.
    */
   id:          ComputedRef<string | undefined>
+  /**
+   * Id of the wrapper's label, for a control whose name must say more than the
+   * label — a list button is named by its label **and its value** (ADR-0082).
+   * Undefined without a label, and in a group.
+   */
+  labelId?:    ComputedRef<string | undefined>
   /** Id of the wrapper's message element, or undefined when there is no message. */
   describedBy: ComputedRef<string | undefined>
   /** The wrapper carries an error message. */

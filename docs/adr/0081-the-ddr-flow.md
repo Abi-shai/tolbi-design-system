@@ -104,8 +104,8 @@ the tree walked by keyboard end to end, « poudre » → 4 rows and 2 underlines
 
 ## Still open
 
-- Inside a `FormField`, `InputDropdown`'s trigger is named by the `<label for>` and still loses its value
-  (« Pays », not « Pays Sénégal ») — the same fix as `ariaLabel`'s, not yet applied there.
+- ~~Inside a `FormField`, `InputDropdown`'s trigger is named by the `<label for>` and still loses its value
+  (« Pays », not « Pays Sénégal »).~~ Closed by ADR-0082.
 - The tree has no lazy loading: the HS nomenclature (~5 000 subheadings) renders only what is open, but
   the product passes the whole hierarchy.
 - 27's list is single-choice; a field with several units would want something else.

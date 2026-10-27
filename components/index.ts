@@ -78,7 +78,7 @@ export { Avatar } from './Avatar'
 export type { AvatarSize, AvatarStatus } from './Avatar'
 
 export { Tooltip } from './Tooltip'
-export type { TooltipArrow } from './Tooltip'
+export type { TooltipArrow, TooltipPlacement } from './Tooltip'
 
 export { HelpIcon } from './HelpIcon'
 export type { HelpPlacement } from './HelpIcon'

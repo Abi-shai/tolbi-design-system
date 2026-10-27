@@ -87,6 +87,16 @@ const isDisabled  = computed(() => (field?.disabled.value ?? false) || props.dis
 const uid     = useId()
 const nameId  = `ds-input-dropdown-name-${uid}`
 const valueId = `ds-input-dropdown-value-${uid}`
+/* Inside a FormField, the `<label for>` named the button and dropped its value
+   the same way (« Pays », not « Pays Sénégal ») — so the label is read first,
+   then the value (ADR-0082). */
+const labelledBy = computed(() => {
+  /* Nothing chosen, the placeholder is not a value: the label alone. */
+  const value = selectedOption.value ? ` ${valueId}` : ''
+  if (props.ariaLabel) return `${nameId}${value}`
+  const label = field?.labelId?.value
+  return label ? `${label}${value}` : undefined
+})
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | number | null]
@@ -255,7 +265,7 @@ onUnmounted(() => {
           :id="triggerId"
           :aria-describedby="describedBy"
           :aria-invalid="isInvalid || undefined"
-          :aria-labelledby="ariaLabel ? `${nameId} ${valueId}` : undefined"
+          :aria-labelledby="labelledBy"
           :aria-expanded="open"
           aria-haspopup="listbox"
           @click="toggle"

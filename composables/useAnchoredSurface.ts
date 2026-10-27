@@ -1,4 +1,4 @@
-import { watch, onBeforeUnmount, type Ref } from 'vue'
+import { ref, watch, onBeforeUnmount, type Ref } from 'vue'
 
 /**
  * A surface that floats from a trigger — a menu, a select's list — and is
@@ -31,13 +31,22 @@ import { watch, onBeforeUnmount, type Ref } from 'vue'
  *   the surface sat inside it; in the top layer it would mean the screen.
  * - `transform-origin` follows the side it opened on, so an entrance scales
  *   from the corner under the trigger (ADR-0021) whichever way it flipped.
+ * - `side` is where it opens first: `below` (a menu, the default), `above`
+ *   (a tooltip), or beside — `left` / `right`, the gap then being its
+ *   `margin-inline`. Each flips to its opposite when it is short there and
+ *   the opposite has more room; `placed` says where it went, for an arrow.
+ *   `center` aligns it on the anchor's middle (ADR-0082).
  */
-export type AnchorAlign = 'start' | 'end'
+export type AnchorAlign = 'start' | 'end' | 'center'
+export type AnchorSide = 'below' | 'above' | 'left' | 'right'
 
 export interface AnchoredSurfaceOptions {
   align: () => AnchorAlign
   matchWidth?: boolean
+  side?: () => AnchorSide
 }
+
+const OPPOSITE: Record<AnchorSide, AnchorSide> = { below: 'above', above: 'below', left: 'right', right: 'left' }
 
 export function useAnchoredSurface(
   anchor: Ref<HTMLElement | null | undefined>,
@@ -46,6 +55,7 @@ export function useAnchoredSurface(
 ) {
   let frame = 0
   let observer: ResizeObserver | null = null
+  const placed = ref<AnchorSide>(options.side?.() ?? 'below')
 
   function place() {
     frame = 0
@@ -57,6 +67,13 @@ export function useAnchoredSurface(
     const vw = viewport.clientWidth
     const vh = viewport.clientHeight
     const style = getComputedStyle(el)
+    const wanted = options.side?.() ?? 'below'
+
+    if (wanted === 'left' || wanted === 'right') {
+      placeBeside(el, a, style, wanted, vw, vh)
+      return
+    }
+
     const gap = parseFloat(style.marginTop) || 0
 
     el.style.setProperty('--anchor-width', `${a.width}px`)
@@ -68,7 +85,10 @@ export function useAnchoredSurface(
     const height = el.offsetHeight + gap * 2
     const below = vh - a.bottom
     const above = a.top
-    const flip = below < height && above > below
+    const flip = wanted === 'above'
+      ? !(above < height && below > above)
+      : below < height && above > below
+    placed.value = flip ? 'above' : 'below'
     /* `max-height` excludes the border and padding in a content box. */
     const chrome = style.boxSizing === 'border-box' ? 0
       : [style.borderTopWidth, style.borderBottomWidth, style.paddingTop, style.paddingBottom]
@@ -77,8 +97,8 @@ export function useAnchoredSurface(
 
     const width = el.offsetWidth
     const align = options.align()
-    const wanted = align === 'end' ? a.right - width : a.left
-    const left = Math.min(Math.max(wanted, gap), Math.max(gap, vw - width - gap))
+    const x = align === 'end' ? a.right - width : align === 'center' ? a.left + (a.width - width) / 2 : a.left
+    const left = Math.min(Math.max(x, gap), Math.max(gap, vw - width - gap))
 
     el.style.left = `${left}px`
     if (flip) {
@@ -88,7 +108,31 @@ export function useAnchoredSurface(
       el.style.bottom = 'auto'
       el.style.top = `${a.bottom}px`
     }
-    el.style.transformOrigin = `${flip ? 'bottom' : 'top'} ${align === 'end' ? 'right' : 'left'}`
+    el.style.transformOrigin = `${flip ? 'bottom' : 'top'} ${align === 'end' ? 'right' : align === 'center' ? 'center' : 'left'}`
+  }
+
+  /* Beside the anchor, centred on its middle and kept on the screen; the gap
+     is the surface's `margin-inline`. */
+  function placeBeside(el: HTMLElement, a: DOMRect, style: CSSStyleDeclaration, wanted: AnchorSide, vw: number, vh: number) {
+    const gap = parseFloat(style.marginLeft) || 0
+    const width = el.offsetWidth + gap * 2
+    const room = { left: a.left, right: vw - a.right }
+    const other = OPPOSITE[wanted] as 'left' | 'right'
+    const side = room[wanted as 'left' | 'right'] < width && room[other] > room[wanted as 'left' | 'right'] ? other : wanted
+    placed.value = side
+
+    const height = el.offsetHeight
+    const y = a.top + (a.height - height) / 2
+    el.style.top = `${Math.min(Math.max(y, 0), Math.max(0, vh - height))}px`
+    el.style.bottom = 'auto'
+    if (side === 'right') {
+      el.style.right = 'auto'
+      el.style.left = `${a.right}px`
+    } else {
+      el.style.left = 'auto'
+      el.style.right = `${vw - a.left}px`
+    }
+    el.style.transformOrigin = `${side === 'right' ? 'left' : 'right'} center`
   }
 
   function schedule() {
@@ -127,5 +171,5 @@ export function useAnchoredSurface(
 
   onBeforeUnmount(stop)
 
-  return { place }
+  return { place, placed }
 }
