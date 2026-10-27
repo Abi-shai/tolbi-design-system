@@ -1012,6 +1012,11 @@ Before working on any component, read:
   it is the bubble (now internal `TooltipBubble`). The text **describes** the trigger unless it repeats its name;
   a **disabled** trigger still shows it. `FormField` hands down **`labelId`**, so a list in a field is named
   **label + value** — the label alone while nothing is chosen.
+- **ADR-0083**: an **Escape aimed at a layer inside a dialog is that layer's**, taken or not (item 34): reka-ui
+  closes its list on `window` without `preventDefault`, and the browser then closed the dialog too. Read in the
+  **capture phase** on the dialog: a target inside an open `listbox`/`menu`/`dialog`/`[popover]` the surface holds,
+  or on an opener (`aria-expanded="true"` + combobox or `aria-haspopup`) — then no `cancel`, and `within` skips it.
+  A disclosure's `aria-expanded` is not a layer.
 
 ## Architecture
 

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import { ref } from 'vue'
+import { defineComponent, h, onBeforeUnmount, onMounted, ref } from 'vue'
 import Dialog from './Dialog.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
 import { Button } from '../Button'
@@ -339,6 +339,73 @@ export const Summary: Story = {
           <template #actions>
             <Button label="Annuler" variant="secondary-gray" size="sm" @click="open = null" />
             <Button label="Lier les champs" variant="primary" size="sm" :disabled="!linked.length" @click="open = null" />
+          </template>
+        </Dialog>
+      </div>
+    `,
+  }),
+}
+
+/* A list from another library, as reka-ui builds one: a combobox whose listbox
+   closes on a `keydown` heard on `window` — without cancelling the key. */
+const ForeignSelect = defineComponent({
+  props: { label: { type: String, required: true }, options: { type: Array as () => string[], required: true } },
+  setup(props) {
+    const open = ref(false)
+    const value = ref(props.options[0])
+    const id = `foreign-${Math.random().toString(36).slice(2, 8)}`
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && open.value) open.value = false }
+    onMounted(() => window.addEventListener('keydown', onKey))
+    onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
+    return () => h('div', { style: 'position:relative; display:flex; flex-direction:column; gap:var(--ds-spacing-sm); font:var(--ds-font-body-md)' }, [
+      h('label', { for: id, style: 'font:var(--ds-font-label-lg); color:var(--ds-text-default)' }, props.label),
+      h('input', {
+        id, role: 'combobox', readonly: true, value: value.value,
+        'aria-expanded': String(open.value), 'aria-haspopup': 'listbox', 'aria-controls': id + '-list',
+        style: 'padding:var(--ds-control-padding-md); border:var(--ds-border-width-default) solid var(--ds-border-default); border-radius:var(--ds-radius-control); font:var(--ds-font-body-lg)',
+        onClick: () => { open.value = !open.value },
+        onKeydown: (e: KeyboardEvent) => { if (e.key === 'ArrowDown') { open.value = true; e.preventDefault() } },
+      }),
+      open.value ? h('ul', {
+        id: id + '-list', role: 'listbox',
+        style: 'margin:0; padding:var(--ds-spacing-xs); list-style:none; border:var(--ds-border-width-default) solid var(--ds-border-subtle); border-radius:var(--ds-radius-control); background:var(--ds-bg-default); box-shadow:var(--ds-elevation-overlay)',
+      }, props.options.map(o => h('li', { role: 'option', 'aria-selected': String(o === value.value), style: 'padding:var(--ds-spacing-sm) var(--ds-spacing-md); cursor:pointer', onClick: () => { value.value = o; open.value = false } }, o))) : null,
+    ])
+  },
+})
+
+/**
+ * ADR-0083 (retour 34) — une liste d’une autre bibliothèque, ouverte dans la fenêtre, qui se ferme sur une Échap
+ * écoutée sur `window` sans l’annuler (reka-ui, donc Nuxt UI). La première Échap ferme la liste et laisse la
+ * fenêtre ; la seconde ferme la fenêtre. Une Échap visant une couche ouverte que la surface contient — une liste,
+ * un menu, une fenêtre, un popover, ou le contrôle qui l’a ouverte — est à cette couche, prise ou non.
+ */
+export const ForeignList: Story = {
+  name: 'Une liste d’une autre bibliothèque',
+  render: () => ({
+    components: { Dialog, Button, ForeignSelect },
+    setup: () => ({ open: ref<'centre' | 'side' | null>(null), last: ref('—'), PAGE }),
+    template: `
+      <div :style="PAGE">
+        <div style="display:flex; gap:var(--ds-spacing-md)">
+          <Button label="Fenêtre" variant="secondary-gray" @click="open = 'centre'" />
+          <Button label="Panneau latéral" variant="secondary-gray" @click="open = 'side'" />
+        </div>
+        <span>Dernière fermeture : {{ last }}</span>
+        <Dialog
+          :open="open !== null"
+          @update:open="(v) => { if (!v) open = null }"
+          @cancel="last = 'Échap ou voile'"
+          :placement="open === 'side' ? 'side' : 'centre'"
+          title="Créer une déclaration"
+          description="Ouvrez la liste des pays, puis appuyez sur Échap."
+        >
+          <template #form>
+            <ForeignSelect label="Pays d’origine" :options="['Sénégal', 'Côte d’Ivoire', 'Mali', 'Ghana']" />
+          </template>
+          <template #actions>
+            <Button label="Annuler" variant="secondary-gray" size="sm" @click="open = null" />
+            <Button label="Continuer" size="sm" @click="open = null" />
           </template>
         </Dialog>
       </div>

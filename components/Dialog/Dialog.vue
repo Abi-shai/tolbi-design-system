@@ -35,7 +35,9 @@ import { pushModal, removeModal } from '../../composables/useModalStack'
  * is off — then there is no close either.
  * Render it where it is used: a popover it was opened from stays open behind
  * it. Its Escape is not stopped — a list from another library inside it must
- * hear the key — and it closes only on an Escape nobody else took (ADR-0077).
+ * hear the key — and it closes only on an Escape nobody else took (ADR-0077),
+ * and that was not aimed at a layer open inside it (ADR-0083): a list that
+ * closes itself without cancelling the key no longer takes the dialog along.
  * While it is open, a `ToastRegion` moves inside it, so a toast stays visible
  * and answers.
  *
@@ -278,9 +280,39 @@ function dismiss() {
   open.value = false
 }
 
-/* Escape: the browser's own cancel, held so the exit can play. */
+/*
+  An Escape aimed at a layer open inside the dialog is that layer's, taken or
+  not (ADR-0083, item 34). Another library's list may close itself on `window`
+  without cancelling the key — reka-ui does — and the browser, seeing nobody
+  took it, then closed the dialog as well, list and all. So the key's target is
+  read **before** anyone handles it (capture, on the dialog): inside an open
+  listbox, menu or dialog the surface holds, or a popover in it — or on the
+  control that opened one (`aria-expanded` with a popup, a combobox). A
+  disclosure's `aria-expanded` is not a layer: it has no popup.
+*/
+const LAYER = '[role="listbox"], [role="menu"], [role="dialog"], [role="alertdialog"], [popover]'
+const OPENER = '[aria-expanded="true"]:is([role="combobox"], [aria-haspopup]:not([aria-haspopup="false"]))'
+let escapeForALayer = false
+
+function isLayerEscape(target: EventTarget | null) {
+  if (!(target instanceof Element) || !surface.value?.contains(target)) return false
+  const layer = target.closest(LAYER)
+  if (layer && layer !== el.value && surface.value.contains(layer)) return true
+  return Boolean(target.closest(OPENER))
+}
+
+function onKeydownCapture(event: KeyboardEvent) {
+  if (event.key !== 'Escape') return
+  escapeForALayer = isLayerEscape(event.target)
+  /* One Escape, one answer: a later close request (a back gesture) is not this one. */
+  setTimeout(() => { escapeForALayer = false })
+}
+
+/* Escape: the browser's own cancel, held so the exit can play — unless the
+   key was a layer's. */
 function onCancel(event: Event) {
   event.preventDefault()
+  if (escapeForALayer) return
   dismiss()
 }
 
@@ -301,7 +333,8 @@ function onKeydown(event: KeyboardEvent) {
     from a dialog that does not hold them.
   */
   if (event.key === 'Escape') {
-    if (props.within) setTimeout(() => { if (!event.defaultPrevented) dismiss() })
+    const layers = escapeForALayer
+    if (props.within) setTimeout(() => { if (!event.defaultPrevented && !layers) dismiss() })
     return
   }
   if (event.key !== 'Tab') return
@@ -354,6 +387,7 @@ function onClick(event: MouseEvent) {
       :aria-describedby="description || (slots.default && !side) ? descriptionId : undefined"
       @cancel="onCancel"
       @close="onClose"
+      @keydown.capture="onKeydownCapture"
       @keydown="onKeydown"
       @pointerdown="onPointerDown"
       @click="onClick"
