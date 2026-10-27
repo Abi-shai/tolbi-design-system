@@ -256,3 +256,61 @@ export const Small: Story = {
     `,
   }),
 }
+
+const COUNTRIES = [
+  { value: 'SN', label: 'Sénégal', flag: 'SN' },
+  { value: 'CI', label: 'Côte d’Ivoire', flag: 'CI' },
+  { value: 'ML', label: 'Mali', flag: 'ML' },
+  { value: 'BF', label: 'Burkina Faso', flag: 'BF' },
+  { value: 'GH', label: 'Ghana', flag: 'GH' },
+  { value: 'CM', label: 'Cameroun', flag: 'CM' },
+  { value: 'FR', label: 'France', flag: 'FR' },
+  { value: 'NL', label: 'Pays-Bas', flag: 'NL' },
+  { value: 'BE', label: 'Belgique', flag: 'BE' },
+  { value: 'DE', label: 'Allemagne', flag: 'DE' },
+]
+
+/** ADR-0085 — le drapeau du pays devant chaque option et devant la valeur (`type="flag-leading"`, `option.flag`). */
+export const FlagLeading: Story = {
+  name: 'Drapeau en tête',
+  render: () => ({
+    components: { InputDropdown, FormField },
+    setup: () => ({ value: ref('SN'), COUNTRIES }),
+    template: `
+      <div style="width:320px">
+        <FormField label="Pays d’origine">
+          <InputDropdown v-model="value" type="flag-leading" :options="COUNTRIES" placeholder="Choisir un pays" />
+        </FormField>
+      </div>
+    `,
+  }),
+}
+
+const PRODUCTS = ['Cacao', 'Café', 'Hévéa', 'Palmier à huile', 'Soja', 'Bois', 'Bovins'].map(p => ({ value: p, label: p }))
+
+/**
+ * ADR-0085 — plusieurs choix (`multiple`, `v-model:values`) : les choix en étiquettes sur une ligne, le reste en
+ * « +N » — le champ ne grandit pas. La liste mène chaque ligne d’une case et reste ouverte ; « Effacer » au pied.
+ * Retour arrière sur le champ retire le dernier choix.
+ */
+export const Multiple: Story = {
+  name: 'Plusieurs choix',
+  render: () => ({
+    components: { InputDropdown, FormField },
+    setup: () => ({ values: ref(['Cacao', 'Café', 'Hévéa', 'Soja']), none: ref([]), countries: ref(['SN', 'CI']), PRODUCTS, COUNTRIES }),
+    template: `
+      <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-2xl); width:320px">
+        <FormField label="Produits">
+          <InputDropdown multiple v-model:values="values" :options="PRODUCTS" placeholder="Choisir des produits" />
+        </FormField>
+        <FormField label="Produits — aucun choisi">
+          <InputDropdown multiple v-model:values="none" :options="PRODUCTS" placeholder="Choisir des produits" />
+        </FormField>
+        <FormField label="Pays d’origine">
+          <InputDropdown multiple type="flag-leading" v-model:values="countries" :options="COUNTRIES" placeholder="Choisir des pays" />
+        </FormField>
+      </div>
+    `,
+  }),
+}
+

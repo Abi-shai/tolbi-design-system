@@ -1,0 +1,111 @@
+# Flags the package ships — ISO 3166-1 alpha-2, one per line (ADR-0085).
+# Add a code, run `npm run flags`; components/Flag/registry.ts follows.
+# Source: country-flag-icons (MIT), 3:2 drawings simplified for small sizes.
+
+# West Africa
+SN
+CI
+ML
+BF
+GH
+GN
+NE
+NG
+TG
+BJ
+GM
+GW
+LR
+SL
+MR
+CV
+# Central Africa
+CM
+GA
+CG
+CD
+CF
+TD
+GQ
+ST
+AO
+# East Africa and the Indian Ocean
+KE
+UG
+TZ
+RW
+ET
+BI
+MG
+# North Africa
+MA
+DZ
+TN
+EG
+# Producers elsewhere (EUDR commodities)
+BR
+CO
+PE
+EC
+BO
+PY
+AR
+MX
+GT
+HN
+NI
+CR
+ID
+MY
+VN
+TH
+IN
+LK
+PG
+PH
+LA
+KH
+MM
+CN
+# European Union
+EU
+AT
+BE
+BG
+HR
+CY
+CZ
+DK
+EE
+FI
+FR
+DE
+GR
+HU
+IE
+IT
+LV
+LT
+LU
+MT
+NL
+PL
+PT
+RO
+SK
+SI
+ES
+SE
+# Other markets
+GB
+CH
+NO
+US
+CA
+TR
+AE
+SA
+JP
+AU
+NZ
+ZA

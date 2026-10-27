@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Avatar } from '../Avatar'
+import { Checkbox } from '../Checkbox'
+import { Flag } from '../Flag'
 import { Icon } from '../Icon'
 import type { IconName } from '../Icon'
 
-export type DropdownSelectItemType = 'default' | 'icon' | 'avatar' | 'dot'
+export type DropdownSelectItemType = 'default' | 'icon' | 'avatar' | 'dot' | 'flag'
 
 interface Props {
   label: string
@@ -15,14 +17,23 @@ interface Props {
   avatarInitials?: string
   avatarAlt?: string
   dotColor?: string
+  /** `type="flag"`: the country's ISO code (ADR-0085). */
+  flag?: string
   selected?: boolean
   disabled?: boolean
+  /**
+   * One choice among several (ADR-0085): a box leads the row and carries the
+   * choice — the row keeps its ground, as `DropdownItem checked` does.
+   */
+  checkbox?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
   type: 'default',
+  flag: undefined,
   selected: false,
   disabled: false,
+  checkbox: false,
 })
 
 const emit = defineEmits<{
@@ -34,7 +45,7 @@ const emit = defineEmits<{
   <div
     class="ds-dropdown-select-item"
     :class="{
-      'ds-dropdown-select-item--selected': selected,
+      'ds-dropdown-select-item--selected': selected && !checkbox,
       'ds-dropdown-select-item--disabled': disabled,
     }"
     role="option"
@@ -45,8 +56,10 @@ const emit = defineEmits<{
     @keydown.space.prevent="!disabled && emit('click')"
   >
     <div class="ds-dropdown-select-item__content">
+      <Checkbox v-if="checkbox" visual-only size="sm" :model-value="selected" :disabled="disabled" class="ds-dropdown-select-item__check" />
+      <Flag v-if="type === 'flag' && flag" :code="flag" :size="20" />
       <Icon
-        v-if="type === 'icon'"
+        v-else-if="type === 'icon'"
         :name="icon || 'user'"
         :size="20"
         class="ds-dropdown-select-item__leading-icon"
@@ -125,6 +138,10 @@ const emit = defineEmits<{
 
 .ds-dropdown-select-item:focus-visible {
   outline: none;
+}
+
+.ds-dropdown-select-item__check {
+  flex-shrink: 0;
 }
 
 .ds-dropdown-select-item__leading-icon {

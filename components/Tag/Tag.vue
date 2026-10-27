@@ -18,6 +18,8 @@ interface Props {
   avatarAlt?: string
   checkbox?:  boolean
   checked?:   boolean
+  /** The close's name — « Retirer Cacao », not « Retirer » alone, when several tags sit side by side. */
+  closeLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -26,6 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
   dot:      false,
   checkbox: false,
   checked:  false,
+  closeLabel: 'Retirer',
 })
 
 const emit = defineEmits<{
@@ -117,7 +120,7 @@ function onTagClick() {
       v-if="action === 'close'"
       type="button"
       class="ds-tag__close"
-      aria-label="Retirer"
+      :aria-label="closeLabel"
       @click.stop="emit('close')"
     >
       <Icon name="x" :size="closeIconSizePx" aria-hidden="true" />

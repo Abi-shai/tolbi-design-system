@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { SurfaceTransition } from '../SurfaceTransition'
-import { ref, computed, onMounted, onUnmounted, nextTick, useId } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, useId, watch } from 'vue'
 import { useFormField } from '../FormField/context'
 import { Icon } from '../Icon'
 import { Scrollbar } from '../Scrollbar'
 import { Avatar } from '../Avatar'
+import { Button } from '../Button'
+import { Flag } from '../Flag'
+import { Tag } from '../Tag'
 import type { IconName } from '../Icon'
 import DropdownSelectItem from './DropdownSelectItem.vue'
 import { useAnchoredSurface } from '../../composables/useAnchoredSurface'
 import type { DropdownSelectItemType } from './DropdownSelectItem.vue'
 
-export type InputDropdownType = 'default' | 'icon-leading' | 'avatar-leading' | 'dot-leading' | 'search'
+/** `flag-leading`: a country's flag before each option and the value (ADR-0085). */
+export type InputDropdownType = 'default' | 'icon-leading' | 'avatar-leading' | 'dot-leading' | 'flag-leading' | 'search'
 
 /**
  * `md` is the form field. `sm` is a control riding in a bar — the table's
@@ -41,14 +45,31 @@ export interface InputDropdownOption {
   avatarSrc?: string
   avatarAlt?: string
   dotColor?: string
+  /** `type="flag-leading"`: the country's ISO 3166-1 code — `SN`, `CI`. */
+  flag?: string
   disabled?: boolean
 }
+
+type Value = string | number
 
 interface Props {
   type?: InputDropdownType
   placeholder?: string
   options: InputDropdownOption[]
-  modelValue?: string | number | null
+  modelValue?: Value | null
+  /**
+   * Several choices (ADR-0085): the chosen ones are tags on one line, the rest
+   * a « +N » — the field never grows; the list leads each row with a box and
+   * stays open while they are ticked, « Effacer » at its foot. The values are
+   * their own model, `v-model:values`, so `modelValue` keeps its one-value type.
+   */
+  multiple?: boolean
+  values?: Value[]
+  /** Said for the chosen count, at the list's foot and in the field's name. */
+  countLabel?: (count: number) => string
+  clearLabel?: string
+  /** The tags' close: « Retirer » + the option's label. */
+  removeLabel?: string
   leadingIcon?: IconName
   /** Standalone use only. Inside a FormField, the wrapper's `disabled` decides. */
   disabled?: boolean
@@ -71,6 +92,11 @@ const props = withDefaults(defineProps<Props>(), {
   ariaLabel: undefined,
   chrome: 'box',
   anchor: null,
+  multiple: false,
+  values: () => [],
+  countLabel: (n: number) => `${n} ${n > 1 ? 'sélectionnés' : 'sélectionné'}`,
+  clearLabel: 'Effacer',
+  removeLabel: 'Retirer',
 })
 
 const field = useFormField()
@@ -92,14 +118,15 @@ const valueId = `ds-input-dropdown-value-${uid}`
    then the value (ADR-0082). */
 const labelledBy = computed(() => {
   /* Nothing chosen, the placeholder is not a value: the label alone. */
-  const value = selectedOption.value ? ` ${valueId}` : ''
+  const value = (props.multiple ? chosen.value.length : selectedOption.value) ? ` ${valueId}` : ''
   if (props.ariaLabel) return `${nameId}${value}`
   const label = field?.labelId?.value
   return label ? `${label}${value}` : undefined
 })
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string | number | null]
+  'update:modelValue': [value: Value | null]
+  'update:values': [values: Value[]]
 }>()
 
 const open = ref(false)
@@ -120,10 +147,72 @@ useAnchoredSurface(anchorEl, panelEl, {
 })
 
 const selectedOption = computed(() =>
-  props.modelValue === null || props.modelValue === undefined
+  props.multiple || props.modelValue === null || props.modelValue === undefined
     ? null
     : props.options.find(o => o.value === props.modelValue) ?? null,
 )
+
+/* ── Several choices (ADR-0085) ─────────────────────────────────────── */
+const chosenValues = computed<Value[]>(() => (props.multiple ? props.values : []))
+/* In the options' order, whatever order they were ticked in. */
+const chosen = computed(() => props.options.filter(o => chosenValues.value.includes(o.value)))
+const isChosen = (o: InputDropdownOption) => (props.multiple ? chosenValues.value.includes(o.value) : o.value === props.modelValue)
+
+function toggleValue(o: InputDropdownOption) {
+  const next = isChosen(o) ? chosenValues.value.filter(v => v !== o.value) : [...chosenValues.value, o.value]
+  emit('update:values', props.options.map(x => x.value).filter(v => next.includes(v)))
+}
+
+function removeValue(o: InputDropdownOption) {
+  emit('update:values', chosenValues.value.filter(v => v !== o.value))
+}
+
+function clearAll() {
+  emit('update:values', [])
+}
+
+/* Backspace on the field takes the last choice back (MUI, Mantine). */
+function onOpenerKeydown(e: KeyboardEvent) {
+  if (e.key !== 'Backspace' || !chosen.value.length) return
+  e.preventDefault()
+  removeValue(chosen.value[chosen.value.length - 1])
+}
+
+/*
+  The tags that fit on the field's one line, the rest as « +N ». Every tag is
+  laid out once in a hidden row to be measured — its width does not depend on
+  where it sits — and the visible row shows as many as fit beside the « +N »
+  they leave. Re-measured when the field or the choice changes.
+*/
+const tagsEl = ref<HTMLElement | null>(null)
+const measureEl = ref<HTMLElement | null>(null)
+const fitting = ref(Infinity)
+
+function measureTags() {
+  const box = tagsEl.value, probe = measureEl.value
+  if (!box || !probe) return
+  const tags = [...probe.querySelectorAll<HTMLElement>('[data-tag]')]
+  const more = probe.querySelector<HTMLElement>('[data-more]')
+  const gap = parseFloat(getComputedStyle(box).columnGap) || 0
+  const room = box.clientWidth
+  let used = 0
+  let n = 0
+  for (const [i, tag] of tags.entries()) {
+    const width = tag.offsetWidth + (i ? gap : 0)
+    const rest = tags.length - i - 1
+    const reserve = rest ? gap + (more?.offsetWidth ?? 0) : 0
+    if (used + width + reserve > room) break
+    used += width
+    n++
+  }
+  fitting.value = n
+}
+
+const shown = computed(() => chosen.value.slice(0, Math.max(0, fitting.value)))
+const hiddenCount = computed(() => chosen.value.length - shown.value.length)
+
+let tagObserver: ResizeObserver | null = null
+watch(chosen, async () => { await nextTick(); measureTags() })
 
 const filteredOptions = computed(() => {
   if (props.type !== 'search' || !searchQuery.value) return props.options
@@ -138,6 +227,7 @@ const itemType = computed((): DropdownSelectItemType => {
     case 'icon-leading':   return 'icon'
     case 'avatar-leading': return 'avatar'
     case 'dot-leading':    return 'dot'
+    case 'flag-leading':   return 'flag'
     default:               return 'default'
   }
 })
@@ -165,6 +255,8 @@ function toggle() {
 
 function selectOption(option: InputDropdownOption) {
   if (option.disabled) return
+  /* Several choices: the list stays open while they are ticked (11 / 13). */
+  if (props.multiple) return toggleValue(option)
   emit('update:modelValue', option.value)
   close()
 }
@@ -193,11 +285,17 @@ function onRootKeyDown(e: KeyboardEvent) {
 onMounted(() => {
   document.addEventListener('click', onClickOutside, true)
   document.addEventListener('keydown', onKeyDown)
+  if (props.multiple && tagsEl.value) {
+    tagObserver = new ResizeObserver(() => measureTags())
+    tagObserver.observe(tagsEl.value)
+    measureTags()
+  }
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', onClickOutside, true)
   document.removeEventListener('keydown', onKeyDown)
+  tagObserver?.disconnect()
 })
 </script>
 
@@ -252,6 +350,66 @@ onUnmounted(() => {
           </div>
         </div>
 
+        <!--
+          ── Several choices (ADR-0085) ─────────────────────────────────
+          The box is not one button: the tags' closes are buttons too, and a
+          button cannot hold another. So the box holds the tags and an opener
+          that ends it; a click anywhere else on the box opens the list too.
+        -->
+        <div
+          v-else-if="multiple"
+          class="ds-input-dropdown__trigger ds-input-dropdown__trigger--multiple"
+          :class="{
+            'ds-input-dropdown__trigger--open':     open,
+            'ds-input-dropdown__trigger--disabled': isDisabled,
+          }"
+          @click="toggle"
+        >
+          <div ref="tagsEl" class="ds-input-dropdown__tags">
+            <Tag
+              v-for="o in shown"
+              :key="o.value"
+              size="sm"
+              :label="o.label"
+              action="close"
+              :close-label="`${removeLabel} ${o.label}`"
+              @close="removeValue(o)"
+            />
+            <span v-if="hiddenCount" class="ds-input-dropdown__more">+{{ hiddenCount }}</span>
+            <span
+              v-if="!chosen.length"
+              class="ds-input-dropdown__value ds-input-dropdown__value--placeholder"
+            >{{ placeholder }}</span>
+          </div>
+          <!-- Every chosen tag, laid out once to be measured — never seen. -->
+          <div ref="measureEl" class="ds-input-dropdown__measure" aria-hidden="true">
+            <Tag v-for="o in chosen" :key="o.value" data-tag size="sm" :label="o.label" action="close" />
+            <span data-more class="ds-input-dropdown__more">+{{ chosen.length }}</span>
+          </div>
+          <button
+            type="button"
+            class="ds-input-dropdown__opener"
+            :id="triggerId"
+            :disabled="isDisabled"
+            :aria-describedby="describedBy"
+            :aria-invalid="isInvalid || undefined"
+            :aria-labelledby="labelledBy"
+            :aria-expanded="open"
+            aria-haspopup="listbox"
+            @click.stop="toggle"
+            @keydown="onOpenerKeydown"
+          >
+            <span v-if="ariaLabel" :id="nameId" class="ds-input-dropdown__name">{{ ariaLabel }}</span>
+            <span :id="valueId" class="ds-input-dropdown__name">{{ countLabel(chosen.length) }}</span>
+            <Icon
+              :name="open ? 'chevron-up' : 'chevron-down'"
+              :size="20"
+              class="ds-input-dropdown__chevron"
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+
         <!-- ── All other types ─────────────────────────────────────── -->
         <button
           v-else
@@ -286,6 +444,11 @@ onUnmounted(() => {
               size="xs"
               class="ds-input-dropdown__leading-avatar"
             />
+            <Flag
+              v-else-if="type === 'flag-leading' && selectedOption?.flag"
+              :code="selectedOption.flag"
+              :size="20"
+            />
             <span
               v-else-if="type === 'dot-leading'"
               class="ds-input-dropdown__leading-dot"
@@ -313,7 +476,14 @@ onUnmounted(() => {
 
         <!-- ── Dropdown panel ──────────────────────────────────────── -->
         <SurfaceTransition>
-          <div v-if="open" ref="panelEl" popover="manual" class="ds-input-dropdown__panel" role="listbox">
+          <div
+            v-if="open"
+            ref="panelEl"
+            popover="manual"
+            class="ds-input-dropdown__panel"
+            role="listbox"
+            :aria-multiselectable="multiple || undefined"
+          >
             <Scrollbar max-height="320px">
               <div class="ds-input-dropdown__panel-items">
                 <DropdownSelectItem
@@ -326,12 +496,19 @@ onUnmounted(() => {
                   :avatar-src="option.avatarSrc"
                   :avatar-alt="option.avatarAlt"
                   :dot-color="option.dotColor"
-                  :selected="option.value === modelValue"
+                  :flag="option.flag"
+                  :selected="isChosen(option)"
+                  :checkbox="multiple"
                   :disabled="option.disabled"
                   @click="selectOption(option)"
                 />
               </div>
             </Scrollbar>
+            <!-- How many, and the way back to none — outside the scroll. -->
+            <div v-if="multiple" class="ds-input-dropdown__foot">
+              <span class="ds-input-dropdown__count">{{ countLabel(chosen.length) }}</span>
+              <Button v-if="chosen.length" variant="link" size="sm" :label="clearLabel" @click="clearAll" />
+            </div>
           </div>
         </SurfaceTransition>
       </div>
@@ -607,6 +784,77 @@ onUnmounted(() => {
 /* A list of short words (« TVA », « EORI ») still reads as a list. */
 .ds-input-dropdown--chrome-none .ds-input-dropdown__panel {
   min-width: max(var(--anchor-width), 10rem);
+}
+
+/* ── Several choices (ADR-0085) ─────────────────────────────────────── */
+/* One line, always: the field never grows (ADR-0038's « nothing wraps »);
+   what does not fit is « +N ». The box takes its ring from what it holds. */
+.ds-input-dropdown__trigger--multiple {
+  position: relative;
+  cursor: pointer;
+}
+
+.ds-input-dropdown__trigger--multiple:focus-within {
+  border-color: var(--ds-border-brand);
+  box-shadow: var(--ds-focus-ring-brand-shadow-xs);
+}
+
+.ds-input-dropdown__tags {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--ds-spacing-xs);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ds-input-dropdown__more {
+  flex: none;
+  font: var(--ds-font-label-md);
+  color: var(--ds-text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Laid out for its widths, out of the flow and out of sight. */
+.ds-input-dropdown__measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  gap: var(--ds-spacing-xs);
+  visibility: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.ds-input-dropdown__opener {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+.ds-input-dropdown__opener:disabled {
+  cursor: not-allowed;
+}
+
+.ds-input-dropdown__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-spacing-md);
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
+  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+}
+
+.ds-input-dropdown__count {
+  font: var(--ds-font-body-sm);
+  color: var(--ds-text-subtle);
 }
 
 /* ── Hint text ─────────────────────────────────────────────────────── */

@@ -1021,6 +1021,12 @@ Before working on any component, read:
   white reads (all ≤ 1.2:1), so the mechanism changes: rail `bg-neutral-subtle` + `border-subtle`, a `bg-default` +
   `elevation-surface` pill that slides (ADR-0024), chosen ink `text-strong`, others `text-subtle`, hover half a
   surface (Tabs'). The rail is 42px, a bordered control's height; segments 32px, no separators.
+- **ADR-0085**: **`Flag`** — a 4:3 box from **country-flag-icons** (MIT, 54 KB for 100 countries vs flag-icons' 524),
+  **generated** from `scripts/flags.manifest.txt` (`npm run flags`), no emoji, no CDN; **its size is its width**
+  (16/20/24/32), a hairline `border-inset`, decorative unless `label`. `InputDropdown type="flag-leading"`
+  (`option.flag`). **`multiple` + `v-model:values`** (not `modelValue`, whose type would break): tags on **one line**
+  then « +N », the list stays open with boxes, a foot « N sélectionnés · Effacer », Backspace removes the last;
+  `Tag` gains `closeLabel`.
 
 ## Architecture
 
@@ -1032,6 +1038,7 @@ Before working on any component, read:
 - Icons are generated — run `npm run icons` after editing `scripts/icons.manifest.txt`; `components/Icon/registry.ts` and `components/Icon/icons/` are build output, not source
 - Module artwork is generated — run `npm run module-art`; `components/ModuleIcon/registry.ts` and `components/ModuleIcon/art/` are build output, not source
 - The brand pattern is generated — run `npm run brand-pattern`; `components/BrandPattern/tile.ts` is build output, not source. Its input is the *stamp* in `scripts/brand-pattern-raw/`, not the Figma sheet: the sheet is 23 MB and has no 2D period (ADR-0035)
+- Flags are generated — run `npm run flags` after editing `scripts/flags.manifest.txt`; `components/Flag/registry.ts` is build output, not source (ADR-0085)
 - Tolbi AI's sign is generated — run `npm run tolbi-ai-art`; `components/TolbiAiSpark/art.ts` is build output, not source. Its input is one export in `scripts/tolbi-ai-raw/`, because Figma's 96 variants are one drawing (ADR-0056)
 - All components are exported from `components/index.ts`
 - Tokens use the `--ds-` prefix and are exposed as CSS custom properties on `:root`

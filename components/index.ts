@@ -149,6 +149,9 @@ export { PageHeader } from './PageHeader'
 
 export { StepDots } from './StepDots'
 
+export { Flag, flags } from './Flag'
+export type { FlagCode, FlagSize } from './Flag'
+
 export { OptionTree } from './OptionTree'
 export type { OptionTreeNode } from './OptionTree'
 
