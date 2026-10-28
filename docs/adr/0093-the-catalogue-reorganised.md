@@ -79,9 +79,27 @@ one costs an import churn across the repository for something no one browsing St
 component to even them out changes its address, and an address that moves costs more than an imbalance
 that shows.
 
+### Amended the same day — the eight pieces have their addresses
+
+`AccordionItem`, `ReportSection`, `ReportSignature`, `MapPanel`, `MapControls`, `MapOverlay`,
+`OptionCard` and `StatusRow` were documented **inside their parent's story**, so they were invisible in
+the sidebar where `Dropdown/Item` and `Toast/Region` were not. ADR-0007's rule said they should have
+their own entries; they do now — `Structure/Accordion/Item`, `Structure/Report/Section` and
+`/Signature`, `Données/Map/Panel`, `/Controls`, `/Overlay`, `Saisie/OptionList/Card`,
+`Données/StatusList/Row`. **116 entries**, 19 new stories, every one rendered and checked.
+
+A piece's own story is the one place its *own* decision can be shown, and each of the eight had one the
+parent's story had no room for: `AccordionItem` alone is a **disclosure** (`v-model:open`), which is what
+half the screens actually need; `ReportSection` **numbers itself** from a CSS counter, so inserting one
+renumbers the rest; `ReportSignature` turns an empty field into **a line to write on**; `MapPanel`'s
+20rem ceiling is **for text** and a row of buttons widens it; `MapControls` carries `aria-pressed` for a
+tool that stays on; `MapOverlay` **draws nothing at all** — it is a place, and only its children take the
+pointer; `OptionCard` alone is **a row that leads**, with no chosen state; `StatusRow` is a `dt`/`dd`
+pair that wants its `<dl>`.
+
+The rule to keep: a piece gets its own entry when it has a decision of its own to show. That is why
+`AvatarGroup` and `BadgeGroup` stay where they are — they are components, not pieces.
+
 ## Still open
 
-The pieces that are titled inside their parent's story rather than under it — `AccordionItem`,
-`ReportSection`, `ReportSignature`, `MapPanel`, `MapControls`, `MapOverlay`, `OptionCard`, `StatusRow` —
-are invisible in the sidebar, where `Dropdown/Item` and `Toast/Region` are not. ADR-0007's rule says
-they should have their own entries; that is eight stories files and a separate pass.
+Nothing from this ADR. The audit it came from is in `.context/organisation-catalogue.md`.

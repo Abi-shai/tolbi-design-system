@@ -1117,8 +1117,14 @@ Before working on any component, read:
   panel is `…/Tolbi AI/Panel` so the folder is never also a component. `Données/Carte` → `Données/Map`:
   the only translated name in the catalogue. **Not done on purpose**: folders are not renamed (a folder
   holds a family, and the churn buys nothing anyone can see) and categories are not rebalanced (an
-  address that moves costs more than an imbalance that shows). Still open: the eight pieces titled
-  inside their parent's story rather than under it.
+  address that moves costs more than an imbalance that shows). **Amended the same day**: the eight
+  pieces documented inside their parent's story — `AccordionItem`, `ReportSection`, `ReportSignature`,
+  `MapPanel`, `MapControls`, `MapOverlay`, `OptionCard`, `StatusRow` — have their own entries now
+  (**116**), because each had a decision the parent's story had no room for: a lone `AccordionItem` is a
+  **disclosure**, `ReportSection` **numbers itself**, an empty `ReportSignature` field is **a line to
+  write on**, `MapPanel`'s 20rem ceiling is **for text**, `MapOverlay` **draws nothing**. The rule: a
+  piece gets its own entry when it has a decision of its own to show — which is why `AvatarGroup` and
+  `BadgeGroup` stay put, being components and not pieces.
 
 ## Architecture
 
