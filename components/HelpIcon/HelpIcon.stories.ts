@@ -5,7 +5,7 @@ import HelpIconDocs from './HelpIcon.mdx'
 const meta: Meta<typeof HelpIcon> = {
   title: 'Superposition/HelpIcon',
   component: HelpIcon,
-  tags: ['autodocs', 'stable'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: { page: HelpIconDocs },

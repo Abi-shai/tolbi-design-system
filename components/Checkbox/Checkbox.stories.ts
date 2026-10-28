@@ -5,7 +5,7 @@ import Checkbox from './Checkbox.vue'
 const meta: Meta<typeof Checkbox> = {
   title: 'Saisie/Checkbox',
   component: Checkbox,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

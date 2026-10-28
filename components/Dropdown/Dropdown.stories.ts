@@ -9,7 +9,7 @@ import { InputField } from '../InputField'
 const meta: Meta<typeof Dropdown> = {
   title: 'Superposition/Dropdown',
   component: Dropdown,
-  tags: ['wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

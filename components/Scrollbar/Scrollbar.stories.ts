@@ -4,7 +4,7 @@ import Scrollbar from './Scrollbar.vue'
 const meta: Meta<typeof Scrollbar> = {
   title: 'Structure/Scrollbar',
   component: Scrollbar,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

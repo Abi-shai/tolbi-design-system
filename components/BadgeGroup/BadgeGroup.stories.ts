@@ -6,7 +6,7 @@ const TONES = ['brand', 'error', 'warning', 'success', 'neutral'] as const
 const meta: Meta<typeof BadgeGroup> = {
   title: 'Étiquettes/BadgeGroup',
   component: BadgeGroup,
-  tags: ['wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

@@ -5,7 +5,7 @@ import FormField from '../FormField/FormField.vue'
 
 const meta: Meta<typeof PasswordField> = {
   title: 'Saisie/PasswordField',
-  tags: ['wip'],
+  tags: ['stable'],
   component: PasswordField,
   parameters: {
     layout: 'padded',

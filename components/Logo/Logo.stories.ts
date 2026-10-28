@@ -6,7 +6,7 @@ import { ARTWORK_SIZES } from '../artwork-size'
 const meta: Meta<typeof Logo> = {
   title: 'Identité & média/Logo',
   component: Logo,
-  tags: ['wip', 'primitive'],
+  tags: ['stable', 'primitive'],
   parameters: {
     layout: 'centered',
   },

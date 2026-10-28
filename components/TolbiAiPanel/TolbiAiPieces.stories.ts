@@ -10,8 +10,8 @@ import TolbiAiWelcome from './TolbiAiWelcome.vue'
   `TolbiAiPanel`. Shown on a 360px column — the panel's 400 less its padding.
 */
 const meta: Meta = {
-  title: 'Structure/TolbiAiPanel/Pièces',
-  tags: ['wip'],
+  title: 'Superposition/Tolbi AI/Pièces du fil',
+  tags: ['stable'],
   parameters: { layout: 'padded' },
   decorators: [() => ({ template: '<div style="width:360px; display:flex; flex-direction:column; gap:var(--ds-spacing-lg);"><story /></div>' })],
 }

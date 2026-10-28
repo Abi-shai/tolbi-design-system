@@ -5,7 +5,7 @@ import { flags } from './registry'
 const meta: Meta<typeof Flag> = {
   title: 'Identité & média/Flag',
   component: Flag,
-  tags: ['autodocs', 'wip', 'primitive'],
+  tags: ['stable', 'primitive'],
   parameters: {
     layout: 'padded',
     docs: {

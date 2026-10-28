@@ -7,7 +7,7 @@ import { Button } from '../Button'
 const meta: Meta<typeof StepDots> = {
   title: 'Navigation/StepDots',
   component: StepDots,
-  tags: ['autodocs', 'stable'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

@@ -5,7 +5,7 @@ import { Button } from '../Button'
 
 const meta: Meta<typeof Callout> = {
   title: 'Feedback & chargement/Callout',
-  tags: ['wip'],
+  tags: ['stable'],
   component: Callout,
   parameters: {
     layout: 'padded',

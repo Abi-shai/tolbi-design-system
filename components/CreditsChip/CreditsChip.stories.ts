@@ -7,7 +7,7 @@ import Docs from './CreditsChip.mdx'
 const meta: Meta<typeof CreditsChip> = {
   title: 'Étiquettes/CreditsChip',
   component: CreditsChip,
-  tags: ['autodocs', 'stable'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: { page: Docs },

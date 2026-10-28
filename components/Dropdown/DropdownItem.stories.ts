@@ -15,7 +15,7 @@ const PANEL = `
 
 const meta: Meta<typeof DropdownItem> = {
   title: 'Superposition/Dropdown/Item',
-  tags: ['wip'],
+  tags: ['stable'],
   component: DropdownItem,
   parameters: {
     layout: 'centered',

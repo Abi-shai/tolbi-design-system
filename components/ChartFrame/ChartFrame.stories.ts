@@ -18,7 +18,7 @@ const FAKE_PLOT = `
 
 const meta: Meta<typeof ChartFrame> = {
   title: 'Données/ChartFrame',
-  tags: ['wip'],
+  tags: ['stable'],
   component: ChartFrame,
   parameters: {
     layout: 'padded',

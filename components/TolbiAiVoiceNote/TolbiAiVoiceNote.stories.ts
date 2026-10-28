@@ -5,9 +5,9 @@ import { humUrl, speechLevels } from './TolbiAiVoiceNote.demo'
 const levels = speechLevels(23)
 
 const meta: Meta<typeof TolbiAiVoiceNote> = {
-  title: 'Identité & média/TolbiAiVoiceNote',
+  title: 'Superposition/Tolbi AI/VoiceNote',
   component: TolbiAiVoiceNote,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'padded',
     docs: {

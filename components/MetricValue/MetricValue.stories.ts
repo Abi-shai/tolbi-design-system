@@ -3,7 +3,7 @@ import MetricValue from './MetricValue.vue'
 
 const meta: Meta<typeof MetricValue> = {
   title: 'Données/MetricValue',
-  tags: ['wip'],
+  tags: ['stable'],
   component: MetricValue,
   parameters: {
     layout: 'padded',

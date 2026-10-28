@@ -6,7 +6,7 @@ import { Button } from '../Button'
 const meta: Meta<typeof Carousel> = {
   title: 'Superposition/Carousel',
   component: Carousel,
-  tags: ['autodocs', 'wip'],
+  tags: ['wip'],
   parameters: {
     layout: 'fullscreen',
     docs: {

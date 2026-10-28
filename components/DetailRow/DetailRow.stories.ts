@@ -4,7 +4,7 @@ import { Badge } from '../Badge'
 
 const meta: Meta<typeof DetailRow> = {
   title: 'Données/DetailRow',
-  tags: ['wip', 'primitive'],
+  tags: ['stable', 'primitive'],
   component: DetailRow,
   parameters: {
     layout: 'padded',

@@ -8,7 +8,7 @@ const allNames = Object.keys(icons) as IconName[]
 const meta: Meta<typeof Icon> = {
   title: 'Identité & média/Icon',
   component: Icon,
-  tags: ['wip', 'primitive'],
+  tags: ['stable', 'primitive'],
   parameters: {
     layout: 'centered',
     docs: {

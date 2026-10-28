@@ -13,7 +13,7 @@ const PANEL = `
 
 const meta: Meta<typeof DropdownGroup> = {
   title: 'Superposition/Dropdown/Group',
-  tags: ['wip', 'primitive'],
+  tags: ['stable', 'primitive'],
   component: DropdownGroup,
   parameters: {
     layout: 'centered',

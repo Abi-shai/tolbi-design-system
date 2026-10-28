@@ -10,7 +10,7 @@ const GROUND =
 
 const meta: Meta<typeof Toast> = {
   title: 'Superposition/Toast',
-  tags: ['wip'],
+  tags: ['stable'],
   component: Toast,
   parameters: {
     layout: 'padded',

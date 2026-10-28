@@ -5,7 +5,7 @@ import { DropdownItem } from '../Dropdown'
 
 const meta: Meta = {
   title: 'Navigation/WorkspaceSelector',
-  tags: ['wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

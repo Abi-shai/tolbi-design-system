@@ -14,7 +14,7 @@ const ALL_COLORS = [
 const meta: Meta<typeof Badge> = {
   title: 'Étiquettes/Badge',
   component: Badge,
-  tags: ['wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

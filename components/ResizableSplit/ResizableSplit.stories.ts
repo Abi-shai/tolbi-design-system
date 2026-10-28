@@ -13,7 +13,7 @@ const PANE = `
 
 const meta: Meta<typeof ResizableSplit> = {
   title: 'Structure/ResizableSplit',
-  tags: ['wip'],
+  tags: ['stable'],
   component: ResizableSplit,
   parameters: {
     layout: 'padded',

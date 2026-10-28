@@ -5,7 +5,7 @@ import { Card } from '../Card'
 
 const meta: Meta<typeof EmptyState> = {
   title: 'Feedback & chargement/EmptyState',
-  tags: ['wip'],
+  tags: ['stable'],
   component: EmptyState,
   parameters: {
     layout: 'padded',

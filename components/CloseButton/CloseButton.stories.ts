@@ -6,7 +6,7 @@ import StoryGrid from '../../stories/StoryGrid.vue'
 const meta: Meta<typeof CloseButton> = {
   title: 'Actions/CloseButton',
   component: CloseButton,
-  tags: ['wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

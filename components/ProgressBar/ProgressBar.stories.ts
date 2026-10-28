@@ -4,7 +4,7 @@ import ProgressBar from './ProgressBar.vue'
 const meta: Meta<typeof ProgressBar> = {
   title: 'Feedback & chargement/ProgressBar',
   component: ProgressBar,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'padded',
     docs: {

@@ -7,7 +7,7 @@ import type { ToastTone } from './Toast.vue'
 
 const meta: Meta<typeof ToastRegion> = {
   title: 'Superposition/Toast/Region',
-  tags: ['wip'],
+  tags: ['stable'],
   component: ToastRegion,
   parameters: {
     layout: 'fullscreen',

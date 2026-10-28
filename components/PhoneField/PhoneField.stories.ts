@@ -6,7 +6,7 @@ import { dialCodes, dialCodesFor } from './dialCodes'
 
 const meta: Meta<typeof PhoneField> = {
   title: 'Saisie/PhoneField',
-  tags: ['wip'],
+  tags: ['stable'],
   component: PhoneField,
   parameters: {
     layout: 'padded',

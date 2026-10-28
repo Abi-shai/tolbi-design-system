@@ -11,7 +11,7 @@ import { Button } from '../Button'
 const meta: Meta<typeof Table> = {
   title: 'Données/Table',
   component: Table,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'padded',
     docs: {

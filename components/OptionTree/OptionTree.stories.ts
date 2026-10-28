@@ -9,7 +9,7 @@ import { ProgressSteps } from '../ProgressSteps'
 const meta: Meta<typeof OptionTree> = {
   title: 'Saisie/OptionTree',
   component: OptionTree,
-  tags: ['autodocs', 'wip'],
+  tags: ['wip'],
   parameters: {
     layout: 'padded',
     docs: {

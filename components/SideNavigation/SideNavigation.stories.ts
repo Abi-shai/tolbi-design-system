@@ -7,7 +7,7 @@ import WorkspaceSelector from '../WorkspaceSelector/WorkspaceSelector.vue'
 
 const meta: Meta = {
   title: 'Navigation/SideNavigation',
-  tags: ['wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'fullscreen',
     docs: {

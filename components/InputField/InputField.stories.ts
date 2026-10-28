@@ -7,7 +7,7 @@ import InputFieldDocs from './InputField.mdx'
 const meta: Meta<typeof InputField> = {
   title: 'Saisie/InputField',
   component: InputField,
-  tags: ['autodocs', 'stable'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: { page: InputFieldDocs },

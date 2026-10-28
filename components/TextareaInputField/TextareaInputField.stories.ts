@@ -7,7 +7,7 @@ import TextareaInputFieldDocs from './TextareaInputField.mdx'
 const meta: Meta<typeof TextareaInputField> = {
   title: 'Saisie/TextareaInputField',
   component: TextareaInputField,
-  tags: ['autodocs', 'stable'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: { page: TextareaInputFieldDocs },

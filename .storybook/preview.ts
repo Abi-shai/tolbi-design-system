@@ -19,6 +19,14 @@ if (typeof document !== 'undefined') {
 }
 
 const preview: Preview = {
+  /*
+    ADR-0093: every component gets a Docs page. It used to be per-story, and 45
+    of 85 entries had one — so whether a component was documented was a matter
+    of which day it was written. A piece that genuinely has nothing to document
+    opts out with `tags: ['!autodocs']`.
+  */
+  tags: ['autodocs'],
+
   globalTypes: {
     theme: {
       description: 'Colour mode',
@@ -53,7 +61,7 @@ const preview: Preview = {
       // Must be inline — Storybook statically analyses this to build the index,
       // so it cannot resolve a variable reference.
       //
-      // Two tiers, then nine functional categories. The categories are
+      // Two tiers, then ten functional categories. The categories are
       // alphabetical on purpose: any "importance" ordering is a judgment that
       // gets argued, and predictability is the point. Atlassian orders its own
       // categories the same way.
@@ -80,6 +88,7 @@ const preview: Preview = {
           'Étiquettes',
           'Feedback & chargement',
           'Identité & média',
+          'Mouvement',
           'Navigation',
           'Saisie',
           'Structure',

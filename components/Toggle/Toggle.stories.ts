@@ -5,7 +5,7 @@ import Toggle from './Toggle.vue'
 const meta: Meta<typeof Toggle> = {
   title: 'Saisie/Toggle',
   component: Toggle,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

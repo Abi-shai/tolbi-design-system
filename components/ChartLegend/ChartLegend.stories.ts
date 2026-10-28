@@ -11,7 +11,7 @@ const SERIES = [
 
 const meta: Meta<typeof ChartLegend> = {
   title: 'Données/ChartLegend',
-  tags: ['wip'],
+  tags: ['stable'],
   component: ChartLegend,
   parameters: {
     layout: 'padded',

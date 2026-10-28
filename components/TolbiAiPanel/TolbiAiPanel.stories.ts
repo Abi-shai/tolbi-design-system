@@ -35,9 +35,9 @@ const ANSWER = `
 `
 
 const meta: Meta<typeof TolbiAiPanel> = {
-  title: 'Structure/TolbiAiPanel',
+  title: 'Superposition/Tolbi AI/Panel',
   component: TolbiAiPanel,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'fullscreen',
     docs: {

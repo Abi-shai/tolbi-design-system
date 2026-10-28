@@ -4,7 +4,7 @@ import SideNavItem from './SideNavItem.vue'
 const meta: Meta = {
   title: 'Navigation/SideNavigation/Item',
   component: SideNavItem,
-  tags: ['wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

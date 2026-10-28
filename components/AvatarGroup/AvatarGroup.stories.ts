@@ -13,7 +13,7 @@ const AGENTS = [
 
 const meta: Meta<typeof AvatarGroup> = {
   title: 'Identité & média/AvatarGroup',
-  tags: ['wip'],
+  tags: ['stable'],
   component: AvatarGroup,
   parameters: {
     layout: 'centered',

@@ -6,7 +6,7 @@ import { Card } from '../Card'
 const meta: Meta<typeof StatusList> = {
   title: 'Données/StatusList',
   component: StatusList,
-  tags: ['autodocs', 'wip'],
+  tags: ['wip'],
   parameters: {
     layout: 'centered',
     docs: {

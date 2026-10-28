@@ -6,7 +6,7 @@ import { moduleNames } from '../ModuleIcon'
 const meta: Meta<typeof ProjectCard> = {
   title: 'Données/ProjectCard',
   component: ProjectCard,
-  tags: ['autodocs', 'stable'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

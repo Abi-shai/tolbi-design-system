@@ -4,7 +4,7 @@ import ProgressCircle from './ProgressCircle.vue'
 const meta: Meta<typeof ProgressCircle> = {
   title: 'Feedback & chargement/ProgressCircle',
   component: ProgressCircle,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

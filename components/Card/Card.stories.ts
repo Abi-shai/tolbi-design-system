@@ -3,7 +3,7 @@ import Card from './Card.vue'
 
 const meta: Meta<typeof Card> = {
   title: 'Structure/Card',
-  tags: ['wip', 'primitive'],
+  tags: ['stable', 'primitive'],
   component: Card,
   parameters: {
     layout: 'padded',

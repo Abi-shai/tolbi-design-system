@@ -6,7 +6,7 @@ import Docs from './VerificationCodeInputField.mdx'
 const meta: Meta<typeof VerificationCodeInputField> = {
   title: 'Saisie/VerificationCodeInputField',
   component: VerificationCodeInputField,
-  tags: ['autodocs', 'stable'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: { page: Docs },

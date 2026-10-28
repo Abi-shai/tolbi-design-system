@@ -3,7 +3,7 @@ import Spinner from './Spinner.vue'
 
 const meta: Meta<typeof Spinner> = {
   title: 'Feedback & chargement/Spinner',
-  tags: ['wip', 'primitive'],
+  tags: ['stable', 'primitive'],
   component: Spinner,
   parameters: {
     layout: 'centered',

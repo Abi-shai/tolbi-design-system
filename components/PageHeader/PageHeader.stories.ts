@@ -9,7 +9,7 @@ const SURFACE =
 
 const meta: Meta<typeof PageHeader> = {
   title: 'Structure/PageHeader',
-  tags: ['wip'],
+  tags: ['stable'],
   component: PageHeader,
   parameters: {
     layout: 'padded',

@@ -6,7 +6,7 @@ import AccordionItem from './AccordionItem.vue'
 const meta: Meta<typeof Accordion> = {
   title: 'Structure/Accordion',
   component: Accordion,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'padded',
     docs: {

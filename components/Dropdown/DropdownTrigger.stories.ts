@@ -6,7 +6,7 @@ import { Avatar } from '../Avatar'
 const meta: Meta = {
   title: 'Superposition/Dropdown/Trigger',
   component: DropdownTrigger,
-  tags: ['wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

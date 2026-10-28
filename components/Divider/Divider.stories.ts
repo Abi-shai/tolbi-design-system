@@ -4,7 +4,7 @@ import Divider from './Divider.vue'
 const meta: Meta<typeof Divider> = {
   title: 'Structure/Divider',
   component: Divider,
-  tags: ['autodocs', 'wip', 'primitive'],
+  tags: ['stable', 'primitive'],
   parameters: {
     layout: 'padded',
     docs: {

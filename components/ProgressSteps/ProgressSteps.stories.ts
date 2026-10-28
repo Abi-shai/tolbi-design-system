@@ -6,7 +6,7 @@ import type { ProgressStep } from './ProgressSteps.vue'
 const meta: Meta<typeof ProgressSteps> = {
   title: 'Navigation/ProgressSteps',
   component: ProgressSteps,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'padded',
     docs: {

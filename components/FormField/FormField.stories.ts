@@ -14,7 +14,7 @@ import IconButton from '../IconButton/IconButton.vue'
 const meta: Meta<typeof FormField> = {
   title: 'Saisie/FormField',
   component: FormField,
-  tags: ['wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'padded',
     docs: {

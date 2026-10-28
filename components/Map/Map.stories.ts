@@ -8,9 +8,9 @@ import { ChartLegend } from '../ChartLegend'
 import { InputDropdown } from '../Dropdown'
 
 const meta: Meta<typeof MapOverlay> = {
-  title: 'Données/Carte',
+  title: 'Données/Map',
   component: MapOverlay,
-  tags: ['autodocs', 'wip'],
+  tags: ['wip'],
   parameters: {
     layout: 'fullscreen',
     docs: {

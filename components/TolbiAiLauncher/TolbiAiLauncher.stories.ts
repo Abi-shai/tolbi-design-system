@@ -4,9 +4,9 @@ import TolbiAiLauncher from './TolbiAiLauncher.vue'
 import { Button } from '../Button'
 
 const meta: Meta<typeof TolbiAiLauncher> = {
-  title: 'Actions/TolbiAiLauncher',
+  title: 'Superposition/Tolbi AI/Launcher',
   component: TolbiAiLauncher,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'fullscreen',
     docs: {

@@ -9,9 +9,9 @@ import { fakeMicrophone, type FakeMicrophone } from './TolbiAiComposer.demo'
 import type { TolbiAiVoiceRecording } from './TolbiAiComposer.vue'
 
 const meta: Meta<typeof TolbiAiComposer> = {
-  title: 'Saisie/TolbiAiComposer',
+  title: 'Superposition/Tolbi AI/Composer',
   component: TolbiAiComposer,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'padded',
     docs: {

@@ -7,7 +7,7 @@ import SideNavGroup from './SideNavGroup.vue'
 const meta: Meta = {
   title: 'Navigation/SideNavigation/Group',
   component: SideNavGroup,
-  tags: ['wip', 'primitive'],
+  tags: ['stable', 'primitive'],
   parameters: {
     layout: 'centered',
     docs: {

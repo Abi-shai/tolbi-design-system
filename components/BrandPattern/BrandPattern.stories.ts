@@ -8,7 +8,7 @@ import { tile } from './tile'
 const meta: Meta<typeof BrandPattern> = {
   title: 'Identité & média/BrandPattern',
   component: BrandPattern,
-  tags: ['autodocs', 'stable'],
+  tags: ['stable'],
   parameters: {
     layout: 'padded',
     docs: { page: BrandPatternDocs },

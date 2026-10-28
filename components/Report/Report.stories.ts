@@ -8,7 +8,7 @@ import { Table } from '../Table'
 const meta: Meta<typeof Report> = {
   title: 'Structure/Report',
   component: Report,
-  tags: ['autodocs', 'wip'],
+  tags: ['wip'],
   parameters: {
     layout: 'fullscreen',
     docs: {

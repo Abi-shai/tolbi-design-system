@@ -4,9 +4,9 @@ import TolbiAiWaveform from './TolbiAiWaveform.vue'
 import { speechLevels } from '../TolbiAiVoiceNote/TolbiAiVoiceNote.demo'
 
 const meta: Meta<typeof TolbiAiWaveform> = {
-  title: 'Identité & média/TolbiAiWaveform',
+  title: 'Superposition/Tolbi AI/Waveform',
   component: TolbiAiWaveform,
-  tags: ['autodocs', 'wip', 'primitive'],
+  tags: ['stable', 'primitive'],
   parameters: {
     layout: 'padded',
     docs: {

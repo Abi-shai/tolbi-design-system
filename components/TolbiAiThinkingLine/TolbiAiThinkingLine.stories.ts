@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import TolbiAiThinkingLine from './TolbiAiThinkingLine.vue'
 
 const meta: Meta<typeof TolbiAiThinkingLine> = {
-  title: 'Feedback & chargement/TolbiAiThinkingLine',
+  title: 'Superposition/Tolbi AI/ThinkingLine',
   component: TolbiAiThinkingLine,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'padded',
     docs: {

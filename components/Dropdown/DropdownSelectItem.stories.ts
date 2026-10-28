@@ -15,7 +15,7 @@ const AVATAR = 'https://i.pravatar.cc/80?img=12'
 
 const meta: Meta<typeof DropdownSelectItem> = {
   title: 'Saisie/InputDropdown/SelectItem',
-  tags: ['wip'],
+  tags: ['stable'],
   component: DropdownSelectItem,
   parameters: {
     layout: 'centered',

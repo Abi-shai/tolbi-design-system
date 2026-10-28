@@ -13,7 +13,7 @@ const PANEL = `
 
 const meta: Meta<typeof DropdownDivider> = {
   title: 'Superposition/Dropdown/Divider',
-  tags: ['wip'],
+  tags: ['stable'],
   component: DropdownDivider,
   parameters: {
     layout: 'centered',

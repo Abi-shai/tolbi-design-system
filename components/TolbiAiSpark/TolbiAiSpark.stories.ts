@@ -5,9 +5,9 @@ import { ARTWORK_SIZES } from '../artwork-size'
 import { Button } from '../Button'
 
 const meta: Meta<typeof TolbiAiSpark> = {
-  title: 'Identité & média/TolbiAiSpark',
+  title: 'Superposition/Tolbi AI/Spark',
   component: TolbiAiSpark,
-  tags: ['autodocs', 'wip', 'primitive'],
+  tags: ['stable', 'primitive'],
   parameters: {
     layout: 'centered',
     docs: {

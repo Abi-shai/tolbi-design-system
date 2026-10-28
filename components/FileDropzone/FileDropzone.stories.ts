@@ -4,7 +4,7 @@ import FileDropzone from './FileDropzone.vue'
 
 const meta: Meta<typeof FileDropzone> = {
   title: 'Saisie/FileDropzone',
-  tags: ['wip'],
+  tags: ['stable'],
   component: FileDropzone,
   parameters: {
     layout: 'padded',

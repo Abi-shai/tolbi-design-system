@@ -6,7 +6,7 @@ import OptionCard from './OptionCard.vue'
 const meta: Meta<typeof OptionList> = {
   title: 'Saisie/OptionList',
   component: OptionList,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'padded',
     docs: {

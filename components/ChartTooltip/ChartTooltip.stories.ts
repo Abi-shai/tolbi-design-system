@@ -3,7 +3,7 @@ import ChartTooltip from './ChartTooltip.vue'
 
 const meta: Meta<typeof ChartTooltip> = {
   title: 'Données/ChartTooltip',
-  tags: ['wip'],
+  tags: ['stable'],
   component: ChartTooltip,
   parameters: {
     layout: 'centered',

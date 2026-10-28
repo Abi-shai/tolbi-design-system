@@ -3,7 +3,7 @@ import Skeleton from './Skeleton.vue'
 
 const meta: Meta<typeof Skeleton> = {
   title: 'Feedback & chargement/Skeleton',
-  tags: ['wip', 'primitive'],
+  tags: ['stable', 'primitive'],
   component: Skeleton,
   parameters: {
     layout: 'padded',

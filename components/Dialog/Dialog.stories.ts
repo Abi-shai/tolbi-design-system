@@ -10,7 +10,7 @@ import { Checkbox } from '../Checkbox'
 const meta: Meta<typeof Dialog> = {
   title: 'Superposition/Dialog',
   component: Dialog,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'fullscreen',
     docs: {

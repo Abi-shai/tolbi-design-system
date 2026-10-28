@@ -7,7 +7,7 @@ import TooltipDocs from './Tooltip.mdx'
 const meta: Meta<typeof Tooltip> = {
   title: 'Superposition/Tooltip',
   component: Tooltip,
-  tags: ['autodocs', 'stable'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: { page: TooltipDocs },

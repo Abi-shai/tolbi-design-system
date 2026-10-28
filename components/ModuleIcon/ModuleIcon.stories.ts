@@ -7,7 +7,7 @@ import { moduleNames } from './registry'
 const meta: Meta<typeof ModuleIcon> = {
   title: 'Identité & média/ModuleIcon',
   component: ModuleIcon,
-  tags: ['autodocs', 'stable', 'primitive'],
+  tags: ['stable', 'primitive'],
   parameters: {
     layout: 'centered',
     docs: { page: ModuleIconDocs },

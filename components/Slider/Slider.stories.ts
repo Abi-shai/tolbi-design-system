@@ -5,7 +5,7 @@ import Slider from './Slider.vue'
 const meta: Meta<typeof Slider> = {
   title: 'Saisie/Slider',
   component: Slider,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'padded',
     docs: {

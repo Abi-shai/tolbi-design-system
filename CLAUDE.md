@@ -1102,11 +1102,30 @@ Before working on any component, read:
   override** (ADR-0006). A rule **between** the rows, never around (ADR-0088), and the glyph in a `1lh`
   box so it holds the first line when the name wraps.
 
+- **ADR-0093**: the catalogue reorganised. **The status axis said nothing** — 17 `stable` against 68
+  `wip`, with `Badge`, `Card`, `Icon`, `FormField`, `Dropdown`, `Toast`, `Table` all claiming to be in
+  progress while shipping, and **nothing had ever graduated**: ADR-0012's argument, pointed at a tag.
+  The test is written now — an ADR settled its form, the stories show every state, changing it would
+  break a consumer — and applied: **84 `stable`, 5 `wip`** (`StatusList`, `Report`, `OptionTree`, `Map`,
+  `Carousel`). The one criterion the repo cannot check is whether the **product** adopted it; any of the
+  84 nothing uses belongs back in `wip`. **`autodocs` is global** (45/85 → 108/108): a Docs page is a
+  rule, not the day a story was written; opt out with `!autodocs`. **A tenth category, `Mouvement`** —
+  the four transitions were exported with **no story at all** and are the easiest pieces to get wrong
+  (unscoped `<style>`, the grid on the transitioning element, `out-in`, the double rAF); they are
+  behaviours, not structures. **Tolbi AI's eight entries across five categories become
+  `Superposition/Tolbi AI/…`** — ADR-0007's sub-component rule applied, not an exception to it, and the
+  panel is `…/Tolbi AI/Panel` so the folder is never also a component. `Données/Carte` → `Données/Map`:
+  the only translated name in the catalogue. **Not done on purpose**: folders are not renamed (a folder
+  holds a family, and the churn buys nothing anyone can see) and categories are not rebalanced (an
+  address that moves costs more than an imbalance that shows). Still open: the eight pieces titled
+  inside their parent's story rather than under it.
+
 ## Architecture
 
 - Components live in `components/<Name>/` — each has `<Name>.vue`, `<Name>.stories.ts`, and `index.ts`
-- Storybook nav is `Foundations/` (tokens only) then nine functional categories: `Actions`, `Données`, `Étiquettes`, `Feedback & chargement`, `Identité & média`, `Navigation`, `Saisie`, `Structure`, `Superposition`. A new story's `title` picks the category by what the component *does*. There is no atomic-level tier and no `Subcomponents/` tier — a piece that only exists inside a parent is titled under it (`Superposition/Dropdown/Item`). See ADR-0007
-- Every component story carries exactly one status tag, `stable` or `wip`, plus `primitive` when it satisfies the rule (one element, no composition of DS components, no internal state). These tags are the only source of truth for status — never re-add a hand-maintained table
+- Storybook nav is `Foundations/` (tokens only) then **ten** functional categories: `Actions`, `Données`, `Étiquettes`, `Feedback & chargement`, `Identité & média`, `Mouvement`, `Navigation`, `Saisie`, `Structure`, `Superposition`. A new story's `title` picks the category by what the component *does*. There is no atomic-level tier and no `Subcomponents/` tier — a piece that only exists inside a parent is titled under it (`Superposition/Dropdown/Item`). See ADR-0007
+- Every component story carries exactly one status tag, `stable` or `wip`, plus `primitive` when it satisfies the rule (one element, no composition of DS components, no internal state). These tags are the only source of truth for status — never re-add a hand-maintained table. **`wip` has to be justified** (ADR-0093): it means the catalogue has not finished deciding the component's form, not that it is new
+- `autodocs` is set **globally** in `.storybook/preview.ts`, never per story — a piece with nothing to document opts out with `tags: ['!autodocs']` (ADR-0093)
 - Sidebar order is pinned inline in `.storybook/preview.ts` under `options.storySort`, which Storybook statically analyses — it cannot be a variable reference. Categories are alphabetical on purpose
 - Design tokens live in `tokens/` — run `npm run tokens` after any token change, and `npm run lint` to check token discipline (both builds run it)
 - Icons are generated — run `npm run icons` after editing `scripts/icons.manifest.txt`; `components/Icon/registry.ts` and `components/Icon/icons/` are build output, not source

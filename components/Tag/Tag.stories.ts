@@ -5,7 +5,7 @@ import StoryGrid from '../../stories/StoryGrid.vue'
 const meta: Meta<typeof Tag> = {
   title: 'Étiquettes/Tag',
   component: Tag,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {

@@ -11,7 +11,7 @@ import { ModuleCapsule } from '.'
 const meta: Meta<typeof ModuleCapsule> = {
   title: 'Données/ModuleCapsule',
   component: ModuleCapsule,
-  tags: ['autodocs', 'stable'],
+  tags: ['stable'],
   // Drawn in dark (ADR-0029/0031), so it opens in dark. Both modes work —
   // flip the Mode toolbar — but light is not the design this came from.
   globals: { theme: 'dark' },

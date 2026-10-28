@@ -4,7 +4,7 @@ import Breadcrumbs from './Breadcrumbs.vue'
 const meta: Meta<typeof Breadcrumbs> = {
   title: 'Navigation/Breadcrumbs',
   component: Breadcrumbs,
-  tags: ['autodocs', 'stable'],
+  tags: ['stable'],
   parameters: {
     layout: 'padded',
     docs: {

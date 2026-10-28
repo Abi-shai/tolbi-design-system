@@ -5,7 +5,7 @@ import Pagination from './Pagination.vue'
 const meta: Meta<typeof Pagination> = {
   title: 'Navigation/Pagination',
   component: Pagination,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'fullscreen',
     docs: {

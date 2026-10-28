@@ -3,7 +3,7 @@ import StatTile from './StatTile.vue'
 
 const meta: Meta<typeof StatTile> = {
   title: 'Données/StatTile',
-  tags: ['wip'],
+  tags: ['stable'],
   component: StatTile,
   parameters: {
     layout: 'padded',

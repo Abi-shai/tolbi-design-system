@@ -27,7 +27,7 @@ const dotMembers: InputDropdownOption[] = [
 const meta: Meta<typeof InputDropdown> = {
   title: 'Saisie/InputDropdown',
   component: InputDropdown,
-  tags: ['autodocs', 'wip'],
+  tags: ['stable'],
   parameters: {
     layout: 'centered',
     docs: {
