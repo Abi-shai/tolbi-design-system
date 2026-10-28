@@ -14,7 +14,7 @@ const meta: Meta<typeof Avatar> = {
   argTypes: {
     size: {
       control: 'select',
-      options: ['xs', 'sm', 'md', 'lg', 'xl', '2xl'],
+      options: ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl'],
       table: { category: 'Apparence', defaultValue: { summary: "'md'" } },
     },
     src: {
@@ -24,6 +24,14 @@ const meta: Meta<typeof Avatar> = {
     initials: {
       control: 'text',
       table: { category: 'Contenu' },
+    },
+    icon: {
+      control: 'text',
+      table: { category: 'Contenu' },
+    },
+    ring: {
+      control: 'boolean',
+      table: { category: 'Apparence', defaultValue: { summary: 'false' } },
     },
     alt: {
       control: 'text',
@@ -148,6 +156,52 @@ export const AllStatuses: Story = {
           <Avatar size="md" src="https://i.pravatar.cc/150?img=47" status="verified" />
           <span style="font-size:11px;color:#666">Verified</span>
         </div>
+      </div>
+    `,
+  }),
+}
+
+/** Une icône en contenu, quand l’avatar ne représente pas une personne : une parcelle prend `land-plot` (ADR-0091). */
+export const WithIcon: Story = {
+  name: 'Icône',
+  args: { icon: 'land-plot', size: 'lg' },
+}
+
+/** `3xl` (112 px, glyphe 48) : la taille de l’en-tête d’une fiche. L’anneau `bg-default` de 4 px la détache de la bande. */
+export const Header: Story = {
+  name: 'En-tête de fiche',
+  parameters: { layout: 'fullscreen' },
+  render: () => ({
+    components: { Avatar },
+    template: `
+      <div style="padding-bottom:24px">
+        <div style="height:120px;background:var(--ds-bg-brand-subtle)"></div>
+        <div style="padding:0 24px;margin-top:-56px;display:flex;align-items:flex-end;gap:16px">
+          <Avatar icon="land-plot" size="3xl" ring />
+          <div style="padding-bottom:8px">
+            <div style="font:var(--ds-font-heading-md);color:var(--ds-text-strong)">Parcelle 62590-014</div>
+            <div style="font:var(--ds-font-body-sm);color:var(--ds-text-subtle)">Soubré · 3,42 ha · cacao</div>
+          </div>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+/** Le glyphe suit le diamètre : le plus grand cran d’`Icon` qui tient dans la moitié de la boîte. */
+export const IconSizes: Story = {
+  name: 'Icône — toutes les tailles',
+  render: () => ({
+    components: { Avatar },
+    template: `
+      <div style="display:flex;align-items:flex-end;gap:16px">
+        <Avatar icon="land-plot" size="xs" />
+        <Avatar icon="land-plot" size="sm" />
+        <Avatar icon="land-plot" size="md" />
+        <Avatar icon="land-plot" size="lg" />
+        <Avatar icon="land-plot" size="xl" />
+        <Avatar icon="land-plot" size="2xl" />
+        <Avatar icon="land-plot" size="3xl" />
       </div>
     `,
   }),

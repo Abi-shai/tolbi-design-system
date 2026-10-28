@@ -3,15 +3,25 @@
    avatar's diameter, so this is geometry, not a typographic role (ADR-0010).
    10px and 18px are off the type ramp by construction. */
 import { computed } from 'vue'
+import { Icon, type IconName } from '../Icon'
 
-export type AvatarSize   = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+export type AvatarSize   = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 export type AvatarStatus = 'online' | 'company' | 'verified'
 
 interface Props {
   size?:       AvatarSize
   src?:        string
   initials?:   string
+  /**
+   * A glyph instead of initials — what the avatar stands for when it is not a
+   * person (ADR-0091): a parcel takes `land-plot`. `EmptyState`'s shape, on
+   * the avatar's own ground. Last of the three contents: a photo, then
+   * initials, then this, then the silhouette.
+   */
+  icon?:       IconName
   alt?:        string
+  /** A 4px `bg-default` ring, for an avatar that overlaps a band or an image. */
+  ring?:       boolean
   status?:     AvatarStatus
   companySrc?: string
 }
@@ -27,6 +37,7 @@ const sizePx: Record<AvatarSize, number> = {
   'lg':  48,
   'xl':  56,
   '2xl': 64,
+  '3xl': 112,
 }
 
 const textSize: Record<AvatarSize, string> = {
@@ -36,6 +47,24 @@ const textSize: Record<AvatarSize, string> = {
   'lg':  '1.125rem', // 18px
   'xl':  '1.25rem',  // 20px
   '2xl': '1.5rem',   // 24px
+  '3xl': '2.625rem', // 42px — the ramp's own 0.375 of the diameter
+}
+
+/*
+  The glyph takes the largest `Icon` rung that is at most half the diameter, so
+  a quarter of the box is margin on each side. At `xs` there is no such rung —
+  16 is the floor — and the margin gives rather than the glyph (ADR-0039's rule
+  at a floor, with the box fixed this time). 48 rides `Icon`'s number hatch: a
+  glyph inside a control is an ornament (ADR-0004).
+*/
+const iconSize: Record<AvatarSize, number> = {
+  'xs':  16,
+  'sm':  16,
+  'md':  20,
+  'lg':  24,
+  'xl':  24,
+  '2xl': 32,
+  '3xl': 48,
 }
 
 const badgeSize: Record<AvatarSize, number> = {
@@ -45,6 +74,7 @@ const badgeSize: Record<AvatarSize, number> = {
   'lg':  12,
   'xl':  14,
   '2xl': 16,
+  '3xl': 28,
 }
 
 const companyBadgeSize: Record<AvatarSize, number> = {
@@ -54,20 +84,30 @@ const companyBadgeSize: Record<AvatarSize, number> = {
   'lg':  18,
   'xl':  20,
   '2xl': 24,
+  '3xl': 40,
 }
 
 const px          = computed(() => sizePx[props.size])
 const showImage   = computed(() => !!props.src)
 const showInitials = computed(() => !props.src && !!props.initials)
+const showIcon    = computed(() => !props.src && !props.initials && !!props.icon)
+
+/* An avatar with nothing to call it is decoration: `role="img"` with no name
+   is a defect, and what names a parcel is the heading beside it (ADR-0041). */
+const name = computed(() => props.alt ?? props.initials)
 </script>
 
 <template>
   <div
     class="ds-avatar"
-    :class="[`ds-avatar--${size}`, { 'ds-avatar--image': showImage, 'ds-avatar--initials': showInitials }]"
+    :class="[
+      `ds-avatar--${size}`,
+      { 'ds-avatar--image': showImage, 'ds-avatar--initials': showInitials, 'ds-avatar--ring': ring },
+    ]"
     :style="{ width: `${px}px`, height: `${px}px` }"
-    role="img"
-    :aria-label="alt ?? initials"
+    :role="name ? 'img' : undefined"
+    :aria-label="name"
+    :aria-hidden="name ? undefined : true"
   >
     <!-- Photo -->
     <img
@@ -84,6 +124,15 @@ const showInitials = computed(() => !props.src && !!props.initials)
       :style="{ fontSize: textSize[size] }"
       aria-hidden="true"
     >{{ initials }}</span>
+
+    <!-- Icône -->
+    <Icon
+      v-else-if="showIcon"
+      :name="icon!"
+      :size="iconSize[size]"
+      class="ds-avatar__icon"
+      aria-hidden="true"
+    />
 
     <!-- Placeholder silhouette -->
     <svg v-else class="ds-avatar__placeholder" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -160,11 +209,30 @@ const showInitials = computed(() => !props.src && !!props.initials)
   z-index: var(--ds-z-raised);
 }
 
+/* ── Icône ────────────────────────────────────────────────────────── */
+/* The glyph recedes as the silhouette it replaces does. */
+.ds-avatar__icon {
+  position: relative;
+  z-index: var(--ds-z-raised);
+  color: var(--ds-text-subtlest);
+}
+
 /* ── Placeholder ──────────────────────────────────────────────────── */
 .ds-avatar__placeholder {
   width: 55%;
   height: 55%;
   color: var(--ds-text-subtlest);
+}
+
+/*
+  ── Ring ───────────────────────────────────────────────────────────
+  A band of the page's own surface, so the avatar reads as lifted off
+  whatever it overlaps. A shadow and not a border: it must take no layout
+  space, or the content shrinks by 8px and the declared size stops being the
+  size (ADR-0039). The hairline below still runs inside it.
+*/
+.ds-avatar--ring {
+  box-shadow: 0 0 0 var(--ds-spacing-xs) var(--ds-bg-default);
 }
 
 /* ── Contrast border ──────────────────────────────────────────────── */

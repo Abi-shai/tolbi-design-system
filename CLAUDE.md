@@ -1075,6 +1075,18 @@ Before working on any component, read:
   rule said « more than the smallest page » and only worked for an empty list because `Math.min(...[])` is
   `Infinity` — now written out. The default `[10, 20, 50, 100]` stays.
 
+- **ADR-0091**: an avatar is **not only a person** — `Avatar` gains `icon?: IconName`, `EmptyState`'s
+  shape on the **avatar's own ground**, as the third of four contents (photo → initials → glyph →
+  silhouette, each the fallback of the one before). The glyph's size is a **rule**: the largest `Icon`
+  rung at most **half** the diameter — 16/16/20/24/24/32/**48** across `xs → 3xl`, so the product's 48
+  falls out of it; at `xs` no rung is ≤ 12, so **the margin gives, not the glyph** (ADR-0039 at a floor,
+  box fixed instead of padding). 48 rides `Icon`'s number hatch (an ornament, ADR-0004), not ADR-0043's
+  artwork ladder. **`3xl` = 112px**, with the ramp's own ratios for the initials (0.375 → 42) and the
+  badges (28 / 40) — nothing hand-tuned. **`ring` is a shadow, not a border** (`0 0 0 4px bg-default`):
+  a border would eat 8px and the declared size would stop being the size; `border-inset` still runs
+  inside it. And **an avatar with nothing to call it is decoration** — `role="img"` with no name was a
+  pre-existing defect; the role and label are now conditional, `aria-hidden` otherwise.
+
 ## Architecture
 
 - Components live in `components/<Name>/` — each has `<Name>.vue`, `<Name>.stories.ts`, and `index.ts`
