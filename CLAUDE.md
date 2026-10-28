@@ -1087,6 +1087,21 @@ Before working on any component, read:
   inside it. And **an avatar with nothing to call it is decoration** — `role="img"` with no name was a
   pre-existing defect; the role and label are now conditional, `aria-hidden` otherwise.
 
+- **ADR-0092**: **`StatusList` / `StatusRow`** (item 43, track A of `3287:1427`) — the glyph, the name,
+  and **the word in the tone's ink**, no chip: B said it twice (glyph + `Badge`), C dropped the glyph and
+  lost the column of marks the eye scans. GOV.UK's Task list writes the settled state as plain text;
+  NSW/USWDS/Fiori make the icon optional and the **word never**. It is a **`<dl>`** — the check is the
+  term, its state the definition, so they are associated with no `aria-describedby` — which is
+  `DetailRow`'s semantics and **deliberately not `DetailRow`**: there the label recedes and the value
+  stands out, here it is the reverse, and there is nowhere to put a leading glyph. **Measured, the obvious
+  ink fails**: on `bg-default` in light `text-success` is 3.906:1 and `text-warning` 3.486:1, under AA for
+  a word; the on-tint partners are 5.691 / 5.427 and are the *same value* in dark — so the word and glyph
+  take `--ds-text-on-{tone}-subtle`, ADR-0032's rule for the second time. `neutral` keeps `text-subtle`:
+  the absence of a verdict recedes. **`status` is required and the product's** (« En attente » and
+  « Non analysé » are two facts under one tone); the **tone picks the glyph and the ink, with no
+  override** (ADR-0006). A rule **between** the rows, never around (ADR-0088), and the glyph in a `1lh`
+  box so it holds the first line when the name wraps.
+
 ## Architecture
 
 - Components live in `components/<Name>/` — each has `<Name>.vue`, `<Name>.stories.ts`, and `index.ts`
