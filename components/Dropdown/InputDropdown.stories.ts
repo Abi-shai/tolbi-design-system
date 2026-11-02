@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import InputDropdown from './InputDropdown.vue'
 import FormField from '../FormField/FormField.vue'
 import type { InputDropdownOption } from './InputDropdown.vue'
+import { flags } from '../Flag'
 
 const teamMembers: InputDropdownOption[] = [
   { value: 'phoenix', label: 'Phoenix Baker',  supportingText: '@phoenix' },
@@ -269,6 +270,52 @@ const COUNTRIES = [
   { value: 'BE', label: 'Belgique', flag: 'BE' },
   { value: 'DE', label: 'Allemagne', flag: 'DE' },
 ]
+
+/* Every ISO 3166-1 country, named in French by the browser and sorted the French way. */
+const regionNames = new Intl.DisplayNames(['fr'], { type: 'region' })
+const ALL_COUNTRIES: InputDropdownOption[] = Object.keys(flags)
+  .map(code => ({ value: code, label: regionNames.of(code) ?? code, flag: code }))
+  .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
+
+/**
+ * ADR-0095 — les 249 pays d’ISO 3166-1, avec drapeau **et** recherche (`searchable`). La recherche ignore accents
+ * et casse (« cote » trouve « Côte d’Ivoire ») et place d’abord ce qui commence par la requête. Au clavier, sans
+ * ouvrir : ↓ ou une lettre ouvrent la liste ; ↑ ↓, Début, Fin, Page ↑ ↓ la parcourent, Entrée choisit, Échap ferme
+ * et rend le focus au champ. Les options ne sont pas des arrêts de tabulation.
+ */
+export const Countries: Story = {
+  name: 'Pays — drapeau et recherche',
+  render: () => ({
+    components: { InputDropdown, FormField },
+    setup: () => ({ value: ref<string | number | null>(null), ALL_COUNTRIES }),
+    template: `
+      <div style="width:360px">
+        <FormField label="Pays" required>
+          <InputDropdown v-model="value" type="flag-leading" searchable :options="ALL_COUNTRIES" placeholder="Choisissez le pays" />
+        </FormField>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * ADR-0095 — sans recherche, le clavier suffit : une lettre va au premier pays qui commence par elle, la même
+ * lettre encore passe au suivant, plusieurs lettres tapées vite forment un début de nom (« co » → Colombie).
+ */
+export const Typeahead: Story = {
+  name: 'Saisie au clavier',
+  render: () => ({
+    components: { InputDropdown, FormField },
+    setup: () => ({ value: ref<string | number | null>(null), ALL_COUNTRIES }),
+    template: `
+      <div style="width:360px">
+        <FormField label="Pays d’activité">
+          <InputDropdown v-model="value" type="flag-leading" :options="ALL_COUNTRIES" placeholder="Sélectionnez le pays" />
+        </FormField>
+      </div>
+    `,
+  }),
+}
 
 /** ADR-0085 — le drapeau du pays devant chaque option et devant la valeur (`type="flag-leading"`, `option.flag`). */
 export const FlagLeading: Story = {

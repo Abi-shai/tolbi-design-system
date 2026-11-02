@@ -26,6 +26,17 @@ interface Props {
    * choice — the row keeps its ground, as `DropdownItem checked` does.
    */
   checkbox?: boolean
+  /**
+   * The option the keyboard points at, in a list whose focus stays on its
+   * field (`aria-activedescendant`, ADR-0095): drawn as hovered.
+   */
+  active?: boolean
+  /**
+   * A tab stop of its own. Off in a field's list — the field keeps the focus
+   * and the arrows move `active`; one tab stop per option made a 195-country
+   * list 195 presses of Tab long.
+   */
+  focusable?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
@@ -34,6 +45,8 @@ withDefaults(defineProps<Props>(), {
   selected: false,
   disabled: false,
   checkbox: false,
+  active: false,
+  focusable: true,
 })
 
 const emit = defineEmits<{
@@ -47,13 +60,15 @@ const emit = defineEmits<{
     :class="{
       'ds-dropdown-select-item--selected': selected && !checkbox,
       'ds-dropdown-select-item--disabled': disabled,
+      'ds-dropdown-select-item--active': active && !disabled,
     }"
     role="option"
     :aria-selected="selected"
-    :tabindex="disabled ? -1 : 0"
+    :aria-disabled="disabled || undefined"
+    :tabindex="focusable && !disabled ? 0 : -1"
     @click="!disabled && emit('click')"
-    @keydown.enter.prevent="!disabled && emit('click')"
-    @keydown.space.prevent="!disabled && emit('click')"
+    @keydown.enter.prevent="focusable && !disabled && emit('click')"
+    @keydown.space.prevent="focusable && !disabled && emit('click')"
   >
     <div class="ds-dropdown-select-item__content">
       <Checkbox v-if="checkbox" visual-only size="sm" :model-value="selected" :disabled="disabled" class="ds-dropdown-select-item__check" />
@@ -125,14 +140,16 @@ const emit = defineEmits<{
 }
 
 .ds-dropdown-select-item:hover:not(.ds-dropdown-select-item--disabled) .ds-dropdown-select-item__content,
-.ds-dropdown-select-item:focus-visible .ds-dropdown-select-item__content {
+.ds-dropdown-select-item:focus-visible .ds-dropdown-select-item__content,
+.ds-dropdown-select-item--active .ds-dropdown-select-item__content {
   background-color: var(--ds-bg-hover);
 }
 
 /* Hovering the current item keeps its ground's family — `bg-hover` would take
    the tint away and leave the brand ink on grey. */
 .ds-dropdown-select-item--selected:hover:not(.ds-dropdown-select-item--disabled) .ds-dropdown-select-item__content,
-.ds-dropdown-select-item--selected:focus-visible .ds-dropdown-select-item__content {
+.ds-dropdown-select-item--selected:focus-visible .ds-dropdown-select-item__content,
+.ds-dropdown-select-item--selected.ds-dropdown-select-item--active .ds-dropdown-select-item__content {
   background-color: var(--ds-bg-selected-hover);
 }
 

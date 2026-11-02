@@ -82,6 +82,16 @@ interface Props {
    * (`chrome="none"`): the gap is measured from that box, not from the word.
    */
   anchor?: HTMLElement | null
+  /**
+   * A field at the top of the list filters it, whatever the type — a country
+   * list is `flag-leading` and searchable at once (ADR-0095). Accents and case
+   * do not count; a label that starts with the query comes first.
+   * `type="search"` is the older spelling and still works.
+   */
+  searchable?: boolean
+  searchPlaceholder?: string
+  /** Said in the list when nothing matches. */
+  noResultsLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -97,6 +107,9 @@ const props = withDefaults(defineProps<Props>(), {
   countLabel: (n: number) => `${n} ${n > 1 ? 'sélectionnés' : 'sélectionné'}`,
   clearLabel: 'Effacer',
   removeLabel: 'Retirer',
+  searchable: false,
+  searchPlaceholder: 'Rechercher',
+  noResultsLabel: 'Aucun résultat',
 })
 
 const field = useFormField()
@@ -133,6 +146,21 @@ const open = ref(false)
 const searchQuery = ref('')
 const rootEl = ref<HTMLElement | null>(null)
 const searchInputEl = ref<HTMLInputElement | null>(null)
+/* The panel's own search field (`searchable`), and the trigger the focus comes
+   back to once the list closes. */
+const panelSearchEl = ref<HTMLInputElement | null>(null)
+const triggerEl = ref<HTMLElement | null>(null)
+
+/*
+  The keyboard (ADR-0095). The focus stays on the field — its button, or the
+  search field when there is one — and the arrows move an *active* option that
+  `aria-activedescendant` names (APG, select-only and editable combobox). The
+  options are not tab stops: a 195-country list was 195 presses of Tab long.
+*/
+const listId = `ds-input-dropdown-list-${uid}`
+const optionId = (i: number) => `ds-input-dropdown-opt-${uid}-${i}`
+const isSearchable = computed(() => props.searchable || props.type === 'search')
+const activeIndex = ref(-1)
 const wrapEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
 
@@ -214,13 +242,128 @@ const hiddenCount = computed(() => chosen.value.length - shown.value.length)
 let tagObserver: ResizeObserver | null = null
 watch(chosen, async () => { await nextTick(); measureTags() })
 
+/* « cote » finds « Côte d'Ivoire »: accents and case do not count. */
+const fold = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
+
 const filteredOptions = computed(() => {
-  if (props.type !== 'search' || !searchQuery.value) return props.options
-  const q = searchQuery.value.toLowerCase()
-  return props.options.filter(
-    o => o.label.toLowerCase().includes(q) || o.supportingText?.toLowerCase().includes(q),
+  if (!isSearchable.value || !searchQuery.value.trim()) return props.options
+  const q = fold(searchQuery.value.trim())
+  const hits = props.options.filter(
+    o => fold(o.label).includes(q) || (o.supportingText ? fold(o.supportingText).includes(q) : false),
   )
+  /* What starts with the query first — « c » is Cameroun before Nouvelle-Calédonie. */
+  return [...hits.filter(o => fold(o.label).startsWith(q)), ...hits.filter(o => !fold(o.label).startsWith(q))]
 })
+
+const activeId = computed(() =>
+  open.value && activeIndex.value >= 0 && activeIndex.value < filteredOptions.value.length
+    ? optionId(activeIndex.value)
+    : undefined,
+)
+
+/** The next option that can be chosen from `from`, in `step`'s direction; -1 past the end. */
+function enabledFrom(from: number, step: 1 | -1) {
+  const list = filteredOptions.value
+  for (let i = from; i >= 0 && i < list.length; i += step) if (!list[i].disabled) return i
+  return -1
+}
+
+function setActive(i: number) {
+  if (i < 0) return
+  activeIndex.value = i
+  nextTick(() => document.getElementById(optionId(i))?.scrollIntoView({ block: 'nearest' }))
+}
+
+/* Opening points at the chosen option, or the first one. */
+function initialActive() {
+  const i = filteredOptions.value.findIndex(o => isChosen(o) && !o.disabled)
+  return i >= 0 ? i : enabledFrom(0, 1)
+}
+
+/*
+  Typing a letter goes to the next option that starts with it, and several
+  letters typed within half a second spell a prefix — « c », « co » → Colombie,
+  Comores, Côte d'Ivoire. The same letter again cycles through its options.
+*/
+let typed = ''
+let typedAt = 0
+function typeahead(ch: string) {
+  const now = Date.now()
+  typed = now - typedAt > 500 ? ch : typed + ch
+  typedAt = now
+  const list = filteredOptions.value
+  if (!list.length) return
+  const same = [...typed].every(c => c === typed[0])
+  const needle = fold(same ? typed[0] : typed)
+  const start = same ? activeIndex.value + 1 : Math.max(activeIndex.value, 0)
+  for (let k = 0; k < list.length; k++) {
+    const i = (start + k) % list.length
+    if (!list[i].disabled && fold(list[i].label).startsWith(needle)) return setActive(i)
+  }
+}
+
+const isPrintable = (e: KeyboardEvent) => e.key.length === 1 && e.key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey
+
+/* The keys a list answers to while it is open; true when the key was its. */
+function onListKey(e: KeyboardEvent, inSearch: boolean): boolean {
+  const last = filteredOptions.value.length - 1
+  switch (e.key) {
+    case 'ArrowDown': setActive(activeIndex.value < 0 ? enabledFrom(0, 1) : enabledFrom(activeIndex.value + 1, 1)); break
+    case 'ArrowUp':   setActive(activeIndex.value < 0 ? enabledFrom(last, -1) : enabledFrom(activeIndex.value - 1, -1)); break
+    case 'PageDown':  setActive(enabledFrom(Math.min(last, activeIndex.value + 10), 1) >= 0 ? enabledFrom(Math.min(last, activeIndex.value + 10), 1) : enabledFrom(last, -1)); break
+    case 'PageUp':    setActive(enabledFrom(Math.max(0, activeIndex.value - 10), -1) >= 0 ? enabledFrom(Math.max(0, activeIndex.value - 10), -1) : enabledFrom(0, 1)); break
+    case 'Home': if (inSearch) return false; setActive(enabledFrom(0, 1)); break
+    case 'End':  if (inSearch) return false; setActive(enabledFrom(last, -1)); break
+    case 'Enter': {
+      const o = filteredOptions.value[activeIndex.value]
+      if (o) selectOption(o)
+      else if (!props.multiple) close({ focus: true })
+      break
+    }
+    case ' ': {
+      if (inSearch) return false
+      const o = filteredOptions.value[activeIndex.value]
+      if (o) selectOption(o)
+      break
+    }
+    case 'Tab': close(); return false
+    default:
+      if (!inSearch && isPrintable(e)) { typeahead(e.key); break }
+      return false
+  }
+  e.preventDefault()
+  return true
+}
+
+/* The field's own button: the arrows and a letter open the list too. */
+function onTriggerKeydown(e: KeyboardEvent) {
+  if (props.multiple) onOpenerKeydown(e)
+  if (e.defaultPrevented || isDisabled.value) return
+  if (!open.value) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault()
+      openPanel()
+    } else if (isPrintable(e)) {
+      e.preventDefault()
+      openPanel(isSearchable.value ? e.key : undefined)
+      if (!isSearchable.value) typeahead(e.key)
+    }
+    return
+  }
+  onListKey(e, false)
+}
+
+function onSearchKeydown(e: KeyboardEvent) {
+  onListKey(e, true)
+}
+
+/* A click in the list keeps the focus where it is — on the field. */
+function onPanelMousedown(e: MouseEvent) {
+  if ((e.target as Element).closest('input')) return
+  e.preventDefault()
+}
+
+watch(searchQuery, () => { if (open.value) setActive(enabledFrom(0, 1)) })
 
 const itemType = computed((): DropdownSelectItemType => {
   switch (props.type) {
@@ -232,19 +375,26 @@ const itemType = computed((): DropdownSelectItemType => {
   }
 })
 
-async function openPanel() {
+async function openPanel(query = '') {
   if (open.value || isDisabled.value) return
+  searchQuery.value = query
   open.value = true
-  if (props.type === 'search') {
-    searchQuery.value = ''
+  activeIndex.value = initialActive()
+  if (activeIndex.value >= 0) setActive(activeIndex.value)
+  if (isSearchable.value) {
     await nextTick()
-    searchInputEl.value?.focus()
+    const input = props.type === 'search' ? searchInputEl.value : panelSearchEl.value
+    input?.focus()
   }
 }
 
-function close() {
+/* `focus`: hand it back to the field — the search field it was in is gone. */
+function close(opts: { focus?: boolean } = {}) {
+  const hadFocus = !!rootEl.value?.contains(document.activeElement)
   open.value = false
   searchQuery.value = ''
+  activeIndex.value = -1
+  if (opts.focus || (hadFocus && isSearchable.value)) nextTick(() => triggerEl.value?.focus())
 }
 
 function toggle() {
@@ -258,7 +408,7 @@ function selectOption(option: InputDropdownOption) {
   /* Several choices: the list stays open while they are ticked (11 / 13). */
   if (props.multiple) return toggleValue(option)
   emit('update:modelValue', option.value)
-  close()
+  close({ focus: true })
 }
 
 function onClickOutside(e: MouseEvent) {
@@ -279,7 +429,7 @@ function onRootKeyDown(e: KeyboardEvent) {
   if (e.key !== 'Escape' || !open.value) return
   e.stopPropagation()
   e.preventDefault()
-  close()
+  close({ focus: true })
 }
 
 onMounted(() => {
@@ -325,7 +475,7 @@ onUnmounted(() => {
           role="combobox"
           :aria-expanded="open"
           aria-haspopup="listbox"
-          @click="openPanel"
+          @click="openPanel()"
         >
           <div class="ds-input-dropdown__content">
             <Icon name="search" :size="20" class="ds-input-dropdown__search-icon" aria-hidden="true" />
@@ -335,8 +485,12 @@ onUnmounted(() => {
               class="ds-input-dropdown__search-input"
               v-model="searchQuery"
               :placeholder="selectedOption?.label || placeholder"
-              aria-label="Search"
+              :aria-label="searchPlaceholder"
+              aria-autocomplete="list"
+              :aria-controls="listId"
+              :aria-activedescendant="activeId"
               @click.stop
+              @keydown="onSearchKeydown"
             />
             <template v-else>
               <span
@@ -396,8 +550,11 @@ onUnmounted(() => {
             :aria-labelledby="labelledBy"
             :aria-expanded="open"
             aria-haspopup="listbox"
+            :aria-controls="open ? listId : undefined"
+            :aria-activedescendant="isSearchable ? undefined : activeId"
+            ref="triggerEl"
             @click.stop="toggle"
-            @keydown="onOpenerKeydown"
+            @keydown="onTriggerKeydown"
           >
             <span v-if="ariaLabel" :id="nameId" class="ds-input-dropdown__name">{{ ariaLabel }}</span>
             <span :id="valueId" class="ds-input-dropdown__name">{{ countLabel(chosen.length) }}</span>
@@ -426,7 +583,11 @@ onUnmounted(() => {
           :aria-labelledby="labelledBy"
           :aria-expanded="open"
           aria-haspopup="listbox"
+          :aria-controls="open ? listId : undefined"
+          :aria-activedescendant="isSearchable ? undefined : activeId"
+          ref="triggerEl"
           @click="toggle"
+          @keydown="onTriggerKeydown"
         >
           <span v-if="ariaLabel" :id="nameId" class="ds-input-dropdown__name">{{ ariaLabel }}</span>
           <div class="ds-input-dropdown__content">
@@ -481,14 +642,42 @@ onUnmounted(() => {
             ref="panelEl"
             popover="manual"
             class="ds-input-dropdown__panel"
-            role="listbox"
-            :aria-multiselectable="multiple || undefined"
+            @mousedown="onPanelMousedown"
           >
+            <!-- The search field, outside the scroll (ADR-0095): it filters what is under it. -->
+            <div v-if="searchable && type !== 'search'" class="ds-input-dropdown__panel-search">
+              <Icon name="search" :size="16" class="ds-input-dropdown__panel-search-icon" aria-hidden="true" />
+              <input
+                ref="panelSearchEl"
+                v-model="searchQuery"
+                class="ds-input-dropdown__panel-search-input"
+                type="text"
+                role="combobox"
+                aria-expanded="true"
+                aria-autocomplete="list"
+                autocomplete="off"
+                :aria-controls="listId"
+                :aria-activedescendant="activeId"
+                :aria-label="searchPlaceholder"
+                :placeholder="searchPlaceholder"
+                @keydown="onSearchKeydown"
+              />
+            </div>
             <Scrollbar max-height="320px">
-              <div class="ds-input-dropdown__panel-items">
+              <p v-if="!filteredOptions.length" class="ds-input-dropdown__empty" role="status">{{ noResultsLabel }}</p>
+              <div
+                :id="listId"
+                class="ds-input-dropdown__panel-items"
+                role="listbox"
+                :aria-labelledby="labelledBy"
+                :aria-multiselectable="multiple || undefined"
+              >
                 <DropdownSelectItem
-                  v-for="option in filteredOptions"
+                  v-for="(option, i) in filteredOptions"
+                  :id="optionId(i)"
                   :key="option.value"
+                  :active="i === activeIndex"
+                  :focusable="false"
                   :type="itemType"
                   :label="option.label"
                   :supporting-text="option.supportingText"
@@ -501,6 +690,7 @@ onUnmounted(() => {
                   :checkbox="multiple"
                   :disabled="option.disabled"
                   @click="selectOption(option)"
+                  @mousemove="activeIndex !== i && !option.disabled && (activeIndex = i)"
                 />
               </div>
             </Scrollbar>
@@ -695,6 +885,45 @@ onUnmounted(() => {
   border-radius: var(--ds-radius-control);
   box-shadow: var(--ds-elevation-overlay);
   overflow: hidden;
+}
+
+/* ── Panel search (searchable) ─────────────────────────────────────── */
+/* The list's own field, ruled off from what it filters — Dropdown's
+   `#header` shape (ADR-0069). */
+.ds-input-dropdown__panel-search {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-md);
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
+  border-bottom: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  flex-shrink: 0;
+}
+
+.ds-input-dropdown__panel-search-icon {
+  color: var(--ds-text-subtle);
+  flex-shrink: 0;
+}
+
+.ds-input-dropdown__panel-search-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: var(--ds-font-body-md);
+  color: var(--ds-text-strong);
+}
+
+.ds-input-dropdown__panel-search-input::placeholder {
+  color: var(--ds-text-placeholder);
+}
+
+.ds-input-dropdown__empty {
+  margin: 0;
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
+  font: var(--ds-font-body-md);
+  color: var(--ds-text-subtle);
 }
 
 /* ── Panel items list ──────────────────────────────────────────────── */
