@@ -56,6 +56,29 @@ export const Row: Story = {
   }),
 }
 
+/**
+ * ADR-0095 — sept tuiles en ligne (~152 px chacune, la page de synthèse EUDR) : le libellé tient sur **deux lignes**
+ * avant d’être coupé, et le chiffre descend au pied de la tuile — une tuile dont le libellé passe à la ligne garde
+ * son chiffre sur la même ligne que ses voisines.
+ */
+export const SevenInARow: Story = {
+  name: 'Sept en ligne',
+  render: () => ({
+    components: { StatTile },
+    template: `
+      <div style="width:1112px; display:grid; grid-template-columns:repeat(7, 1fr); gap:var(--ds-spacing-md)">
+        <StatTile label="Polygones" value="22 652" />
+        <StatTile label="Polygones éligibles" value="21 980" />
+        <StatTile label="Polygones non éligibles" value="672" />
+        <StatTile label="Surfaces éligibles (ha)" value="48 210" />
+        <StatTile label="Surfaces non éligibles (ha)" value="1 304" />
+        <StatTile label="Producteurs" value="9 412" />
+        <StatTile label="Chevauchements à arbitrer entre parcelles voisines" value="37" />
+      </div>
+    `,
+  }),
+}
+
 export const Loading: Story = {
   name: 'Chargement',
   args: { loading: true },

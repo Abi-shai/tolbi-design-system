@@ -64,23 +64,38 @@ withDefaults(defineProps<Props>(), {
   font-family: var(--ds-typography-font-family-poppins);
 }
 
+/*
+  A tile in a row of seven is ~152px wide: one line cut « Polygones non éli… ».
+  The label takes two lines before it is cut (ADR-0095), and the figure goes to
+  the foot of the body, so a tile whose label wraps keeps its figure on the
+  same line as its neighbours' — the row stretches every tile to one height.
+*/
+.ds-stat-tile :deep(.ds-card__body) {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
 .ds-stat-tile__head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--ds-spacing-md);
   min-width: 0;
+  margin-bottom: var(--ds-spacing-md);
 }
 
 .ds-stat-tile__label {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
   font: var(--ds-font-label-md);
   color: var(--ds-text-subtle);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .ds-stat-tile__metric,
-.ds-stat-tile__loading { margin-top: var(--ds-spacing-md); }
+.ds-stat-tile__loading { margin-top: auto; }
 
 /* MetricValue carries its own label; the tile supplies it above instead. */
 .ds-stat-tile__metric :deep(.ds-metric__label) { display: none; }
