@@ -173,6 +173,9 @@ export type { ProgressStep, ProgressStepsType, ProgressStepsSize, ProgressStepsO
 
 export { StatusList, StatusRow } from './StatusList'
 export type { StatusTone } from './StatusList'
+
+export { FormSection, FormLayout } from './FormSection'
+export type { FormSectionHeadingLevel } from './FormSection'
 export { Table, TableColumnMenu } from './Table'
 export type { TableColumn, TableRow, TableSort, TableSortDirection } from './Table'
 

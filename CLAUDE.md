@@ -1126,6 +1126,15 @@ Before working on any component, read:
   piece gets its own entry when it has a decision of its own to show — which is why `AvatarGroup` and
   `BadgeGroup` stay put, being components and not pieces.
 
+- **ADR-0094**: a form has **three layers and three owners** — the shell is `Dialog placement="side"`
+  (the package's), the grammar of a sectioned form is the package's, the form itself (fields, order, rules,
+  API) the product's. **`FormSection`** is a **heading, not a `<fieldset>`** (`h3`, `headingLevel` 2–6): a
+  section *cuts* a form, related controls already have `FormField group`, and some readers repeat a legend
+  before every field. Its surface is **`Card sunk`, rendered, not a prop** (1 system of 16 offers one). Track A
+  of a 19-system spacing benchmark: **16** between fields, **20** under the head and around, **4** title →
+  sentence, no outer margin. **`FormLayout`** owns the **24** between blocks, because a form alternates
+  sections and lone fields and a margin cannot space both. In Figma both are components with **slots**.
+
 ## Architecture
 
 - Components live in `components/<Name>/` — each has `<Name>.vue`, `<Name>.stories.ts`, and `index.ts`
