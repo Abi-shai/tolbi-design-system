@@ -1135,6 +1135,15 @@ Before working on any component, read:
   sentence, no outer margin. **`FormLayout`** owns the **24** between blocks, because a form alternates
   sections and lone fields and a margin cannot space both. In Figma both are components with **slots**.
 
+- **ADR-0095**: a list you can type into. `InputDropdown`'s `type` held two questions, so `flag-leading`
+  and `search` excluded each other — **`searchable`** is its own prop now (`type="search"` the old spelling), a
+  field **at the top of the list** (Dropdown's `#header` shape), accent- and case-blind, prefix matches first.
+  The list had **no keyboard** (every option a tab stop): APG combobox now — focus stays on the field,
+  `aria-activedescendant` names the active option, arrows/Page/Home/End, Enter chooses, Escape hands focus back,
+  **a letter goes somewhere** (typeahead, 500ms prefix). `Flag` ships **all 249 ISO 3166-1 codes** (54 → 164 KB,
+  16 → 45 KB gz). `StatTile`'s label takes **two lines** and the figure sits at the tile's foot, so a row stays
+  aligned. The collapsed two-level `SideNavigation` reverses ADR-0046 — drawn first, not decided here.
+
 ## Architecture
 
 - Components live in `components/<Name>/` — each has `<Name>.vue`, `<Name>.stories.ts`, and `index.ts`
