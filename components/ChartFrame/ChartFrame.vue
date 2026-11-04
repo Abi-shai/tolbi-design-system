@@ -6,6 +6,8 @@ import { EmptyState } from '../EmptyState'
 
 interface Props {
   title?: string
+  /** One sentence under the title — what is measured, the threshold it is held to (ADR-0096). */
+  description?: string
   /** Height of the plot area. The frame never guesses it from content. */
   height?: number | string
   /** Left-hand tick labels, top to bottom. */
@@ -45,8 +47,11 @@ const gridLines = computed(() => (props.yTicks.length ? props.yTicks.length : 5)
 
 <template>
   <figure class="ds-chart-frame">
-    <figcaption v-if="title || $slots.legend" class="ds-chart-frame__head">
-      <span v-if="title" class="ds-chart-frame__title">{{ title }}</span>
+    <figcaption v-if="title || description || $slots.legend" class="ds-chart-frame__head">
+      <div v-if="title || description" class="ds-chart-frame__heading">
+        <span v-if="title" class="ds-chart-frame__title">{{ title }}</span>
+        <span v-if="description" class="ds-chart-frame__description">{{ description }}</span>
+      </div>
       <div v-if="$slots.legend" class="ds-chart-frame__legend">
         <slot name="legend" />
       </div>
@@ -110,9 +115,21 @@ const gridLines = computed(() => (props.yTicks.length ? props.yTicks.length : 5)
   flex-wrap: wrap;
 }
 
+.ds-chart-frame__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-xs);
+  min-width: 0;
+}
+
 .ds-chart-frame__title {
   font: var(--ds-font-heading-md);
   color: var(--ds-text-strong);
+}
+
+.ds-chart-frame__description {
+  font: var(--ds-font-body-sm);
+  color: var(--ds-text-subtle);
 }
 
 .ds-chart-frame__body {

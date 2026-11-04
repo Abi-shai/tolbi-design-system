@@ -8,9 +8,20 @@ export interface ChartLegendItem {
   active?: boolean
   /** Optional figure shown after the label. */
   value?: string
+  /** This entry's mark, when it is not the legend's — a map's key mixes them (ADR-0096). */
+  shape?: ChartLegendShape
 }
 
-export type ChartLegendShape = 'dot' | 'line'
+/**
+ * The mark says what kind of thing the series is drawn as, so a legend whose
+ * series are drawn differently names each one (ADR-0096):
+ * - `dot` a series' colour; `line` a line; `dashed` a dashed line — a
+ *   comparison or a threshold;
+ * - `square`, `circle`, `point` the symbols a map draws — a project point, a
+ *   control point, a reserve point;
+ * - `zone` an area: its colour as the edge over a tint of it.
+ */
+export type ChartLegendShape = 'dot' | 'line' | 'dashed' | 'square' | 'circle' | 'point' | 'zone'
 
 /**
  * `horizontal` wraps beside a chart. `vertical` is a list — the legend set on a
@@ -74,8 +85,8 @@ function seriesColor(color: string | undefined, index: number): string {
       >
         <span
           class="ds-chart-legend__mark"
-          :class="`ds-chart-legend__mark--${shape}`"
-          :style="{ backgroundColor: seriesColor(item.color, i) }"
+          :class="`ds-chart-legend__mark--${item.shape ?? shape}`"
+          :style="{ '--chart-legend-mark': seriesColor(item.color, i) }"
           aria-hidden="true"
         />
         <span class="ds-chart-legend__label">{{ item.label }}</span>
@@ -96,7 +107,9 @@ function seriesColor(color: string | undefined, index: number): string {
   font-family: var(--ds-typography-font-family-poppins);
 }
 
-.ds-chart-legend__item { min-width: 0; }
+/* A flex item, not a line box: an inline-flex entry takes its baseline from its
+   first child — the mark — so a 5px point or a 0-high dash dropped its label. */
+.ds-chart-legend__item { display: flex; min-width: 0; }
 
 .ds-chart-legend__entry {
   display: inline-flex;
@@ -128,10 +141,30 @@ button.ds-chart-legend__entry:focus-visible {
    Inset, over the colour, so the mark keeps its size. */
 .ds-chart-legend__mark {
   flex-shrink: 0;
+  background-color: var(--chart-legend-mark);
   box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-border-inset);
 }
-.ds-chart-legend__mark--dot  { width: 8px; height: 8px; border-radius: var(--ds-radius-pill); }
-.ds-chart-legend__mark--line { width: 14px; height: 3px; border-radius: var(--ds-radius-pill); }
+.ds-chart-legend__mark--dot    { width: 8px; height: 8px; border-radius: var(--ds-radius-pill); }
+.ds-chart-legend__mark--line   { width: 14px; height: 3px; border-radius: var(--ds-radius-pill); }
+.ds-chart-legend__mark--square { width: 8px; height: 8px; border-radius: 1px; } /* token-lint-disable no-raw-radius — a map symbol's corner, drawn at 8px, not a surface's radius */
+/* A circle is a symbol, not a swatch: it is drawn ringed, as on the map. */
+.ds-chart-legend__mark--circle { width: 8px; height: 8px; border-radius: var(--ds-radius-pill); box-shadow: 0 0 0 var(--ds-border-width-default) var(--ds-bg-default), inset 0 0 0 var(--ds-border-width-default) var(--ds-border-inset); }
+.ds-chart-legend__mark--point  { width: 5px; height: 5px; border-radius: var(--ds-radius-pill); margin-inline: 1.5px; }
+/* Lines carry no hairline: they are the drawing itself, not a swatch of it. */
+.ds-chart-legend__mark--dashed {
+  width: 14px;
+  height: 0;
+  background: none;
+  box-shadow: none;
+  border-top: var(--ds-border-width-strong) dashed var(--chart-legend-mark);
+}
+.ds-chart-legend__mark--zone {
+  width: 14px;
+  height: 10px;
+  border-radius: 2px; /* token-lint-disable no-raw-radius — the zone symbol's corner, as drawn on the map */
+  background-color: color-mix(in srgb, var(--chart-legend-mark) 12%, transparent);
+  box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--chart-legend-mark);
+}
 
 .ds-chart-legend__label {
   font: var(--ds-font-body-sm);

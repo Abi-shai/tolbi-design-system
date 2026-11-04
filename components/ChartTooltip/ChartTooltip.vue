@@ -11,6 +11,8 @@ export interface ChartTooltipSeries {
 interface Props {
   /** What is being pointed at — usually a formatted date. */
   title?: string
+  /** A sentence under the title — what the rows are (« Ses 5 points de contrôle, du plus proche au plus éloigné »). */
+  description?: string
   /** Short qualifier on the reading: `Mesuré`, `Estimé`. */
   tag?: string
   tagTone?: BadgeTone
@@ -50,6 +52,7 @@ function seriesColor(color: string | undefined, index: number): string {
       <span v-if="title" class="ds-chart-tooltip__title">{{ title }}</span>
       <Badge v-if="tag" :label="tag" :tone="tagTone" size="sm" />
     </div>
+    <p v-if="description" class="ds-chart-tooltip__description">{{ description }}</p>
 
     <div v-if="value" class="ds-chart-tooltip__value">
       {{ value }}<span v-if="unit" class="ds-chart-tooltip__unit">{{ unit }}</span>
@@ -156,5 +159,10 @@ function seriesColor(color: string | undefined, index: number): string {
   color: var(--ds-text-strong);
   font-weight: var(--ds-font-weight-label-md);
   font-variant-numeric: tabular-nums;
+}
+.ds-chart-tooltip__description {
+  margin: 0;
+  font: var(--ds-font-body-sm);
+  color: var(--ds-text-subtle);
 }
 </style>

@@ -36,6 +36,38 @@
         "$type": "color",
         "$description": "series 7 — purple. min ΔE 16.1 to purple's neighbour; past this, aggregate rather than add a colour"
       }
+    },
+    "sequential": {
+      "1": {
+        "$value": "{color.accent.200}",
+        "$type": "color",
+        "$description": "sequential 1 — the low end. L* 93.6. One hue family, lightness falling at every step (ADR-0096): a magnitude, not a deviation from a midpoint"
+      },
+      "2": {
+        "$value": "{color.accent.400}",
+        "$type": "color",
+        "$description": "sequential 2 — L* 82.5"
+      },
+      "3": {
+        "$value": "{color.success.400}",
+        "$type": "color",
+        "$description": "sequential 3 — L* 74.1"
+      },
+      "4": {
+        "$value": "{color.success.600}",
+        "$type": "color",
+        "$description": "sequential 4 — L* 53.9"
+      },
+      "5": {
+        "$value": "{color.success.800}",
+        "$type": "color",
+        "$description": "sequential 5 — the high end. L* 34.4. Measured: adjacent ΔE ≥ 20.0 in normal, protan, deutan and tritan vision; red→yellow→green kept 18.9 end to end in protan"
+      }
+    },
+    "threshold": {
+      "$value": "{color.gray-light.500}",
+      "$type": "color",
+      "$description": "a threshold or reference line drawn dashed across a plot (ADR-0096) — 4.8:1 on white, readable on the dark ground too"
     }
   }
 }

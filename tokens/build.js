@@ -240,6 +240,10 @@ await buildAllSources()
     .filter((k) => /^DsChartCategorical\d+$/.test(k))
     .sort((a, b) => Number(a.match(/\d+$/)[0]) - Number(b.match(/\d+$/)[0]))
     .map((k) => flat[k])
+  const sequential = Object.keys(flat)
+    .filter((k) => /^DsChartSequential\d+$/.test(k))
+    .sort((a, b) => Number(a.match(/\d+$/)[0]) - Number(b.match(/\d+$/)[0]))
+    .map((k) => flat[k])
   appendFileSync('tokens/dist/index.js', `
 /**
  * Data-series colours, ordered by measured ΔE so the first N are always the most
@@ -250,6 +254,16 @@ export const chartCategorical = ${JSON.stringify(series)}
 
 /** The comfortable ceiling. Beyond this the palette stops being distinguishable. */
 export const chartCategoricalCeiling = 5
+
+/**
+ * A magnitude, low to high (ADR-0096): one hue family, lightness falling at every
+ * step, adjacent ΔE ≥ 20 in all four visions. A map or a chart interpolates
+ * between the stops; the scale's legend is \`ColorScale\`.
+ */
+export const chartSequential = ${JSON.stringify(sequential)}
+
+/** The colour of a threshold or reference line, drawn dashed. */
+export const chartThreshold = ${JSON.stringify(flat.DsChartThreshold)}
 `)
   appendFileSync('tokens/dist/index.d.ts', `
 /**
@@ -258,6 +272,10 @@ export const chartCategoricalCeiling = 5
  */
 export const chartCategorical: readonly string[]
 export const chartCategoricalCeiling: 5
+/** A magnitude, low to high (ADR-0096). Interpolate between the stops. */
+export const chartSequential: readonly string[]
+/** A threshold or reference line, drawn dashed. */
+export const chartThreshold: string
 `)
 }
 

@@ -116,3 +116,33 @@ export const Interactive: Story = {
     `,
   }),
 }
+
+/**
+ * ADR-0096 — une forme **par entrée** quand les séries sont dessinées différemment : la légende d’une carte
+ * (carré, rond, point, zone) et celle d’une comparaison (trait plein, trait pointillé, seuil).
+ */
+export const Shapes: Story = {
+  name: 'Formes par entrée',
+  render: () => ({
+    components: { ChartLegend },
+    setup: () => ({
+      map: [
+        { key: 'project', label: 'Point du projet', shape: 'square', color: 'var(--ds-text-strong)' },
+        { key: 'control', label: 'Point de contrôle', shape: 'circle', color: 'var(--ds-chart-sequential-3)' },
+        { key: 'reserve', label: 'Réserve', shape: 'point', color: 'var(--ds-text-subtlest)' },
+        { key: 'excluded', label: 'Zone exclue', shape: 'zone', color: 'var(--ds-border-error)' },
+      ],
+      lines: [
+        { key: 'project', label: 'Points du projet', shape: 'line', color: 'var(--ds-chart-categorical-1)' },
+        { key: 'control', label: 'Points de contrôle', shape: 'dashed', color: 'var(--ds-chart-categorical-5)' },
+        { key: 'threshold', label: 'Seuil 95 %', shape: 'dashed', color: 'var(--ds-chart-threshold)' },
+      ],
+    }),
+    template: `
+      <div style="display:flex;flex-direction:column;gap:var(--ds-spacing-3xl)">
+        <ChartLegend :items="map" />
+        <ChartLegend :items="lines" />
+      </div>
+    `,
+  }),
+}
