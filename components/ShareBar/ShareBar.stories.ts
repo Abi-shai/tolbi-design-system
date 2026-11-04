@@ -26,7 +26,7 @@ type Story = StoryObj<typeof ShareBar>
 
 /** Deux parts, dont le reste — la part créditable (ARR). Le chiffre est dit plus haut, plus grand : `showShare` à `false`. */
 export const PartAndRest: Story = {
-  name: 'Une part et le reste',
+  name: 'Barre de parts — une part et le reste',
   args: { items: [{ label: 'Grâce au projet', share: 86 }, { label: 'Sans lui', share: 14, rest: true }], showShare: false },
   render: (args) => ({ components: { ShareBar }, setup: () => ({ args }), template: `<div style="width:328px"><ShareBar v-bind="args" /></div>` }),
 }

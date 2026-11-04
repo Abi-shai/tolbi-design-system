@@ -74,7 +74,7 @@ const preview: Preview = {
         order: [
           'Introduction',
           'Foundations', [
-            'Color', ['Primitives', 'Semantic', 'Modes', 'Display palette', 'Chart series'],
+            'Color', ['Primitives', 'Semantic', 'Modes', 'Display palette', 'Chart'],
             'Typography',
             'Spacing', ['Primitives', 'Semantic', 'Control padding'],
             'Radius', ['Primitives', 'Roles'],

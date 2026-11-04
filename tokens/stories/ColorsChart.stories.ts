@@ -18,10 +18,16 @@ const sequential = Object.entries(chart.chart.sequential).map(([n, t]) => ({
 }))
 
 const meta: Meta = {
-  title: 'Foundations/Color/Chart series',
-  tags: ['autodocs'],
+  title: 'Foundations/Color/Chart',
+}
+export default meta
+type Story = StoryObj<typeof meta>
+
+/** ADR-0016 — des catégories : ordonnées par ΔE, cinq au plus. */
+export const Categorical: Story = {
+  name: 'Catégories (categorical)',
   render: () => ({
-    setup: () => ({ series, sequential }),
+    setup: () => ({ series }),
     template: `
       <div style="padding: 2rem;">
         <p style="margin: 0 0 1.5rem; max-width: 44rem; font: var(--ds-font-body-sm); color: var(--ds-text-subtle);">
@@ -40,7 +46,19 @@ const meta: Meta = {
           <span style="width: 15rem; flex: none; font-family: monospace; font: var(--ds-font-body-sm); color: var(--ds-text-strong);">{{ s.cssVar }}</span>
           <span style="font: var(--ds-font-body-sm); color: var(--ds-text-subtle);">{{ s.note }}</span>
         </div>
-        <h3 style="margin: 3rem 0 0.5rem; font: var(--ds-font-heading-sm); color: var(--ds-text-strong);">Sequential — a magnitude (ADR-0096)</h3>
+      </div>
+    `,
+  }),
+}
+
+/** ADR-0096 — une grandeur, du bas vers le haut : la rampe séquentielle, et la ligne de seuil. */
+export const Sequential: Story = {
+  name: 'Grandeur (sequential) et seuil',
+  render: () => ({
+    setup: () => ({ sequential }),
+    template: `
+      <div style="padding: 2rem;">
+        <h3 style="margin: 0 0 0.5rem; font: var(--ds-font-heading-sm); color: var(--ds-text-strong);">Sequential — a magnitude (ADR-0096)</h3>
         <p style="margin: 0 0 1rem; max-width: 44rem; font: var(--ds-font-body-sm); color: var(--ds-text-subtle);">
           One hue family, lightness falling at every step: the reader orders it without the legend, in any of the
           four visions (adjacent ΔE ≥ 20). Not red → green — that kept 18.9 end to end in protan vision. A map or a
@@ -54,10 +72,12 @@ const meta: Meta = {
           <span style="width: 15rem; flex: none; font-family: monospace; font: var(--ds-font-body-sm); color: var(--ds-text-strong);">{{ s.cssVar }}</span>
           <span style="font: var(--ds-font-body-sm); color: var(--ds-text-subtle);">{{ s.note }}</span>
         </div>
+        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.4rem 0; border-bottom: 1px solid var(--ds-border-subtlest);">
+          <span style="width: 20px; flex: none; border-top: 2px dashed var(--ds-chart-threshold);" />
+          <span style="width: 15rem; flex: none; font: var(--ds-font-body-sm); color: var(--ds-text-strong);">--ds-chart-threshold</span>
+          <span style="font: var(--ds-font-body-sm); color: var(--ds-text-subtle);">a threshold or reference line, drawn dashed — chartThreshold in ./tokens/js</span>
+        </div>
       </div>
     `,
   }),
 }
-export default meta
-type Story = StoryObj<typeof meta>
-export const All: Story = {}
