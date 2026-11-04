@@ -1160,6 +1160,13 @@ Before working on any component, read:
   no panels); `.ds-tabs` ran 10px past its box (`border-box` now). `Table`: **`numeric`** (right, tabular, 6rem
   floor) and **`framed: false`** inside a surface that draws its own frame.
 
+- **ADR-0099**: `MapPanel size="lg"` — the panel a screen is read from: **25rem declared**, a `#header` (after the
+  fold) and a `#footer` that stay, the body scrolling between. It **folds into a map control at its corner** (track
+  A, the owner's choice over a rail): `Button` icon-only `secondary-gray` `sm` `panel-left`, 17px from where the
+  fold was; the panel leaves toward its corner, the control arrives there (`SurfaceTransition` out-in — wrapped,
+  because `Button`'s own `transition` outweighed it), focus moves as it arrives; the map is not re-framed.
+  **`HelpIcon` is the anchored `Tooltip`** (top layer, 400ms, Escape; it was cut in a scrolling panel).
+
 ## Architecture
 
 - Components live in `components/<Name>/` — each has `<Name>.vue`, `<Name>.stories.ts`, and `index.ts`

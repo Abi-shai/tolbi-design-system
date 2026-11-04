@@ -2,6 +2,13 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import MapPanel from './MapPanel.vue'
 import { ChartLegend } from '../ChartLegend'
 import { Button } from '../Button'
+import { ref } from 'vue'
+import MapOverlay from './MapOverlay.vue'
+import { Tabs } from '../Tabs'
+import { SectionCard } from '../SectionCard'
+import { MetricValue } from '../MetricValue'
+import { ShareBar } from '../ShareBar'
+import { StatTile } from '../StatTile'
 
 const meta: Meta<typeof MapPanel> = {
   title: 'Données/Map/Panel',
@@ -84,6 +91,52 @@ export const Ceiling: Story = {
             <Button variant="primary" size="sm" label="Tracer" />
           </div>
         </MapPanel>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * ADR-0099 — `size="lg"` : le panneau d’où l’on lit un écran (ARR). **25rem déclarés**, aussi haut que l’encart le
+ * permet, une tête (`#header`, les `Tabs`) et un pied (`#footer`) qui restent, le corps qui défile entre eux.
+ * **Le repli (piste A)** : le bouton est en tête, au début ; replié, le panneau devient une commande de carte à son
+ * coin — `Button` icône seule, `secondary-gray`, comme `MapControls` — et la carte est entière. Le panneau rentre
+ * vers son coin, la commande y arrive ; le focus suit ; la carte ne se recadre pas.
+ */
+export const ReadingPanel: Story = {
+  name: 'Panneau de lecture (lg)',
+  parameters: { layout: 'fullscreen' },
+  render: () => ({
+    components: { MapPanel, MapOverlay, Tabs, SectionCard, MetricValue, ShareBar, StatTile, Button },
+    setup: () => ({
+      collapsed: ref(false),
+      tab: ref('vue'),
+      tabs: [{ value: 'vue', label: 'Vue d’ensemble' }, { value: 'rapport', label: 'Rapport' }],
+      shares: [{ label: 'Grâce au projet', share: 86 }, { label: 'Sans lui', share: 14, rest: true }],
+    }),
+    template: `
+      <div style="position:relative;height:100vh;min-height:640px;background:var(--ds-bg-neutral);overflow:hidden">
+        <MapOverlay position="top-start">
+          <MapPanel v-model:collapsed="collapsed" size="lg" title="Dynamic baseline" collapsible collapse-label="Replier le panneau" expand-label="Déplier le panneau">
+            <template #header><Tabs v-model="tab" :tabs="tabs" size="sm" /></template>
+            <SectionCard title="Part créditable">
+              <div>
+                <MetricValue value="86" unit="%" size="lg" />
+                <p style="margin:var(--ds-spacing-xs) 0 0;font:var(--ds-font-body-sm);color:var(--ds-text-default)">du carbone gagné depuis 2016 revient au projet</p>
+              </div>
+              <ShareBar :items="shares" :show-share="false" />
+            </SectionCard>
+            <SectionCard title="Les chiffres clés">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--ds-spacing-md)">
+                <StatTile label="Crédits estimés" value="65 762" caption="tCO2e" />
+                <StatTile label="|Z|, projet face aux points de contrôle" value="15,8" caption="seuil 1,96" />
+                <StatTile label="Écart des points de contrôle" value="0,029" caption="seuil 0,25" />
+                <StatTile label="Jeux complets" value="39" caption="sur 40 · couverture satellite 98 %" />
+              </div>
+            </SectionCard>
+            <template #footer><Button variant="secondary-gray" icon-leading="chart-column" label="Voir toutes les données" block /></template>
+          </MapPanel>
+        </MapOverlay>
       </div>
     `,
   }),
