@@ -79,6 +79,20 @@ export const SevenInARow: Story = {
   }),
 }
 
+/** ADR-0097 — `caption` : ce contre quoi le chiffre se mesure, juste dessous. Le chiffre reste court. */
+export const WithCaption: Story = {
+  name: 'Avec contexte',
+  render: () => ({
+    components: { StatTile },
+    template: `
+      <div style="width:460px;display:grid;grid-template-columns:1fr 1fr;gap:var(--ds-spacing-md)">
+        <StatTile label="Jeux complets" value="39" caption="sur 40 · seuil 30" />
+        <StatTile label="|Z|, projet face aux points de contrôle" value="15,8" caption="seuil 1,96" />
+      </div>
+    `,
+  }),
+}
+
 export const Loading: Story = {
   name: 'Chargement',
   args: { loading: true },

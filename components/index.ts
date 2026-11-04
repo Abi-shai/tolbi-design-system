@@ -176,6 +176,12 @@ export type { StatusTone } from './StatusList'
 
 export { FormSection, FormLayout } from './FormSection'
 export type { FormSectionHeadingLevel } from './FormSection'
+
+export { SectionCard } from './SectionCard'
+export type { SectionCardHeadingLevel } from './SectionCard'
+
+export { ShareBar } from './ShareBar'
+export type { ShareBarItem } from './ShareBar'
 export { Table, TableColumnMenu } from './Table'
 export type { TableColumn, TableRow, TableSort, TableSortDirection } from './Table'
 

@@ -5,6 +5,7 @@ import { Icon, type IconName } from '../Icon'
 import { IconButton } from '../IconButton'
 import { ModuleIcon, type ModuleName } from '../ModuleIcon'
 import { Skeleton } from '../Skeleton'
+import { ShareBar } from '../ShareBar'
 
 /**
  * One project of one module, as a tile in a grid.
@@ -231,32 +232,8 @@ const spread = computed(() => {
   return null
 })
 
-/**
- * **Biggest first, always.** The order is the component's, not the caller's:
- * the palette is ordered by measured ΔE (ADR-0016), so the first series are the
- * most distinguishable — and a spread whose dominant share is not the first
- * colour wastes that. It also means the `+N` tail is always the small change.
- */
-const ordered = computed(() => spread.value ? [...spread.value.items].sort((a, b) => b.share - a.share) : [])
-const shown   = computed(() => ordered.value.slice(0, spread.value?.shown ?? 0))
-const hidden  = computed(() => Math.max(0, ordered.value.length - (spread.value?.shown ?? 0)))
-
-/**
- * Past the palette's comfortable ceiling the tail shares one neutral (ADR-0016)
- * — reaching further down a ramp solved for five gives two series nobody can
- * tell apart.
- *
- * The legend binds first, though: **a colour the legend does not name is not a
- * colour, it is noise.** Whatever collapses into `+N` collapses into the same
- * neutral in the bar, so the two readings of the spread always agree on how
- * many things have names. The ceiling still caps — a legend wide enough for six
- * entries still only gets five hues.
- */
-const CEILING = 5
-const named = computed(() => Math.min(spread.value?.shown ?? 0, CEILING))
-function shareColour(i: number) {
-  return i < named.value ? `var(--ds-chart-categorical-${i + 1})` : 'var(--project-card-share-rest)'
-}
+/* The bar and its legend are `ShareBar` (ADR-0097): biggest first, five hues
+   at most, the tail neutral and counted `+N` — the rules this card wrote first. */
 </script>
 
 <template>
@@ -378,41 +355,13 @@ function shareColour(i: number) {
           <div
             v-if="spread"
             class="ds-project-card__stage"
-            :class="{ 'ds-project-card__stage--bare': !ordered.length }"
+            :class="{ 'ds-project-card__stage--bare': !spread.items.length }"
           >
             <div class="ds-project-card__stage-head">
               <span>{{ spread.label }}</span>
             </div>
 
-            <template v-if="ordered.length">
-              <div class="ds-project-card__track" role="presentation">
-                <span
-                  v-for="(c, i) in ordered"
-                  :key="c.label"
-                  class="ds-project-card__segment"
-                  :style="{ flexGrow: c.share, background: shareColour(i) }"
-                />
-              </div>
-              <div class="ds-project-card__legend">
-                <!-- The track is **clipped**, not counted down: entries are laid
-                     out in full and the row cuts wherever it runs out. -->
-                <ul class="ds-project-card__legend-track">
-                  <li v-for="(c, i) in shown" :key="c.label">
-                    <span class="ds-project-card__dot" :style="{ background: shareColour(i) }" />
-                    <span>{{ c.label }} {{ c.share }} %</span>
-                  </li>
-                </ul>
-                <!-- Outside the clip, so the count can never be the thing cut. -->
-                <Badge
-                  v-if="hidden"
-                  class="ds-project-card__legend-rest"
-                  :label="`+${hidden}`"
-                  tone="neutral"
-                  variant="pill-outline"
-                  size="sm"
-                />
-              </div>
-            </template>
+            <ShareBar v-if="spread.items.length" :items="spread.items" :shown="spread.shown" />
           </div>
         </div>
       </div>
@@ -477,7 +426,6 @@ function shareColour(i: number) {
     component-scoped, and it stays private.
   */
   --project-card-mark: 32px;
-  --project-card-share-rest: var(--ds-bg-neutral-strong);
 
   position: relative;
   display: flex;
@@ -856,89 +804,6 @@ function shareColour(i: number) {
 /* No bar under it: the line states a fact rather than labelling a scale. */
 .ds-project-card__stage--bare .ds-project-card__stage-head {
   color: var(--ds-text-subtle);
-}
-
-/* `spacing-xxs` (2px), and both bars agree on it. The ordinal bar drew 3 for a
-   while — off the ramp, and a gap is layout rhythm even when it is one pixel
-   wide — so the file came to the code rather than the reverse. */
-.ds-project-card__track {
-  display: flex;
-  gap: var(--ds-spacing-xxs);
-  height: 6px;
-}
-
-/* `flex-grow` carries the share, so a series is as wide as it is big. The
-   colour arrives inline, from `shareColour`. */
-.ds-project-card__segment {
-  flex: 1 1 0;
-  flex-basis: 0;
-  border-radius: var(--ds-radius-pill);
-  background-color: var(--project-card-share-rest);
-}
-
-/*
-  The legend never wraps: the overflow becomes `+N` instead, because a card that
-  grows a line when a seventh crop appears stops matching its neighbours in the
-  grid.
-*/
-/*
-  Three parts, and the order matters. The **track** clips — entries are written
-  out in full and the row cuts mid-word wherever the width ends. A **fade** over
-  its right edge turns that cut into something deliberate. The **count** sits
-  outside the clip, because the one thing that must never be truncated is the
-  number saying how much was.
-
-  `spacing-md` between entries where Figma draws 10 — the ramp goes 8 then 12.
-*/
-.ds-project-card__legend {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-xs);
-}
-
-.ds-project-card__legend-track {
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex: 1 1 auto;
-  min-width: 1px;
-  gap: var(--ds-spacing-md);
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  list-style: none;
-}
-
-/* The fade takes the insight's own ground, or it reads as a smudge. */
-.ds-project-card__legend-track::after {
-  content: '';
-  position: absolute;
-  inset-block: 0;
-  right: 0;
-  width: 32px;
-  pointer-events: none;
-  background: linear-gradient(to right, transparent, var(--ds-bg-neutral-subtle));
-}
-
-.ds-project-card__legend-track li {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-spacing-xs);
-  flex: none;
-  white-space: nowrap;
-  font: var(--ds-font-label-xs);
-  color: var(--ds-text-subtle);
-}
-
-.ds-project-card__legend-rest {
-  flex: none;
-}
-
-.ds-project-card__dot {
-  width: 8px;
-  height: 8px;
-  flex: none;
-  border-radius: var(--ds-radius-pill);
 }
 
 /* ── Footer ───────────────────────────────────────────────────────── */

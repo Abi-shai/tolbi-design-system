@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { ref } from 'vue'
-import FormSection from './FormSection.vue'
+import FormSection from '../SectionCard/SectionCard.vue'
 import FormField from '../FormField/FormField.vue'
 import InputField from '../InputField/InputField.vue'
 import InputDropdown from '../Dropdown/InputDropdown.vue'

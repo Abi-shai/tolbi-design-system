@@ -6,7 +6,8 @@ export type MetricTrend = 'up' | 'down' | 'flat'
 export type MetricSize = 'sm' | 'md' | 'lg'
 
 interface Props {
-  label: string
+  /** Omitted when the block it sits in already names it — a `SectionCard`'s title (ADR-0097). */
+  label?: string
   value: string
   /** Unit shown after the value at a smaller size — `t/ha`, `%`, `ha`. */
   unit?: string
@@ -32,7 +33,7 @@ const arrow = computed(() =>
 
 <template>
   <div class="ds-metric" :class="`ds-metric--${size}`">
-    <span class="ds-metric__label">{{ label }}</span>
+    <span v-if="label" class="ds-metric__label">{{ label }}</span>
 
     <div class="ds-metric__row">
       <span class="ds-metric__value">

@@ -15,6 +15,11 @@ interface Props {
   tag?: string
   tagTone?: BadgeTone
   loading?: boolean
+  /**
+   * What the figure is measured against, right under it — « sur 40 · seuil 30 »,
+   * « tCO2e » (ADR-0097). The figure stays a short number; the rest goes here.
+   */
+  caption?: string
 }
 
 withDefaults(defineProps<Props>(), {
@@ -41,15 +46,17 @@ withDefaults(defineProps<Props>(), {
         <Skeleton variant="text" width="55%" height="32px" />
       </div>
 
-      <MetricValue
-        v-else
-        label=""
-        :value="value ?? '—'"
-        :unit="unit"
-        :delta="delta"
-        :trend="trend"
-        class="ds-stat-tile__metric"
-      />
+      <div v-else class="ds-stat-tile__figure">
+        <MetricValue
+          label=""
+          :value="value ?? '—'"
+          :unit="unit"
+          :delta="delta"
+          :trend="trend"
+          class="ds-stat-tile__metric"
+        />
+        <p v-if="caption" class="ds-stat-tile__caption">{{ caption }}</p>
+      </div>
     </SwapTransition>
 
     <div v-if="$slots.default" class="ds-stat-tile__footer">
@@ -94,8 +101,23 @@ withDefaults(defineProps<Props>(), {
   color: var(--ds-text-subtle);
 }
 
-.ds-stat-tile__metric,
+.ds-stat-tile__figure,
 .ds-stat-tile__loading { margin-top: auto; }
+
+/* The figure and what it is measured against travel together to the foot. */
+.ds-stat-tile__figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-xs);
+  min-width: 0;
+}
+
+/* `text-subtle`, not the drawing's `subtlest`: on a raised dark ground that is 4.18:1 (ADR-0048). */
+.ds-stat-tile__caption {
+  margin: 0;
+  font: var(--ds-font-body-sm);
+  color: var(--ds-text-subtle);
+}
 
 /* MetricValue carries its own label; the tile supplies it above instead. */
 .ds-stat-tile__metric :deep(.ds-metric__label) { display: none; }
