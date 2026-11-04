@@ -50,10 +50,12 @@ import { pushModal, removeModal } from '../../composables/useModalStack'
  * action on top.
  *
  * `size` is one scale for both: `sm` 24rem, `md` 32rem (the default), `lg`
- * 45rem, `xl` 60rem — each a width the catalogue already used — and `full`.
+ * 45rem, `xl` 60rem — each a width the catalogue already used — `2xl` 82rem,
+ * and `full`. `2xl` is a window of data (ADR-0098): it takes the full height
+ * too, so changing what it shows never resizes it.
  */
 export type DialogPlacement = 'centre' | 'side'
-export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | 'full'
+export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
 
 /** One figure of the foot's summary — « Champs liés » / « 1 champ ». */
 export interface DialogSummaryItem {
@@ -135,6 +137,11 @@ const emit = defineEmits<{
 const slots = defineSlots<{
   /** The body, in place of `description` — read as the dialog's description. */
   default?: () => unknown
+  /**
+   * Between the head and the body, and fixed: what the body is navigated by —
+   * `Tabs` (ADR-0098). The body scrolls under it.
+   */
+  nav?: () => unknown
   /** What the body asks for after it has said what will happen — a field. Not read as the description. */
   form?: () => unknown
   /** The actions, in the foot, on the right. */
@@ -422,6 +429,7 @@ function onClick(event: MouseEvent) {
             <h2 v-else :id="titleId" class="ds-dialog__title">{{ title }}</h2>
             <CloseButton v-if="dismissible" size="sm" :ariaLabel="closeLabel" @click="dismiss" />
           </header>
+          <div v-if="slots.nav" class="ds-dialog__nav"><slot name="nav" /></div>
           <div v-if="slots.default || (description && !side) || slots.form" ref="body" class="ds-dialog__body" @scroll="measureScroll">
             <!-- At the side, the slot is the panel's body — a form — and describes nothing. -->
             <div v-if="slots.default" :id="side ? undefined : descriptionId" :class="side ? 'ds-dialog__content' : 'ds-dialog__description'"><slot /></div>
@@ -524,10 +532,18 @@ function onClick(event: MouseEvent) {
 .ds-dialog--md { --dialog-width: 32rem; }
 .ds-dialog--lg { --dialog-width: 45rem; }
 .ds-dialog--xl { --dialog-width: 60rem; }
+.ds-dialog--2xl { --dialog-width: 82rem; }
 .ds-dialog--full { --dialog-width: none; }
 
-.ds-dialog--centre.ds-dialog--full .ds-dialog__surface {
+.ds-dialog--centre.ds-dialog--full .ds-dialog__surface,
+.ds-dialog--centre.ds-dialog--2xl .ds-dialog__surface {
   height: 100%;
+}
+
+/* The body takes what the head, the nav and the foot leave: a short tab does
+   not shrink the window, a long one scrolls inside it. */
+.ds-dialog--centre.ds-dialog--2xl .ds-dialog__body {
+  flex: 1 1 auto;
 }
 
 /* The head is ruled off from the body with the surface's own hairline; the
@@ -599,6 +615,18 @@ function onClick(event: MouseEvent) {
   overflow-y: auto;
   padding: var(--ds-spacing-3xl) var(--ds-spacing-2xl);
   border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+}
+
+.ds-dialog__nav {
+  flex: none;
+  padding: var(--ds-spacing-3xl) var(--ds-spacing-2xl) 0;
+  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+}
+
+/* The rule is the nav's now: the body follows it without a second one. */
+.ds-dialog__nav + .ds-dialog__body {
+  padding-top: var(--ds-spacing-xl);
+  border-top: 0;
 }
 
 .ds-dialog__foot {

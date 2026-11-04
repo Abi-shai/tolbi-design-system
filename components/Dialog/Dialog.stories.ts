@@ -6,6 +6,12 @@ import { Button } from '../Button'
 import { FormField } from '../FormField'
 import { InputField } from '../InputField'
 import { Checkbox } from '../Checkbox'
+import { Tabs, TabPanel } from '../Tabs'
+import { StatTile } from '../StatTile'
+import { Card } from '../Card'
+import { ChartFrame } from '../ChartFrame'
+import { ChartLegend } from '../ChartLegend'
+import { Table } from '../Table'
 
 const meta: Meta<typeof Dialog> = {
   title: 'Superposition/Dialog',
@@ -413,3 +419,83 @@ export const ForeignList: Story = {
   }),
 }
 
+
+/**
+ * ADR-0098 — une fenêtre de données : `size="2xl"` (82rem, un plafond ; toute la hauteur, donc changer d’onglet ne
+ * la redimensionne jamais), les `Tabs` dans `#nav` — fixes, le corps défile dessous — et chaque onglet relié à son
+ * `TabPanel` par le même `id`. **Pas de pied** : en lecture seule, × et Échap ferment ; un « Fermer » ferait doublon.
+ * Les tableaux dans une carte : `framed=false` ; les colonnes de chiffres : `numeric`.
+ */
+export const DataWindow: Story = {
+  name: 'Fenêtre de données (2xl)',
+  render: () => ({
+    components: { Dialog, Button, Tabs, TabPanel, StatTile, Card, ChartFrame, ChartLegend, Table },
+    setup: () => ({
+      open: ref(false),
+      PAGE,
+      tab: ref('controle'),
+      tabs: [
+        { value: 'vue', label: 'Vue d’ensemble' },
+        { value: 'projet', label: 'Points du projet' },
+        { value: 'controle', label: 'Points de contrôle' },
+        { value: 'qualite', label: 'Qualité des mesures' },
+      ],
+      columns: [
+        { key: 'critere', label: 'Critère' },
+        { key: 'ecart', label: 'Écart', numeric: true },
+        { key: 'seuil', label: 'Seuil', numeric: true },
+      ],
+      rows: [
+        { id: 1, critere: 'Indice de stock 2006', ecart: '0,021', seuil: '0,25' },
+        { id: 2, critere: 'Indice de stock 2011', ecart: '0,027', seuil: '0,25' },
+        { id: 3, critere: 'Indice de stock 2016', ecart: '0,029', seuil: '0,25' },
+        { id: 4, critere: 'Pente 2006 → 2016', ecart: '0,018', seuil: '0,25' },
+      ],
+      bars: [96, 97, 94, 99, 98, 99, 97, 98, 99, 98, 98],
+      legend: [
+        { key: 'ok', label: 'Au-dessus du seuil', color: 'var(--ds-chart-categorical-5)' },
+        { key: 'low', label: 'En dessous · 2018, 94 %', color: 'var(--ds-chart-categorical-2)' },
+        { key: 't', label: 'Seuil 95 %', shape: 'dashed', color: 'var(--ds-chart-threshold)' },
+      ],
+    }),
+    template: `
+      <div :style="PAGE">
+        <Button label="Voir toutes les données" icon-leading="chart-column" variant="secondary-gray" @click="open = true" />
+        <Dialog v-model:open="open" title="Toutes les données" size="2xl">
+          <template #nav><Tabs id="donnees" v-model="tab" :tabs="tabs" size="sm" /></template>
+          <TabPanel tabs-id="donnees" :value="tab">
+            <div style="display:flex;flex-direction:column;gap:var(--ds-spacing-xl)">
+              <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:var(--ds-spacing-xl)">
+                <StatTile label="Points de contrôle" value="200" caption="5 par point du projet, à moins de 100 km" />
+                <StatTile label="Écart le plus grand" value="0,029" caption="seuil 0,25 · les points de contrôle ressemblent au projet" />
+                <StatTile label="Points de contrôle remplacés" value="13" caption="2 événements, motifs admis par VM0047" />
+                <StatTile label="Réserve" value="2 189" caption="points pour remplacer un point de contrôle" />
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--ds-spacing-xl)">
+                <Card>
+                  <ChartFrame title="Images valides par année" description="Seuil : 95 % des points du projet" :height="160" :x-ticks="['2016', '2021', '2026']">
+                    <svg viewBox="0 0 330 100" preserveAspectRatio="none" style="width:100%;height:100%;display:block">
+                      <rect v-for="(b, i) in bars" :key="i" :x="i * 30 + 3" :y="100 - (b - 90) * 10" width="24" :height="(b - 90) * 10"
+                        :fill="b < 95 ? 'var(--ds-chart-categorical-2)' : 'var(--ds-chart-categorical-5)'" />
+                      <line x1="0" x2="330" y1="50" y2="50" stroke="var(--ds-chart-threshold)" stroke-width="1.5" stroke-dasharray="4 3" vector-effect="non-scaling-stroke" />
+                    </svg>
+                    <template #legend><ChartLegend :items="legend" /></template>
+                  </ChartFrame>
+                </Card>
+                <Card>
+                  <div style="display:flex;flex-direction:column;gap:var(--ds-spacing-lg)">
+                    <div>
+                      <div style="font:var(--ds-font-heading-md);color:var(--ds-text-strong)">Écart par critère (SDM)</div>
+                      <div style="font:var(--ds-font-body-sm);color:var(--ds-text-subtle)">Les points de contrôle ressemblent au projet sous 0,25</div>
+                    </div>
+                    <Table :columns="columns" :rows="rows" :framed="false" :page-sizes="[]" />
+                  </div>
+                </Card>
+              </div>
+            </div>
+          </TabPanel>
+        </Dialog>
+      </div>
+    `,
+  }),
+}

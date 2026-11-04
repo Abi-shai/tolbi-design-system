@@ -15,6 +15,12 @@ interface Props {
   modelValue: string
   tabs: TabsItem[]
   size?: TabsSize
+  /**
+   * Ties each tab to its panel (ADR-0098): the tab is `{id}-tab-{value}` and
+   * controls `{id}-panel-{value}` — which `TabPanel` renders with the same `id`.
+   * Without it a tab says it is selected but not what it shows.
+   */
+  id?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -76,6 +82,8 @@ function onKeydown(e: KeyboardEvent, i: number) {
       type="button"
       :class="['ds-tabs__tab', tab.value === modelValue && 'ds-tabs__tab--active']"
       :aria-selected="tab.value === modelValue"
+      :id="id ? `${id}-tab-${tab.value}` : undefined"
+      :aria-controls="id ? `${id}-panel-${tab.value}` : undefined"
       :tabindex="tab.value === modelValue ? 0 : -1"
       @click="activate(i)"
       @keydown="onKeydown($event, i)"
@@ -96,6 +104,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
 /* ── Container ─────────────────────────────────────────────────────── */
 .ds-tabs {
   position: relative;
+  box-sizing: border-box; /* `width: 100%` plus its border and padding ran 10px past its box */
   display: flex;
   align-items: center;
   width: 100%;

@@ -23,6 +23,11 @@ export interface TableColumn {
   hideable?: boolean
   /** The cell that carries the row's link. Without one, the first column shown. */
   primary?: boolean
+  /**
+   * Figures (ADR-0098): right-aligned, tabular, and at least 6rem wide unless a
+   * width says otherwise — a narrow figure column printed « 0,… ».
+   */
+  numeric?: boolean
 }
 
 export type TableRow = { id: string | number } & Record<string, unknown>
@@ -76,6 +81,8 @@ interface Props {
    * height of whatever the product keeps at the top of the screen.
    */
   stickyHeader?: boolean
+  /** `false` in a surface that draws its own frame — a `Card`, a `SectionCard` (ADR-0098). */
+  framed?: boolean
   /** Where a row leads. Given, the row opens as a link. */
   rowLink?: (row: TableRow) => string | undefined
   /** Declared as a prop so the table knows a row can be opened (`@row-click`). */
@@ -113,6 +120,7 @@ const props = withDefaults(defineProps<Props>(), {
   sort: null,
   visibleColumns: undefined,
   stickyHeader: false,
+  framed: true,
   rowLink: undefined,
   onRowClick: undefined,
   total: undefined,
@@ -337,7 +345,7 @@ function headerCells(pinned: boolean): TableHeaderCellSpec[] {
       key: col.key,
       label: col.label,
       help: col.help,
-      align: col.align,
+      align: alignOf(col),
       sortable: col.sortable,
       ariaSort: pinned ? undefined : ariaSort(col),
       sortDirection: sortOf(col),
@@ -355,10 +363,17 @@ function sortByKey(key: string) {
 }
 
 /* ── Cells ─────────────────────────────────────────────────────────── */
+function alignOf(col: TableColumn) {
+  return col.align ?? (col.numeric ? 'right' : undefined)
+}
+
+const NUMERIC_MIN_WIDTH = '6rem' // token-lint-disable no-literal-dimension-js — a figure column's floor, a rule of the component (ADR-0098), not layout rhythm
+
 function colStyle(col: TableColumn) {
   const styles: Record<string, string> = {}
   if (col.width) styles.width = typeof col.width === 'number' ? `${col.width}px` : col.width
   if (col.minWidth) styles.minWidth = typeof col.minWidth === 'number' ? `${col.minWidth}px` : col.minWidth
+  else if (col.numeric && !col.width) styles.minWidth = NUMERIC_MIN_WIDTH
   return { ...styles, ...fixedStyle(col.key) }
 }
 
@@ -403,7 +418,7 @@ const showPagination = computed(() =>
 </script>
 
 <template>
-  <div class="ds-table-container">
+  <div class="ds-table-container" :class="{ 'ds-table-container--bare': !framed }">
     <div class="ds-table__frame">
     <Scrollbar ref="scrollbarRef" :horizontal="true">
       <table ref="tableEl" class="ds-table">
@@ -468,7 +483,7 @@ const showPagination = computed(() =>
                 v-for="col in shown"
                 :key="col.key"
                 class="ds-table__td"
-                :class="[col.align && `ds-table__td--${col.align}`, fixedClass(col.key)]"
+                :class="[alignOf(col) && `ds-table__td--${alignOf(col)}`, col.numeric && 'ds-table__td--numeric', fixedClass(col.key)]"
                 :style="fixedStyle(col.key)"
               >
                 <!-- The name, as the row's own link or button: what a click on the row opens. -->
@@ -566,6 +581,15 @@ const showPagination = computed(() =>
   overflow: clip;
 }
 
+/* In a surface that already draws one (a `Card`, a `SectionCard`): no second
+   frame — the border, the radius and the shadow are the host's (ADR-0098). */
+.ds-table-container--bare {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent;
+}
+
 /* The scroller and the pinned copy share one cell, so the copy covers the
    header it repeats instead of taking a second row's worth of height. */
 .ds-table__frame {
@@ -652,6 +676,7 @@ const showPagination = computed(() =>
 
 .ds-table__td--center { text-align: center; }
 .ds-table__td--right  { text-align: right; }
+.ds-table__td--numeric { font-variant-numeric: tabular-nums; }
 
 .ds-table__td--empty {
   text-align: center;

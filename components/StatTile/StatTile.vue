@@ -46,21 +46,21 @@ withDefaults(defineProps<Props>(), {
         <Skeleton variant="text" width="55%" height="32px" />
       </div>
 
-      <div v-else class="ds-stat-tile__figure">
-        <MetricValue
-          label=""
-          :value="value ?? '—'"
-          :unit="unit"
-          :delta="delta"
-          :trend="trend"
-          class="ds-stat-tile__metric"
-        />
-        <p v-if="caption" class="ds-stat-tile__caption">{{ caption }}</p>
-      </div>
+      <MetricValue
+        v-else
+        :value="value ?? '—'"
+        :unit="unit"
+        :delta="delta"
+        :trend="trend"
+        class="ds-stat-tile__metric"
+      />
     </SwapTransition>
 
-    <div v-if="$slots.default" class="ds-stat-tile__footer">
-      <slot />
+    <div v-if="caption || $slots.default" class="ds-stat-tile__tail">
+      <p v-if="caption" class="ds-stat-tile__caption">{{ caption }}</p>
+      <div v-if="$slots.default" class="ds-stat-tile__footer">
+        <slot />
+      </div>
     </div>
   </Card>
 </template>
@@ -72,15 +72,30 @@ withDefaults(defineProps<Props>(), {
 }
 
 /*
-  A tile in a row of seven is ~152px wide: one line cut « Polygones non éli… ».
-  The label takes two lines before it is cut (ADR-0095), and the figure goes to
-  the foot of the body, so a tile whose label wraps keeps its figure on the
-  same line as its neighbours' — the row stretches every tile to one height.
+  Three rows — the label, the figure, what it is measured against — and in a
+  grid they are the **row's**, not the tile's (ADR-0097): the tile spans three
+  of its parent's rows and takes them as a subgrid, so every figure of a row
+  sits on one line whatever its label or its caption runs to. A label of two
+  lines and a caption of one, beside a label of one and a caption of two, keep
+  their figures level — `margin-top: auto` (0.83) did that for the label only,
+  and a two-line caption lifted its figure off the line.
+
+  Outside a grid, `subgrid` falls back to plain rows: the tile on its own reads
+  label, figure, caption, top to bottom.
 */
+/* Two classes: `Card`'s own `display: flex` must lose to this one. */
+.ds-card.ds-stat-tile {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+}
+
 .ds-stat-tile :deep(.ds-card__body) {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
+  display: grid;
+  grid-row: 1 / -1;
+  grid-template-rows: subgrid;
+  row-gap: 0;
 }
 
 .ds-stat-tile__head {
@@ -88,9 +103,9 @@ withDefaults(defineProps<Props>(), {
   align-items: flex-start;
   gap: var(--ds-spacing-md);
   min-width: 0;
-  margin-bottom: var(--ds-spacing-md);
 }
 
+/* A tile in a row of seven is ~152px wide: two lines before the cut (ADR-0095). */
 .ds-stat-tile__label {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -101,14 +116,14 @@ withDefaults(defineProps<Props>(), {
   color: var(--ds-text-subtle);
 }
 
-.ds-stat-tile__figure,
-.ds-stat-tile__loading { margin-top: auto; }
+.ds-stat-tile__metric,
+.ds-stat-tile__loading { margin-top: var(--ds-spacing-md); }
 
-/* The figure and what it is measured against travel together to the foot. */
-.ds-stat-tile__figure {
+.ds-stat-tile__tail {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-xs);
+  gap: var(--ds-spacing-lg);
+  margin-top: var(--ds-spacing-xs);
   min-width: 0;
 }
 
@@ -123,7 +138,6 @@ withDefaults(defineProps<Props>(), {
 .ds-stat-tile__metric :deep(.ds-metric__label) { display: none; }
 
 .ds-stat-tile__footer {
-  margin-top: var(--ds-spacing-lg);
   font: var(--ds-font-body-sm);
   color: var(--ds-text-subtle);
 }

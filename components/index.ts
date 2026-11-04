@@ -140,7 +140,7 @@ export type { ProgressCircleSize, ProgressCircleShape } from './ProgressCircle'
 export { Slider } from './Slider'
 export type { SliderValueDisplay } from './Slider'
 
-export { Tabs } from './Tabs'
+export { Tabs, TabPanel } from './Tabs'
 export type { TabsSize, TabsItem } from './Tabs'
 
 export { Pagination } from './Pagination'
