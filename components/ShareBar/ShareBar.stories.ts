@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import { computed, ref } from 'vue'
 import ShareBar from './ShareBar.vue'
 
 const meta: Meta<typeof ShareBar> = {
@@ -41,4 +42,26 @@ export const Spread: Story = {
     ],
   },
   render: (args) => ({ components: { ShareBar }, setup: () => ({ args }), template: `<div style="width:280px;background:var(--ds-bg-neutral-subtle);padding:var(--ds-spacing-lg)"><ShareBar v-bind="args" /></div>` }),
+}
+
+/** Une part qui change — une autre année choisie — **voyage** jusqu’à sa largeur (`enter`, `in-out`) : le mouvement dit de combien. */
+export const Changing: Story = {
+  name: 'Une part qui change',
+  render: () => ({
+    components: { ShareBar },
+    setup() {
+      const years = { 2024: 71, 2025: 79, 2026: 86 } as Record<number, number>
+      const year = ref(2026)
+      const items = computed(() => [{ label: 'Grâce au projet', share: years[year.value] }, { label: 'Sans lui', share: 100 - years[year.value], rest: true }])
+      return { year, items, years: Object.keys(years) }
+    },
+    template: `
+      <div style="width:328px;display:flex;flex-direction:column;gap:var(--ds-spacing-lg)">
+        <div style="display:flex;gap:var(--ds-spacing-md)">
+          <button v-for="y in years" :key="y" type="button" :aria-pressed="String(+y === year)" @click="year = +y">{{ y }}</button>
+        </div>
+        <ShareBar :items="items" />
+      </div>
+    `,
+  }),
 }

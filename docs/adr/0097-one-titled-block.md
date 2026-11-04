@@ -32,3 +32,19 @@ spans **three of its parent's rows as a subgrid** (label, figure, caption), so i
 row sits on one line whatever its label or caption runs to; outside a grid, `subgrid` falls back to plain
 rows. Measured: the panel's 2×2, the window's four and the row of seven — figures level to the pixel.
 `MetricValue`'s `label` is optional, for a figure its block already names.
+
+## Amended — the state changes, and two limits (4 Nov.)
+
+**A share that changes travels.** When the year changes, `ShareBar`'s segments go to their new widths over
+`enter` + `easing-in-out` — the movement says by how much (ADR-0023: movement must explain). Filmed at a tenth of
+the speed: 280.4 → 231.5px, ≤ 0.59px a frame, no reversal. Reduced motion: a cut.
+
+**Measured contrast, both modes.** Every text ≥ 6:1; the coloured segment 3.86 / 3.35:1 against its ground. The
+**`rest` segment is 1.41 / 1.78:1** — a track, not a series — and that is allowed only because the whole is said
+in text: the legend writes every share, and with `showShare` off the figure above must say it (« 86 % »). A
+`ShareBar` whose shares are said nowhere in text fails WCAG 1.4.11.
+
+**Two limits of the subgrid.** A `StatTile` spans three rows of its parent grid: a sibling that is not a tile
+takes one, so tiles and other blocks belong in **separate grids** (the stories do). And **in dark, a tile in a
+`SectionCard` sinks**: `bg-default` (gray-forest 900) on `bg-neutral-subtle` (800), where ADR-0048 has every
+surface rise above its container. It reads by its border (1.64:1); a raised tile for that ground is open.

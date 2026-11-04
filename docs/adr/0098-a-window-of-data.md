@@ -28,3 +28,13 @@ while the list stays in `#nav`. Found on the way: `.ds-tabs` was `width: 100%` p
 **`Table`** — a column can be **`numeric`**: right-aligned, tabular, and **6rem** wide at least unless a width
 says otherwise — a narrow figure column printed « 0,… ». **`framed: false`** for a table inside a surface that
 draws its own frame (a `Card`, a `SectionCard`): no second border, radius or shadow.
+
+## Amended — the state changes (4 Nov.)
+
+Audited after release: the tokens, contrast and dark mode held (every text ≥ 6:1 in both modes, the threshold
+dash 3.34:1 on the dark ground), the **state changes did not**. Changing tab cut from one content to the next and
+left the body scrolled where it was, so the next tab was read from its middle. `TabPanel` now **swaps** its
+content (`SwapTransition`, out-in at `quick` — ADR-0026: one place, two states, two heights) and moves the
+scroller to the panel's top **between the leave and the enter**, while nothing is shown, and only if the top had
+gone out of view. Filmed at a tenth of the speed: the two contents never share a frame; the scroll went 500 → 0
+at opacity 0. Reduced motion: the tokens' global rule makes the swap a cut; the scroll still happens.

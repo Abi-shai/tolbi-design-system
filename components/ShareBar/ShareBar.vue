@@ -131,6 +131,15 @@ function colour(i: number) {
   flex-basis: 0;
   border-radius: var(--ds-radius-pill);
   background-color: var(--share-bar-rest);
+  /*
+    A share that changes — another year chosen — **travels** to its new width:
+    the movement says by how much (ADR-0023: movement must explain). `enter` and
+    `in-out`, a thing that travels; its colour follows if its rank changes.
+    Reduced motion: the tokens' global rule makes it a cut.
+  */
+  transition:
+    flex-grow var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
+    background-color var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
 }
 
 /*

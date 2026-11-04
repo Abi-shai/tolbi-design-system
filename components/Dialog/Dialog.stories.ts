@@ -457,6 +457,12 @@ export const DataWindow: Story = {
         { key: 'low', label: 'En dessous · 2018, 94 %', color: 'var(--ds-chart-categorical-2)' },
         { key: 't', label: 'Seuil 95 %', shape: 'dashed', color: 'var(--ds-chart-threshold)' },
       ],
+      pointColumns: [
+        { key: 'point', label: 'Point du projet' },
+        { key: 'indice', label: 'Indice de stock', numeric: true },
+        { key: 'images', label: 'Images valides', numeric: true },
+      ],
+      points: Array.from({ length: 40 }, (_, i) => ({ id: i, point: `P-${String(i + 1).padStart(2, '0')}`, indice: (0.31 + i * 0.007).toFixed(3).replace('.', ','), images: `${92 + (i % 8)} %` })),
     }),
     template: `
       <div :style="PAGE">
@@ -464,7 +470,10 @@ export const DataWindow: Story = {
         <Dialog v-model:open="open" title="Toutes les données" size="2xl">
           <template #nav><Tabs id="donnees" v-model="tab" :tabs="tabs" size="sm" /></template>
           <TabPanel tabs-id="donnees" :value="tab">
-            <div style="display:flex;flex-direction:column;gap:var(--ds-spacing-xl)">
+            <Card v-if="tab !== 'controle'">
+              <Table :columns="pointColumns" :rows="points" :framed="false" :page-sizes="[]" />
+            </Card>
+            <div v-else style="display:flex;flex-direction:column;gap:var(--ds-spacing-xl)">
               <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:var(--ds-spacing-xl)">
                 <StatTile label="Points de contrôle" value="200" caption="5 par point du projet, à moins de 100 km" />
                 <StatTile label="Écart le plus grand" value="0,029" caption="seuil 0,25 · les points de contrôle ressemblent au projet" />
