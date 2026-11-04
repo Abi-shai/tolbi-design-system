@@ -1144,6 +1144,22 @@ Before working on any component, read:
   16 → 45 KB gz). `StatTile`'s label takes **two lines** and the figure sits at the tile's foot, so a row stays
   aligned. The collapsed two-level `SideNavigation` reverses ADR-0046 — drawn first, not decided here.
 
+- **ADR-0096**: a **magnitude** takes a **sequential** ramp — `--ds-chart-sequential-1…5` (accent 200/400 →
+  success 400/600/800, primitives only), lightness falling at every step, **adjacent ΔE ≥ 20 in all four
+  visions**; the drawn red → green kept 18.9 end to end in protan, and the index has no midpoint to diverge
+  from. Also `--ds-chart-threshold`; both in JS (`chartSequential`, `chartThreshold`) for map and chart engines.
+  `ChartLegend` takes a **shape per entry** (`dashed`, `square`, `circle`, `point`, `zone`); an entry is a flex
+  item, or a small mark dropped its label. `ChartFrame` / `ChartTooltip` take a `description`.
+- **ADR-0097**: **`FormSection` is `SectionCard`** — the ARR panel drew the same titled block around figures, so
+  one component (two words: `Section` is an HTML element) with `#actions` on the title's line; `FormSection`
+  stays its alias. **`ShareBar`** leaves `ProjectCard` (which renders it) with a neutral `rest`. `StatTile`
+  gains `caption` and spans **three of its parent's rows as a subgrid**, so a row's figures stay level
+  whatever the label or caption runs to (0.83's `margin-top: auto` broke on a two-line caption).
+- **ADR-0098**: a window of data — `Dialog size="2xl"` (82rem, full height so a tab never resizes it), a fixed
+  **`#nav`** between head and body, **no foot** when it only reads. `Tabs` gains `id` + **`TabPanel`** (it named
+  no panels); `.ds-tabs` ran 10px past its box (`border-box` now). `Table`: **`numeric`** (right, tabular, 6rem
+  floor) and **`framed: false`** inside a surface that draws its own frame.
+
 ## Architecture
 
 - Components live in `components/<Name>/` — each has `<Name>.vue`, `<Name>.stories.ts`, and `index.ts`
