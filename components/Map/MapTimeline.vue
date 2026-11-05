@@ -215,7 +215,7 @@ function exitCompare() {
 <template>
   <div ref="root" class="ds-map-timeline" :class="{ 'ds-map-timeline--small': small, 'ds-map-timeline--dense': dense }">
     <template v-if="scales.length > 1">
-      <Dropdown v-model:open="scaleOpen" class="ds-map-timeline__scale-menu" :label="scaleLabel">
+      <Dropdown v-model:open="scaleOpen" class="ds-map-timeline__scale-menu" :label="scaleLabel" align="start" size="sm">
         <template #trigger="{ open, toggle }">
           <button
             type="button"

@@ -107,7 +107,7 @@ export type { TagSize, TagAction } from './Tag'
 
 export { Dropdown, DropdownTrigger, DropdownItem, DropdownDivider, DropdownGroup, DropdownSelectItem, InputDropdown } from './Dropdown'
 export type {
-  DropdownTriggerVariant, DropdownAlign, DropdownTriggerSize, DropdownTriggerChrome,
+  DropdownTriggerVariant, DropdownAlign, DropdownSide, DropdownSize, DropdownTriggerSize, DropdownTriggerChrome,
   DropdownSelectItemType, InputDropdownType, InputDropdownOption, InputDropdownSize, InputDropdownChrome,
 } from './Dropdown'
 

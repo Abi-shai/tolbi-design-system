@@ -12,6 +12,7 @@ import type { IconName } from '../Icon'
 import DropdownSelectItem from './DropdownSelectItem.vue'
 import { useAnchoredSurface } from '../../composables/useAnchoredSurface'
 import type { DropdownSelectItemType } from './DropdownSelectItem.vue'
+import type { DropdownSide } from './Dropdown.vue'
 
 /** `flag-leading`: a country's flag before each option and the value (ADR-0085). */
 export type InputDropdownType = 'default' | 'icon-leading' | 'avatar-leading' | 'dot-leading' | 'flag-leading' | 'search'
@@ -73,7 +74,14 @@ interface Props {
   leadingIcon?: IconName
   /** Standalone use only. Inside a FormField, the wrapper's `disabled` decides. */
   disabled?: boolean
+  /** The field's size — and its list's: a row is the field's height (ADR-0101). */
   size?: InputDropdownSize
+  /**
+   * The side the list prefers (ADR-0101): `below` by default, `above` for a
+   * field whose room is above — a table's foot. It still turns when its side is
+   * short and the other has more (ADR-0078).
+   */
+  side?: DropdownSide
   /** The name, outside a FormField — which otherwise gives it its label. */
   ariaLabel?: string
   chrome?: InputDropdownChrome
@@ -99,6 +107,7 @@ const props = withDefaults(defineProps<Props>(), {
   placeholder: 'Select...',
   disabled: false,
   size: 'md',
+  side: 'below',
   ariaLabel: undefined,
   chrome: 'box',
   anchor: null,
@@ -172,6 +181,7 @@ useAnchoredSurface(anchorEl, panelEl, {
   /* Inside a box, the list ends under its word: the word ends the box. */
   align: () => (props.chrome === 'none' ? 'end' : 'start'),
   matchWidth: props.size === 'md' && props.chrome === 'box',
+  side: () => props.side,
 })
 
 const selectedOption = computed(() =>
@@ -689,6 +699,7 @@ onUnmounted(() => {
                   :selected="isChosen(option)"
                   :checkbox="multiple"
                   :disabled="option.disabled"
+                  :size="size"
                   @click="selectOption(option)"
                   @mousemove="activeIndex !== i && !option.disabled && (activeIndex = i)"
                 />

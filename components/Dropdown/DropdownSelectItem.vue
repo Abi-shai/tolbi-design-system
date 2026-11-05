@@ -20,6 +20,11 @@ interface Props {
   /** `type="flag"`: the country's ISO code (ADR-0085). */
   flag?: string
   selected?: boolean
+  /**
+   * The list's size, which is its field's (ADR-0101): `md` 46px in `label-xl`,
+   * `sm` 38px in `label-lg` — a row is the height of the field that opened it.
+   */
+  size?: 'sm' | 'md'
   disabled?: boolean
   /**
    * One choice among several (ADR-0085): a box leads the row and carries the
@@ -40,6 +45,7 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
+  size: 'md',
   type: 'default',
   flag: undefined,
   selected: false,
@@ -59,6 +65,7 @@ const emit = defineEmits<{
     class="ds-dropdown-select-item"
     :class="{
       'ds-dropdown-select-item--selected': selected && !checkbox,
+      'ds-dropdown-select-item--sm': size === 'sm',
       'ds-dropdown-select-item--disabled': disabled,
       'ds-dropdown-select-item--active': active && !disabled,
     }"
@@ -72,11 +79,11 @@ const emit = defineEmits<{
   >
     <div class="ds-dropdown-select-item__content">
       <Checkbox v-if="checkbox" visual-only size="sm" :model-value="selected" :disabled="disabled" class="ds-dropdown-select-item__check" />
-      <Flag v-if="type === 'flag' && flag" :code="flag" :size="20" />
+      <Flag v-if="type === 'flag' && flag" :code="flag" :size="size === 'sm' ? 16 : 20" />
       <Icon
         v-else-if="type === 'icon'"
         :name="icon || 'user'"
-        :size="20"
+        :size="size === 'sm' ? 16 : 20"
         class="ds-dropdown-select-item__leading-icon"
         aria-hidden="true"
       />
@@ -231,6 +238,25 @@ const emit = defineEmits<{
   text-overflow: ellipsis;
   flex: 0 100 auto;
   min-width: 0;
+}
+
+/* sm (ADR-0101): the row is the `sm` field's height — 38px: `label-lg`'s 20px
+   line, 8px above and below, and the row's 1px gap. One step down in type,
+   as the field is. */
+.ds-dropdown-select-item--sm .ds-dropdown-select-item__content {
+  padding: var(--ds-spacing-md) 10px var(--ds-spacing-md) var(--ds-spacing-md);
+}
+
+.ds-dropdown-select-item--sm .ds-dropdown-select-item__label {
+  font: var(--ds-font-label-lg);
+}
+
+.ds-dropdown-select-item--sm.ds-dropdown-select-item--selected .ds-dropdown-select-item__label {
+  font: var(--ds-font-label-lg-strong);
+}
+
+.ds-dropdown-select-item--sm .ds-dropdown-select-item__supporting {
+  font: var(--ds-font-body-md);
 }
 
 .ds-dropdown-select-item--disabled .ds-dropdown-select-item__supporting {

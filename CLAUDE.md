@@ -1179,6 +1179,11 @@ Before working on any component, read:
   leaves, so open ↔ fold is one press in one place; two shapes swapped by `SurfaceTransition`.
   **`ProjectCard` `computing`**: same card, « En calcul » + clock, `value: null` said « en calcul », nothing to
   open; **`#insight`** slot. **`Sparkline`**: line + dashed comparison on one scale, `label` for a reader.
+- **ADR-0101**: **a list is the size of what opens it** — `InputDropdown`'s list inherits the field's size (a row
+  is the field's height: `md` 46/16 unchanged, `sm` **38/14** — it was 46/16 under a 38px field), the benchmark's
+  unanimous rule; `Dropdown` takes its own **`size`** (`md` 40/14, `sm` 34/12 and a 160px panel), declared on the
+  panel and read by its rows. **`side: 'below' | 'above'`** is a *preference*: still turned when its side is
+  short (ADR-0078); `Pagination` prefers `above`. Track B (one compact list) declined.
 
 ## Architecture
 

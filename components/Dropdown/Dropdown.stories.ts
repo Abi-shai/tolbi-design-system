@@ -188,3 +188,57 @@ export const HeaderAndGroups: Story = {
     `,
   }),
 }
+
+/**
+ * Deux tailles (ADR-0101). `md` est le menu du catalogue — lignes de 40 px en `label-lg`. `sm` est le menu
+ * qu’ouvre un petit contrôle — lignes de 34 px en `label-md`, panneau de 160 px : la puce d’échelle de la
+ * frise, un bouton `sm` d’une barre d’outils. La taille se déclare sur le panneau ; ses lignes la lisent.
+ */
+export const Sizes: Story = {
+  name: 'Tailles md et sm',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { Dropdown, DropdownItem, DropdownDivider },
+    setup: () => ({ openMd: ref(true), openSm: ref(true) }),
+    template: `
+      <div style="display:flex; gap:280px; align-items:flex-start; padding:16px 16px 260px;">
+        <Dropdown trigger="button" v-model:open="openMd" button-label="md" align="start">
+          <DropdownItem icon="pencil" label="Renommer" />
+          <DropdownItem icon="copy" label="Dupliquer" shortcut="⌘D" />
+          <DropdownDivider />
+          <DropdownItem icon="trash-2" label="Supprimer" />
+        </Dropdown>
+        <Dropdown trigger="button" v-model:open="openSm" button-label="sm" align="start" size="sm">
+          <DropdownItem icon="pencil" label="Renommer" />
+          <DropdownItem icon="copy" label="Dupliquer" shortcut="⌘D" />
+          <DropdownDivider />
+          <DropdownItem icon="trash-2" label="Supprimer" />
+        </Dropdown>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * Le côté (ADR-0101) : `below` par défaut, `above` pour un déclencheur dont la place est au-dessus — une
+ * barre au pied d’une carte ou d’un tableau. C’est une **préférence** : le panneau passe de l’autre côté
+ * quand le sien manque de place et que l’autre en a davantage (ADR-0078). Ici, le même menu en bas d’un
+ * cadre : demandé `above`, il s’ouvre au-dessus ; demandé `below` au ras de l’écran, il bascule seul.
+ */
+export const Side: Story = {
+  name: 'Ouvrir vers le haut',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { Dropdown, DropdownItem },
+    setup: () => ({ open: ref(false) }),
+    template: `
+      <div style="height:320px; display:flex; align-items:flex-end; padding:16px;">
+        <Dropdown trigger="button" v-model:open="open" button-label="Année" align="start" side="above" size="sm">
+          <DropdownItem label="Année" :selected="true" @click="open = false" />
+          <DropdownItem label="Mois" :selected="false" @click="open = false" />
+          <DropdownItem label="Jour" :selected="false" @click="open = false" />
+        </Dropdown>
+      </div>
+    `,
+  }),
+}

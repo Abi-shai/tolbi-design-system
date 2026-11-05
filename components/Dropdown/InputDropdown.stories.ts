@@ -242,7 +242,12 @@ export const InAScrollingBox: Story = {
   }),
 }
 
-/** `sm` : un contrôle posé dans une barre — les lignes par page du pied de tableau (ADR-0080). Il épouse sa valeur ; sa liste est au moins aussi large que lui. */
+/**
+ * `sm` : un contrôle posé dans une barre — les lignes par page du pied de tableau (ADR-0080). Il épouse sa
+ * valeur ; sa liste est au moins aussi large que lui, et **de sa taille** (ADR-0101) : une ligne fait la
+ * hauteur du champ, 38 px en `label-lg` — elle faisait 46 px en 16 px, plus grande que ce qui l’ouvre.
+ * `side="above"` : au pied d’un tableau, la liste préfère s’ouvrir au-dessus.
+ */
 export const Small: Story = {
   name: 'Taille sm',
   parameters: { layout: 'padded' },
@@ -250,9 +255,9 @@ export const Small: Story = {
     components: { InputDropdown },
     setup: () => ({ size: ref(10), sizes: [10, 20, 50, 100].map(n => ({ value: n, label: String(n) })) }),
     template: `
-      <div style="display:flex; align-items:center; gap:var(--ds-spacing-md); font:var(--ds-font-body-md); color:var(--ds-text-subtle);">
+      <div style="display:flex; align-items:center; gap:var(--ds-spacing-md); font:var(--ds-font-body-md); color:var(--ds-text-subtle); padding-top:240px;">
         <span aria-hidden="true">Lignes par page</span>
-        <InputDropdown size="sm" aria-label="Lignes par page" :options="sizes" v-model="size" />
+        <InputDropdown size="sm" side="above" aria-label="Lignes par page" :options="sizes" v-model="size" />
       </div>
     `,
   }),

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
+import { DROPDOWN_SIZE_KEY } from './context'
 import { Avatar } from '../Avatar'
 import { Checkbox } from '../Checkbox'
 import { Icon } from '../Icon'
@@ -62,6 +63,9 @@ const emit = defineEmits<{
   click: []
 }>()
 
+/* The panel's size (ADR-0101); a row outside a `Dropdown` is `md`. */
+const size = inject(DROPDOWN_SIZE_KEY, () => 'md' as const)
+
 const isChoice  = computed(() => props.selected !== undefined)
 const isCheck   = computed(() => props.checked !== undefined)
 const isButton  = computed(() => props.as === 'button')
@@ -103,6 +107,7 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
     :class="{
       'ds-dropdown-item--disabled': disabled,
       'ds-dropdown-item--selected': selected,
+      'ds-dropdown-item--sm': size() === 'sm',
     }"
     v-bind="rootAttrs"
     @click="!disabled && emit('click')"
@@ -249,5 +254,23 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
   color: var(--ds-text-subtlest);
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+/* sm (ADR-0101): 34px a row — `label-md`'s 16px line and 8px above and below,
+   plus the row's 1px gap — the size of the small control that opens it. */
+.ds-dropdown-item--sm .ds-dropdown-item__content {
+  padding: var(--ds-spacing-md) 10px;
+}
+
+.ds-dropdown-item--sm .ds-dropdown-item__label {
+  font: var(--ds-font-label-md);
+}
+
+.ds-dropdown-item--sm.ds-dropdown-item--selected .ds-dropdown-item__label {
+  font: var(--ds-font-label-md-strong);
+}
+
+.ds-dropdown-item--sm .ds-dropdown-item__shortcut {
+  font: var(--ds-font-label-xs);
 }
 </style>

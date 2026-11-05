@@ -124,8 +124,11 @@ const sizeLabelId = `ds-pagination-size-${useId()}`
     <div class="ds-pagination__controls">
       <div v-if="offersSizes" class="ds-pagination__size">
         <span :id="sizeLabelId" class="ds-pagination__size-label" aria-hidden="true">{{ pageSizeLabel }}</span>
+        <!-- At a list's foot, the room is above: the choice opens there
+             (ADR-0101), and still turns below when the top is short. -->
         <InputDropdown
           size="sm"
+          side="above"
           :options="sizeOptions"
           :model-value="pageSize"
           :aria-label="pageSizeLabel"

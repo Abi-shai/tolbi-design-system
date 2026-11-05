@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { SurfaceTransition } from '../SurfaceTransition'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, provide } from 'vue'
 import { useAnchoredSurface } from '../../composables/useAnchoredSurface'
 import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
 import { Scrollbar } from '../Scrollbar'
 import DropdownTrigger from './DropdownTrigger.vue'
+import { DROPDOWN_SIZE_KEY, type DropdownSize } from './context'
 
 /**
  * Which built-in trigger `Dropdown` renders when nothing is slotted.
@@ -21,6 +22,14 @@ export type DropdownTriggerVariant = 'button' | 'icon' | 'avatar'
  * the composable that places it: a public type may only point at what ships.
  */
 export type DropdownAlign = 'start' | 'end'
+
+/**
+ * Which side of the trigger the panel opens on (ADR-0101). A **preference**:
+ * `below` by default; `above` for a trigger whose room is above — a bar at the
+ * foot of a map or of a table. Either way the panel still turns to the other
+ * side when its own has not the room and the other has more (ADR-0078).
+ */
+export type DropdownSide = 'below' | 'above'
 
 interface Props {
   trigger?:    DropdownTriggerVariant
@@ -51,6 +60,14 @@ interface Props {
    * of text (the workspace switcher, a conversation's title).
    */
   align?:      DropdownAlign
+  /** The side the panel prefers; it still turns when that side is short. */
+  side?:       DropdownSide
+  /**
+   * The rows' size (ADR-0101): `md` 40px in `label-lg`, the catalogue's menu;
+   * `sm` 34px in `label-md`, for a menu opened from a small control. Declared
+   * on the panel, read by its rows.
+   */
+  size?:       DropdownSize
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -60,7 +77,11 @@ const props = withDefaults(defineProps<Props>(), {
   role:        'menu',
   label:       undefined,
   align:       'end',
+  side:        'below',
+  size:        'md',
 })
+
+provide(DROPDOWN_SIZE_KEY, () => props.size)
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -71,7 +92,7 @@ const panelEl = ref<HTMLElement | null>(null)
 
 /* In the top layer, placed on the trigger (ADR-0078): a panel inside a box
    that scrolls no longer grows its scroll. */
-useAnchoredSurface(rootEl, panelEl, { align: () => props.align })
+useAnchoredSurface(rootEl, panelEl, { align: () => props.align, side: () => props.side })
 
 function toggle() {
   emit('update:open', !props.open)
@@ -199,6 +220,7 @@ onUnmounted(() => {
       ref="panelEl"
       popover="manual"
       class="ds-dropdown__panel"
+      :class="{ 'ds-dropdown__panel--sm': size === 'sm' }"
       :role="role"
       :aria-label="label"
     >
@@ -368,6 +390,13 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   padding: var(--ds-spacing-xs) 0;
+}
+
+/* sm (ADR-0101): a small control opens a small menu — 160px, as 240 would
+   bury the chip that opened it. A size, not a ceiling: labels are cut, the
+   panel does not breathe with them. */
+.ds-dropdown__panel--sm {
+  width: 10rem;
 }
 
 /* ── Footer ───────────────────────────────────────────────────────── */
