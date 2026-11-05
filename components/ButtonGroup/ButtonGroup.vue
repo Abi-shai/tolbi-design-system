@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, provide, ref, watch, nextTick } from 'vue'
+import { computed, provide, ref, toRef, watch, nextTick } from 'vue'
 import { useSlidingIndicator } from '../../composables/useSlidingIndicator'
-import { BUTTON_GROUP_KEY, type ButtonGroupContext } from './context'
+import { BUTTON_GROUP_KEY, type ButtonGroupContext, type ButtonGroupSize } from './context'
 
 /**
  * ADR-0024: the parent owns the selection.
@@ -13,16 +13,23 @@ import { BUTTON_GROUP_KEY, type ButtonGroupContext } from './context'
  *
  * Now the group holds `v-model`, items register themselves in order, and the
  * selection is a single indicator that slides between them.
+ *
+ * `size` follows the fields it sits beside in a toolbar: `md` (42px) next to
+ * `md` controls, `sm` (38px) next to `InputField` / `InputDropdown` `sm` — the
+ * rail's 4px inset and border stay, the segments go 32 → 28.
  */
 interface Props {
   /** The selected item's value. */
   modelValue?: string
   ariaLabel?: string
+  /** `md` 42px, `sm` 38px — the height of the fields beside it. */
+  size?: ButtonGroupSize
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: undefined,
   ariaLabel: undefined,
+  size: 'md',
 })
 
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
@@ -48,6 +55,7 @@ const context: ButtonGroupContext = {
   },
   select(value) { emit('update:modelValue', value) },
   isSelected: (value) => value === props.modelValue,
+  size: toRef(props, 'size'),
 }
 provide(BUTTON_GROUP_KEY, context)
 
@@ -55,7 +63,7 @@ watch(values, async () => { await nextTick(); measure() }, { deep: true })
 </script>
 
 <template>
-  <div ref="containerRef" class="ds-button-group" role="group" :aria-label="ariaLabel">
+  <div ref="containerRef" class="ds-button-group" :class="`ds-button-group--${size}`" role="group" :aria-label="ariaLabel">
     <!-- Sliding selection — behind the items, like Tabs' indicator -->
     <div
       v-if="activeIndex !== -1"
@@ -104,6 +112,16 @@ watch(values, async () => { await nextTick(); measure() }, { deep: true })
   pointer-events: none;
   z-index: 0;
   /* No transition until after the first paint, or it flies in from 0 */
+}
+
+/* sm (38px): Tabs xs' geometry — the rail takes the control radius, the pill
+   and the segments the smaller inner one, as the element shrinks (ADR-0013). */
+.ds-button-group--sm {
+  border-radius: var(--ds-radius-control);
+}
+
+.ds-button-group--sm .ds-button-group__indicator {
+  border-radius: var(--ds-radius-inner-sm);
 }
 
 .ds-button-group__indicator--animated {

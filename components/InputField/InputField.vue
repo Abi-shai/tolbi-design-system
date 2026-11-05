@@ -209,8 +209,15 @@ provide(FORM_FIELD_KEY, null as unknown as FormFieldContext)
   padding: var(--ds-control-padding-md); /* md */
 }
 
+/* sm is 38px, as InputDropdown sm and ButtonGroup sm beside it in a bar
+   (ADR-0101): the sm padding *and* the 14/20 type — at 16/24 it stood 42. */
 .ds-input-field--sm .ds-input-field__wrapper {
-  padding: var(--ds-spacing-md) var(--ds-spacing-lg); /* 8px 12px */
+  padding: var(--ds-control-padding-sm);
+}
+
+.ds-input-field--sm .ds-input-field__input,
+.ds-input-field--sm .ds-input-field__leading-text {
+  font: var(--ds-font-body-md);
 }
 
 /* ── Content (leading icon + input) ──────────────────────────────── */

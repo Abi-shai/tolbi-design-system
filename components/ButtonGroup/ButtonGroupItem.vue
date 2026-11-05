@@ -42,6 +42,7 @@ onBeforeUnmount(() => group?.unregister(key.value))
 
 const selected = computed(() => group?.isSelected(key.value) ?? false)
 const iconOnly = computed(() => !!props.icon && !props.label)
+const size = computed(() => group?.size.value ?? 'md')
 
 function handleClick(event: MouseEvent) {
   if (props.disabled) return
@@ -58,6 +59,7 @@ function handleClick(event: MouseEvent) {
     :aria-pressed="selected || undefined"
     :class="[
       'ds-button-group-item',
+      `ds-button-group-item--${size}`,
       iconOnly && 'ds-button-group-item--icon-only',
       icon && label && 'ds-button-group-item--leading-icon',
       selected && 'ds-button-group-item--active',
@@ -67,7 +69,7 @@ function handleClick(event: MouseEvent) {
     <Icon
       v-if="icon"
       :name="icon"
-      :size="20"
+      :size="size === 'sm' ? 16 : 20"
       class="ds-button-group-item__icon"
       aria-hidden="true"
     />
@@ -110,6 +112,24 @@ function handleClick(event: MouseEvent) {
 .ds-button-group-item--leading-icon {
   gap: var(--ds-spacing-md);
   padding: var(--ds-spacing-sm) var(--ds-spacing-lg) var(--ds-spacing-sm) var(--ds-spacing-md);
+}
+
+/* ── sm ────────────────────────────────────────────────────────────── */
+/* 28px, so the rail is 38 — an sm field's height. The type does not shrink
+   (it is the field's 14px); the inset does, and the glyph goes 20 → 16. */
+.ds-button-group-item--sm {
+  min-height: 28px;
+  padding: var(--ds-spacing-xs) var(--ds-spacing-md);
+  border-radius: var(--ds-radius-inner-sm);
+}
+
+.ds-button-group-item--sm.ds-button-group-item--icon-only {
+  padding: var(--ds-spacing-sm);
+}
+
+.ds-button-group-item--sm.ds-button-group-item--leading-icon {
+  gap: var(--ds-spacing-sm);
+  padding: var(--ds-spacing-xs) var(--ds-spacing-md) var(--ds-spacing-xs) var(--ds-spacing-sm);
 }
 
 /* ── States ───────────────────────────────────────────────────────── */

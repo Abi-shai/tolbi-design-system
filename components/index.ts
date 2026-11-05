@@ -20,6 +20,7 @@ export { CloseButton } from './CloseButton'
 export type { CloseButtonSize } from './CloseButton'
 
 export { ButtonGroup, ButtonGroupItem } from './ButtonGroup'
+export type { ButtonGroupSize } from './ButtonGroup'
 
 export { Badge } from './Badge'
 export type { BadgeTone, BadgeColor, BadgeVariant, BadgeSize } from './Badge'

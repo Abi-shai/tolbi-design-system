@@ -1,4 +1,7 @@
-import type { InjectionKey } from 'vue'
+import type { InjectionKey, Ref } from 'vue'
+
+/** `md` 42px, `sm` 38px — the rail stands as tall as the fields beside it. */
+export type ButtonGroupSize = 'sm' | 'md'
 
 export interface ButtonGroupContext {
   /**
@@ -11,6 +14,8 @@ export interface ButtonGroupContext {
   unregister(value: string): void
   select(value: string): void
   isSelected(value: string): boolean
+  /** The group's size — the segments read it, so it is said once. */
+  size: Readonly<Ref<ButtonGroupSize>>
 }
 
 export const BUTTON_GROUP_KEY: InjectionKey<ButtonGroupContext> = Symbol('ds-button-group')

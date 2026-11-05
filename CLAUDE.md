@@ -1224,6 +1224,10 @@ Before working on any component, read:
   drawing gives eight variants (four quarter turns × mirror), picked from **`seed`** (the project id, hashed — stable per
   project, varied across neighbours) or `variant` (0–7). It goes in `ProjectCard`'s `#zone`, 40px, no ground. dMRV = zone,
   ARR baselines = baseline.
+- **ADR-0108**: **one height for a filter bar** — search, filter and view switcher on one line, all **`sm` = 38px**.
+  `ButtonGroup` gains **`size`** (`sm | md`): at `sm` the segments go 32 → 28 (rail 38, glyph 16, `radius-control` rail,
+  `radius-inner-sm` pill — `Tabs xs`' geometry), the type stays 14px. **`InputField sm` was 42px** (sm padding, md type)
+  and is now 38 (`control-padding-sm` + `body-md`), as ADR-0101 said `sm` is; Tolbi AI's history search follows.
 
 ## Architecture
 

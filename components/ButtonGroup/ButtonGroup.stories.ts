@@ -2,6 +2,8 @@ import { ref } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 import ButtonGroup from './ButtonGroup.vue'
 import ButtonGroupItem from './ButtonGroupItem.vue'
+import { InputField } from '../InputField'
+import { InputDropdown } from '../Dropdown'
 
 const meta: Meta = {
   title: 'Actions/ButtonGroup',
@@ -113,6 +115,61 @@ export const DynamicSegments: Story = {
           La sélection doit rester sur le même segment pendant que ses voisins apparaissent et
           disparaissent — c'est le chemin de démontage que le détachement DOM ne déclenche pas.
         </p>
+      </div>
+    `,
+  }),
+}
+
+/** `md` (42px) à côté des contrôles `md`, `sm` (38px) à côté des champs `sm` : le rail garde son retrait de 4px, les segments passent de 32 à 28. */
+export const Sizes: Story = {
+  name: 'Sizes',
+  render: () => ({
+    setup: () => ({ md: ref('grille'), sm: ref('grille') }),
+    components: { ButtonGroup, ButtonGroupItem },
+    template: `
+      <div style="display:flex; flex-direction:column; align-items:flex-start; gap:var(--ds-spacing-xl);">
+        <ButtonGroup v-model="md" aria-label="Vue, md">
+          <ButtonGroupItem value="grille" icon="layout-grid" aria-label="Grille" />
+          <ButtonGroupItem value="tableau" icon="table" aria-label="Tableau" />
+        </ButtonGroup>
+        <ButtonGroup v-model="sm" size="sm" aria-label="Vue, sm">
+          <ButtonGroupItem value="grille" icon="layout-grid" aria-label="Grille" />
+          <ButtonGroupItem value="tableau" icon="table" aria-label="Tableau" />
+        </ButtonGroup>
+        <ButtonGroup v-model="sm" size="sm" aria-label="Vue avec libellés, sm">
+          <ButtonGroupItem value="grille" icon="layout-grid" label="Grille" />
+          <ButtonGroupItem value="tableau" icon="table" label="Tableau" />
+        </ButtonGroup>
+      </div>
+    `,
+  }),
+}
+
+/** Une barre de filtres sur une seule ligne de 38px : recherche et liste en `sm`, la vue en `sm`. */
+export const InAFilterBar: Story = {
+  name: 'In a filter bar',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    setup: () => ({
+      view: ref('tableau'),
+      query: ref(''),
+      filter: ref<string | null>(null),
+      options: [
+        { value: 'tous', label: 'Tous les projets' },
+        { value: 'a-jour', label: 'Suivi à jour' },
+        { value: 'calcul', label: 'En calcul' },
+      ],
+    }),
+    components: { ButtonGroup, ButtonGroupItem, InputField, InputDropdown },
+    template: `
+      <div style="display:flex; align-items:center; gap:var(--ds-spacing-md); width:900px;">
+        <div style="width:300px;"><InputField v-model="query" size="sm" type="search" placeholder="Rechercher un projet" /></div>
+        <InputDropdown v-model="filter" size="sm" :options="options" placeholder="Tous les projets" aria-label="Filtrer les projets" />
+        <div style="flex:1;" />
+        <ButtonGroup v-model="view" size="sm" aria-label="Vue">
+          <ButtonGroupItem value="grille" icon="layout-grid" aria-label="Grille" />
+          <ButtonGroupItem value="tableau" icon="table" aria-label="Tableau" />
+        </ButtonGroup>
       </div>
     `,
   }),
