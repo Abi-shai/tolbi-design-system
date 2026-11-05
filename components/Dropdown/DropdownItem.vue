@@ -50,6 +50,13 @@ interface Props {
    * `aria-current` rather than checked. The same row to the eye.
    */
   as?:        'menuitem' | 'button'
+  /**
+   * `danger` — an action that destroys (delete, remove). **Red in the menu**,
+   * glyph and word, and the error tint under the pointer or the focus (ADR-0113).
+   * It goes **last, alone in its group** after a `DropdownDivider`, and the
+   * product still confirms it (`ConfirmDialog`).
+   */
+  tone?:      'neutral' | 'danger'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -57,6 +64,7 @@ const props = withDefaults(defineProps<Props>(), {
   selected: undefined,
   checked:  undefined,
   as:       'menuitem',
+  tone:     'neutral',
 })
 
 const emit = defineEmits<{
@@ -108,6 +116,7 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
       'ds-dropdown-item--disabled': disabled,
       'ds-dropdown-item--selected': selected,
       'ds-dropdown-item--sm': size() === 'sm',
+      'ds-dropdown-item--danger': tone === 'danger',
     }"
     v-bind="rootAttrs"
     @click="!disabled && emit('click')"
@@ -244,6 +253,28 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
 .ds-dropdown-item--selected .ds-dropdown-item__label {
   font: var(--ds-font-label-lg-strong);
   color: var(--ds-text-on-brand-subtle);
+}
+
+/*
+  ── Danger (ADR-0113) ─────────────────────────────────────────────────
+  Red at rest, glyph and word — the menu's norm (7 of 8 systems benchmarked):
+  inside an opened menu, the word is the action, and the colour says what kind.
+  Where a row's trash icon waits for the approach (ADR-0112), a menu has
+  already been asked for. `text-error` on the panel (4.83:1 light, 5.97 dark);
+  under the pointer or the focus the row takes the error tint and its exact ink,
+  `bg-error-subtle` + `text-on-error-subtle` (6.05:1).
+*/
+.ds-dropdown-item--danger .ds-dropdown-item__label,
+.ds-dropdown-item--danger .ds-dropdown-item__icon {
+  color: var(--ds-text-error);
+}
+
+.ds-dropdown-item--danger:is(:hover, :focus-visible):not(.ds-dropdown-item--disabled) .ds-dropdown-item__content {
+  background-color: var(--ds-bg-error-subtle);
+}
+
+.ds-dropdown-item--danger:is(:hover, :focus-visible):not(.ds-dropdown-item--disabled) :is(.ds-dropdown-item__label, .ds-dropdown-item__icon) {
+  color: var(--ds-text-on-error-subtle);
 }
 
 .ds-dropdown-item--selected .ds-dropdown-item__icon {

@@ -1255,6 +1255,11 @@ Before working on any component, read:
   variants red at rest 9/9, but inline table trash neutral at Primer and MUI). `Table`'s neutral veil leaves it alone. **Amended**: a row's action has **one shape** —
   `IconButton xs subtle` (round), the destructive one last with `tone="danger"` — never `Button` icon-only (a square);
   two stories still drew the old one.
+- **ADR-0113**: **a project's actions are a menu** — `DropdownItem` takes **`tone: 'danger'`** (red at rest in a menu,
+  glyph and word `text-error`; `bg-error-subtle` + `text-on-error-subtle` under the pointer — 7/8 menus benchmarked),
+  the order is the rule: consult, change, then **the destructive one last, alone after a `DropdownDivider`**, still
+  confirmed by `ConfirmDialog`. `ProjectCard` takes **`#menu`** — presence decides: the « ⋯ » opens the package's
+  `Dropdown` and emits nothing; a chosen row closes it and hands the focus back.
 
 ## Architecture
 

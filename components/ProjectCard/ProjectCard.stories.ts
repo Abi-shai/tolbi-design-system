@@ -4,6 +4,7 @@ import Docs from './ProjectCard.mdx'
 import { moduleNames } from '../ModuleIcon'
 import { Sparkline } from '../Sparkline'
 import { ProjectGlyph } from '../ProjectGlyph'
+import { DropdownItem, DropdownDivider } from '../Dropdown'
 
 const meta: Meta<typeof ProjectCard> = {
   title: 'Données/ProjectCard',
@@ -401,4 +402,40 @@ export const Dmrv: Story = {
 
 /* One module per entry first — each module's look, in the order of the product —
    then what every card shares. */
-export const __namedExportsOrder = ['Yield', 'Scan', 'Baseline', 'Dmrv', 'Modules', 'States', 'ModuleMark', 'CropOverflow']
+/**
+ * **Le menu d’actions d’un projet** (ADR-0113). Remplir `#menu` fait du « ⋯ » le déclencheur du menu du
+ * paquet : des `DropdownItem`, groupés par des `DropdownDivider`, et **l’action destructive en dernier, seule
+ * dans son groupe**, avec `tone="danger"` — rouge dans le menu, teinte d’erreur au survol. Choisir une ligne
+ * ferme le menu et rend le focus au « ⋯ » ; la suppression passe ensuite par `ConfirmDialog`. Sans `#menu`, la
+ * carte émet `menu` comme avant.
+ */
+export const ActionMenu: Story = {
+  name: 'Menu d’actions',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { ProjectCard, Sparkline, ProjectGlyph, DropdownItem, DropdownDivider },
+    setup: () => ({ d: DMRV, INSIGHT_HEAD, chosen: { value: '—' } }),
+    template: `
+      <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-xl); padding-bottom:160px;">
+        <div style="width: 280px; display: flex;">
+          <ProjectCard v-bind="d.card" state="done" status="Suivi à jour" href="#" style="width:100%;">
+            <template #zone><ProjectGlyph kind="zone" status="done" seed="fph-cacao" /></template>
+            <template #insight>
+              <div :style="INSIGHT_HEAD"><span>Comparé à la baseline</span><span style="color:var(--ds-text-on-success-subtle)">+3,0 tCO2e/ha</span></div>
+              <Sparkline :values="d.project" :comparison="d.baseline" :label="d.label" />
+            </template>
+            <template #menu>
+              <DropdownItem icon="eye" label="Voir le détail" />
+              <DropdownItem icon="pencil" label="Modifier" />
+              <DropdownItem icon="copy" label="Dupliquer" />
+              <DropdownDivider />
+              <DropdownItem icon="trash-2" label="Supprimer" tone="danger" />
+            </template>
+          </ProjectCard>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+export const __namedExportsOrder = ['Yield', 'Scan', 'Baseline', 'Dmrv', 'Modules', 'States', 'ActionMenu', 'ModuleMark', 'CropOverflow']

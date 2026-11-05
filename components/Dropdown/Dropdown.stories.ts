@@ -303,3 +303,31 @@ export const FilterPanel: Story = {
     `,
   }),
 }
+
+/**
+ * **Les actions d’un objet** (ADR-0113) : un menu d’actions groupées — consulter, puis modifier, puis ce qui
+ * détruit. Les groupes sont séparés par `DropdownDivider` ; **l’action destructive va en dernier, seule dans son
+ * groupe**, avec `tone="danger"` : rouge (glyphe et mot), teinte d’erreur au survol et au focus. Elle ouvre
+ * ensuite une confirmation (`ConfirmDialog`), jamais une suppression directe.
+ */
+export const ObjectActions: Story = {
+  name: 'Actions d’un objet',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { Dropdown, DropdownItem, DropdownDivider },
+    setup: () => ({ open: ref(true) }),
+    template: `
+      <div style="padding:16px 16px 240px;">
+        <Dropdown trigger="button" v-model:open="open" button-label="Actions" align="start">
+          <DropdownItem icon="eye" label="Voir le détail" />
+          <DropdownItem icon="pencil" label="Modifier" />
+          <DropdownItem icon="copy" label="Dupliquer" />
+          <DropdownDivider />
+          <DropdownItem icon="archive" label="Archiver" />
+          <DropdownDivider />
+          <DropdownItem icon="trash-2" label="Supprimer" tone="danger" />
+        </Dropdown>
+      </div>
+    `,
+  }),
+}

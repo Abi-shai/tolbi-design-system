@@ -7,6 +7,7 @@ import { ModuleIcon, type ModuleName } from '../ModuleIcon'
 import { Skeleton } from '../Skeleton'
 import { ShareBar } from '../ShareBar'
 import { Tooltip } from '../Tooltip'
+import { Dropdown } from '../Dropdown'
 
 /**
  * One project of one module, as a tile in a grid.
@@ -206,7 +207,31 @@ defineSlots<{
   insight?: () => unknown
   /** The zone's drawing, in place of `zone` — the 40px box stays the card's (ADR-0106). */
   zone?: () => unknown
+  /**
+   * The project's actions, as a menu (ADR-0113): `DropdownItem`s, a
+   * `DropdownDivider` between groups, the destructive one last with
+   * `tone="danger"`. **Presence decides** (ADR-0053): filled, the « ⋯ » opens
+   * this menu and emits nothing; empty, it emits `menu` as before. The menu
+   * closes when a row is chosen, and the focus goes back to the « ⋯ ».
+   */
+  menu?: () => unknown
 }>()
+
+/* The « ⋯ » menu (ADR-0113): open while its rows are shown. */
+const menuOpen = ref(false)
+const menuEl = ref<HTMLElement | null>(null)
+
+/* A row chosen — by a click, or Enter / Space on a `div` row — closes the menu
+   and hands the focus back to the « ⋯ », the menu button's rule. */
+function onMenuChoose(event: Event) {
+  if (event instanceof KeyboardEvent && event.key !== 'Enter' && event.key !== ' ') return
+  const row = (event.target as Element | null)?.closest?.('[role="menuitem"], button.ds-dropdown-item')
+  if (!row || row.getAttribute('aria-disabled') === 'true') return
+  nextTick(() => {
+    menuOpen.value = false
+    menuEl.value?.querySelector<HTMLElement>('.ds-project-card__more')?.focus()
+  })
+}
 
 const emit = defineEmits<{
   click: [event: MouseEvent]
@@ -519,8 +544,32 @@ watch(() => [props.title, props.meta, props.state], async () => {
       `xs`: 32px, not the navigation bar's 36. A tile 280px wide cannot spend a
       36px disc on a menu it shares with a status pill.
     -->
+    <!-- Filled `#menu`: the « ⋯ » is the trigger of the package's menu (ADR-0113). -->
+    <div
+      v-if="interactive && $slots.menu"
+      ref="menuEl"
+      class="ds-project-card__menu"
+      @click="onMenuChoose"
+      @keydown="onMenuChoose"
+    >
+      <Dropdown v-model:open="menuOpen" align="end" :label="`Actions — ${title}`">
+        <template #trigger>
+          <IconButton
+            class="ds-project-card__more"
+            icon="ellipsis"
+            size="xs"
+            :active="menuOpen"
+            :ariaLabel="`Actions — ${title}`"
+            aria-haspopup="menu"
+            :aria-expanded="menuOpen"
+            @click.stop="menuOpen = !menuOpen"
+          />
+        </template>
+        <slot name="menu" />
+      </Dropdown>
+    </div>
     <IconButton
-      v-if="interactive"
+      v-else-if="interactive"
       class="ds-project-card__more"
       icon="ellipsis"
       size="xs"
@@ -626,11 +675,20 @@ watch(() => [props.title, props.meta, props.state], async () => {
 
 /* Above the title's overlay, or the card would swallow the menu's clicks.
    Stacking inside one component, so the number stays literal (ADR-0020). */
-.ds-project-card__more {
+.ds-project-card__more,
+.ds-project-card__menu {
   position: absolute;
   z-index: 1;
   top: var(--ds-spacing-lg);
   right: var(--ds-spacing-lg);
+}
+
+/* In the menu's wrapper, the button is placed by the wrapper. */
+.ds-project-card__menu .ds-project-card__more {
+  position: static;
+}
+
+.ds-project-card__more {
   background: var(--ds-bg-default);
   border: var(--ds-border-width-default) solid var(--ds-border-default);
   box-shadow: var(--ds-elevation-surface);
@@ -671,7 +729,8 @@ watch(() => [props.title, props.meta, props.state], async () => {
   }
 
   .ds-project-card:hover .ds-project-card__more,
-  .ds-project-card__more:focus-visible {
+  .ds-project-card__more:focus-visible,
+  .ds-project-card__more.ds-icon-button--active {
     opacity: 1;
   }
 }
