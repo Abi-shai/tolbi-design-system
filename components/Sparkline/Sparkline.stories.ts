@@ -14,7 +14,12 @@ const meta: Meta<typeof Sparkline> = {
           'grille, ni point — le chiffre à côté dit le nombre, la ligne dit dans quel sens il est allé.\n\n' +
           '`comparison` est une seconde série **sur la même échelle**, en pointillé et dans l’encre qui recule : ' +
           'ce contre quoi la première se lit (les points de contrôle). `label` est la phrase qu’entend un lecteur ' +
-          'à la place de la ligne. Pas un moteur de graphique (ADR-0006) : ni infobulle, ni interaction.',
+          'à la place de la ligne. Pas un moteur de graphique (ADR-0006) : ni infobulle, ni interaction.\n\n' +
+          '**Pas `ChartFrame`, et les deux ne s’emboîtent pas.** `ChartFrame` est le cadre d’un vrai graphique — titre, ' +
+          'légende, axes, grille, états — autour d’un tracé que dessine le moteur du produit : on y *lit des valeurs*. ' +
+          '`Sparkline` dessine sa ligne et rien autour : le chiffre est déjà dit à côté. Le jour où la ligne a besoin ' +
+          'd’un axe, d’une légende ou d’une infobulle, c’est un graphique : mettre le tracé du moteur dans un ' +
+          '`ChartFrame` plutôt que faire grandir celle-ci.',
       },
     },
   },

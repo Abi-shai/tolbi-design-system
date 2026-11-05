@@ -4,6 +4,21 @@ import { computed } from 'vue'
 import { Spinner } from '../Spinner'
 import { EmptyState } from '../EmptyState'
 
+/**
+ * The frame around a chart (ADR-0006): title, description, legend, axis ticks,
+ * grid, loading and empty states — **everything but the data**. The plot comes
+ * from the product's charting engine, in the default slot; the system ships no
+ * engine.
+ *
+ * **Not `Sparkline`, and the two do not nest.** Reach for `ChartFrame` when the
+ * reader must *read values off* the chart — axes, a legend, a tooltip from the
+ * engine. Reach for `Sparkline` when a figure is already said beside it and the
+ * line only says *which way it went*: no axis, no title, no interaction. A
+ * sparkline in a frame grows axes and stops being one; a frame that drew its own
+ * line would be an engine. The family: `ChartLegend` and `ChartTooltip` go with
+ * a `ChartFrame`; `Sparkline` stands alone, beside a figure (`ProjectCard`'s
+ * `#insight`, a `StatTile`); `ColorScale` and `MapTooltip` are a map's.
+ */
 interface Props {
   title?: string
   /** One sentence under the title — what is measured, the threshold it is held to (ADR-0096). */

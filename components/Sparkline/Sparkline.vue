@@ -14,6 +14,13 @@ import { computed } from 'vue'
  * hears (« +12 % contre +4 % pour les points de contrôle »). It is not a
  * charting engine (ADR-0006): no tooltip, no interaction; past a few dozen
  * points or one axis, it is a chart, and the engine's.
+ *
+ * **Not `ChartFrame`, and the two do not nest.** `ChartFrame` is the frame of a
+ * real chart — title, legend, axes, grid, states — around a plot the product's
+ * engine draws; it is for values the reader reads off the chart. `Sparkline`
+ * draws its line and nothing around it; it is for a figure already said beside
+ * it. The day the line needs an axis, a legend or a tooltip, it is a chart: put
+ * the engine's plot in a `ChartFrame` instead of growing this one.
  */
 interface Props {
   values: number[]

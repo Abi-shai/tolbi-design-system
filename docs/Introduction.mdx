@@ -55,6 +55,26 @@ du code, jamais alphabétique.
 
 ---
 
+## Graphiques et cartes : quelle pièce ?
+
+Le design system fournit **l'habillage** des données, jamais le moteur qui les trace (ADR-0006) — à
+une exception près, `Sparkline`, une ligne trop petite pour qu'un moteur vaille la peine.
+
+| Besoin | Pièce | Ce qu'elle dessine |
+|---|---|---|
+| Un graphique où l'on **lit des valeurs** | `ChartFrame` + le tracé du moteur | Titre, description, légende, axes, grille, chargement, vide — pas les données |
+| Nommer les séries d'un graphique | `ChartLegend` (dans `ChartFrame`) | Une marque et un mot par série |
+| La valeur sous le pointeur, sur un graphique | `ChartTooltip` (placée par le moteur) | Une valeur héros, des séries — ne contient rien de cliquable |
+| **La tendance d'un chiffre** déjà dit à côté | `Sparkline`, seule | Une ligne et sa comparaison en pointillé — ni axe, ni titre, ni interaction |
+| La couleur d'une grandeur sur une carte | `ColorScale` | Un dégradé, ses valeurs, la clé des symboles |
+| Ce que dit un **clic** sur un point de carte | `MapTooltip` (placée par le moteur) | Un petit dialogue : titre, fermer, lignes marque · mot · valeur |
+
+`ChartFrame` et `Sparkline` ne s'emboîtent pas : une sparkline encadrée gagnerait des axes, un cadre qui
+dessinerait sa courbe serait un moteur. Quand une ligne a besoin d'un axe, d'une légende ou d'une
+infobulle, c'est un graphique.
+
+---
+
 ## Icônes
 
 Le jeu d'icônes est [Lucide](https://lucide.dev) (ISC) — **189 icônes**, exactement le sous-ensemble
