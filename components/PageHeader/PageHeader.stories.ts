@@ -19,7 +19,7 @@ const meta: Meta<typeof PageHeader> = {
           "L'en-tête d'une page : son nom — **le seul `<h1>` de la page** —, une ligne dessous, et les " +
           'actions de la page à droite. Titre en `heading-lg` (20/28), ' +
           'sous-titre en `body-md` `text-subtle`, `spacing-xs` entre les deux et `spacing-xl` jusqu\'aux ' +
-          "actions. **Aucune marge externe** : l'écart sous l'en-tête (24 dans la maquette) appartient à " +
+          "actions — des **`Button` `md`**, jamais `lg`. **Aucune marge externe** : l'écart sous l'en-tête (24 dans la maquette) appartient à " +
           'la page. En colonne étroite, les actions passent sous le texte dès que celui-ci descendrait ' +
           'sous `20rem` — sans point de rupture, c\'est la colonne qui décide.',
       },
@@ -55,7 +55,7 @@ export const Default: Story = {
     template: `
       <PageHeader v-bind="args">
         <template #actions>
-          <Button label="Créer un rôle" size="lg" />
+          <Button label="Créer un rôle" size="md" />
         </template>
       </PageHeader>
     `,
@@ -87,7 +87,7 @@ export const RichSubtitle: Story = {
           ne se modifient pas — <a href="#" style="color: var(--ds-text-brand);">en savoir plus</a>.
         </template>
         <template #actions>
-          <Button label="Créer un rôle" size="lg" />
+          <Button label="Créer un rôle" size="md" />
         </template>
       </PageHeader>
     `,
@@ -102,8 +102,8 @@ export const SeveralActions: Story = {
     template: `
       <PageHeader v-bind="args">
         <template #actions>
-          <Button label="Exporter" variant="secondary-gray" size="lg" />
-          <Button label="Créer un rôle" size="lg" />
+          <Button label="Exporter" variant="secondary-gray" size="md" />
+          <Button label="Créer un rôle" size="md" />
         </template>
       </PageHeader>
     `,
@@ -124,8 +124,8 @@ export const Narrow: Story = {
       <div style="max-width: 420px;">
         <PageHeader v-bind="args">
           <template #actions>
-            <Button label="Exporter" variant="secondary-gray" size="lg" />
-            <Button label="Créer un rôle" size="lg" />
+            <Button label="Exporter" variant="secondary-gray" size="md" />
+            <Button label="Créer un rôle" size="md" />
           </template>
         </PageHeader>
       </div>
@@ -143,7 +143,7 @@ export const InPage: Story = {
       <div style="display: flex; flex-direction: column; gap: var(--ds-spacing-3xl);">
         <PageHeader v-bind="args">
           <template #actions>
-            <Button label="Créer un rôle" size="lg" />
+            <Button label="Créer un rôle" size="md" />
           </template>
         </PageHeader>
         <Card>Le contenu de la page commence ici.</Card>

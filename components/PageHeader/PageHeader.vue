@@ -11,6 +11,9 @@ import { computed, useSlots } from 'vue'
  * what the frame (`heading-xl`) and the request (`heading-lg`) disagreed on —
  * and the roles' descriptions were rewritten to match (ADR-0051).
  *
+ * **Its actions are `Button md`** (42px), never `lg` — the owner's rule, amended
+ * into ADR-0051. The header places them; it does not size them.
+ *
  * **No outer margin.** The space under the header — 24px in the frame — belongs
  * to the page, which spaces all its blocks the same way (ADR-0047's column, one
  * level down).

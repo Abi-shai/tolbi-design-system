@@ -591,7 +591,7 @@ Before working on any component, read:
   posted their `<h1>` by hand (`text-2xl/3xl/5xl`, Bold). Title = `<h1>` in **`heading-lg`** (20/28),
   set by the design owner on the Figma component; the roles' descriptions were rewritten to match
   (`heading-xl` had said *Page title* and is now only the figures' step). `subtitle` + `#subtitle`
-  (the prop as fallback); neither = no line and no gap. `#actions` on the right, centred on the text.
+  (the prop as fallback); neither = no line and no gap. `#actions` on the right, centred on the text — **`Button md`**, never `lg` (amended 5 Nov.).
   `spacing-xs` / `spacing-xl`, subtitle capped at the frame's 720 (`45rem`, a ceiling). **No outer
   margin** — the 24 below belongs to the page. In a narrow column the actions **drop under the text**
   when it would go below `20rem` — intrinsic, no breakpoint. A `<div>`, not a `<header>` (the bar is the

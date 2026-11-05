@@ -70,6 +70,12 @@ A `PageHeader` component on Home (`2103:4619`): `Titre`, `Sous-titre`, `Avec sou
 `Actions` slot holding a primary `lg` Button by default, and `Avec actions`. Figma cannot express the
 wrap, and the component's description says so.
 
+## Amended (5 Nov.) — the page's buttons are `md`
+
+The owner: the actions on the right are **`Button md`** (42px rendered), not `lg` (46) — the stories showed `lg`, and the
+product copied them. The header still only places its actions; `md` is the rule a page follows. With a subtitle the row
+stays 52 (the text block is taller); without one it is the button's 42.
+
 ## Still open
 
 - The fifty-two pages migrate on the product's side.
