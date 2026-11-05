@@ -1177,8 +1177,8 @@ Before working on any component, read:
   `IconButton xs subtle`, not bare glyphs; the navigator: mini-map +
   − **zoom gauge** (`v-model:zoom`) + ⊙, folded into a bar whose map button is **last** — in the corner the fold
   leaves, so open ↔ fold is one press in one place; two shapes swapped by `SurfaceTransition`.
-  **`ProjectCard` `computing`**: same card, « En calcul » + clock, `value: null` said « en calcul », nothing to
-  open; **`#insight`** slot. **`Sparkline`**: line + dashed comparison on one scale, `label` for a reader.
+  **`ProjectCard` `computing`**: same card, « En calcul » + clock, `value: null` said « en calcul » (**amended by
+  ADR-0105**: written « — », read « en calcul »), nothing to open; **`#insight`** slot. **`Sparkline`**: line + dashed comparison on one scale, `label` for a reader.
 - **ADR-0101**: **a list is the size of what opens it** — `InputDropdown`'s list inherits the field's size (a row
   is the field's height: `md` 46/16 unchanged, `sm` **38/14** — it was 46/16 under a 38px field), the benchmark's
   unanimous rule; `Dropdown` takes its own **`size`** (`md` 40/14, `sm` 34/12 and a 160px panel), declared on the
@@ -1204,6 +1204,26 @@ Before working on any component, read:
   read « Crédits insuffisants »); the product's primary action becomes « Acheter des crédits ». No count of what is
   missing, no confirmation on top. Benchmark: 78 captures, 51 products — the cost in 0–2 lines, no text in an
   illustration's place. Only Yield can estimate before the click today; the other modules need an estimate route.
+- **ADR-0105**: **what is not there yet is written « — »** — the owner's pattern (Figma `3074:10268`), which the
+  package contradicted: in the **type of the value it stands for** (a figure's dash is `heading-lg`), in
+  `text-subtlest`, the unit dropped, `aria-hidden` with a hidden word that says the state (« en calcul »,
+  « Pas encore calculé »). Not a skeleton — **a skeleton promises seconds**, the dash says « not computed yet ».
+  A curve not there yet is a **flat dashed line** (`border-default`, 1px, `4 4`, his « Tracé=Vide »): `Sparkline`
+  with fewer than two points, and no comparison. Applies to `ProjectCard` (`value: null`), `CreditCost` (`cost`
+  absent), `Sparkline`. `ProjectCard`'s stories are filed **one module per story first** (Yield, Scan, ARR · Dynamic
+  baseline, dMRV · suivi — the carbon against the baseline in `Sparkline`'s `comparison`), then what every card shares.
+- **ADR-0106**: **the zone as the card's mark** — the owner's dMRV and ARR cards are marked with the drawing of the
+  project's **zone**, not a module artwork the package does not have. `ProjectCard` takes `zone` (an image source) and
+  a `#zone` slot (the prop its fallback, ADR-0040); **one mark per card** — the zone takes the module's place;
+  **40px, no ground** (his tile's `bg-brand-subtle` dropped the same day, his call), 8px from the name; the row's floor follows
+  (`--project-card-mark` 40). Decorative; the drawing is the product's, generated from the geometry, in the owner's
+  range « Glyphe » (`3041:8757`: zone / parcelle / baseline × status). **Amended by ADR-0107**: not generated — a range.
+- **ADR-0107**: **a project's picture is a range, not a snapshot** — the owner kept his « Glyphe » range over three
+  vector tracks drawn from GeoJSON (bench of 33 captures, page `3766:1427`). `ProjectGlyph` draws one of his eight
+  drawings (`kind` zone / parcel / baseline × `status`, 2× PNG, decorative); **a list cycles through the range**: each
+  drawing gives eight variants (four quarter turns × mirror), picked from **`seed`** (the project id, hashed — stable per
+  project, varied across neighbours) or `variant` (0–7). It goes in `ProjectCard`'s `#zone`, 40px, no ground. dMRV = zone,
+  ARR baselines = baseline.
 
 ## Architecture
 

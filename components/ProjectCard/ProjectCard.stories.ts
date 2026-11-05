@@ -3,6 +3,7 @@ import ProjectCard from './ProjectCard.vue'
 import Docs from './ProjectCard.mdx'
 import { moduleNames } from '../ModuleIcon'
 import { Sparkline } from '../Sparkline'
+import { ProjectGlyph } from '../ProjectGlyph'
 
 const meta: Meta<typeof ProjectCard> = {
   title: 'Données/ProjectCard',
@@ -100,12 +101,37 @@ const SCAN = {
   freshness: 'Créé le 12 mars 2026',
 }
 
+/* The head of an insight — a name on the left, its reading on the right. */
+const INSIGHT_HEAD = 'display:flex;justify-content:space-between;gap:var(--ds-spacing-md);white-space:nowrap;font:var(--ds-font-label-md);color:var(--ds-text-default)'
+
+/*
+  dMRV — a monitoring project: the carbon it gained, the surface it follows,
+  and **the carbon against the baseline**, year after year — `Sparkline`'s
+  `comparison` is that sentence (ADR-0100): the project's line, the baseline
+  dashed, on one scale.
+*/
+const DMRV = {
+  card: {
+    title: 'FPH — Agroforesterie cacao',
+    meta: [{ icon: 'map-pin', label: 'Soubré' }],
+    metrics: [
+      { label: 'Gain carbone', value: '3 120', unit: 'tCO2e' },
+      { label: 'Surface suivie', value: '236', unit: 'ha' },
+    ],
+    freshness: 'Créé le 4 mars 2021',
+  },
+  // tCO2e/ha, 2020 → 2026
+  project:  [9.1, 9.6, 10.2, 10.9, 11.5, 12.1, 12.7],
+  baseline: [9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7],
+  label: '12,7 tCO2e/ha en 2026 contre 9,7 pour la baseline, depuis 9,1 en 2020',
+}
+
 const frame = (inner: string) =>
   `<div style="width: 280px; display: flex;">${inner}</div>`
 
 /** Yield : le bloc du bas est une progression — 2 stades sur 4, de gauche à droite. */
 export const Yield: Story = {
-  name: 'Yield — stades phénologiques',
+  name: 'Yield · stades phénologiques',
   render: () => ({
     components: { ProjectCard },
     setup: () => ({ args: YIELD }),
@@ -119,7 +145,7 @@ export const Yield: Story = {
  * delà de ce qui tient, le reste devient `+N`.
  */
 export const Scan: Story = {
-  name: 'Scan — répartition',
+  name: 'Scan · répartition',
   render: () => ({
     components: { ProjectCard },
     setup: () => ({ args: SCAN }),
@@ -184,15 +210,32 @@ export const States: Story = {
  * barre du bas.
  */
 export const Modules: Story = {
-  name: 'Les deux modules',
+  name: 'Tous les modules',
   parameters: { layout: 'padded' },
   render: () => ({
-    components: { ProjectCard },
-    setup: () => ({ y: YIELD, s: SCAN }),
+    components: { ProjectCard, Sparkline, ProjectGlyph },
+    setup: () => ({ y: YIELD, s: SCAN, d: DMRV, INSIGHT_HEAD, up: [0.31, 0.32, 0.34, 0.33, 0.36, 0.38, 0.39, 0.41, 0.42, 0.44], ref: [0.31, 0.31, 0.32, 0.32, 0.32, 0.33, 0.33, 0.33, 0.34, 0.34] }),
     template: `
-      <div style="display: grid; grid-template-columns: repeat(2, 280px); gap: var(--ds-spacing-xl);">
+      <div style="display: grid; grid-template-columns: repeat(4, 280px); gap: var(--ds-spacing-xl); align-items: stretch;">
         <ProjectCard v-bind="y" />
         <ProjectCard v-bind="s" />
+        <ProjectCard state="done" status="À jour" title="Soubré — cacao agroforestier"
+          :meta="[{ icon: 'map-pin', label: 'Soubré · référence 2026' }]"
+          :metrics="[{ label: 'Part créditable', value: '86', unit: '%' }, { label: 'Crédits estimés', value: '65 762', unit: 'tCO2e' }]"
+          freshness="Créée le 12 mars 2026">
+          <template #zone><ProjectGlyph kind="baseline" status="up-to-date" seed="soubre-ref" /></template>
+          <template #insight>
+            <div :style="INSIGHT_HEAD"><span>Indice de stock</span><span style="color:var(--ds-text-on-success-subtle)">7× plus vite</span></div>
+            <Sparkline :values="up" :comparison="ref" label="+12 % contre +4 % pour les points de contrôle" />
+          </template>
+        </ProjectCard>
+        <ProjectCard v-bind="d.card" state="done" status="Suivi à jour">
+          <template #zone><ProjectGlyph kind="zone" status="done" seed="fph-cacao" /></template>
+          <template #insight>
+            <div :style="INSIGHT_HEAD"><span>Comparé à la baseline</span><span style="color:var(--ds-text-on-success-subtle)">+3,0 tCO2e/ha</span></div>
+            <Sparkline :values="d.project" :comparison="d.baseline" :label="d.label" />
+          </template>
+        </ProjectCard>
       </div>
     `,
   }),
@@ -238,14 +281,14 @@ export const ModuleMark: Story = {
  * autre chose qu’une répartition.
  *
  * **En calcul** : la même carte, à la même hauteur. Ce qu’on sait reste ; ce
- * qui se calcule est dit « en calcul » (un tiret se lit « rien », un squelette
- * promet des secondes). Rien à ouvrir : ni lien, ni menu, ni soulèvement.
+ * qui se calcule s'écrit « — », lu « en calcul », et la courbe attend en
+ * pointillé (ADR-0105). Rien à ouvrir : ni lien, ni menu, ni soulèvement.
  */
 export const Baseline: Story = {
-  name: 'Fiche de référence — à jour, à mettre à jour, en calcul',
+  name: 'ARR · Dynamic baseline',
   parameters: { layout: 'padded' },
   render: () => ({
-    components: { ProjectCard, Sparkline },
+    components: { ProjectCard, Sparkline, ProjectGlyph },
     setup: () => ({
       up: [0.31, 0.32, 0.34, 0.33, 0.36, 0.38, 0.39, 0.41, 0.42, 0.44],
       ref: [0.31, 0.31, 0.32, 0.32, 0.32, 0.33, 0.33, 0.33, 0.34, 0.34],
@@ -256,6 +299,7 @@ export const Baseline: Story = {
           :meta="[{ icon: 'map-pin', label: 'Soubré · référence 2026' }]"
           :metrics="[{ label: 'Part créditable', value: '86', unit: '%' }, { label: 'Crédits estimés', value: '65 762', unit: 'tCO2e' }]"
           freshness="Créée le 12 mars 2026">
+          <template #zone><ProjectGlyph kind="baseline" status="up-to-date" seed="soubre-ref" /></template>
           <template #insight>
             <div style="display:flex;justify-content:space-between;font:var(--ds-font-label-md);color:var(--ds-text-default)">
               <span>Indice de stock</span><span style="color:var(--ds-text-on-success-subtle)">7× plus vite</span>
@@ -267,6 +311,7 @@ export const Baseline: Story = {
           :meta="[{ icon: 'map-pin', label: 'Gagnoa · référence 2026' }]"
           :metrics="[{ label: 'Part créditable', value: '78', unit: '%' }, { label: 'Crédits estimés', value: '41 230', unit: 'tCO2e' }]"
           freshness="Créée le 14 octobre 2026">
+          <template #zone><ProjectGlyph kind="baseline" status="outdated" seed="gagnoa-nord" /></template>
           <template #insight>
             <div style="display:flex;justify-content:space-between;font:var(--ds-font-label-md);color:var(--ds-text-default)">
               <span>Indice de stock</span><span style="color:var(--ds-text-on-success-subtle)">5× plus vite</span>
@@ -278,14 +323,63 @@ export const Baseline: Story = {
           :meta="[{ icon: 'map-pin', label: 'Sassandra' }]"
           :metrics="[{ label: 'Surface comparée', value: '2 880', unit: 'ha' }, { label: 'Carbone', value: null }]"
           freshness="Créée le 26 octobre 2026">
+          <template #zone><ProjectGlyph kind="baseline" status="computing" seed="bas-sassandra" /></template>
           <template #insight>
             <div style="display:flex;justify-content:space-between;font:var(--ds-font-label-md);color:var(--ds-text-default)">
-              <span>Indice de stock</span><span style="color:var(--ds-text-subtle)">en calcul</span>
+              <span>Indice de stock</span><span style="color:var(--ds-text-subtlest)">—</span>
             </div>
-            <div style="height:32px" />
+            <Sparkline :values="[]" label="En calcul" />
           </template>
         </ProjectCard>
       </div>
     `,
   }),
 }
+
+/**
+ * dMRV — un projet de suivi. La même coque ; l'aperçu dit **le carbone face à la
+ * baseline**, année après année : la ligne du projet, la baseline en pointillé,
+ * sur une même échelle (`Sparkline` avec `comparison`, ADR-0100).
+ *
+ * Les états sont ceux du suivi : à jour ; **en calcul** — le motif existant,
+ * `state="computing"` et les chiffres à `null`, rien à ouvrir ; et le suivi de
+ * l'année **à lancer**, qui garde le dernier suivi lisible.
+ */
+export const Dmrv: Story = {
+  name: 'dMRV · suivi',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { ProjectCard, Sparkline, ProjectGlyph },
+    setup: () => ({ d: DMRV, INSIGHT_HEAD }),
+    template: `
+      <div style="display: grid; grid-template-columns: repeat(3, 280px); gap: var(--ds-spacing-xl); align-items: stretch;">
+        <ProjectCard v-bind="d.card" state="done" status="Suivi à jour">
+          <template #zone><ProjectGlyph kind="zone" status="done" seed="fph-cacao" /></template>
+          <template #insight>
+            <div :style="INSIGHT_HEAD"><span>Comparé à la baseline</span><span style="color:var(--ds-text-on-success-subtle)">+3,0 tCO2e/ha</span></div>
+            <Sparkline :values="d.project" :comparison="d.baseline" :label="d.label" />
+          </template>
+        </ProjectCard>
+        <ProjectCard v-bind="d.card" state="computing"
+          :metrics="[{ label: 'Gain carbone', value: null }, { label: 'Surface suivie', value: '236', unit: 'ha' }]">
+          <template #zone><ProjectGlyph kind="zone" status="running" seed="fph-cacao" /></template>
+          <template #insight>
+            <div :style="INSIGHT_HEAD"><span>Comparé à la baseline</span><span style="color:var(--ds-text-subtlest)">—</span></div>
+            <Sparkline :values="[]" label="En calcul" />
+          </template>
+        </ProjectCard>
+        <ProjectCard v-bind="d.card" state="running" status="Suivi 2027 à lancer">
+          <template #zone><ProjectGlyph kind="zone" status="done" seed="fph-cacao" /></template>
+          <template #insight>
+            <div :style="INSIGHT_HEAD"><span>Comparé à la baseline</span><span style="color:var(--ds-text-on-success-subtle)">+3,0 tCO2e/ha</span></div>
+            <Sparkline :values="d.project" :comparison="d.baseline" :label="d.label" />
+          </template>
+        </ProjectCard>
+      </div>
+    `,
+  }),
+}
+
+/* One module per entry first — each module's look, in the order of the product —
+   then what every card shares. */
+export const __namedExportsOrder = ['Yield', 'Scan', 'Baseline', 'Dmrv', 'Modules', 'States', 'ModuleMark', 'CropOverflow']
