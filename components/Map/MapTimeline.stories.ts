@@ -80,6 +80,30 @@ export const FewYears: Story = {
   }),
 }
 
+/**
+ * **Deux tailles** (ADR-0115). `md`, par défaut : l’instrument principal d’un écran — périodes en 14 px, chacune une
+ * cible de 32 px, barre de 48 px, point de mesure de 6 px. `sm` : le premier dessin (42 px, 12 px), pour une carte
+ * étroite où la frise est secondaire.
+ */
+export const Sizes: Story = {
+  name: 'Tailles md et sm',
+  render: () => ({
+    components: { MapTimeline },
+    setup: () => ({
+      md: ref('2024'), sm: ref('2024'), months: ref('2026-3'), scale: ref('month'),
+      SCALE: [{ value: 'year', label: 'Année' }], SCALES, MONTHS,
+      PERIODS: ['2020', '2021', '2022', '2023', '2024'].map((y, i) => ({ value: y, label: y, data: i !== 1 })),
+      SEVEN: ['2018', '2019', '2020', '2021', '2022', '2023', '2024'].map((y) => ({ value: y, label: y, data: true })),
+    }),
+    template: ground(`<div style="display:flex; flex-direction:column; align-items:center; gap:24px;">
+      <MapTimeline v-model="md" :scales="SCALE" :periods="PERIODS" label="Année" compare />
+      <MapTimeline v-model="md" :scales="SCALE" :periods="SEVEN" label="Année" compare />
+      <MapTimeline v-model="months" v-model:scale="scale" :scales="SCALES" :periods="MONTHS" label="Mois" compare />
+      <MapTimeline v-model="sm" size="sm" :scales="SCALE" :periods="PERIODS" label="Année" compare />
+    </div>`),
+  }),
+}
+
 export const Months: Story = {
   name: 'Mois — mesures et mois à venir',
   render: () => ({

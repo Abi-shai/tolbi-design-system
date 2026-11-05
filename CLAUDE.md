@@ -1264,6 +1264,11 @@ Before working on any component, read:
   word (« Année ») where the chip would be, no chevron; **one scale or none, the bar hugs** (`fit-content` up to 30rem —
   480 was a size only so a scale switch never resizes it; five years: 358px, no void); a **data dot hangs under its
   label out of the flow**, so every year keeps the chosen pill's line.
+- **ADR-0115**: **a timeline read and touched** — `MapTimeline` gains **`size`**, **`md` by default** (the screen's
+  instrument): periods `label-lg` 14px on **32px targets** (the chosen one too — the pill is the target), ‹ › 32, a
+  6px data dot inside the target, « Comparer » `Button link sm` with a 32px target, the bar **48px** and **35rem**
+  (hugging, up to 40rem). `sm` keeps the owner's drawing (42px, 12px) for a narrow map; its « Comparer » gets a 24px
+  target (it measured 18).
 
 ## Architecture
 
