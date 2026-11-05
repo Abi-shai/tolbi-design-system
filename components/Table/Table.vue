@@ -689,6 +689,30 @@ const showPagination = computed(() =>
 .ds-table__td--right .ds-table__actions  { justify-content: flex-end; }
 .ds-table__td--center .ds-table__actions { justify-content: center; }
 
+/*
+  **A veil, not a tint** (ADR-0111, track A of `3784:1427`). A ghost control's
+  hover is `bg-hover` — the very ground of the hovered row, so pointing at an
+  action changed nothing (1.000:1). Here it takes `text-strong` at 7 % (12 %
+  pressed): translucent, it stacks on whatever the row wears — hover, selected,
+  light or dark — and stays visible (1.154:1 light, 1.194:1 dark, measured). Six
+  of ten systems benchmarked do this; none draws a contour. The ink steps to
+  `text-strong` with it. Ghost and subtle `IconButton`s and a ghost `Button`;
+  the filled ones (primary, surface, neutral) keep their own hover.
+*/
+.ds-table__actions {
+  --table-action-veil: color-mix(in srgb, var(--ds-text-strong) 7%, transparent);
+  --table-action-veil-pressed: color-mix(in srgb, var(--ds-text-strong) 12%, transparent);
+}
+
+.ds-table__actions :deep(:is(.ds-icon-button--ghost, .ds-icon-button--subtle, .ds-button--ghost):is(:hover, .ds-icon-button--active, [aria-expanded='true']):not(:disabled)) {
+  background: var(--table-action-veil);
+  color: var(--ds-text-strong);
+}
+
+.ds-table__actions :deep(:is(.ds-icon-button--ghost, .ds-icon-button--subtle, .ds-button--ghost):active:not(:disabled)) {
+  background: var(--table-action-veil-pressed);
+}
+
 @media (hover: hover) {
   .ds-table__actions {
     opacity: 0;

@@ -1246,7 +1246,9 @@ Before working on any component, read:
 - **ADR-0111**: **a row's actions come with the row** — `TableColumn.actions` marks the column; hidden at rest, they
   fade in (opacity alone, `quick`, `ProjectCard`'s menu motion) when the row is hovered, reached by the keyboard
   (`:focus-visible` inside), selected, or holds an open menu; still tabbable; always shown without hover
-  (`hover: hover`). The row's name is **no longer underlined** on hover.
+  (`hover: hover`). The row's name is **no longer underlined** on hover. **Amended**: an action pointed at on a hovered row took `bg-hover`,
+  the row's own ground (1.000:1) — after a 13-system benchmark (veil 6/10), ghost/subtle actions take a **veil**,
+  `text-strong` 7 % (12 % pressed), that stacks on any row: 1.154 light, 1.194 dark.
 
 ## Architecture
 

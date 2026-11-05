@@ -29,3 +29,19 @@ on top of the ground and the hand.
 - **`hover: hover` gates it**: a touch screen has no pointer to rest, so there the actions stay.
 - **The name is not underlined on hover.** The ground and the hand already say the row is the target; the focus ring
   still marks the link for the keyboard.
+
+## Amended (5 Nov.) — an action pointed at, on a pointed row: a veil
+
+Pointing at an action on a hovered row changed nothing: a ghost control's hover is `bg-hover`, **the very ground of the
+hovered row** (1.000:1 — ADR-0036's sentence: a `bg-*` token is solved against `bg-default`). The owner asked for a
+benchmark first: 13 systems measured (`.context/table-actions/bench/`) — a **translucent veil** that stacks on the row's
+tint in 6 of 10 (Polaris, Atlassian, Primer, MUI, GitLab, Radix; alphas 4–16 %, 1.09–1.15:1), a darker solid step in 3
+(Carbon 1.25:1), our defect in 1 (Fluent, which compensates with a filled blue glyph); no contour anywhere. Three tracks
+were prototyped in the real `Table`, light and dark (Figma `3784:1427`); **A was chosen**:
+
+- Inside the actions column, a ghost or subtle `IconButton` and a ghost `Button` take **`text-strong` at 7 %** on hover
+  and while its menu is open, **12 %** pressed, and the ink steps to `text-strong`. Translucent, it stacks on whatever
+  the row wears — hovered, selected, light or dark. Measured: **1.154:1 light, 1.194:1 dark** against the hovered row.
+- The veil is a variant switch (`--table-action-veil`, ADR-0010), not a token: one place, one reason.
+- Not chosen: B, `bg-neutral-strong` (1.41 / 1.78 — the token of inert rails); C, the button rising as a surface with a
+  contour (heavier, and no system does it in a table).
