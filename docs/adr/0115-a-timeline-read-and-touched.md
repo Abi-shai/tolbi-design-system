@@ -1,4 +1,4 @@
-# ADR-0115 — A timeline read and touched: `MapTimeline` `md`
+# ADR-0115 — A timeline read and touched: one size, the large one
 
 **Date:** 2026-11-05
 **Amends:** ADR-0100 (`MapTimeline`'s geometry), ADR-0114
@@ -15,19 +15,22 @@ Measured in Storybook on the owner's drawing: periods in `label-md` / `label-xs`
 
 ## Decisions
 
-- **`size: 'sm' | 'md'`, `md` the default.** `sm` is the owner's drawing, kept for a narrow map where the timeline is
-  secondary. `md` is the instrument:
-  - every period is a **32px** target — `label-lg` (14/20) + `spacing-sm` above and below, at least 32px wide (a
-    one-digit day is still a square) — and the **chosen one the same**: the pill is the target, only the weight steps
-    (`label-lg-strong`);
-  - ‹ › and ✕ stay `IconButton xs`, 32px: one height across the bar;
-  - the bar is **48px** and **35rem** wide — 480 × 14/12, or five years and « Comparer » no longer fit and the first
-    year is cut; hugging (one scale or none, ADR-0114) it may run to **40rem**, where seven years and « Comparer »
-    measure 612px;
-  - the data dot is **6px**, inside its period's target (its bottom padding), so it never leaves the box it marks;
-  - « Comparer » is `Button link sm` (14px) with a 32px target, its range and the one scale's word `label-lg-strong`.
-- « Comparer » gets a target at **`sm`** too: 24px, where it measured 18.
-- The scale chip stays `DropdownTrigger chip` (24px, 12px) at both sizes: it is a setting of the instrument, not a period.
+**One size, the large one** — the owner: « on ne va pas avoir plusieurs tailles, une seule, la plus grande, pour plus
+d'accessibilité ». A `size` prop (`md` default, the drawing kept as `sm`) was shipped to main the same day and removed
+before release.
 
-Measured (story « Tailles md et sm »): every period 32px tall, chosen 32, ‹ › 32, « Comparer » 32, one line for every
+- every period is a **32px** target — `label-lg` (14/20) + `spacing-sm` above and below, at least 32px wide (a
+  one-digit day is still a square) — and the **chosen one the same**: the pill is the target, only the weight steps
+  (`label-lg-strong`);
+- ‹ › and ✕ stay `IconButton xs`, 32px: one height across the bar;
+- the bar is **48px** and **35rem** wide — the drawing's 480 × 14/12, or five years and « Comparer » no longer fit and
+  the first year is cut; hugging (one scale or none, ADR-0114) it may run to **40rem**, where seven years and
+  « Comparer » measure 612px;
+- the data dot is **6px**, inside its period's target (its bottom padding), so it never leaves the box it marks;
+- « Comparer » is `Button link sm` (14px) with a 32px target (it measured 18); its range and the one scale's word
+  `label-lg-strong`;
+- the `small` step (`label-xs` for periods carrying dots) is gone: the dot no longer takes room from the label;
+- the scale chip stays `DropdownTrigger chip` (24px, 12px): it is a setting of the instrument, not a period.
+
+Measured (story « Cinq et sept années »): every period 32px tall, chosen 32, ‹ › 32, « Comparer » 32, one line for every
 label; five years 510px, seven 612px, both whole; twelve months 560px and scrolling as before.

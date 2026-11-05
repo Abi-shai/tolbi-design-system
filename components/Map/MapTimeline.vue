@@ -22,13 +22,6 @@ export interface MapTimelinePeriod {
   minor?: boolean
 }
 
-/**
- * `md` (default) — the screen's main instrument: 14px periods, a 32px target
- * each, a 48px bar (ADR-0115). `sm` — the owner's first drawing, 42px with 12px
- * type, for a narrow map where the bar is secondary.
- */
-export type MapTimelineSize = 'sm' | 'md'
-
 /** One choice of the scale chip — année, mois, jour. */
 export interface MapTimelineScale {
   value: string
@@ -76,8 +69,6 @@ interface Props {
   comparedLabel?: string
   /** Said after a period with a data dot. */
   dataLabel?: string
-  /** `md` — read and touched as the screen's instrument; `sm` — a narrow map's (ADR-0115). */
-  size?: MapTimelineSize
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -92,7 +83,6 @@ const props = withDefaults(defineProps<Props>(), {
   exitCompareLabel: 'Quitter la comparaison',
   comparedLabel: 'comparée',
   dataLabel: 'mesure disponible',
-  size: 'md',
 })
 
 const value = defineModel<string>({ required: true })
@@ -108,9 +98,7 @@ const index = computed(() => props.periods.findIndex((p) => p.value === value.va
 const currentScale = computed(() => props.scales.find((s) => s.value === scale.value) ?? props.scales[0])
 const scaleName = computed(() => currentScale.value?.label)
 
-/* A step that carries a mark under it (a data dot) or between which dots
-   stand is set one size down: the bar keeps its height. */
-const small = computed(() => props.periods.some((p) => p.data !== undefined || p.minor))
+/* Between dots, the labelled days are landmarks (they recede). */
 const dense = computed(() => props.periods.some((p) => p.minor))
 
 const { containerRef: track, itemRefs, style, ready, measure, reducedMotion } = useSlidingIndicator(index)
@@ -273,7 +261,7 @@ function exitCompare() {
 </script>
 
 <template>
-  <div ref="root" class="ds-map-timeline" :class="[`ds-map-timeline--${size}`, { 'ds-map-timeline--small': small && size === 'sm', 'ds-map-timeline--dense': dense, 'ds-map-timeline--hug': scales.length < 2 }]">
+  <div ref="root" class="ds-map-timeline" :class="{ 'ds-map-timeline--dense': dense, 'ds-map-timeline--hug': scales.length < 2 }">
     <span class="ds-map-timeline__said" role="status">{{ announced }}</span>
     <template v-if="scales.length > 1">
       <Dropdown v-model:open="scaleOpen" class="ds-map-timeline__scale-menu" :label="scaleLabel" align="start" size="sm">
@@ -373,7 +361,7 @@ function exitCompare() {
         v-if="!comparing"
         class="ds-map-timeline__action"
         variant="link"
-        :size="size === 'md' ? 'sm' : 'xs'"
+        size="sm"
         :label="compareLabel"
         @click="startCompare"
       />
@@ -397,19 +385,24 @@ function exitCompare() {
 
 <style scoped>
 /*
-  The drawing: a raised pill 42px tall, 8 in at the start and 12 at the end,
-  6 between its parts. 480px is a size — the bar does not breathe with the
-  labels of the scale it shows. The border is `border-subtle` (ADR-0030): in
-  dark the shadow cannot separate a surface from the map, the edge does.
+  The drawing — a raised pill, 8 in at the start and 12 at the end, 6 between
+  its parts — at **one size, the large one** (ADR-0115): the timeline is the
+  screen's instrument, so it is read at 14px and touched on 32px targets. The
+  drawing's 42px and 12px type gave 20px targets, under WCAG 2.5.8's 24.
+
+  **48px tall, 35rem wide** — the drawing's 480 × 14/12, or five years and
+  « Comparer » no longer fit. 35rem is a size: the bar does not breathe with
+  the labels of the scale it shows. The border is `border-subtle` (ADR-0030):
+  in dark the shadow cannot separate a surface from the map, the edge does.
 */
 .ds-map-timeline {
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-sm);
   box-sizing: border-box;
-  width: 30rem;
+  width: 35rem;
   max-width: 100%;
-  height: 42px;
+  height: 48px;
   padding: 0 var(--ds-spacing-lg) 0 var(--ds-spacing-md);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-pill);
@@ -421,12 +414,13 @@ function exitCompare() {
   **One scale or none: the bar hugs** (ADR-0114). 480 is a size so that
   switching from years to months never resizes the bar; with nothing to switch,
   that reason is gone, and five years at the end of a 480px bar left 127px of
-  void before them. It hugs up to the same 30rem, then scrolls as before — and
-  stays centred where the screen centres it (ADR-0103's axis).
+  void before them. It hugs up to 40rem — seven years and « Comparer » measure
+  612px — then scrolls as before, and stays centred where the screen centres it
+  (ADR-0103's axis).
 */
 .ds-map-timeline--hug {
   width: fit-content;
-  max-width: min(30rem, 100%);
+  max-width: min(40rem, 100%);
 }
 
 /* ── The scale chip ───────────────────────────────────────────────── */
@@ -444,7 +438,7 @@ function exitCompare() {
 .ds-map-timeline__scale-word {
   flex: none;
   padding-inline-start: var(--ds-spacing-xs);
-  font: var(--ds-font-label-md-strong);
+  font: var(--ds-font-label-lg-strong);
   color: var(--ds-text-subtle);
   white-space: nowrap;
 }
@@ -481,18 +475,14 @@ function exitCompare() {
   flex: none;
 }
 
-/* « Comparer » is a link — no box of its own — so its target is given: 24px
-   at `sm` (WCAG 2.5.8's floor; it measured 18), the periods' 32 at `md`. */
+/* « Comparer » is a link — no box of its own — so its target is given, the
+   periods' 32px (it measured 18). */
 .ds-map-timeline__action {
-  min-height: 24px;
-}
-
-.ds-map-timeline--md .ds-map-timeline__action {
   min-height: 32px;
 }
 
 .ds-map-timeline__range {
-  font: var(--ds-font-label-md-strong);
+  font: var(--ds-font-label-lg-strong);
   color: var(--ds-text-brand);
   white-space: nowrap;
 }
@@ -528,9 +518,9 @@ function exitCompare() {
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-md);
+  gap: var(--ds-spacing-xs);
   width: max-content;
-  min-height: 30px;
+  min-height: 32px;
   margin-inline-start: auto;
 }
 
@@ -559,11 +549,15 @@ function exitCompare() {
   flex-direction: column;
   align-items: center;
   gap: var(--ds-spacing-xxs);
-  padding: var(--ds-spacing-xxs) var(--ds-spacing-xs);
+  /* A 32px target: `label-lg`'s 20px line + 6 above and below, and at least
+     32px wide, so a one-digit day is still a square. */
+  box-sizing: border-box;
+  min-width: 32px;
+  padding: var(--ds-spacing-sm) var(--ds-spacing-md);
   border: none;
   border-radius: var(--ds-radius-pill);
   background: transparent;
-  font: var(--ds-font-label-md);
+  font: var(--ds-font-label-lg);
   color: var(--ds-text-strong);
   white-space: nowrap;
   cursor: pointer;
@@ -572,10 +566,6 @@ function exitCompare() {
     color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
     background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
     box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
-}
-
-.ds-map-timeline--small .ds-map-timeline__tick {
-  font: var(--ds-font-label-xs);
 }
 
 /* Between dots, the labelled days are landmarks: they recede. */
@@ -596,19 +586,13 @@ function exitCompare() {
   cursor: default;
 }
 
-/* Chosen: the pill's ink, a step stronger, and 4px of air above and below. */
+/* Chosen: the pill's ink, a step stronger — the same box: the pill is the
+   target, it does not grow. */
 .ds-map-timeline__tick--current,
-.ds-map-timeline__tick--chosen {
-  padding-block: var(--ds-spacing-xs);
-  font: var(--ds-font-label-md-strong);
-  color: var(--ds-text-on-brand-solid);
-}
-
-.ds-map-timeline--small .ds-map-timeline__tick--current,
-.ds-map-timeline--small .ds-map-timeline__tick--chosen,
+.ds-map-timeline__tick--chosen,
 .ds-map-timeline--dense .ds-map-timeline__tick--current,
 .ds-map-timeline--dense .ds-map-timeline__tick--chosen {
-  font: var(--ds-font-label-md-strong);
+  font: var(--ds-font-label-lg-strong);
   color: var(--ds-text-on-brand-solid);
 }
 
@@ -632,33 +616,33 @@ function exitCompare() {
 }
 
 /*
-  A day between the labelled ones is 4px drawn on a 12px pitch: its target is
-  the whole pitch (the gap split between neighbours) and 24px tall. Under the
-  24px of WCAG 2.5.8 across, by the drawing — met by its exception: ‹ › and the
-  arrow keys reach every day one press at a time (ADR-0100).
+  A day between the labelled ones is its dot: its target is the whole pitch
+  (the gap split between neighbours) and 32px tall. Under 24px across, by the
+  drawing — met by WCAG 2.5.8's exception: ‹ › and the arrow keys reach every
+  day one press at a time (ADR-0100).
 */
+.ds-map-timeline__tick--minor {
+  min-width: 0;
+}
+
 .ds-map-timeline__tick--minor::before {
   content: '';
   position: absolute;
-  inset: -10px calc(-1 * var(--ds-spacing-xs));
-}
-
-.ds-map-timeline--dense .ds-map-timeline__tick--current,
-.ds-map-timeline--dense .ds-map-timeline__tick--chosen {
-  padding-inline: 10px;
+  inset: -13px calc(-1 * var(--ds-spacing-xxs));
 }
 
 .ds-map-timeline__dot {
   flex: none;
-  /* Under its label, out of the flow (ADR-0114): in it, a dot made its year
-     6px taller, centred, so the labels with a dot sat 3px above the chosen
-     one, whose pill hides its dot. The label is the box; the dot hangs under. */
+  /* Under its label, out of the flow (ADR-0114) — in it, a dot made its year
+     taller and lifted its label off the chosen one's line — and inside the
+     period's own 32px target, in its bottom padding (ADR-0115): 6px, so it
+     reads on imagery, and never outside the box it marks. */
   position: absolute;
-  top: 100%;
+  bottom: 1px;
   left: 50%;
   translate: -50% 0;
-  width: 4px;
-  height: 4px;
+  width: 6px;
+  height: 6px;
   border-radius: var(--ds-radius-pill);
   background: var(--ds-bg-brand-solid);
 }
@@ -682,86 +666,4 @@ function exitCompare() {
   display: none;
 }
 
-/*
-  ── md: the screen's instrument (ADR-0115) ────────────────────────────
-  etolbi on 0.95: on the dMRV project page the timeline is the main control —
-  the year is chosen and compared there — and the drawing's 12px type and 20px
-  targets were under WCAG 2.5.8's 24px. Maps that carry a timeline as their
-  instrument (Global Nature Watch, Planet, Earth Engine) set it at 14px with
-  targets of 32 or more. So, at `md`:
-
-  - every period is **32px tall** — `label-lg` (14/20) + `spacing-sm` above and
-    below — and the chosen one **the same**: the pill is the target, it does not
-    grow (the weight steps to `label-lg-strong`, not the box);
-  - ‹ › and ✕ are `IconButton xs`, 32px: one height across the bar;
-  - the bar is **48px**, 8 above and below the targets, and **35rem** wide —
-    480 × 14/12, or five years and « Comparer » no longer fit;
-  - the « mesure disponible » dot is **6px**, inside the period's own target —
-    in its bottom padding — so it never leaves the box it marks;
-  - « Comparer » is `Button link sm` (14px), the range it becomes too; the one
-    scale's word takes `label-lg-strong`.
-*/
-.ds-map-timeline--md {
-  /* 480 × 14/12: the bar grows with its type, or five years and « Comparer »
-     no longer fit and the first year is cut. Still centred on the map's axis. */
-  width: 35rem;
-  height: 48px;
-}
-
-/* Hugging, it may run to 40rem: seven years and « Comparer » measure 618px,
-   and a bar that never switches scale has no fixed size to keep. */
-.ds-map-timeline--md.ds-map-timeline--hug {
-  width: fit-content;
-  max-width: min(40rem, 100%);
-}
-
-.ds-map-timeline--md .ds-map-timeline__track {
-  gap: var(--ds-spacing-xs);
-  min-height: 32px;
-}
-
-.ds-map-timeline--md .ds-map-timeline__tick,
-.ds-map-timeline--md .ds-map-timeline__tick--current,
-.ds-map-timeline--md .ds-map-timeline__tick--chosen {
-  padding: var(--ds-spacing-sm) var(--ds-spacing-md);
-}
-
-.ds-map-timeline--md .ds-map-timeline__tick {
-  /* A one-digit day is still a 32px square target. */
-  min-width: 32px;
-  box-sizing: border-box;
-  font: var(--ds-font-label-lg);
-}
-
-.ds-map-timeline--md .ds-map-timeline__tick--current,
-.ds-map-timeline--md .ds-map-timeline__tick--chosen,
-.ds-map-timeline--md.ds-map-timeline--dense .ds-map-timeline__tick--current,
-.ds-map-timeline--md.ds-map-timeline--dense .ds-map-timeline__tick--chosen {
-  font: var(--ds-font-label-lg-strong);
-}
-
-.ds-map-timeline--md .ds-map-timeline__dot {
-  top: auto;
-  bottom: 1px;
-  width: 6px;
-  height: 6px;
-}
-
-.ds-map-timeline--md .ds-map-timeline__tick--minor {
-  padding: 0;
-}
-
-.ds-map-timeline--md .ds-map-timeline__tick--minor .ds-map-timeline__dot {
-  bottom: auto;
-}
-
-/* A day between the labelled ones keeps a 24px-tall target at least. */
-.ds-map-timeline--md .ds-map-timeline__tick--minor::before {
-  inset: -13px calc(-1 * var(--ds-spacing-xs));
-}
-
-.ds-map-timeline--md .ds-map-timeline__range,
-.ds-map-timeline--md .ds-map-timeline__scale-word {
-  font: var(--ds-font-label-lg-strong);
-}
 </style>

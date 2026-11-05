@@ -81,25 +81,23 @@ export const FewYears: Story = {
 }
 
 /**
- * **Deux tailles** (ADR-0115). `md`, par défaut : l’instrument principal d’un écran — périodes en 14 px, chacune une
- * cible de 32 px, barre de 48 px, point de mesure de 6 px. `sm` : le premier dessin (42 px, 12 px), pour une carte
- * étroite où la frise est secondaire.
+ * **Une taille, la grande** (ADR-0115) : la frise est l’instrument de l’écran. Périodes en 14 px, chacune une cible de
+ * 32 px (la choisie aussi), ‹ › de 32 px, point de mesure de 6 px, « Comparer » sur 32 px, barre de 48 px et 35rem —
+ * jusqu’à 40rem quand elle épouse son contenu : cinq puis sept années, entières.
  */
-export const Sizes: Story = {
-  name: 'Tailles md et sm',
+export const Lengths: Story = {
+  name: 'Cinq et sept années',
   render: () => ({
     components: { MapTimeline },
     setup: () => ({
-      md: ref('2024'), sm: ref('2024'), months: ref('2026-3'), scale: ref('month'),
-      SCALE: [{ value: 'year', label: 'Année' }], SCALES, MONTHS,
-      PERIODS: ['2020', '2021', '2022', '2023', '2024'].map((y, i) => ({ value: y, label: y, data: i !== 1 })),
+      five: ref('2024'), seven: ref('2024'),
+      SCALE: [{ value: 'year', label: 'Année' }],
+      FIVE: ['2020', '2021', '2022', '2023', '2024'].map((y, i) => ({ value: y, label: y, data: i !== 1 })),
       SEVEN: ['2018', '2019', '2020', '2021', '2022', '2023', '2024'].map((y) => ({ value: y, label: y, data: true })),
     }),
     template: ground(`<div style="display:flex; flex-direction:column; align-items:center; gap:24px;">
-      <MapTimeline v-model="md" :scales="SCALE" :periods="PERIODS" label="Année" compare />
-      <MapTimeline v-model="md" :scales="SCALE" :periods="SEVEN" label="Année" compare />
-      <MapTimeline v-model="months" v-model:scale="scale" :scales="SCALES" :periods="MONTHS" label="Mois" compare />
-      <MapTimeline v-model="sm" size="sm" :scales="SCALE" :periods="PERIODS" label="Année" compare />
+      <MapTimeline v-model="five" :scales="SCALE" :periods="FIVE" label="Année" compare />
+      <MapTimeline v-model="seven" :scales="SCALE" :periods="SEVEN" label="Année" compare />
     </div>`),
   }),
 }
