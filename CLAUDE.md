@@ -1232,9 +1232,9 @@ Before working on any component, read:
   word, count in a **`Badge sm`** — a `md` badge is 24px and makes it 42), and an action in the bar is a `Button sm`:
   both **38 rendered** (the `sm` token's « 36 » omits the border).
 - **ADR-0109**: **a card holds its own text** (etolbi's 0.88 feedback). A figure and its unit **hold one line and never
-  run into the neighbour**: where a pair does not fit its 106px column, **both** figures of the card step down
-  `heading-lg` → `heading-md` together (measured; the 28px line box stays, so the height does not move). The unit under
-  the number was shipped twice and reversed (« standardiser », then « trop condensé »). The name stays **one line in
+  run into the neighbour**: the figure is **`heading-md` on every card of every module** (« 166 610 tCO2e » is 99px in
+  the 106px column; at `heading-lg` it was 114), the « — » too; the card loses 4px. Unit-under (twice) and a step down
+  only where it overflowed were shipped and reversed the same day — one size everywhere. The name stays **one line in
   ellipsis**, given whole in a **`Tooltip` only when cut**. The identity line is **the region alone**; defensively it
   shows **whole chips** and counts the rest **`+N`**. An anchored tooltip's long title wraps inside its 20rem. A gain has
   **no « + »**.

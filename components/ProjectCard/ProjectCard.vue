@@ -323,44 +323,28 @@ function fit() {
   metaShown.value = Math.max(1, k)
 }
 
-/* The figures: one size for the card, the largest at which every pair holds
-   its column on one line (ADR-0109). Measured at the full size each time, so a
-   card that widens steps back up. */
-const valuesEl = ref<HTMLElement[]>([])
-const figuresSmall = ref(false)
-
-async function fitFigures() {
-  figuresSmall.value = false
-  await nextTick()
-  figuresSmall.value = valuesEl.value.some(v => v.scrollWidth > v.clientWidth + 0.5)
-}
-
 let observer: ResizeObserver | undefined
 onMounted(() => {
   fit()
-  fitFigures()
   if (typeof ResizeObserver === 'undefined') return
-  observer = new ResizeObserver(() => { fit(); fitFigures() })
+  observer = new ResizeObserver(() => fit())
   if (linkEl.value) observer.observe(linkEl.value)
   if (metaEl.value) observer.observe(metaEl.value)
-  valuesEl.value.forEach(v => observer?.observe(v))
 })
 onBeforeUnmount(() => observer?.disconnect())
-watch(() => [props.title, props.meta, props.state, props.metrics], async () => {
+watch(() => [props.title, props.meta, props.state], async () => {
   await nextTick()
   observer?.disconnect()
   if (linkEl.value) observer?.observe(linkEl.value)
   if (metaEl.value) observer?.observe(metaEl.value)
-  valuesEl.value.forEach(v => observer?.observe(v))
   fit()
-  fitFigures()
 }, { deep: true })
 </script>
 
 <template>
   <article
     class="ds-project-card"
-    :class="[`ds-project-card--${state}`, { 'ds-project-card--static': !interactive, 'ds-project-card--zone': hasZone, 'ds-project-card--figures-md': figuresSmall }]"
+    :class="[`ds-project-card--${state}`, { 'ds-project-card--static': !interactive, 'ds-project-card--zone': hasZone }]"
     :aria-label="ariaLabel"
     :aria-busy="isLoading || undefined"
   >
@@ -489,7 +473,7 @@ watch(() => [props.title, props.meta, props.state, props.metrics], async () => {
             <div v-for="m in metrics" :key="m.label" class="ds-project-card__metric">
               <span class="ds-project-card__metric-label">{{ m.label }}</span>
               <span v-if="m.value === null" class="ds-project-card__metric-pending"><span aria-hidden="true">—</span><span class="ds-project-card__hidden">{{ pendingLabel }}</span></span>
-              <span v-else ref="valuesEl" class="ds-project-card__metric-value">
+              <span v-else class="ds-project-card__metric-value">
                 <span class="ds-project-card__metric-number">{{ m.value }}</span>
                 <span v-if="m.unit" class="ds-project-card__metric-unit">{{ m.unit }}</span>
               </span>
@@ -977,34 +961,27 @@ watch(() => [props.title, props.meta, props.state, props.metrics], async () => {
 
 /*
   **The figure and its unit hold one line, and never run into the neighbour**
-  (ADR-0109). The pair sits on one **baseline**, as drawn — a 28px number and a
-  16px unit centred on each other would float the unit. Where a pair does not fit
-  its column (« 166 610 tCO2e » is 114px in 106), **both** figures of the card
-  step down to `heading-md` together (`--figures-md`, set by the card's
-  measurement), so the two columns of a card always speak one size. The line box
-  stays the heading's 28px (`1lh` of the outer font), so nothing below moves.
+  (ADR-0109). The pair sits on one **baseline** — a number and a 12px unit
+  centred on each other would float the unit. The figure is `heading-md` on
+  every card of every module: at `heading-lg`, « 166 610 tCO2e » was 114px in a
+  106px column, and stepping down only the cards that overflowed made two sizes
+  in one grid. At 16px the pair is 99px; past ~12 characters with a unit the
+  product writes it compactly.
 */
 .ds-project-card__metric-value {
   display: flex;
   align-items: baseline;
   gap: var(--ds-spacing-xs);
-  min-height: 1lh;
-  font: var(--ds-font-heading-lg);
   white-space: nowrap;
 }
 
 .ds-project-card__metric-number {
-  /* `heading-lg`, as drawn — the metric ramp starts at 30px and would swamp a
-     280px tile, so the figure borrows a heading rather than a metric role. */
-  font: var(--ds-font-heading-lg);
+  /* A heading role, not a metric one — the metric ramp starts at 30px and would
+     swamp a 280px tile. `heading-md`, on every card (ADR-0109). */
+  font: var(--ds-font-heading-md);
   /* Must follow `font:`, which resets font-variant-numeric (ADR-0011). */
   font-variant-numeric: tabular-nums;
   color: var(--ds-text-strong);
-}
-
-.ds-project-card--figures-md .ds-project-card__metric-number {
-  font: var(--ds-font-heading-md);
-  font-variant-numeric: tabular-nums;
 }
 
 .ds-project-card__metric-unit {
@@ -1022,7 +999,7 @@ watch(() => [props.title, props.meta, props.state, props.metrics], async () => {
   /* What is not there yet is written « — », in the type of the figure it
      stands for and the receding ink (ADR-0105) — the same dash as
      `CreditCost`'s unpriced cost. */
-  font: var(--ds-font-heading-lg);
+  font: var(--ds-font-heading-md);
   color: var(--ds-text-subtlest);
   white-space: nowrap;
 }
