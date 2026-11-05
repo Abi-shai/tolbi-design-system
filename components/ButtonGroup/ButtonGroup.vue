@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, provide, ref, watch, nextTick } from 'vue'
 import { useSlidingIndicator } from '../../composables/useSlidingIndicator'
-import { BUTTON_GROUP_KEY, type ButtonGroupContext } from './context'
+import { BUTTON_GROUP_KEY, type ButtonGroupContext, type ButtonGroupSize } from './context'
 
 /**
  * ADR-0024: the parent owns the selection.
@@ -18,11 +18,14 @@ interface Props {
   /** The selected item's value. */
   modelValue?: string
   ariaLabel?: string
+  /** `sm` sits beside `sm` controls — a toolbar on a map (ADR-0100). */
+  size?: ButtonGroupSize
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: undefined,
   ariaLabel: undefined,
+  size: 'md',
 })
 
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
@@ -48,6 +51,7 @@ const context: ButtonGroupContext = {
   },
   select(value) { emit('update:modelValue', value) },
   isSelected: (value) => value === props.modelValue,
+  size: () => props.size,
 }
 provide(BUTTON_GROUP_KEY, context)
 

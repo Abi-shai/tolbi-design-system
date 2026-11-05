@@ -55,7 +55,7 @@ import { ShareBar } from '../ShareBar'
  * ground. `error`, the snapshot's failure, went with it: with nothing to fetch,
  * nothing can fail.
  */
-export type ProjectCardState = 'planned' | 'running' | 'done' | 'loading'
+export type ProjectCardState = 'planned' | 'running' | 'done' | 'loading' | 'computing'
 
 /** A chip in the identity line: what the project *is*, not what it measures. */
 export interface ProjectCardMeta {
@@ -86,7 +86,8 @@ export interface ProjectCardMetricBadge {
 /** One of the two figures. `badge` is a second reading of the same number. */
 export interface ProjectCardMetric {
   label:  string
-  value:  string | number
+  /** `null`: not known yet — the card says `pendingLabel` in its place (ADR-0100). */
+  value:  string | number | null
   unit?:  string
   /**
    * A plain string is the same word in every state, which is right for a
@@ -161,6 +162,8 @@ interface Props {
   href?:       string
   freshness?:  string
   ariaLabel?:  string
+  /** Said where a figure is not known yet — `computing`'s figures, or any `null` value. */
+  pendingLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -180,7 +183,17 @@ const props = withDefaults(defineProps<Props>(), {
   href:       undefined,
   freshness:  undefined,
   ariaLabel:  undefined,
+  pendingLabel: 'en calcul',
 })
+
+defineSlots<{
+  /**
+   * What the module measures, under the two figures — in place of the spread.
+   * A figure and its `Sparkline` (ARR's « Indice de stock »). The shell stays
+   * the card's; the insight is where a module may differ (ADR-0038).
+   */
+  insight?: () => unknown
+}>()
 
 const emit = defineEmits<{
   click: [event: MouseEvent]
@@ -188,6 +201,16 @@ const emit = defineEmits<{
 }>()
 
 const isLoading = computed(() => props.state === 'loading')
+/**
+ * **Computing is a project the card cannot open yet** (ADR-0100, track A): the
+ * server is still working out its figures. It keeps the card's geometry — the
+ * grid stays on one height — and says what it knows; what it does not know is
+ * said **in words**, « en calcul », never a dash (which reads « nothing ») nor
+ * a skeleton (which promises seconds where this takes minutes). There is
+ * nothing to open: no link, no menu, no lift.
+ */
+const isComputing = computed(() => props.state === 'computing')
+const interactive = computed(() => !isLoading.value && !isComputing.value)
 
 /** The pill's tone is the state's, so the two can never disagree. */
 const STATUS = {
@@ -195,6 +218,8 @@ const STATUS = {
   running: { label: 'En cours', tone: 'warning' },
   done:    { label: 'Terminé',  tone: 'success' },
   loading: { label: '',         tone: 'neutral' },
+  /* Neutral, and a glyph: the tone alone would say nothing (ADR-0006). */
+  computing: { label: 'En calcul', tone: 'neutral' },
 } as const
 
 const statusLabel = computed(() => props.status ?? STATUS[props.state].label)
@@ -239,7 +264,7 @@ const spread = computed(() => {
 <template>
   <article
     class="ds-project-card"
-    :class="`ds-project-card--${state}`"
+    :class="[`ds-project-card--${state}`, { 'ds-project-card--static': !interactive }]"
     :aria-label="ariaLabel"
     :aria-busy="isLoading || undefined"
   >
@@ -253,7 +278,13 @@ const spread = computed(() => {
         <!-- 20px: the `md` badge's own height, or the card's content would
              rise 4px on arrival (measured). -->
         <Skeleton v-if="isLoading" variant="rect" :height="20" :width="68" />
-        <Badge v-else :label="statusLabel" :tone="statusTone" size="md" />
+        <Badge
+          v-else
+          :label="statusLabel"
+          :tone="statusTone"
+          :icon="isComputing ? 'clock' : undefined"
+          size="md"
+        />
       </div>
 
       <!-- Yield and Scan load **identically** — the wait says nothing about
@@ -313,7 +344,10 @@ const spread = computed(() => {
               variant="illustration"
               size="var(--project-card-mark)"
             />
+            <!-- Nothing to open while it computes: the title is a title. -->
+            <span v-if="isComputing" class="ds-project-card__link">{{ title }}</span>
             <component
+              v-else
               :is="href ? 'a' : 'button'"
               class="ds-project-card__link"
               :type="href ? undefined : 'button'"
@@ -335,7 +369,8 @@ const spread = computed(() => {
           <div v-if="metrics.length" class="ds-project-card__metrics">
             <div v-for="m in metrics" :key="m.label" class="ds-project-card__metric">
               <span class="ds-project-card__metric-label">{{ m.label }}</span>
-              <span class="ds-project-card__metric-value">
+              <span v-if="m.value === null" class="ds-project-card__metric-pending"><span>{{ pendingLabel }}</span></span>
+              <span v-else class="ds-project-card__metric-value">
                 <span class="ds-project-card__metric-number">{{ m.value }}</span>
                 <span v-if="m.unit" class="ds-project-card__metric-unit">{{ m.unit }}</span>
               </span>
@@ -352,8 +387,9 @@ const spread = computed(() => {
 
           <!-- Widths are the data, so they must not be equal. Same block for
                stages and for crops: both say how the parcel is divided. -->
+          <div v-if="$slots.insight" class="ds-project-card__slot"><slot name="insight" /></div>
           <div
-            v-if="spread"
+            v-else-if="spread"
             class="ds-project-card__stage"
             :class="{ 'ds-project-card__stage--bare': !spread.items.length }"
           >
@@ -381,7 +417,7 @@ const spread = computed(() => {
       36px disc on a menu it shares with a status pill.
     -->
     <IconButton
-      v-if="!isLoading"
+      v-if="interactive"
       class="ds-project-card__more"
       icon="ellipsis"
       size="xs"
@@ -466,10 +502,15 @@ const spread = computed(() => {
   survives a mode change where an elevation alone does not.
 */
 @media (hover: hover) {
-  .ds-project-card:hover {
+  .ds-project-card:not(.ds-project-card--static):hover {
     transform: translateY(-2px);
     box-shadow: var(--ds-elevation-surface);
   }
+}
+
+/* Nothing to open, nothing to point at. */
+.ds-project-card--static {
+  cursor: auto;
 }
 
 /* No edge while it waits, as drawn: the hairline is what makes the block a
@@ -775,6 +816,29 @@ const spread = computed(() => {
 /* Nothing has been measured yet, so the figure is a placeholder and drops to
    its own label's colour. Derived from the state, not from the value being a
    dash — a planned project has no number to make strong. */
+/*
+  A figure not known yet keeps the figure's line — the outer box is the
+  heading's line box, the words inside it are body text in the receding ink —
+  so a card that computes is the height of its neighbours.
+*/
+.ds-project-card__metric-pending {
+  display: block;
+  font: var(--ds-font-heading-lg);
+  white-space: nowrap;
+}
+
+.ds-project-card__metric-pending > span {
+  font: var(--ds-font-body-md);
+  color: var(--ds-text-subtle);
+}
+
+.ds-project-card__slot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-xs);
+  min-width: 0;
+}
+
 .ds-project-card--planned .ds-project-card__metric-number {
   color: var(--ds-text-subtlest);
 }

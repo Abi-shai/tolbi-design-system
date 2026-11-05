@@ -1167,6 +1167,16 @@ Before working on any component, read:
   because `Button`'s own `transition` outweighed it), focus moves as it arrives; the map is not re-framed.
   **`HelpIcon` is the anchored `Tooltip`** (top layer, 400ms, Escape; it was cut in a scrolling panel).
 
+- **ADR-0100**: what a map is read with (ARR lots 6–8; lot 5 dropped). **`ColorScale`**: title, a continuous
+  `chart-sequential` gradient named once (`role="img"`), three ticks, `ChartLegend`'s symbols below. **No second
+  tooltip**: `ChartTooltip` `dismissible` — a click opens it, a close button makes it a non-modal dialog named by
+  its title, focus in and back, Escape. **`PeriodPicker`**: granularity (`InputDropdown sm`) · ‹ `ButtonGroup sm`
+  › · `#actions`; the chosen period is ADR-0084's pill, not a green fill; ‹ › step the choice, the window follows;
+  one tab stop, arrows. `ButtonGroup` gains **`size="sm"`** (38px rail). **`MapNavigator`**: mini-map + − + ⊙,
+  folds into a bar of four; the three never move (the box is the bar's 140px), the fold is one height.
+  **`ProjectCard` `computing`**: same card, « En calcul » + clock, `value: null` said « en calcul », nothing to
+  open; **`#insight`** slot. **`Sparkline`**: line + dashed comparison on one scale, `label` for a reader.
+
 ## Architecture
 
 - Components live in `components/<Name>/` — each has `<Name>.vue`, `<Name>.stories.ts`, and `index.ts`

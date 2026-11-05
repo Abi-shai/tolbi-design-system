@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import ProjectCard from './ProjectCard.vue'
 import Docs from './ProjectCard.mdx'
 import { moduleNames } from '../ModuleIcon'
+import { Sparkline } from '../Sparkline'
 
 const meta: Meta<typeof ProjectCard> = {
   title: 'Données/ProjectCard',
@@ -226,6 +227,64 @@ export const ModuleMark: Story = {
         <ProjectCard v-bind="y" />
         <ProjectCard v-bind="s" />
         <ProjectCard v-bind="y" :module="undefined" title="Rendement Arachide Nord" />
+      </div>
+    `,
+  }),
+}
+
+/**
+ * La fiche de référence de l’ARR (ADR-0100) : l’aperçu est un **slot**
+ * (`#insight`) — un chiffre et sa `Sparkline` — parce qu’un module y mesure
+ * autre chose qu’une répartition.
+ *
+ * **En calcul** : la même carte, à la même hauteur. Ce qu’on sait reste ; ce
+ * qui se calcule est dit « en calcul » (un tiret se lit « rien », un squelette
+ * promet des secondes). Rien à ouvrir : ni lien, ni menu, ni soulèvement.
+ */
+export const Baseline: Story = {
+  name: 'Fiche de référence — à jour, à mettre à jour, en calcul',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { ProjectCard, Sparkline },
+    setup: () => ({
+      up: [0.31, 0.32, 0.34, 0.33, 0.36, 0.38, 0.39, 0.41, 0.42, 0.44],
+      ref: [0.31, 0.31, 0.32, 0.32, 0.32, 0.33, 0.33, 0.33, 0.34, 0.34],
+    }),
+    template: `
+      <div style="display: grid; grid-template-columns: repeat(3, 280px); gap: var(--ds-spacing-xl); align-items: stretch;">
+        <ProjectCard state="done" status="À jour" title="Soubré — cacao agroforestier"
+          :meta="[{ icon: 'map-pin', label: 'Soubré · référence 2026' }]"
+          :metrics="[{ label: 'Part créditable', value: '86', unit: '%' }, { label: 'Crédits estimés', value: '65 762', unit: 'tCO2e' }]"
+          freshness="Créée le 12 mars 2026">
+          <template #insight>
+            <div style="display:flex;justify-content:space-between;font:var(--ds-font-label-md);color:var(--ds-text-default)">
+              <span>Indice de stock</span><span style="color:var(--ds-text-on-success-subtle)">7× plus vite</span>
+            </div>
+            <Sparkline :values="up" :comparison="ref" label="+12 % contre +4 % pour les points de contrôle" />
+          </template>
+        </ProjectCard>
+        <ProjectCard state="running" status="À mettre à jour" title="Gagnoa nord"
+          :meta="[{ icon: 'map-pin', label: 'Gagnoa · référence 2026' }]"
+          :metrics="[{ label: 'Part créditable', value: '78', unit: '%' }, { label: 'Crédits estimés', value: '41 230', unit: 'tCO2e' }]"
+          freshness="Créée le 14 octobre 2026">
+          <template #insight>
+            <div style="display:flex;justify-content:space-between;font:var(--ds-font-label-md);color:var(--ds-text-default)">
+              <span>Indice de stock</span><span style="color:var(--ds-text-on-success-subtle)">5× plus vite</span>
+            </div>
+            <Sparkline :values="up.map(v => v * 0.97)" :comparison="ref" label="+9 % contre +4 % pour les points de contrôle" />
+          </template>
+        </ProjectCard>
+        <ProjectCard state="computing" title="Bas-Sassandra — riz pluvial"
+          :meta="[{ icon: 'map-pin', label: 'Sassandra' }]"
+          :metrics="[{ label: 'Surface comparée', value: '2 880', unit: 'ha' }, { label: 'Carbone', value: null }]"
+          freshness="Créée le 26 octobre 2026">
+          <template #insight>
+            <div style="display:flex;justify-content:space-between;font:var(--ds-font-label-md);color:var(--ds-text-default)">
+              <span>Indice de stock</span><span style="color:var(--ds-text-subtle)">en calcul</span>
+            </div>
+            <div style="height:32px" />
+          </template>
+        </ProjectCard>
       </div>
     `,
   }),
