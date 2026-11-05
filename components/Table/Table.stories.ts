@@ -40,7 +40,7 @@ const COLUMNS: TableColumn[] = [
   { key: 'role',    label: 'Rôle',            width: 176, help: 'Niveau d\'accès au tableau de bord et aux outils d\'analyse.' },
   { key: 'email',   label: 'Adresse e-mail',  width: 220 },
   { key: 'tags',    label: 'Entreprise',      width: 280 },
-  { key: 'actions', label: '',                width: 80, align: 'right' },
+  { key: 'actions', label: '',                width: 80, align: 'right', actions: true },
 ]
 
 const TAG_COLORS = ['brand', 'blue', 'purple', 'orange', 'success', 'pink', 'indigo'] as const
@@ -241,7 +241,7 @@ const PROJECT_COLUMNS: TableColumn[] = [
   { key: 'created',  label: 'Créé le',       width: 150, sortable: true },
   { key: 'status',   label: 'Statut',        width: 130, sortable: true },
   { key: 'region',   label: 'Région',        width: 160, sortable: true },
-  { key: 'actions',  label: '',              width: 104, fixed: 'end', hideable: false, align: 'right' },
+  { key: 'actions',  label: '',              width: 104, fixed: 'end', hideable: false, align: 'right', actions: true },
 ]
 
 const NAMES = ['Coops Bayan Cocoa', 'Deforestation Assessment', 'Analyse RDUE Périmètre 62590', 'Test analogue', 'Soubré — lot de 128 parcelles', 'Gripazo coopérative', 'Daloa — campagne 2025', 'Méagui Nord', 'Divo — producteurs certifiés', 'Guiglo Ouest']

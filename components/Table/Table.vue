@@ -28,6 +28,12 @@ export interface TableColumn {
    * width says otherwise — a narrow figure column printed « 0,… ».
    */
   numeric?: boolean
+  /**
+   * The row's actions (ADR-0111): hidden at rest, they fade in when the row is
+   * pointed at, reached by the keyboard or selected, and stay while one of them
+   * holds an open menu. Always shown on a screen with no hover.
+   */
+  actions?: boolean
 }
 
 export type TableRow = { id: string | number } & Record<string, unknown>
@@ -499,6 +505,11 @@ const showPagination = computed(() =>
                     <span class="ds-table__cell-text">{{ row[col.key] }}</span>
                   </slot>
                 </component>
+                <!-- The row's actions: their own box, so the fade takes the
+                     buttons and never the cell's ground (a fixed cell paints it). -->
+                <div v-else-if="col.actions" class="ds-table__actions">
+                  <slot :name="`cell-${col.key}`" :row="row" :value="row[col.key]" />
+                </div>
                 <slot v-else :name="`cell-${col.key}`" :row="row" :value="row[col.key]">
                   <span class="ds-table__cell-text">{{ row[col.key] }}</span>
                 </slot>
@@ -647,13 +658,49 @@ const showPagination = computed(() =>
   border-bottom: var(--ds-border-width-default) solid var(--ds-border-subtle);
 }
 
-/* A row that opens: the hand, and its name underlined while the pointer is on it. */
+/* A row that opens: the hand, and the row's ground. Its name is **not**
+   underlined on hover any more (ADR-0111, the owner: it did not look right) —
+   the ground already says the row is the target. */
 .ds-table__row--opens {
   cursor: pointer;
 }
 
-.ds-table__row--opens:hover .ds-table__row-link {
-  text-decoration: underline;
+/*
+  ── The row's actions (ADR-0111) ──────────────────────────────────────
+  Out of the way at rest, there the moment the row is the subject: pointed at,
+  reached by the keyboard (`:focus-visible` inside — not a focus a click left
+  behind), selected, or holding an open menu, so a list does not vanish from
+  under the menu it opened. `ProjectCard`'s menu, and its reasons (ADR-0038):
+
+  - **`quick`**, the row's own ground transition — one gesture, one duration
+    (ADR-0037) — and the pointer is already travelling toward them.
+  - **Opacity alone.** They were always in that cell; a slide would say they
+    arrived from somewhere (ADR-0023).
+  - **Still in the tab order** at `opacity: 0`, so the keyboard reaches them,
+    and the reveal follows it.
+  - **`hover: hover` gates it**: a touch screen has no pointer to rest, so
+    there they stay.
+*/
+.ds-table__actions {
+  display: flex;
+  align-items: center;
+}
+
+.ds-table__td--right .ds-table__actions  { justify-content: flex-end; }
+.ds-table__td--center .ds-table__actions { justify-content: center; }
+
+@media (hover: hover) {
+  .ds-table__actions {
+    opacity: 0;
+    transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+  }
+
+  .ds-table__row:hover .ds-table__actions,
+  .ds-table__row:has(:focus-visible) .ds-table__actions,
+  .ds-table__row--selected .ds-table__actions,
+  .ds-table__actions:has([aria-expanded='true']) {
+    opacity: 1;
+  }
 }
 
 /* ── Data cell ─────────────────────────────────────────────────────── */

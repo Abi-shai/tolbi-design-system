@@ -1243,6 +1243,10 @@ Before working on any component, read:
   border, so every one stood 2px short. **`Dropdown` takes `width`** (any CSS length; unset, 240 / 160) — a dialog
   holding a form says how wide it is, no more `:deep()`. A **`role="dialog"` panel's height follows the room** under its
   trigger (`--anchor-room` is its only cap); a `menu`'s list keeps 320px.
+- **ADR-0111**: **a row's actions come with the row** — `TableColumn.actions` marks the column; hidden at rest, they
+  fade in (opacity alone, `quick`, `ProjectCard`'s menu motion) when the row is hovered, reached by the keyboard
+  (`:focus-visible` inside), selected, or holds an open menu; still tabbable; always shown without hover
+  (`hover: hover`). The row's name is **no longer underlined** on hover.
 
 ## Architecture
 
