@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import { ref } from 'vue'
 import ChartTooltip from './ChartTooltip.vue'
 
 const meta: Meta<typeof ChartTooltip> = {
@@ -64,41 +63,5 @@ export const OnDarkPanel: Story = {
     components: { ChartTooltip },
     setup: () => ({ args }),
     template: `<ChartTooltip v-bind="args" />`,
-  }),
-}
-
-/**
- * **Ouverte par un clic** — un point sur une carte (ADR-0100). La même
- * infobulle, pas une seconde : elle porte alors un bouton Fermer, devient un
- * petit dialogue non modal nommé par son titre, prend le focus en s’ouvrant,
- * le rend en se fermant, et Échap la ferme. Le moteur de carte la place.
- */
-export const Dismissible: Story = {
-  name: 'Ouverte par un clic (point de carte)',
-  render: () => ({
-    components: { ChartTooltip },
-    setup() {
-      const open = ref(true)
-      return { open }
-    },
-    template: `
-      <div style="min-height:340px;display:flex;flex-direction:column;align-items:flex-start;gap:12px">
-        <button type="button" :aria-expanded="open" @click="open = true">Point du projet P-17</button>
-        <ChartTooltip
-          v-if="open"
-          dismissible
-          title="Point du projet P-17"
-          description="Ses 5 points de contrôle, du plus proche au plus éloigné"
-          :series="[
-            { label: 'Faible', value: '0,083', color: 'var(--ds-chart-sequential-1)' },
-            { label: 'Moyen', value: '0,232', color: 'var(--ds-chart-sequential-3)' },
-            { label: 'Moyen', value: '0,264', color: 'var(--ds-chart-sequential-3)' },
-            { label: 'Fort', value: '0,274', color: 'var(--ds-chart-sequential-5)' },
-            { label: 'Fort', value: '0,353', color: 'var(--ds-chart-sequential-5)' },
-          ]"
-          @close="open = false"
-        />
-      </div>
-    `,
   }),
 }

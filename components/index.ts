@@ -20,7 +20,6 @@ export { CloseButton } from './CloseButton'
 export type { CloseButtonSize } from './CloseButton'
 
 export { ButtonGroup, ButtonGroupItem } from './ButtonGroup'
-export type { ButtonGroupSize } from './ButtonGroup'
 
 export { Badge } from './Badge'
 export type { BadgeTone, BadgeColor, BadgeVariant, BadgeSize } from './Badge'
@@ -236,11 +235,9 @@ export { ChartTooltip } from './ChartTooltip'
 export type { ChartTooltipSeries } from './ChartTooltip'
 export { ColorScale } from './ColorScale'
 export { Sparkline } from './Sparkline'
-export { PeriodPicker } from './PeriodPicker'
-export type { PeriodPickerOption } from './PeriodPicker'
 
-export { MapOverlay, MapPanel, MapControls, MapNavigator } from './Map'
-export type { MapOverlayPosition, MapControl } from './Map'
+export { MapOverlay, MapPanel, MapControls, MapNavigator, MapTimeline, MapTooltip } from './Map'
+export type { MapOverlayPosition, MapControl, MapTimelinePeriod, MapTooltipRow } from './Map'
 
 export { ChartLegend } from './ChartLegend'
 export type { ChartLegendItem, ChartLegendShape, ChartLegendOrientation } from './ChartLegend'

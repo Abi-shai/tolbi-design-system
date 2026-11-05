@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, useId } from 'vue'
 import { Badge, type BadgeTone } from '../Badge'
-import { CloseButton } from '../CloseButton'
 
 export interface ChartTooltipSeries {
   label: string
@@ -22,55 +20,12 @@ interface Props {
   value?: string
   unit?: string
   series?: ChartTooltipSeries[]
-  /**
-   * Opened by a **click**, not a hover — a point on a map, a bar pinned for
-   * reading (ADR-0100). It then holds a close button, so it is no longer a
-   * tooltip but a small non-modal dialog named by its title: the focus goes in
-   * when it opens and back where it came from when it closes, Escape closes it.
-   * One surface for both readings — a second tooltip that looks the same but
-   * behaves differently is what a design system exists to prevent.
-   */
-  dismissible?: boolean
-  closeLabel?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   tagTone: 'neutral',
   series: () => [],
-  dismissible: false,
-  closeLabel: 'Fermer',
 })
-
-const emit = defineEmits<{
-  /** The close button or Escape. The product removes it. */
-  close: []
-}>()
-
-const root = ref<HTMLElement | null>(null)
-const titleId = `ds-chart-tooltip-${useId()}`
-
-/*
- * The focus is handed back to what held it at the opening — the map's canvas,
- * the marker, the bar — and only if it is still inside the surface when the
- * surface goes: a reader who clicked elsewhere has moved on (ADR-0062's rule,
- * a focus is not held hostage).
- */
-let opener: HTMLElement | null = null
-onMounted(() => {
-  if (!props.dismissible) return
-  opener = document.activeElement as HTMLElement | null
-  root.value?.focus({ preventScroll: true })
-})
-onBeforeUnmount(() => {
-  if (!props.dismissible) return
-  if (root.value?.contains(document.activeElement) && opener?.isConnected) opener.focus({ preventScroll: true })
-})
-
-function onKeydown(event: KeyboardEvent) {
-  if (!props.dismissible || event.key !== 'Escape') return
-  event.stopPropagation()
-  emit('close')
-}
 
 /*
  * Same rule as ChartLegend: a colourless series takes the categorical palette by
@@ -92,25 +47,10 @@ function seriesColor(color: string | undefined, index: number): string {
     the one thing the pattern this replaces got wrong — its palette was
     entirely hard-coded.
   -->
-  <div
-    ref="root"
-    class="ds-chart-tooltip"
-    :class="{ 'ds-chart-tooltip--dismissible': dismissible }"
-    :role="dismissible ? 'dialog' : 'tooltip'"
-    :aria-labelledby="dismissible && title ? titleId : undefined"
-    :tabindex="dismissible ? -1 : undefined"
-    @keydown="onKeydown"
-  >
-    <div v-if="title || tag || dismissible" class="ds-chart-tooltip__head">
-      <span v-if="title" :id="titleId" class="ds-chart-tooltip__title">{{ title }}</span>
+  <div class="ds-chart-tooltip" role="tooltip">
+    <div v-if="title || tag" class="ds-chart-tooltip__head">
+      <span v-if="title" class="ds-chart-tooltip__title">{{ title }}</span>
       <Badge v-if="tag" :label="tag" :tone="tagTone" size="sm" />
-      <CloseButton
-        v-if="dismissible"
-        class="ds-chart-tooltip__close"
-        size="xs"
-        :ariaLabel="closeLabel"
-        @click="emit('close')"
-      />
     </div>
     <p v-if="description" class="ds-chart-tooltip__description">{{ description }}</p>
 
@@ -170,30 +110,6 @@ function seriesColor(color: string | undefined, index: number): string {
   white-space: nowrap;
 }
 
-/*
-  Opened by a click, the title is what the surface is called, not the date a
-  figure is read at: it takes the strong ink, and the 32px close gives back its
-  8px above and beside so the head stays one title line (MapPanel's rule).
-*/
-.ds-chart-tooltip--dismissible {
-  outline: none;
-}
-
-.ds-chart-tooltip--dismissible .ds-chart-tooltip__title {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font: var(--ds-font-label-md-strong);
-  color: var(--ds-text-strong);
-}
-
-.ds-chart-tooltip__close {
-  flex: none;
-  margin-block: calc(-1 * var(--ds-spacing-md));
-  margin-inline-end: calc(-1 * var(--ds-spacing-md));
-}
-
 .ds-chart-tooltip__value {
   font: var(--ds-font-heading-xl);
   letter-spacing: var(--ds-letter-spacing-heading-xl);
@@ -227,8 +143,7 @@ function seriesColor(color: string | undefined, index: number): string {
   width: 8px;
   height: 8px;
   border-radius: var(--ds-radius-pill);
-  flex-shrink: 0;
-  /* A light step of a ramp keeps an edge on the white surface (ChartLegend's, ADR-0077). */
+  flex-shrink: 0;  /* A light step of a ramp keeps an edge on the white surface (ChartLegend's, ADR-0077). */
   box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-border-inset);
 }
 

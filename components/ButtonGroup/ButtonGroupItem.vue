@@ -61,7 +61,6 @@ function handleClick(event: MouseEvent) {
       iconOnly && 'ds-button-group-item--icon-only',
       icon && label && 'ds-button-group-item--leading-icon',
       selected && 'ds-button-group-item--active',
-      group?.size() === 'sm' && 'ds-button-group-item--sm',
     ]"
     @click="handleClick"
   >
@@ -103,14 +102,6 @@ function handleClick(event: MouseEvent) {
     box-shadow       var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
-/* `sm`: 28px — the label-md line box and 4px above and below — so the rail is
-   38px, the height of a bordered `sm` control beside it (ADR-0033's 2px). */
-.ds-button-group-item--sm {
-  min-height: 28px;
-  padding: var(--ds-spacing-xs) var(--ds-spacing-md);
-  font: var(--ds-font-label-md-strong);
-}
-
 /* ── Icon modes ───────────────────────────────────────────────────── */
 .ds-button-group-item--icon-only {
   padding: var(--ds-spacing-sm);
@@ -119,10 +110,6 @@ function handleClick(event: MouseEvent) {
 .ds-button-group-item--leading-icon {
   gap: var(--ds-spacing-md);
   padding: var(--ds-spacing-sm) var(--ds-spacing-lg) var(--ds-spacing-sm) var(--ds-spacing-md);
-}
-
-.ds-button-group-item--sm.ds-button-group-item--icon-only {
-  padding: var(--ds-spacing-xs);
 }
 
 /* ── States ───────────────────────────────────────────────────────── */

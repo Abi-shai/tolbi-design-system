@@ -1,137 +1,177 @@
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { IconButton } from '../IconButton'
+import { SurfaceTransition } from '../SurfaceTransition'
 import { Tooltip, type TooltipPlacement } from '../Tooltip'
-import MapPanel from './MapPanel.vue'
 
 /**
- * Where you are on the map and how to move (ADR-0100, the owner's drawing —
- * track A): the mini-map, and under it − + and « Recentrer », **together**. It
- * folds into a bar of four buttons — the three and the mini-map's own — and
- * the zoom slider is gone (decided 4 Nov.).
+ * The map's navigator (ADR-0100, Figma « Carte/Navigateur » `3552:3437`), at
+ * the top right of a map, in the owner's drawing — two forms:
  *
- * The three never move: open, the box is the mini-map's width and the row
- * keeps its places; folded, the mini-map's button takes the empty fourth one.
- * So the fold is **one height that travels** (ADR-0025's `0fr → 1fr`, `enter`
- * in and `exit` out, `in-out`), and a pointer pressing − twice finds it where
- * it was. The pressed control is replaced, so the focus goes to the one
- * replacing it (MapPanel's rule).
+ * - **open**: the mini-map (`#default`, the engine's — the system draws its
+ *   frame, ADR-0006) with its fold on its corner, and under it − **the zoom
+ *   gauge** + and « Recentrer »;
+ * - **folded**: a bar — the mini-map's button, a rule, − + « Recentrer ».
  *
- * The mini-map is the engine's (`#default`): the system draws its frame, not
- * the map (ADR-0006). The zoom at its limit is `disabled`.
+ * The zoom is a model (`v-model:zoom`, between `zoomMin` and `zoomMax`):
+ * the gauge shows it and moves it, − and + step it by `zoomStep` and stop at
+ * the ends. « Recentrer » emits; the engine knows where the centre is.
+ *
+ * The two forms are two surfaces of two shapes, so the fold is a surface
+ * leaving and another arriving at the same corner (`SurfaceTransition`, out
+ * then in — `MapPanel`'s fold, ADR-0099); the focus goes to the button that
+ * replaced the one pressed.
  */
 interface Props {
+  zoomMin?: number
+  zoomMax?: number
+  zoomStep?: number
+  zoomLabel?: string
   zoomInLabel?: string
   zoomOutLabel?: string
   recenterLabel?: string
   expandLabel?: string
   collapseLabel?: string
-  zoomInDisabled?: boolean
-  zoomOutDisabled?: boolean
   /** The tooltips' side: away from the edge the navigator stands on. */
   tooltipPlacement?: TooltipPlacement
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
+  zoomMin: 0,
+  zoomMax: 20,
+  zoomStep: 1,
+  zoomLabel: 'Niveau de zoom',
   zoomInLabel: 'Zoomer',
   zoomOutLabel: 'Dézoomer',
   recenterLabel: 'Recentrer',
   expandLabel: 'Afficher la mini-carte',
   collapseLabel: 'Masquer la mini-carte',
-  zoomInDisabled: false,
-  zoomOutDisabled: false,
-  tooltipPlacement: 'top',
+  tooltipPlacement: 'left',
 })
 
-const emit = defineEmits<{
-  'zoom-in': []
-  'zoom-out': []
-  recenter: []
-}>()
+const emit = defineEmits<{ recenter: [] }>()
 
 defineSlots<{
-  /** The mini-map — the engine's canvas, 4:3. */
+  /** The mini-map — the engine's canvas. */
   default?: () => unknown
 }>()
 
 const collapsed = defineModel<boolean>('collapsed', { default: false })
+const zoom = defineModel<number>('zoom', { default: 10 })
 
-const root = ref<HTMLElement | null>(null)
-async function fold(next: boolean) {
-  collapsed.value = next
-  await nextTick()
-  root.value?.querySelector<HTMLElement>(next ? '[data-map-navigator-open] button' : '[data-map-navigator-fold] button')?.focus()
+const clamp = (z: number) => Math.min(props.zoomMax, Math.max(props.zoomMin, z))
+const atMin = computed(() => zoom.value <= props.zoomMin)
+const atMax = computed(() => zoom.value >= props.zoomMax)
+const by = (d: number) => { zoom.value = clamp(zoom.value + d * props.zoomStep) }
+
+const host = ref<HTMLElement | null>(null)
+function focusArrived() {
+  host.value?.querySelector<HTMLElement>(collapsed.value ? '[data-map-navigator-open] button' : '[data-map-navigator-fold] button')?.focus()
 }
 </script>
 
 <template>
-  <MapPanel class="ds-map-navigator">
-    <div ref="root" class="ds-map-navigator__inner">
-      <Transition name="ds-map-navigator-reveal">
-        <div v-if="!collapsed" class="ds-map-navigator__reveal">
-          <div class="ds-map-navigator__clip">
-            <div class="ds-map-navigator__minimap">
-              <slot />
-              <Tooltip :title="collapseLabel" :placement="tooltipPlacement" class="ds-map-navigator__fold" data-map-navigator-fold>
-                <IconButton icon="minimize-2" size="xs" variant="surface" :ariaLabel="collapseLabel" aria-expanded="true" @click="fold(true)" />
-              </Tooltip>
-            </div>
-          </div>
+  <div ref="host" class="ds-map-navigator-host">
+    <SurfaceTransition mode="out-in" @enter="focusArrived">
+      <!-- ── Open ──────────────────────────────────────────────────── -->
+      <div v-if="!collapsed" key="open" class="ds-map-navigator">
+        <div class="ds-map-navigator__minimap">
+          <slot />
+          <Tooltip :title="collapseLabel" :placement="tooltipPlacement" class="ds-map-navigator__fold" data-map-navigator-fold>
+            <IconButton
+              icon="minimize-2"
+              size="xs"
+              variant="surface"
+              :ariaLabel="collapseLabel"
+              aria-expanded="true"
+              @click="collapsed = true"
+            />
+          </Tooltip>
         </div>
-      </Transition>
-      <div class="ds-map-navigator__row">
+        <div class="ds-map-navigator__zoom">
+          <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
+            <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="atMin" @click="by(-1)" />
+          </Tooltip>
+          <input
+            v-model.number="zoom"
+            class="ds-map-navigator__gauge"
+            type="range"
+            :min="zoomMin"
+            :max="zoomMax"
+            :step="zoomStep"
+            :aria-label="zoomLabel"
+          />
+          <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
+            <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="atMax" @click="by(1)" />
+          </Tooltip>
+          <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
+            <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" />
+          </Tooltip>
+        </div>
+      </div>
+
+      <!-- ── Folded: a bar ─────────────────────────────────────────── -->
+      <div v-else key="folded" class="ds-map-navigator ds-map-navigator--folded">
+        <Tooltip :title="expandLabel" :placement="tooltipPlacement" data-map-navigator-open>
+          <IconButton icon="map" size="xs" variant="subtle" :ariaLabel="expandLabel" aria-expanded="false" @click="collapsed = false" />
+        </Tooltip>
+        <span class="ds-map-navigator__rule" aria-hidden="true" />
         <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
-          <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="zoomOutDisabled" @click="emit('zoom-out')" />
+          <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="atMin" @click="by(-1)" />
         </Tooltip>
         <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
-          <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="zoomInDisabled" @click="emit('zoom-in')" />
+          <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="atMax" @click="by(1)" />
         </Tooltip>
         <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
           <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" />
         </Tooltip>
-        <Transition name="ds-map-navigator-fade">
-          <Tooltip v-if="collapsed" :title="expandLabel" :placement="tooltipPlacement" data-map-navigator-open>
-            <IconButton icon="map" size="xs" variant="subtle" :ariaLabel="expandLabel" aria-expanded="false" @click="fold(false)" />
-          </Tooltip>
-        </Transition>
       </div>
-    </div>
-  </MapPanel>
+    </SurfaceTransition>
+  </div>
 </template>
 
 <style scoped>
+.ds-map-navigator-host {
+  display: contents;
+}
+
 /*
-  The box is four 32px buttons 4px apart — 140px — and the mini-map is that
-  wide, 4:3, so opening it never changes the width.
+  The drawing: `bg-default`, `border-subtle`, `elevation-raised`, 8 around and
+  between. The open form takes `radius-surface` (Figma's 14 is no step; 12 is
+  the role of a surface that holds content), the bar `radius-surface-sm` (10,
+  exactly as drawn). Both grow from the top right, the corner they stand in.
 */
-.ds-map-navigator__inner {
-  --map-navigator-width: calc(4 * 32px + 3 * var(--ds-spacing-xs));
-
-  display: flex;
+.ds-map-navigator {
+  display: inline-flex;
   flex-direction: column;
-  width: var(--map-navigator-width);
+  gap: var(--ds-spacing-md);
+  box-sizing: border-box;
+  padding: var(--ds-spacing-md);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-surface);
+  background: var(--ds-bg-default);
+  box-shadow: var(--ds-elevation-raised);
+  transform-origin: top right;
+  /* Its own height in any row it lands in — a stretched card is a hole in the map. */
+  align-self: flex-start;
 }
 
-/* ADR-0025: the grid sits on the transitioning element, the gap inside it, so
-   nothing snaps when it closes. */
-.ds-map-navigator__reveal {
-  display: grid;
-  grid-template-rows: 1fr;
+.ds-map-navigator--folded {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--ds-spacing-xxs);
+  padding: var(--ds-spacing-xs);
+  border-radius: var(--ds-radius-surface-sm);
 }
 
-.ds-map-navigator__clip {
-  min-height: 0;
-  overflow: hidden;
-}
-
+/* 148 × 96, as drawn; the engine's canvas fills it. */
 .ds-map-navigator__minimap {
   position: relative;
-  aspect-ratio: 4 / 3;
-  margin-bottom: var(--ds-spacing-md);
+  width: 9.25rem;
+  height: 6rem;
   overflow: hidden;
   border-radius: var(--ds-radius-inner);
   background: var(--ds-bg-neutral-subtle);
-  box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-border-inset);
 }
 
 .ds-map-navigator__minimap > :deep(:not(.ds-map-navigator__fold)) {
@@ -145,32 +185,76 @@ async function fold(next: boolean) {
   right: var(--ds-spacing-xs);
 }
 
-.ds-map-navigator__row {
+.ds-map-navigator__zoom {
   display: flex;
-  gap: var(--ds-spacing-xs);
+  align-items: center;
+  gap: var(--ds-spacing-xxs);
+  width: 9.25rem;
 }
 
-.ds-map-navigator-reveal-enter-active {
-  transition:
-    grid-template-rows var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
-    opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
+.ds-map-navigator__rule {
+  flex: none;
+  width: var(--ds-border-width-default);
+  height: 20px;
+  background: var(--ds-border-subtle);
 }
 
-.ds-map-navigator-reveal-leave-active {
-  transition:
-    grid-template-rows var(--ds-motion-duration-exit) var(--ds-motion-easing-in-out),
-    opacity var(--ds-motion-duration-exit) var(--ds-motion-easing-in-out);
+/*
+  The gauge, as drawn: a 4px `border-subtle` channel and a 12px thumb — white,
+  ringed 2px in the text's ink — that says where the zoom is and moves it.
+  A native range, so the keyboard and a reader get it for free; the part of the
+  channel already travelled is not filled, as drawn.
+*/
+.ds-map-navigator__gauge {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 32px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  outline: none;
 }
 
-.ds-map-navigator-reveal-enter-from,
-.ds-map-navigator-reveal-leave-to {
-  grid-template-rows: 0fr;
-  opacity: 0;
+.ds-map-navigator__gauge::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-border-subtle);
 }
 
-/* The fourth place was empty: its button arrives there, nothing travels. */
-.ds-map-navigator-fade-enter-active { transition: opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-out); }
-.ds-map-navigator-fade-leave-active { transition: opacity var(--ds-motion-duration-exit) var(--ds-motion-easing-in); }
-.ds-map-navigator-fade-enter-from,
-.ds-map-navigator-fade-leave-to { opacity: 0; }
+.ds-map-navigator__gauge::-moz-range-track {
+  height: 4px;
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-border-subtle);
+}
+
+.ds-map-navigator__gauge::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  box-sizing: border-box;
+  border: var(--ds-border-width-strong) solid var(--ds-text-default);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-bg-default);
+  appearance: none;
+  transition: box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
+}
+
+.ds-map-navigator__gauge::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  box-sizing: border-box;
+  border: var(--ds-border-width-strong) solid var(--ds-text-default);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-bg-default);
+  transition: box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
+}
+
+.ds-map-navigator__gauge:focus-visible::-webkit-slider-thumb {
+  box-shadow: var(--ds-focus-ring-gray);
+}
+
+.ds-map-navigator__gauge:focus-visible::-moz-range-thumb {
+  box-shadow: var(--ds-focus-ring-gray);
+}
 </style>

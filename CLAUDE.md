@@ -1168,12 +1168,14 @@ Before working on any component, read:
   **`HelpIcon` is the anchored `Tooltip`** (top layer, 400ms, Escape; it was cut in a scrolling panel).
 
 - **ADR-0100**: what a map is read with (ARR lots 6–8; lot 5 dropped). **`ColorScale`**: title, a continuous
-  `chart-sequential` gradient named once (`role="img"`), three ticks, `ChartLegend`'s symbols below. **No second
-  tooltip**: `ChartTooltip` `dismissible` — a click opens it, a close button makes it a non-modal dialog named by
-  its title, focus in and back, Escape. **`PeriodPicker`**: granularity (`InputDropdown sm`) · ‹ `ButtonGroup sm`
-  › · `#actions`; the chosen period is ADR-0084's pill, not a green fill; ‹ › step the choice, the window follows;
-  one tab stop, arrows. `ButtonGroup` gains **`size="sm"`** (38px rail). **`MapNavigator`**: mini-map + − + ⊙,
-  folds into a bar of four; the three never move (the box is the bar's 140px), the fold is one height.
+  `chart-sequential` gradient named once (`role="img"`), three ticks, `ChartLegend`'s symbols below.
+  **`MapTooltip`** is its own component (`Données/Map/Tooltip`), not a mode of `ChartTooltip` — reversed the same
+  day: a thing is filed where it is looked for; a click opens it, a close makes it a non-modal dialog, focus in
+  and back, Escape. **`MapTimeline`** and **`MapNavigator`** are the owner's Figma components drawn as drawn
+  (a first draft from `InputDropdown`/`ButtonGroup` was reversed: form controls on a map read as a form) —
+  the timeline: raised pill, scale chip (a `Dropdown` trigger), periods as a radio group with the **brand's solid
+  pill** sliding, `data` dots, `minor` days as dots, « Comparer » → « 2020 → 2026 » ✕; the navigator: mini-map +
+  − **zoom gauge** (`v-model:zoom`) + ⊙, folded into a bar, two shapes swapped by `SurfaceTransition`.
   **`ProjectCard` `computing`**: same card, « En calcul » + clock, `value: null` said « en calcul », nothing to
   open; **`#insight`** slot. **`Sparkline`**: line + dashed comparison on one scale, `label` for a reader.
 

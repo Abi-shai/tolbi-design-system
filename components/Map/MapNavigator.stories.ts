@@ -11,12 +11,13 @@ const meta: Meta<typeof MapNavigator> = {
     docs: {
       description: {
         component:
-          'Le **navigateur** d’une carte (ADR-0100, le dessin — piste A) : la mini-carte, et dessous − + et ' +
-          '« Recentrer », **ensemble**. Il se replie en une barre de quatre boutons ; le curseur de zoom est retiré.\n\n' +
-          'Les trois boutons **ne bougent jamais** : ouvert, la boîte a la largeur de la mini-carte ; replié, le ' +
-          'bouton de la mini-carte prend la quatrième place, vide. Le pli est **une hauteur qui voyage** ' +
-          '(`0fr → 1fr`, `enter` à l’ouverture, `exit` à la fermeture) ; le focus va au bouton qui remplace celui ' +
-          'qu’on a pressé. La mini-carte est celle du moteur (`#default`) : le système dessine son cadre.',
+          'Le **navigateur** d’une carte (ADR-0100, Figma « Carte/Navigateur ») en haut à droite, deux formes : ' +
+          '**ouvert**, la mini-carte avec son pli dans le coin et dessous − **la jauge de zoom** + et « Recentrer » ; ' +
+          '**replié**, une barre — le bouton de la mini-carte, un filet, − + « Recentrer ».\n\n' +
+          'Le zoom est un modèle (`v-model:zoom`, entre `zoomMin` et `zoomMax`) : la jauge le montre et le déplace, ' +
+          '− et + le font avancer d’un `zoomStep` et s’arrêtent aux bouts. Le pli est une surface qui part et une autre ' +
+          'qui arrive au même coin (`SurfaceTransition`) ; le focus va au bouton qui a remplacé celui pressé. ' +
+          'La mini-carte est celle du moteur (`#default`) : le système dessine son cadre.',
       },
     },
   },
@@ -26,20 +27,20 @@ export default meta
 type Story = StoryObj<typeof MapNavigator>
 
 const minimap = `
-  <svg viewBox="0 0 140 105" style="display:block;width:100%;height:100%;background:var(--ds-bg-neutral-subtle)">
-    <circle cx="70" cy="52" r="34" fill="none" stroke="var(--ds-chart-sequential-4)" stroke-dasharray="3 3" />
-    <rect x="52" y="36" width="36" height="30" fill="none" stroke="var(--ds-text-strong)" stroke-width="1.5" />
-    <circle cx="70" cy="52" r="3" fill="var(--ds-text-strong)" />
+  <svg viewBox="0 0 148 96" style="display:block;width:100%;height:100%;background:var(--ds-bg-neutral-subtle)">
+    <circle cx="74" cy="48" r="40" fill="none" stroke="var(--ds-bg-brand-solid)" stroke-dasharray="3 3" />
+    <rect x="29" y="3" width="91" height="91" rx="3" fill="none" stroke="var(--ds-text-strong)" stroke-width="1.2" />
+    <rect x="71" y="45" width="6" height="6" rx="1.5" fill="var(--ds-bg-brand-solid)" />
   </svg>`
 
 export const Default: Story = {
   name: 'Ouvert',
   render: () => ({
     components: { MapNavigator },
-    setup: () => ({ collapsed: ref(false) }),
+    setup: () => ({ collapsed: ref(false), zoom: ref(8) }),
     template: `
-      <div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;min-height:220px">
-        <MapNavigator v-model:collapsed="collapsed">${minimap}</MapNavigator>
+      <div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;min-height:220px;display:flex;justify-content:flex-end">
+        <MapNavigator v-model:collapsed="collapsed" v-model:zoom="zoom">${minimap}</MapNavigator>
       </div>
     `,
   }),
@@ -49,10 +50,10 @@ export const Collapsed: Story = {
   name: 'Replié en barre',
   render: () => ({
     components: { MapNavigator },
-    setup: () => ({ collapsed: ref(true) }),
+    setup: () => ({ collapsed: ref(true), zoom: ref(8) }),
     template: `
-      <div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;min-height:220px">
-        <MapNavigator v-model:collapsed="collapsed">${minimap}</MapNavigator>
+      <div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;min-height:220px;display:flex;justify-content:flex-end">
+        <MapNavigator v-model:collapsed="collapsed" v-model:zoom="zoom">${minimap}</MapNavigator>
       </div>
     `,
   }),
@@ -63,8 +64,8 @@ export const AtLimit: Story = {
   render: () => ({
     components: { MapNavigator },
     template: `
-      <div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;min-height:220px">
-        <MapNavigator zoom-in-disabled>${minimap}</MapNavigator>
+      <div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;min-height:220px;display:flex;justify-content:flex-end">
+        <MapNavigator :zoom="20">${minimap}</MapNavigator>
       </div>
     `,
   }),
