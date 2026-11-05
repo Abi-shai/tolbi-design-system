@@ -1190,6 +1190,10 @@ Before working on any component, read:
   continuous gradient, the bounds; the symbols' key below; its own surface, as drawn. **`Tabs size="xs"`** (28px,
   `label-md-strong`, 2px rail) joins the package. The drawing's red → green ramp is declined: a magnitude is
   sequential (ADR-0096).
+- **ADR-0103**: the GIS screen's layout is the owner's retained frames, measured (map 1424 × 828): `MapPanel lg` on
+  **the whole left side** (400 × 796, 16 all round), `MapLegend` **top** and `MapTimeline` **bottom**, both 480px
+  and centred — one axis, so `MapLegend` declares 30rem — and `MapNavigator` top end. `MapOverlay` gains **`start` /
+  `end`**, a whole side; `MapPanel lg` takes a height it is given. No `MapControls` on this screen.
 
 ## Architecture
 

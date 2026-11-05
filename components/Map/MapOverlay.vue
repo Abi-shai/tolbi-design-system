@@ -12,10 +12,20 @@
  * center of the map »). Only its children take the pointer: between them, the
  * map stays draggable.
  *
+ * Two more places hold **a whole side** (ADR-0103): `start` and `end` run from
+ * 16px under the top edge to 16px over the bottom one — the column a screen is
+ * read from (`MapPanel size="lg"`, which then fills that height and keeps its
+ * foot at the bottom). The GIS screen's layout, as the owner's frames place
+ * it: the panel on `start`, the legend on `top` and the timeline on `bottom`
+ * (one 480px axis, centred on the map), the navigator on `top-end`.
+ *
  * The map's container must be positioned (`position: relative`); the overlay
  * is placed in it.
  */
-export type MapOverlayPosition = 'top-start' | 'top' | 'top-end' | 'bottom-start' | 'bottom' | 'bottom-end'
+export type MapOverlayPosition =
+  | 'top-start' | 'top' | 'top-end'
+  | 'bottom-start' | 'bottom' | 'bottom-end'
+  | 'start' | 'end'
 
 withDefaults(defineProps<{ position?: MapOverlayPosition }>(), {
   position: 'top-start',
@@ -42,6 +52,24 @@ withDefaults(defineProps<{ position?: MapOverlayPosition }>(), {
 
 .ds-map-overlay > :deep(*) {
   pointer-events: auto;
+}
+
+/* A whole side: from the top edge to the bottom one, its children stacked
+   down from the top, the last one free to take what is left. */
+.ds-map-overlay--start,
+.ds-map-overlay--end {
+  top: var(--ds-spacing-xl);
+  bottom: var(--ds-spacing-xl);
+}
+
+.ds-map-overlay--start {
+  inset-inline-start: var(--ds-spacing-xl);
+  align-items: flex-start;
+}
+
+.ds-map-overlay--end {
+  inset-inline-end: var(--ds-spacing-xl);
+  align-items: flex-end;
 }
 
 /* Top: the first child against the edge, the next under it. */

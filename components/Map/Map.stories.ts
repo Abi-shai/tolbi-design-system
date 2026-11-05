@@ -24,7 +24,7 @@ const meta: Meta<typeof MapOverlay> = {
           '**La famille Carte (SIG)** — tout ce qui se pose sur une carte, au même endroit. Le moteur de carte ' +
           'reste celui du produit (ADR-0006) : le système fournit les instruments autour.\n\n' +
           '| Pièce | Ce qu’elle fait |\n|---|---|\n' +
-          '| `MapOverlay` | Une place — un des quatre coins, le milieu du haut ou du bas — à 16 px des bords |\n' +
+          '| `MapOverlay` | Une place — un coin, le milieu du haut ou du bas, ou tout un bord (`start`, `end`) — à 16 px des bords |\n' +
           '| `MapPanel` | La surface d’un encart ; `lg` : le panneau d’où l’on lit l’écran, repliable en un contrôle |\n' +
           '| `MapControls` | La pile de boutons de la carte (couches, tracer…) |\n' +
           '| `MapNavigator` | La mini-carte, − la jauge de zoom + et recentrer ; replié en barre |\n' +
@@ -52,7 +52,8 @@ const MAP = 'position:relative; height:560px; margin:var(--ds-spacing-2xl); over
   'repeating-linear-gradient(-55deg, transparent 0 60px, color-mix(in srgb, var(--ds-border-default) 40%, transparent) 60px 120px),' +
   'var(--ds-bg-neutral);'
 
-const MAP_TALL = MAP.replace('height:560px', 'height:760px')
+/* The retained frames' map: 1424 × 828 inside a 1440 page. */
+const GIS_MAP = MAP.replace('height:560px', 'height:828px').replace('margin:var(--ds-spacing-2xl)', 'margin:var(--ds-spacing-md)')
 
 /** Le dessin : la consigne et l’année en haut à gauche, les contrôles en haut à droite, la barre d’outils en bas à droite, la légende en bas à gauche. */
 export const OnAMap: Story = {
@@ -118,16 +119,17 @@ export const OnAMap: Story = {
 }
 
 /**
- * L’écran SIG complet (ARR, ADR-0099 à 0102) : chaque pièce à sa place et vivante — le panneau de lecture
- * à gauche (repliable), le navigateur en haut à droite, la frise en bas au milieu, la légende en bas à
- * gauche qui change d’indicateur, un point qui ouvre sa bulle. Le fond tient lieu d’imagerie.
+ * L’écran SIG, placé comme les cadres retenus de l’ARR (Figma section 15, carte de 1424 × 828) — ADR-0103 :
+ * le panneau de lecture sur **tout le bord gauche** (`MapOverlay position="start"`, 400 px, 16 px du haut et du
+ * bas), la **légende en haut** et la **frise en bas**, centrées sur un même axe de 480 px, le **navigateur en haut à
+ * droite**. Un point ouvre sa bulle. Chaque pièce est vivante ; le fond tient lieu d’imagerie.
  */
 export const GisScreen: Story = {
   name: 'Écran SIG — toutes les pièces',
   render: () => ({
-    components: { MapOverlay, MapPanel, MapControls, MapNavigator, MapTimeline, MapLegend, MapTooltip, Tabs },
+    components: { MapOverlay, MapPanel, MapNavigator, MapTimeline, MapLegend, MapTooltip, Tabs, Button },
     setup() {
-      const tab = ref('summary')
+      const tab = ref('data')
       const zoom = ref(9)
       const year = ref('2026')
       const comparison = ref<string | null>(null)
@@ -138,8 +140,9 @@ export const GisScreen: Story = {
         carbon: { title: 'Carbone', unit: 'CO2e/ha', ticks: ['0 t', '8 t', '16 t'] },
         biomass: { title: 'Biomasse', unit: 't/ha', ticks: ['0', '60', '120'] },
         cover: { title: 'Couvert', unit: '%', ticks: ['0', '50', '100'] },
+        height: { title: 'Hauteur', unit: 'm', ticks: ['0', '15', '30'] },
       }
-      const metrics = [{ value: 'carbon', label: 'Carbone' }, { value: 'biomass', label: 'Biomasse' }, { value: 'cover', label: 'Couvert' }]
+      const metrics = [{ value: 'carbon', label: 'Carbone' }, { value: 'biomass', label: 'Biomasse' }, { value: 'cover', label: 'Couvert' }, { value: 'height', label: 'Hauteur' }]
       const legendScale = computed(() => SCALES[metric.value])
       const point = ref(false)
       const rows = [
@@ -147,18 +150,24 @@ export const GisScreen: Story = {
         { label: 'Moyen', value: '0,232', color: 'var(--ds-chart-sequential-3)' },
         { label: 'Fort', value: '0,353', color: 'var(--ds-chart-sequential-5)' },
       ]
-      const controls = [{ key: 'layers', icon: 'layers', label: 'Couches' }]
-      return { MAP_TALL, tab, zoom, year, comparison, scale, years, metric, metrics, legendScale, point, rows, controls, SCALES_LIST: [{ value: 'year', label: 'Année' }, { value: 'month', label: 'Mois' }] }
+      return { GIS_MAP, tab, zoom, year, comparison, scale, years, metric, metrics, legendScale, point, rows, SCALES_LIST: [{ value: 'year', label: 'Année' }, { value: 'month', label: 'Mois' }, { value: 'day', label: 'Jour' }] }
     },
     template: `
-      <div :style="MAP_TALL">
-        <MapOverlay position="top-start">
-          <MapPanel size="lg" title="Dynamic baseline" collapsible expand-label="Afficher le panneau">
+      <div :style="GIS_MAP">
+        <MapOverlay position="start">
+          <MapPanel size="lg" title="Baseline" collapsible expand-label="Afficher le panneau">
             <template #header>
-              <Tabs v-model="tab" size="sm" :tabs="[{ value: 'summary', label: 'Synthèse' }, { value: 'points', label: 'Points' }]" />
+              <Tabs v-model="tab" size="sm" :tabs="[{ value: 'data', label: 'Données' }, { value: 'plots', label: 'Parcelles' }]" />
             </template>
-            <p style="margin:0; font:var(--ds-font-body-md); color:var(--ds-text-default)">Le panneau d’où l’on lit l’écran : 25rem, une tête et un pied qui restent.</p>
+            <p style="margin:0; font:var(--ds-font-heading-xl); color:var(--ds-text-strong)">+3 120 <span style="font:var(--ds-font-body-sm); color:var(--ds-text-subtle)">tCO2e</span></p>
+            <p style="margin:0; font:var(--ds-font-body-md); color:var(--ds-text-default)">Le panneau d’où l’on lit l’écran : tout le bord gauche, 400 px ; sa tête et son pied restent, son corps défile.</p>
+            <template #footer>
+              <Button label="Voir toutes les données" variant="secondary-gray" size="sm" />
+            </template>
           </MapPanel>
+        </MapOverlay>
+        <MapOverlay position="top">
+          <MapLegend v-model:metric="metric" :metrics="metrics" :title="legendScale.title" :unit="legendScale.unit" :ticks="legendScale.ticks" />
         </MapOverlay>
         <MapOverlay position="top-end">
           <MapNavigator v-model:zoom="zoom">
@@ -167,19 +176,13 @@ export const GisScreen: Story = {
               <rect x="29" y="3" width="91" height="91" rx="3" fill="none" stroke="var(--ds-text-strong)" stroke-width="1.2" />
             </svg>
           </MapNavigator>
-          <MapControls :controls="controls" />
         </MapOverlay>
         <MapOverlay position="bottom">
           <MapTimeline v-model="year" v-model:scale="scale" v-model:comparison="comparison" :scales="SCALES_LIST" :periods="years" label="Année" compare />
         </MapOverlay>
-        <MapOverlay position="bottom-start">
-          <div style="width:26rem">
-            <MapLegend v-model:metric="metric" :metrics="metrics" :title="legendScale.title" :unit="legendScale.unit" :ticks="legendScale.ticks" />
-          </div>
-        </MapOverlay>
         <button type="button" aria-label="Point du projet P-17" :aria-expanded="point" @click="point = !point"
-          style="position:absolute; left:58%; top:44%; width:14px; height:14px; padding:0; border:2px solid var(--ds-bg-default); border-radius:3px; background:var(--ds-bg-brand-solid); cursor:pointer"></button>
-        <div v-if="point" style="position:absolute; left:calc(58% + 22px); top:calc(44% - 12px)">
+          style="position:absolute; left:62%; top:46%; width:14px; height:14px; padding:0; border:2px solid var(--ds-bg-default); border-radius:3px; background:var(--ds-bg-brand-solid); cursor:pointer"></button>
+        <div v-if="point" style="position:absolute; left:calc(62% + 22px); top:calc(46% - 12px)">
           <MapTooltip title="Point du projet P-17" description="Ses points de contrôle, du plus proche au plus éloigné" :rows="rows" @close="point = false" />
         </div>
       </div>

@@ -215,6 +215,9 @@ function focusArrived() {
 .ds-map-panel--lg {
   width: 25rem;
   max-width: 100%;
+  /* In a place that has a height — a whole side of the map (ADR-0103) — it
+     takes it, and its foot sits at the bottom; in a corner, it hugs. */
+  flex: 1 1 auto;
   min-height: 0;
   max-height: 100%;
   gap: 0;
@@ -248,6 +251,8 @@ function focusArrived() {
   flex: none;
   display: flex;
   flex-direction: column;
+  /* The action keeps its own width, as the GIS screen draws it (ADR-0103). */
+  align-items: flex-start;
   gap: var(--ds-spacing-md);
 }
 

@@ -92,15 +92,16 @@ const said = computed(() => {
 <style scoped>
 /*
   As drawn: the surface 8px around, the switch flush with it, the scale and the
-  symbols each 8px further in. A width the drawing gives is a ceiling (ADR-0031):
-  the legend takes its column and stops at 592px.
+  symbols each 8px further in. **480px, declared** (ADR-0103) — the timeline's
+  own width: on the GIS screen the two are centred on one axis, the legend at
+  the top of the map and the timeline at its bottom.
 */
 .ds-map-legend {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  width: 100%;
-  max-width: 37rem;
+  width: 30rem;
+  max-width: 100%;
   padding: var(--ds-spacing-md);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
