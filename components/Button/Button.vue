@@ -347,17 +347,22 @@ function handleClick(event: MouseEvent) {
 }
 
 /* ── Icon-only ────────────────────────────────────────────────────── */
+/* A square **as tall as its text sibling** at the same size (ADR-0110): the
+   boxes were the padding tokens' heights, which omit the border (ADR-0033), so
+   every icon-only button stood 2px under the text button beside it — a 36px
+   « Plus d'actions » next to a 38px search. Border-box, declared. */
 .ds-button--icon-only {
+  box-sizing: border-box;
   padding: 0;
   gap: 0;
 }
-.ds-button--icon-only.ds-button--xs  { width: 24px; height: 24px; }
-.ds-button--icon-only.ds-button--sm  { width: 36px; height: 36px; }
-.ds-button--icon-only.ds-button--md  { width: 40px; height: 40px; }
-.ds-button--icon-only.ds-button--lg  { width: 44px; height: 44px; }
-.ds-button--icon-only.ds-button--lg-compact { width: 36px; height: 36px; }
-.ds-button--icon-only.ds-button--xl  { width: 48px; height: 48px; }
-.ds-button--icon-only.ds-button--2xl { width: 56px; height: 56px; }
+.ds-button--icon-only.ds-button--xs  { width: 26px; height: 26px; }
+.ds-button--icon-only.ds-button--sm  { width: 38px; height: 38px; }
+.ds-button--icon-only.ds-button--md  { width: 42px; height: 42px; }
+.ds-button--icon-only.ds-button--lg  { width: 46px; height: 46px; }
+.ds-button--icon-only.ds-button--lg-compact { width: 38px; height: 38px; }
+.ds-button--icon-only.ds-button--xl  { width: 50px; height: 50px; }
+.ds-button--icon-only.ds-button--2xl { width: 62px; height: 62px; }
 
 /* ── Selected: the current item's mark (ADR-0050) ─────────────────── */
 .ds-button--selected:not(:disabled) {

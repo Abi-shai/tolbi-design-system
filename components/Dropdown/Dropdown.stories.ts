@@ -5,6 +5,12 @@ import DropdownItem from './DropdownItem.vue'
 import DropdownDivider from './DropdownDivider.vue'
 import DropdownGroup from './DropdownGroup.vue'
 import { InputField } from '../InputField'
+import DropdownTrigger from './DropdownTrigger.vue'
+import { FormField } from '../FormField'
+import { Checkbox } from '../Checkbox'
+import { Button } from '../Button'
+import { Badge } from '../Badge'
+import { Icon } from '../Icon'
 
 const meta: Meta<typeof Dropdown> = {
   title: 'Superposition/Dropdown',
@@ -237,6 +243,61 @@ export const Side: Story = {
           <DropdownItem label="Année" :selected="true" @click="open = false" />
           <DropdownItem label="Mois" :selected="false" @click="open = false" />
           <DropdownItem label="Jour" :selected="false" @click="open = false" />
+        </Dropdown>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * Un filtre à plusieurs critères (ADR-0110) : `role="dialog"`, car le panneau tient un formulaire et non une
+ * liste d’actions, et **`width`** pour la largeur dont il a besoin (`20rem` ici ; 240px sans rien). Sa hauteur
+ * **suit la place réelle** sous le déclencheur — le plafond de 320px est celui d’une liste de menu — et le corps
+ * ne défile que passé cette place. Le pied reste hors du défilement.
+ */
+export const FilterPanel: Story = {
+  name: 'Panneau de filtres',
+  parameters: { layout: 'padded' },
+  render: () => ({
+    components: { Dropdown, DropdownTrigger, FormField, Checkbox, Button, Badge, Icon },
+    setup() {
+      const open = ref(true)
+      const crops = ['Arachide', 'Mil', 'Maïs', 'Sorgho', 'Niébé', 'Riz']
+      const states = ['Planifié', 'En cours', 'Terminé', 'En calcul']
+      const picked = ref<string[]>(['Arachide', 'En cours'])
+      const toggle = (v: string, on: boolean) => {
+        picked.value = on ? [...picked.value, v] : picked.value.filter(x => x !== v)
+      }
+      return { open, crops, states, picked, toggle }
+    },
+    template: `
+      <div style="padding:16px; min-height:640px;">
+        <Dropdown v-model:open="open" role="dialog" label="Filtres" width="20rem" align="start">
+          <template #trigger>
+            <DropdownTrigger size="sm" chevron :open="open" @click="open = !open">
+              <Icon name="filter" :size="16" aria-hidden="true" />
+              Filtres
+              <Badge v-if="picked.length" :label="String(picked.length)" size="sm" />
+            </DropdownTrigger>
+          </template>
+          <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-xl); padding:var(--ds-spacing-lg);">
+            <FormField label="Culture" group>
+              <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-md);">
+                <Checkbox v-for="c in crops" :key="c" :label="c" :model-value="picked.includes(c)" @update:model-value="on => toggle(c, on)" />
+              </div>
+            </FormField>
+            <FormField label="Statut" group>
+              <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-md);">
+                <Checkbox v-for="c in states" :key="c" :label="c" :model-value="picked.includes(c)" @update:model-value="on => toggle(c, on)" />
+              </div>
+            </FormField>
+          </div>
+          <template #footer>
+            <div style="display:flex; justify-content:flex-end; gap:var(--ds-spacing-md); padding:var(--ds-spacing-md) var(--ds-spacing-lg);">
+              <Button size="sm" variant="secondary-gray" label="Effacer" @click="picked = []" />
+              <Button size="sm" label="Appliquer" @click="open = false" />
+            </div>
+          </template>
         </Dropdown>
       </div>
     `,

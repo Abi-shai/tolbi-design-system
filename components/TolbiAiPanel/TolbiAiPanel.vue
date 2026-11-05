@@ -399,6 +399,7 @@ defineExpose({ scrollToEnd })
           align="start"
           class="ds-tolbi-ai-panel__switcher"
           role="dialog"
+          width="20rem"
           :label="labels.title"
         >
           <template #trigger="{ open: listed, toggle }">
@@ -618,10 +619,8 @@ defineExpose({ scrollToEnd })
   white-space: nowrap;
 }
 
-/* Under the title, from its start (`align="start"`), 320 wide: its rows are sentences. */
-.ds-tolbi-ai-panel__switcher :deep(.ds-dropdown__panel) {
-  width: 320px;
-}
+/* Under the title, from its start (`align="start"`), 20rem wide — `Dropdown`'s
+   `width` (ADR-0110): its rows are sentences. */
 
 /* The whole title, under the cut one — from its start, as the list opens. */
 .ds-tolbi-ai-panel__title-tip {

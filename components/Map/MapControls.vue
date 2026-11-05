@@ -6,7 +6,7 @@ import { Tooltip } from '../Tooltip'
 /**
  * The map's buttons (ADR-0087) — the owner's drawing: separate square buttons,
  * one under the other, 8px apart. Each is `Button` icon-only `secondary-gray`
- * `sm` (36px), the package's own button and not a drawing of its own
+ * `sm` (38px), the package's own button and not a drawing of its own
  * (ADR-0001): its `border-default` reads better on imagery than the Figma
  * component's `border-subtle`. Its label is its name and its tooltip, which
  * opens away from the map's edge — on the left by default, since controls sit

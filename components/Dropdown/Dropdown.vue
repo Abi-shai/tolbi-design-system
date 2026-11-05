@@ -68,6 +68,12 @@ interface Props {
    * on the panel, read by its rows.
    */
   size?:       DropdownSize
+  /**
+   * The panel's width, any CSS length (`20rem`). Unset, the size's: 240px at
+   * `md`, 160 at `sm` — a menu's rows. A `dialog` holding a form (a filter with
+   * a calendar) says how wide it needs to be (ADR-0110).
+   */
+  width?:      string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -79,6 +85,7 @@ const props = withDefaults(defineProps<Props>(), {
   align:       'end',
   side:        'below',
   size:        'md',
+  width:       undefined,
 })
 
 provide(DROPDOWN_SIZE_KEY, () => props.size)
@@ -221,6 +228,7 @@ onUnmounted(() => {
       popover="manual"
       class="ds-dropdown__panel"
       :class="{ 'ds-dropdown__panel--sm': size === 'sm' }"
+      :style="width ? { '--dropdown-panel-width': width } : undefined"
       :role="role"
       :aria-label="label"
     >
@@ -247,8 +255,9 @@ onUnmounted(() => {
         <slot name="header" />
       </div>
 
-      <!-- Items slot -->
-      <Scrollbar max-height="320px">
+      <!-- Items slot. A menu's list stops at 320px; a dialog's body takes the
+           room under (or over) its trigger, and scrolls only past it (ADR-0110). -->
+      <Scrollbar :max-height="role === 'dialog' ? undefined : '320px'">
         <div class="ds-dropdown__items">
           <slot />
         </div>
@@ -331,7 +340,9 @@ onUnmounted(() => {
   padding: 0;
   color: inherit;
   z-index: var(--ds-z-popover);
-  width: 240px;
+  width: var(--dropdown-panel-width, 240px);
+  /* Never wider than the screen, whatever width a dialog asks for. */
+  max-width: calc(100vw - 2 * var(--ds-spacing-md));
   max-height: var(--anchor-room, none);
   background-color: var(--ds-bg-default);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
@@ -396,7 +407,7 @@ onUnmounted(() => {
    bury the chip that opened it. A size, not a ceiling: labels are cut, the
    panel does not breathe with them. */
 .ds-dropdown__panel--sm {
-  width: 10rem;
+  width: var(--dropdown-panel-width, 10rem);
 }
 
 /* ── Footer ───────────────────────────────────────────────────────── */

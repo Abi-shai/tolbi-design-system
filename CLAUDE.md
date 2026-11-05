@@ -1238,6 +1238,11 @@ Before working on any component, read:
   ellipsis**, given whole in a **`Tooltip` only when cut**. The identity line is **the region alone**; defensively it
   shows **whole chips** and counts the rest **`+N`**. An anchored tooltip's long title wraps inside its 20rem. A gain has
   **no « + »**.
+- **ADR-0110**: **an icon-only `Button` is as tall as its text sibling** (`xs` 26 · `sm` 38 · `md` 42 · `lg` 46 ·
+  `lg-compact` 38 · `xl` 50 · `2xl` 62, border-box) — the squares were the padding tokens' heights, which omit the
+  border, so every one stood 2px short. **`Dropdown` takes `width`** (any CSS length; unset, 240 / 160) — a dialog
+  holding a form says how wide it is, no more `:deep()`. A **`role="dialog"` panel's height follows the room** under its
+  trigger (`--anchor-room` is its only cap); a `menu`'s list keeps 320px.
 
 ## Architecture
 
