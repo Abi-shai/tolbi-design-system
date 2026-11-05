@@ -23,8 +23,10 @@ export type MapPanelSize = 'sm' | 'lg'
  * **The fold (track A of `3649:1427`).** A panel with a `#header` folds into a
  * map control at its corner — `Button` icon-only, `secondary-gray`, `sm`, the
  * shape `MapControls` gives every control on a map — and the map is whole
- * again. The fold sits at the head's **end**, after the tabs, as the owner's
- * frames draw it (ADR-0103 — ADR-0099 had put it at the start). The focus
+ * again. The fold sits at the head's **start**, so the control that replaces
+ * it stands in the same corner: folding and unfolding again is one press in
+ * one place, the pointer barely moves (ADR-0099 — briefly moved to the end
+ * after the frames, and brought back for that reason, ADR-0103). The focus
  * follows the fold, to the control that replaced the one pressed; the map is
  * not re-framed — the panel floats, it reserves nothing.
  *
@@ -71,12 +73,24 @@ const panelId = `ds-map-panel-${useId()}`
 const named = (verb: string) => (props.title ? `${verb} ${props.title}` : verb)
 const iconFold = computed(() => !!slots.header)
 
-/* The pressed control is replaced; the focus moves to the one replacing it
-   as it starts to arrive (out, then in) — never left on the page between. */
+/*
+  The control the panel becomes stands **exactly where the fold was** (the
+  owner, 5 Nov.): fold, unfold, fold again is one press in one place, the
+  pointer does not move. The fold's offset inside the panel is measured as it
+  is pressed — it depends on the head's content — and the control takes it as
+  its margin. Folded from the start (nothing measured), it sits in the corner.
+*/
+const offset = ref({ x: 0, y: 0 })
 async function fold(next: boolean) {
+  if (next) {
+    const panel = host.value?.querySelector<HTMLElement>('.ds-map-panel')?.getBoundingClientRect()
+    const btn = host.value?.querySelector<HTMLElement>('[data-map-panel-fold]')?.getBoundingClientRect()
+    if (panel && btn) offset.value = { x: btn.left - panel.left, y: btn.top - panel.top }
+  }
   collapsed.value = next
   await nextTick()
 }
+const unfoldAt = computed(() => ({ marginLeft: `${offset.value.x}px`, marginTop: `${offset.value.y}px` }))
 function focusArrived() {
   host.value?.querySelector<HTMLElement>(collapsed.value ? '[data-map-panel-open]' : '[data-map-panel-fold]')?.focus()
 }
@@ -89,7 +103,7 @@ function focusArrived() {
       <!-- With a head of its own: a map control at the panel's corner. -->
       <!-- The transition is the wrapper's: `Button` declares its own `transition`,
            which outweighs the surface's and would make it arrive in one frame. -->
-      <div v-if="collapsible && collapsed && iconFold" key="open-icon" class="ds-map-panel__unfold">
+      <div v-if="collapsible && collapsed && iconFold" key="open-icon" class="ds-map-panel__unfold" :style="unfoldAt">
       <Button
         data-map-panel-open
         variant="secondary-gray"
@@ -124,7 +138,6 @@ function focusArrived() {
         :aria-label="props.title"
       >
         <div v-if="slots.header" class="ds-map-panel__head ds-map-panel__head--slot">
-          <div class="ds-map-panel__header"><slot name="header" /></div>
           <IconButton
             v-if="collapsible"
             data-map-panel-fold
@@ -136,6 +149,7 @@ function focusArrived() {
             :aria-controls="panelId"
             @click="fold(true)"
           />
+          <div class="ds-map-panel__header"><slot name="header" /></div>
         </div>
         <div v-else-if="title" class="ds-map-panel__head">
           <span class="ds-map-panel__title">{{ title }}</span>

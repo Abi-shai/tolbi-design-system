@@ -37,8 +37,14 @@ navigator 16 / 16 from the top right, 166 × 154.
 `Dialog`'s side panel draws it (ADR-0079) — a rule that runs to the border reads as a seam in the surface. Measured:
 the rule and the action both start 16px inside the panel.
 
-**The fold sits at the end of the head**, after the tabs, as the frames draw it — the owner, 5 Nov., reversing
-ADR-0099's start. The folded panel still becomes its map control at the panel's corner (top left).
+**The fold stays at the start of the head** (ADR-0099). It was moved to the end to match the frames, and brought
+back the same day by the owner once the reason was plain again: the folded panel becomes its control in the panel's
+top-left corner, so a fold at the start puts the two presses — fold, unfold, fold — in one place, the pointer
+barely moving (`MapNavigator`'s rule, ADR-0100). The frames follow the code. Measured, « barely » was not enough:
+the control sat in the overlay's corner, 25px from the fold's centre, and the pointer that folded landed on its
+very corner — the second press missed. The fold's offset inside the panel is now **measured as it is pressed**
+and the control takes it as its margin: the two centres are **0px** apart, six presses in one place, open ↔ folded
+every time.
 
 **The motion is the catalogue's, chosen by what moves** (the owner: « que la motion vienne vraiment du design
 system, logique avec ce composant et cette interaction »). `MapPanel lg` stands on a whole side, so it is a **side

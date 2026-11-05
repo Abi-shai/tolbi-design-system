@@ -1193,8 +1193,8 @@ Before working on any component, read:
 - **ADR-0103**: the GIS screen's layout is the owner's retained frames, measured (map 1424 × 828): `MapPanel lg` on
   **the whole left side** (400 × 796, 16 all round), `MapLegend` **top** and `MapTimeline` **bottom**, both 480px
   and centred — one axis, so `MapLegend` declares 30rem — and `MapNavigator` top end. `MapOverlay` gains **`start` /
-  `end`**, a whole side; `MapPanel lg` takes a height it is given, folds from the **end** of its head (as drawn)
-  and **moves as a side panel** — `Dialog side`'s 24px of travel toward its edge in place of the scale; its foot's
+  `end`**, a whole side; `MapPanel lg` takes a height it is given, folds from the **start** of its head and the control it
+  becomes stands **exactly** where the fold was (offset measured on press — 0px; moved to the end and back the same day) and **moves as a side panel** — `Dialog side`'s 24px of travel toward its edge in place of the scale; its foot's
   rule is inset. No `MapControls` on this screen.
 
 ## Architecture
