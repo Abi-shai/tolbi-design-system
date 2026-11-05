@@ -49,7 +49,10 @@ instrument on imagery, as `MapControls` is. What it owns:
 - **« Comparer »** (`compare`) at the end, in brand ink: pressed, the next period chosen is the compared one
   (`v-model:comparison`), both wear the pill, the end says « 2020 → 2026 » with its ✕. The focus follows each
   replaced control (Comparer → ✕ → Comparer; the chip after a choice of scale).
-The 16px glyphs keep the drawing; their target is a 28px invisible disc. A `border-subtle` edge is added
+**Amended (the owner, 5 Nov.)**: ‹ › and the comparison's ✕ were bare 16px glyphs over an invisible 28px target;
+a control that steps through the periods is a button and must look like one — they are `IconButton xs subtle`
+(32px, its own hover, focus and disabled). The bar ending on ✕ gives back the disc's 8px in its end padding. The
+Figma component follows (`Frise du temps`, IconButton instances; the compare variant's strip now fills). A `border-subtle` edge is added
 (ADR-0030: in dark the shadow cannot separate the bar from the map).
 
 **`MapNavigator`** — the owner's « Carte/Navigateur » (`3552:3437`), **drawn as drawn**, gauge included. Drafted

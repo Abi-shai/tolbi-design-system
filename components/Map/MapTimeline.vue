@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Dropdown, DropdownItem } from '../Dropdown'
 import { Icon } from '../Icon'
+import { IconButton } from '../IconButton'
 import { useSlidingIndicator } from '../../composables/useSlidingIndicator'
 
 /** One step of the timeline — a year, a month, a day. */
@@ -240,15 +241,15 @@ function exitCompare() {
       <span class="ds-map-timeline__rule" aria-hidden="true" />
     </template>
 
-    <button
-      type="button"
+    <IconButton
       class="ds-map-timeline__step"
-      :aria-label="previousLabel"
+      icon="chevron-left"
+      size="xs"
+      variant="subtle"
+      :ariaLabel="previousLabel"
       :disabled="previous < 0"
       @click="go(previous)"
-    >
-      <Icon name="chevron-left" :size="16" aria-hidden="true" />
-    </button>
+    />
 
     <div ref="viewport" class="ds-map-timeline__viewport">
       <div ref="track" class="ds-map-timeline__track" role="radiogroup" :aria-label="label" @keydown="onKeydown">
@@ -288,15 +289,15 @@ function exitCompare() {
       </div>
     </div>
 
-    <button
-      type="button"
+    <IconButton
       class="ds-map-timeline__step"
-      :aria-label="nextLabel"
+      icon="chevron-right"
+      size="xs"
+      variant="subtle"
+      :ariaLabel="nextLabel"
       :disabled="next < 0"
       @click="go(next)"
-    >
-      <Icon name="chevron-right" :size="16" aria-hidden="true" />
-    </button>
+    />
 
     <template v-if="compare">
       <span class="ds-map-timeline__rule" aria-hidden="true" />
@@ -310,14 +311,14 @@ function exitCompare() {
         <span class="ds-map-timeline__range" :class="{ 'ds-map-timeline__range--hint': !range }" aria-live="polite">
           {{ range ?? compareHint }}
         </span>
-        <button
-          type="button"
+        <IconButton
           class="ds-map-timeline__exit"
-          :aria-label="exitCompareLabel"
+          icon="x"
+          size="xs"
+          variant="subtle"
+          :ariaLabel="exitCompareLabel"
           @click="exitCompare"
-        >
-          <Icon name="x" :size="16" aria-hidden="true" />
-        </button>
+        />
       </template>
     </template>
   </div>
@@ -387,58 +388,27 @@ function exitCompare() {
   background: var(--ds-border-subtle);
 }
 
-/* ── Bare glyphs and words ────────────────────────────────────────── */
+/* ── The arrows and the exit ─────────────────────────────────────── */
 /*
-  The arrows and the exit are 16px glyphs, as drawn — the target is not: an
-  invisible 28px disc around each (`::before`), so the bar keeps its rhythm and
-  a finger still finds them.
+  The catalogue's round button (`IconButton xs subtle`, 32px — a 16px glyph in
+  its own disc, hover and focus included), not bare glyphs: a control that steps
+  through the periods is a button and looks like one (the owner, 5 Nov.). The
+  bar is 42px, so 5px of it above and below. Ending on the exit, the bar's end
+  padding gives back the disc's own 8px of air, so the glyph keeps its place.
 */
 .ds-map-timeline__step,
 .ds-map-timeline__exit {
-  position: relative;
   flex: none;
-  display: inline-flex;
-  padding: 0;
-  border: none;
-  border-radius: var(--ds-radius-pill);
-  background: none;
-  color: var(--ds-text-subtle);
-  cursor: pointer;
-  outline: none;
-  transition:
-    color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
-    box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
-.ds-map-timeline__step::before,
-.ds-map-timeline__exit::before {
-  content: '';
-  position: absolute;
-  inset: calc(-1 * var(--ds-spacing-sm));
+.ds-map-timeline:has(> .ds-map-timeline__exit:last-child) {
+  padding-inline-end: var(--ds-spacing-xs);
 }
 
-.ds-map-timeline__step:hover:not(:disabled) {
-  color: var(--ds-text-strong);
-}
-
-.ds-map-timeline__step:disabled {
-  color: var(--ds-text-disabled);
-  cursor: default;
-}
-
-.ds-map-timeline__step:focus-visible,
-.ds-map-timeline__exit:focus-visible,
 .ds-map-timeline__action:focus-visible {
   box-shadow: var(--ds-focus-ring-brand);
 }
 
-.ds-map-timeline__exit {
-  color: var(--ds-text-brand);
-}
-
-.ds-map-timeline__exit:hover {
-  color: var(--ds-text-brand-hover);
-}
 
 /* The end of the bar speaks in the brand's ink: it is the one action there. */
 .ds-map-timeline__action,
