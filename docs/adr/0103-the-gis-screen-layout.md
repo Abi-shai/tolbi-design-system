@@ -33,6 +33,10 @@ Measured in the story « Écran SIG — toutes les pièces » at the frames' siz
 472 / 16, 480; timeline 472, 480 × 42, 16 from the bottom (the frames say 14 — `MapOverlay`'s 16 holds);
 navigator 16 / 16 from the top right, 166 × 154.
 
+**The foot's rule is inset** (the owner, 5 Nov.): it stops at the content's edges, 16px in from the panel's, as
+`Dialog`'s side panel draws it (ADR-0079) — a rule that runs to the border reads as a seam in the surface. Measured:
+the rule and the action both start 16px inside the panel.
+
 ## Still open
 
 - In the frames the panel's fold sits at the **end** of its head; ADR-0099 put it at the **start** (track A, so the

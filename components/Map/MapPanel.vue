@@ -256,9 +256,25 @@ function focusArrived() {
   gap: var(--ds-spacing-md);
 }
 
+/* The rule is **inset** — it stops at the content's edges, 16px from the
+   panel's, as `Dialog`'s side panel draws it (ADR-0079): a rule that runs to
+   the border reads as a seam in the surface; inset, it separates the foot from
+   the body and nothing else. A drawn line, so the 1px is added above. */
 .ds-map-panel--lg .ds-map-panel__foot {
-  padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
-  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  position: relative;
+  padding:
+    calc(var(--ds-spacing-lg) + var(--ds-border-width-default)) var(--ds-spacing-xl)
+    var(--ds-spacing-lg);
+}
+
+.ds-map-panel--lg .ds-map-panel__foot::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: var(--ds-spacing-xl);
+  left: var(--ds-spacing-xl);
+  height: var(--ds-border-width-default);
+  background: var(--ds-border-subtle);
 }
 
 .ds-map-panel__unfold {
