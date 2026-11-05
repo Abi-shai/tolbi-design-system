@@ -1260,6 +1260,10 @@ Before working on any component, read:
   the order is the rule: consult, change, then **the destructive one last, alone after a `DropdownDivider`**, still
   confirmed by `ConfirmDialog`. `ProjectCard` takes **`#menu`** — presence decides: the « ⋯ » opens the package's
   `Dropdown` `md` (240px, 40px rows; `sm` was tried and read too small) and emits nothing; a chosen row closes it and hands the focus back.
+- **ADR-0114**: **a timeline with few periods** (`MapTimeline`, etolbi dMRV): **one scale is said, not offered** — the
+  word (« Année ») where the chip would be, no chevron; **one scale or none, the bar hugs** (`fit-content` up to 30rem —
+  480 was a size only so a scale switch never resizes it; five years: 358px, no void); a **data dot hangs under its
+  label out of the flow**, so every year keeps the chosen pill's line.
 
 ## Architecture
 

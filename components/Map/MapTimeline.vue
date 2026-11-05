@@ -263,7 +263,7 @@ function exitCompare() {
 </script>
 
 <template>
-  <div ref="root" class="ds-map-timeline" :class="{ 'ds-map-timeline--small': small, 'ds-map-timeline--dense': dense }">
+  <div ref="root" class="ds-map-timeline" :class="{ 'ds-map-timeline--small': small, 'ds-map-timeline--dense': dense, 'ds-map-timeline--hug': scales.length < 2 }">
     <span class="ds-map-timeline__said" role="status">{{ announced }}</span>
     <template v-if="scales.length > 1">
       <Dropdown v-model:open="scaleOpen" class="ds-map-timeline__scale-menu" :label="scaleLabel" align="start" size="sm">
@@ -285,6 +285,12 @@ function exitCompare() {
           @click="pickScale(s)"
         />
       </Dropdown>
+      <Divider class="ds-map-timeline__rule" orientation="vertical" />
+    </template>
+    <!-- One scale (ADR-0114): said, not offered — the word the chip would carry,
+         without a chip or a chevron, since there is nothing to choose. -->
+    <template v-else-if="scales.length === 1">
+      <span class="ds-map-timeline__scale-word">{{ scaleName }}</span>
       <Divider class="ds-map-timeline__rule" orientation="vertical" />
     </template>
 
@@ -401,10 +407,36 @@ function exitCompare() {
   box-shadow: var(--ds-elevation-raised);
 }
 
+/*
+  **One scale or none: the bar hugs** (ADR-0114). 480 is a size so that
+  switching from years to months never resizes the bar; with nothing to switch,
+  that reason is gone, and five years at the end of a 480px bar left 127px of
+  void before them. It hugs up to the same 30rem, then scrolls as before — and
+  stays centred where the screen centres it (ADR-0103's axis).
+*/
+.ds-map-timeline--hug {
+  width: fit-content;
+  max-width: min(30rem, 100%);
+}
+
 /* ── The scale chip ───────────────────────────────────────────────── */
 /* `DropdownTrigger`'s `chip` chrome: the trigger owns its chrome (ADR-0033). */
 .ds-map-timeline__scale-menu {
   flex: none;
+}
+
+/*
+  One scale: the word alone (ADR-0114). The chip's type and ink, without its
+  ground or its chevron — a chip says « choose », and there is nothing to
+  choose. It fills the start of the bar the drawing gives to the scale, where
+  a few years left a void between the edge and ‹.
+*/
+.ds-map-timeline__scale-word {
+  flex: none;
+  padding-inline-start: var(--ds-spacing-xs);
+  font: var(--ds-font-label-md-strong);
+  color: var(--ds-text-subtle);
+  white-space: nowrap;
 }
 
 /* `Divider`, vertical — 20px tall, as drawn, not the bar's height. */
@@ -598,10 +630,23 @@ function exitCompare() {
 
 .ds-map-timeline__dot {
   flex: none;
+  /* Under its label, out of the flow (ADR-0114): in it, a dot made its year
+     6px taller, centred, so the labels with a dot sat 3px above the chosen
+     one, whose pill hides its dot. The label is the box; the dot hangs under. */
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  translate: -50% 0;
   width: 4px;
   height: 4px;
   border-radius: var(--ds-radius-pill);
   background: var(--ds-bg-brand-solid);
+}
+
+/* A day between the labelled ones *is* its dot: there it stays in the flow. */
+.ds-map-timeline__tick--minor .ds-map-timeline__dot {
+  position: static;
+  translate: none;
 }
 
 /* No measure: a **ring**, not a paler dot — the shape says it, not the colour

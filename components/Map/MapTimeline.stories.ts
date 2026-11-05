@@ -61,6 +61,25 @@ export const Years: Story = {
   }),
 }
 
+/**
+ * **Peu de périodes, une seule échelle** (ADR-0114) — la page projet dMRV : cinq à sept années, pas de mois mesurés.
+ * Une échelle unique est **dite, pas offerte** : le mot « Année » à la place de la puce, sans chevron, ce qui remplit
+ * le début de la barre. Les points « mesure disponible » pendent **sous** leur année, hors du flux : chaque année
+ * garde la ligne de base de la pastille choisie.
+ */
+export const FewYears: Story = {
+  name: 'Peu d’années, une échelle',
+  render: () => ({
+    components: { MapTimeline },
+    setup: () => ({
+      value: ref('2024'),
+      SCALE: [{ value: 'year', label: 'Année' }],
+      PERIODS: ['2020', '2021', '2022', '2023', '2024'].map((y, i) => ({ value: y, label: y, data: i !== 1 })),
+    }),
+    template: ground(`<MapTimeline v-model="value" :scales="SCALE" :periods="PERIODS" label="Année" />`),
+  }),
+}
+
 export const Months: Story = {
   name: 'Mois — mesures et mois à venir',
   render: () => ({
