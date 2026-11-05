@@ -1259,7 +1259,7 @@ Before working on any component, read:
   glyph and word `text-error`; `bg-error-subtle` + `text-on-error-subtle` under the pointer — 7/8 menus benchmarked),
   the order is the rule: consult, change, then **the destructive one last, alone after a `DropdownDivider`**, still
   confirmed by `ConfirmDialog`. `ProjectCard` takes **`#menu`** — presence decides: the « ⋯ » opens the package's
-  `Dropdown` **`sm`** (160px, 34px rows — the « ⋯ » is `xs`, ADR-0101) and emits nothing; a chosen row closes it and hands the focus back.
+  `Dropdown` `md` (240px, 40px rows; `sm` was tried and read too small) and emits nothing; a chosen row closes it and hands the focus back.
 
 ## Architecture
 

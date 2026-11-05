@@ -25,8 +25,9 @@ item is **red at rest**; under the pointer 5 take a **red tint**, 2 a solid red;
   split by `DropdownDivider`, and the **destructive action last, alone in its group**. It still opens `ConfirmDialog`
   (ADR-0075/0076), never a delete straight from the menu.
 - **`ProjectCard` takes `#menu`.** **Presence decides** (ADR-0053): filled, the « ⋯ » is the trigger of the package's
-  `Dropdown` **`sm`** (`align="end"`, 160px, 34px rows in `label-md` — a list is the size of what opens it, and the « ⋯ » is
-  `xs`, ADR-0101; amended the same day from `md`, the owner's call), in the top layer (ADR-0078), `aria-haspopup="menu"` + `aria-expanded`, and it
+  `Dropdown` `md` (`align="end"`, 240px, 40px rows in `label-lg`), in the top layer (ADR-0078). `sm` (160px, 34px
+  rows — ADR-0101's « the size of what opens it », the « ⋯ » being `xs`) was tried the same day and read too small: the
+  owner kept `md`, `aria-haspopup="menu"` + `aria-expanded`, and it
   emits nothing; empty, it emits `menu` as before. Choosing a row — click, or Enter / Space — closes the menu and hands
   the focus back to the « ⋯ » (the menu button's rule); Escape does the same (`Dropdown`'s own). While the menu is
   open the « ⋯ » stays shown (`active`), or it would fade under the pointer that left for the panel.

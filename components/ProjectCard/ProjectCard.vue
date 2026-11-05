@@ -544,8 +544,7 @@ watch(() => [props.title, props.meta, props.state], async () => {
       `xs`: 32px, not the navigation bar's 36. A tile 280px wide cannot spend a
       36px disc on a menu it shares with a status pill.
     -->
-    <!-- Filled `#menu`: the « ⋯ » is the trigger of the package's menu (ADR-0113),
-         `sm` — a list is the size of what opens it, and the « ⋯ » is `xs` (ADR-0101). -->
+    <!-- Filled `#menu`: the « ⋯ » is the trigger of the package's menu (ADR-0113). -->
     <div
       v-if="interactive && $slots.menu"
       ref="menuEl"
@@ -553,7 +552,7 @@ watch(() => [props.title, props.meta, props.state], async () => {
       @click="onMenuChoose"
       @keydown="onMenuChoose"
     >
-      <Dropdown v-model:open="menuOpen" align="end" size="sm" :label="`Actions — ${title}`">
+      <Dropdown v-model:open="menuOpen" align="end" :label="`Actions — ${title}`">
         <template #trigger>
           <IconButton
             class="ds-project-card__more"
