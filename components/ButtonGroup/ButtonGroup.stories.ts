@@ -3,7 +3,10 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import ButtonGroup from './ButtonGroup.vue'
 import ButtonGroupItem from './ButtonGroupItem.vue'
 import { InputField } from '../InputField'
-import { InputDropdown } from '../Dropdown'
+import { InputDropdown, Dropdown, DropdownTrigger, DropdownItem } from '../Dropdown'
+import { Button } from '../Button'
+import { Badge } from '../Badge'
+import { Icon } from '../Icon'
 
 const meta: Meta = {
   title: 'Actions/ButtonGroup',
@@ -145,27 +148,57 @@ export const Sizes: Story = {
   }),
 }
 
-/** Une barre de filtres sur une seule ligne de 38px : recherche et liste en `sm`, la vue en `sm`. */
+/**
+ * Une barre de filtres sur une seule ligne de 38px (ADR-0108) : tout est en `sm`.
+ * Recherche `InputField`, liste de valeurs `InputDropdown`, filtre à plusieurs
+ * critères = `Dropdown` dont le `#trigger` est un `DropdownTrigger` (boxed, `sm`) —
+ * icône `filter` 16, libellé, nombre de filtres actifs en `Badge` **`sm`** (un `md`
+ * fait 24px et porte le déclencheur à 42), chevron. Une action posée dans la barre
+ * est un `Button` `sm` : 38px rendus (son jeton dit 36, sans la bordure — ADR-0033).
+ */
 export const InAFilterBar: Story = {
   name: 'In a filter bar',
   parameters: { layout: 'padded' },
   render: () => ({
-    setup: () => ({
+    setup: () => {
+      const criteria = ref<string[]>(['arachide', 'en-cours'])
+      const toggle = (v: string) => {
+        criteria.value = criteria.value.includes(v) ? criteria.value.filter(x => x !== v) : [...criteria.value, v]
+      }
+      return {
       view: ref('tableau'),
       query: ref(''),
       filter: ref<string | null>(null),
+      criteria,
+      toggle,
+      filtersOpen: ref(false),
       options: [
         { value: 'tous', label: 'Tous les projets' },
         { value: 'a-jour', label: 'Suivi à jour' },
         { value: 'calcul', label: 'En calcul' },
       ],
-    }),
-    components: { ButtonGroup, ButtonGroupItem, InputField, InputDropdown },
+      }
+    },
+    components: { ButtonGroup, ButtonGroupItem, InputField, InputDropdown, Dropdown, DropdownTrigger, DropdownItem, Button, Badge, Icon },
     template: `
-      <div style="display:flex; align-items:center; gap:var(--ds-spacing-md); width:900px;">
+      <div style="display:flex; align-items:center; gap:var(--ds-spacing-md); width:1000px;">
         <div style="width:300px;"><InputField v-model="query" size="sm" type="search" placeholder="Rechercher un projet" /></div>
         <InputDropdown v-model="filter" size="sm" :options="options" placeholder="Tous les projets" aria-label="Filtrer les projets" />
+        <Dropdown v-model:open="filtersOpen" label="Filtres">
+          <template #trigger>
+            <DropdownTrigger size="sm" chevron :open="filtersOpen" @click="filtersOpen = !filtersOpen">
+              <Icon name="filter" :size="16" aria-hidden="true" />
+              Filtres
+              <Badge v-if="criteria.length" :label="String(criteria.length)" size="sm" />
+            </DropdownTrigger>
+          </template>
+          <DropdownItem label="Arachide" :checked="criteria.includes('arachide')" @click="toggle('arachide')" />
+          <DropdownItem label="Mil" :checked="criteria.includes('mil')" @click="toggle('mil')" />
+          <DropdownItem label="En cours" :checked="criteria.includes('en-cours')" @click="toggle('en-cours')" />
+          <DropdownItem label="Terminé" :checked="criteria.includes('termine')" @click="toggle('termine')" />
+        </Dropdown>
         <div style="flex:1;" />
+        <Button size="sm" variant="secondary-gray" icon-leading="download" label="Télécharger la liste" />
         <ButtonGroup v-model="view" size="sm" aria-label="Vue">
           <ButtonGroupItem value="grille" icon="layout-grid" aria-label="Grille" />
           <ButtonGroupItem value="tableau" icon="table" aria-label="Tableau" />

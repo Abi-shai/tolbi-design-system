@@ -24,6 +24,18 @@ the sm padding and kept the md type (16/24). `InputDropdown sm` was the only con
   Its one consumer in the package — the conversation search in Tolbi AI's history — goes 42 → 38 with it.
 - A filter bar is **all `sm`**: search, filter and switcher measured 38.0px each, on one top edge.
 
+## Amended (5 Nov.) — the multi-criteria filter and the action
+
+etolbi asked for Yield's « Filtres » (a panel of several criteria with the active count) and reported `Button sm` at
+36px and `DropdownTrigger sm` boxed at 42. **Measured in the package, both are 38**: `control-padding-sm` (8/12) around
+the 20px line box of `label-lg-strong`, plus the border (ADR-0033 — the token's « 36px » omits it). What makes a trigger
+42 is its content: a **`Badge md` is 24px**. So nothing new ships:
+
+- **The filter** is a `Dropdown` whose `#trigger` is a `DropdownTrigger` boxed `sm` — `filter` glyph at 16, the word,
+  the active count in a **`Badge sm`**, the chevron. 38px, measured. The panel is the product's.
+- **An action in the bar** (« Télécharger la liste ») is a `Button sm`: 38px rendered, so yes, it shares the line.
+- The story « In a filter bar » carries the whole line: search, list, filters, action, view — five controls, 38.0px each.
+
 ## Not done
 
 - No `ButtonGroup` `lg`: no consumer.

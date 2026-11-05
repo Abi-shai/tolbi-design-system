@@ -1228,6 +1228,9 @@ Before working on any component, read:
   `ButtonGroup` gains **`size`** (`sm | md`): at `sm` the segments go 32 → 28 (rail 38, glyph 16, `radius-control` rail,
   `radius-inner-sm` pill — `Tabs xs`' geometry), the type stays 14px. **`InputField sm` was 42px** (sm padding, md type)
   and is now 38 (`control-padding-sm` + `body-md`), as ADR-0101 said `sm` is; Tolbi AI's history search follows.
+  **Amended**: the multi-criteria filter is a `Dropdown` with a `DropdownTrigger` boxed `sm` in `#trigger` (glyph 16,
+  word, count in a **`Badge sm`** — a `md` badge is 24px and makes it 42), and an action in the bar is a `Button sm`:
+  both **38 rendered** (the `sm` token's « 36 » omits the border).
 - **ADR-0109**: **a card holds its own text** (etolbi's 0.88 feedback). A figure and its unit **hold one line and never
   run into the neighbour**: where a pair does not fit its 106px column, **both** figures of the card step down
   `heading-lg` → `heading-md` together (measured; the 28px line box stays, so the height does not move). The unit under
