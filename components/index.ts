@@ -101,6 +101,7 @@ export type { OtpSize, OtpDigits } from './VerificationCodeInputField'
 
 export { CreditsChip } from './CreditsChip'
 export type { CreditsChipTone } from './CreditsChip'
+export { CreditCost } from './CreditCost'
 
 export { Tag } from './Tag'
 export type { TagSize, TagAction } from './Tag'

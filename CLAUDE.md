@@ -1196,6 +1196,14 @@ Before working on any component, read:
   `end`**, a whole side; `MapPanel lg` takes a height it is given, folds from the **start** of its head and the control it
   becomes stands **exactly** where the fold was (offset measured on press — 0px; moved to the end and back the same day) and **moves as a side panel** — `Dialog side`'s 24px of travel toward its edge in place of the scale; its foot's
   rule is inset. No `MapControls` on this screen.
+- **ADR-0104**: **the cost before the click** — every action that consumes credits and is launched from a creation
+  panel says its cost in the **foot** of `Dialog placement="side"` (`#summary`): `CreditCost`, the owner's drawing
+  (`3734:2259`) — his coin composition (64 × 56, a 3× PNG, decorative, nothing written in its place), 8px, « Coût en
+  crédits » `body-sm` over the number alone in `heading-lg`. `cost` absent = « — », `null` = a placeholder in the
+  number's line box, a number = the cost. **Not enough is derived** from `balance` (error ink + `circle-alert`,
+  read « Crédits insuffisants »); the product's primary action becomes « Acheter des crédits ». No count of what is
+  missing, no confirmation on top. Benchmark: 78 captures, 51 products — the cost in 0–2 lines, no text in an
+  illustration's place. Only Yield can estimate before the click today; the other modules need an estimate route.
 
 ## Architecture
 
