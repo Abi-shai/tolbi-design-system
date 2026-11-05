@@ -1,7 +1,7 @@
 # ADR-0109 — A card holds its own text
 
 **Date:** 2026-11-05
-**Amends:** ADR-0038 (« nothing wraps »), ADR-0055 (the card's height)
+**Amends:** ADR-0038 (« nothing wraps »)
 **Source:** etolbi's feedback on 0.88 (`/dmrv`, real data): two figures overlapping, a name cut with no way to read it,
 a chip cut mid-word. The owner, the same day: the name stays **one line**, in ellipsis; no « + » before a gain.
 **Status:** Accepted
@@ -15,12 +15,16 @@ line was `overflow: hidden`, so a third chip was sliced (« Référenc »).
 
 ## Decisions
 
-- **A figure is never cut and never runs into its neighbour: the unit sits under the number, always** — in both
-  columns and on every card. Wrapping only when the pair did not fit was shipped first and put one unit under its
-  figure and the other beside it, on one card (the owner: « il faut standardiser »). The unit's line (`label-md`) is held
-  even where there is none, so a grid keeps one height (+16px: 300 → 316 with a zone mark, 296 → 312 with a module mark;
-  loading matches). No ellipsis on a number — a cut number lies — and no type step that would make two cards' figures
-  disagree in size. Past ~10 characters the number alone overflows: the product writes it compactly.
+- **A figure and its unit hold one line, and never run into the neighbour.** Where a pair does not fit its column
+  (« 166 610 tCO2e » is 114px in 106), **both** figures of the card step down one role together, `heading-lg` →
+  `heading-md` — measured by the card, at the full size each time so a wider card steps back up. The line box stays
+  the heading's 28px, so the card's height does not move (300px with a zone mark, 296 with a module mark). No ellipsis
+  on a number — a cut number lies. Past what `heading-md` holds (~12 characters with a unit) the product writes it
+  compactly.
+  Two forms were shipped and reversed the same day: the unit **wrapped** under the number only when it did not fit
+  (one card then had a unit under and a unit beside — « il faut standardiser »), then the unit **always** under the
+  number, its line held by every card (+16px — « trop condensé » for the baseline block below). The owner's rule is the
+  one line.
 - **The name keeps one line, in ellipsis** (the owner's call — two lines at 20px were drawn, cost 16px and still cut
   « FPH — Agroforesterie… »). **A cut name is given whole in a `Tooltip`**, only when it is cut (ADR-0069's rule), anchored
   on the title: the title's overlay covers the card, so pointing anywhere on it, or focusing the title, asks for it.

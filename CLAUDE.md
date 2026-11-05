@@ -1228,12 +1228,13 @@ Before working on any component, read:
   `ButtonGroup` gains **`size`** (`sm | md`): at `sm` the segments go 32 → 28 (rail 38, glyph 16, `radius-control` rail,
   `radius-inner-sm` pill — `Tabs xs`' geometry), the type stays 14px. **`InputField sm` was 42px** (sm padding, md type)
   and is now 38 (`control-padding-sm` + `body-md`), as ADR-0101 said `sm` is; Tolbi AI's history search follows.
-- **ADR-0109**: **a card holds its own text** (etolbi's 0.88 feedback). A figure is **never cut and never runs into its
-  neighbour**: the **unit sits under the number, always** (wrapping only when it did not fit split one card in two
-  forms), its line held by every card (+16px, one grid height). The name stays **one line in ellipsis** (the owner's
-  call — two lines were drawn and refused), given whole in a **`Tooltip` only when cut**. The identity line is **the
-  region alone**; defensively it shows **whole chips** and counts the rest **`+N`**. An anchored tooltip's long title
-  wraps inside its 20rem. A gain has **no « + »**.
+- **ADR-0109**: **a card holds its own text** (etolbi's 0.88 feedback). A figure and its unit **hold one line and never
+  run into the neighbour**: where a pair does not fit its 106px column, **both** figures of the card step down
+  `heading-lg` → `heading-md` together (measured; the 28px line box stays, so the height does not move). The unit under
+  the number was shipped twice and reversed (« standardiser », then « trop condensé »). The name stays **one line in
+  ellipsis**, given whole in a **`Tooltip` only when cut**. The identity line is **the region alone**; defensively it
+  shows **whole chips** and counts the rest **`+N`**. An anchored tooltip's long title wraps inside its 20rem. A gain has
+  **no « + »**.
 
 ## Architecture
 
