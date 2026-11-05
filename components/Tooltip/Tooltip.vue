@@ -203,4 +203,12 @@ onMounted(() => {
 .ds-tooltip-anchor__bubble--inline {
   margin-inline: var(--ds-spacing-xs);
 }
+
+/* A one-line title longer than the 20rem cap wraps inside it rather than
+   running out of its own bubble — a project's whole name (ADR-0109). A short
+   one still takes one line: the bubble hugs it. */
+.ds-tooltip-anchor__bubble :deep(.ds-tooltip__title--single) {
+  white-space: normal;
+  text-align: start;
+}
 </style>

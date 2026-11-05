@@ -124,6 +124,18 @@ const DMRV = {
   project:  [9.1, 9.6, 10.2, 10.9, 11.5, 12.1, 12.7],
   baseline: [9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7],
   label: '12,7 tCO2e/ha en 2026 contre 9,7 pour la baseline, depuis 9,1 en 2020',
+  /* Real data from the product (etolbi /dmrv): a name the line cuts, figures
+     seven characters long. */
+  long: {
+    title: 'Suivi des émissions — coopérative agricole de Soubré',
+    /* The region alone: the identity line of a project says where it is. */
+    meta: [{ icon: 'map-pin', label: "Soubré, Côte d'Ivoire" }],
+    metrics: [
+      { label: 'Gain carbone', value: '166 610', unit: 'tCO2e' },
+      { label: 'Surface suivie', value: '29 645,2', unit: 'ha' },
+    ],
+    freshness: 'Créé le 2 février 2024',
+  },
 }
 
 const frame = (inner: string) =>
@@ -352,7 +364,7 @@ export const Dmrv: Story = {
     components: { ProjectCard, Sparkline, ProjectGlyph },
     setup: () => ({ d: DMRV, INSIGHT_HEAD }),
     template: `
-      <div style="display: grid; grid-template-columns: repeat(3, 280px); gap: var(--ds-spacing-xl); align-items: stretch;">
+      <div style="display: grid; grid-template-columns: repeat(4, 280px); gap: var(--ds-spacing-xl); align-items: stretch;">
         <ProjectCard v-bind="d.card" state="done" status="Suivi à jour">
           <template #zone><ProjectGlyph kind="zone" status="done" seed="fph-cacao" /></template>
           <template #insight>
@@ -372,6 +384,13 @@ export const Dmrv: Story = {
           <template #zone><ProjectGlyph kind="zone" status="done" seed="fph-cacao" /></template>
           <template #insight>
             <div :style="INSIGHT_HEAD"><span>Comparé à la baseline</span><span style="color:var(--ds-text-on-success-subtle)">+3,0 tCO2e/ha</span></div>
+            <Sparkline :values="d.project" :comparison="d.baseline" :label="d.label" />
+          </template>
+        </ProjectCard>
+        <ProjectCard v-bind="d.long" state="done" href="#">
+          <template #zone><ProjectGlyph kind="zone" status="done" seed="soubre-coop" /></template>
+          <template #insight>
+            <div :style="INSIGHT_HEAD"><span>Comparé à la baseline</span><span style="color:var(--ds-text-on-success-subtle)">+5,6 tCO2e/ha</span></div>
             <Sparkline :values="d.project" :comparison="d.baseline" :label="d.label" />
           </template>
         </ProjectCard>

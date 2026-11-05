@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, useSlots } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue'
 import { Badge } from '../Badge'
 import { Icon, type IconName } from '../Icon'
 import { IconButton } from '../IconButton'
 import { ModuleIcon, type ModuleName } from '../ModuleIcon'
 import { Skeleton } from '../Skeleton'
 import { ShareBar } from '../ShareBar'
+import { Tooltip } from '../Tooltip'
 
 /**
  * One project of one module, as a tile in a grid.
@@ -222,8 +223,8 @@ const isLoading = computed(() => props.state === 'loading')
  * nothing to open: no link, no menu, no lift.
  */
 const isComputing = computed(() => props.state === 'computing')
-const slotsZone = useSlots()
-const hasZone = computed(() => Boolean(props.zone || slotsZone.zone))
+const slotsZone = useSlots() as Record<string, unknown>
+const hasZone = computed<boolean>(() => Boolean(props.zone || slotsZone.zone))
 const interactive = computed(() => !isLoading.value && !isComputing.value)
 
 /** The pill's tone is the state's, so the two can never disagree. */
@@ -276,6 +277,68 @@ const spread = computed(() => {
 
 /* The bar and its legend are `ShareBar` (ADR-0097): biggest first, five hues
    at most, the tail neutral and counted `+N` — the rules this card wrote first. */
+
+/*
+  ── What does not fit (ADR-0109) ──────────────────────────────────────
+  Two measurements, one observer: the name's two lines, and the identity line.
+*/
+
+/* The name keeps its one line — two at 20px cost every card 16px and still cut
+   « FPH — Agroforesterie… » — and a cut name is given whole in a tooltip, only
+   when it is cut, or a whole name would be said twice. */
+const linkEl = ref<HTMLElement | null>(null)
+const titleCut = ref(false)
+
+/* The identity line never wraps and never shows half a chip: the chips that fit
+   are shown whole, the rest are counted `+N` — the crops' legend rule. The rest
+   stay in the list, visually hidden, so a reader still hears every one. */
+const metaEl = ref<HTMLElement | null>(null)
+const metaProbe = ref<HTMLElement | null>(null)
+const metaShown = ref(Number.POSITIVE_INFINITY)
+const metaHidden = computed(() => Math.max(0, props.meta.length - metaShown.value))
+
+function fit() {
+  const link = linkEl.value
+  titleCut.value = !!link && link.scrollWidth > link.clientWidth + 1
+
+  const list = metaEl.value
+  const probe = metaProbe.value
+  if (!list || !probe) return
+  const chips = [...probe.children] as HTMLElement[]
+  const more = chips.pop()
+  const gap = parseFloat(getComputedStyle(probe).columnGap) || 0
+  const widths = chips.map(c => c.getBoundingClientRect().width)
+  const room = list.clientWidth
+  const all = widths.reduce((sum, w) => sum + w, 0) + gap * Math.max(0, widths.length - 1)
+  if (all <= room) { metaShown.value = widths.length; return }
+  /* Room for the `+N` is kept from the start: it is there whenever one is cut. */
+  const tail = gap + (more?.getBoundingClientRect().width ?? 0)
+  let used = 0
+  let k = 0
+  while (k < widths.length && used + (k ? gap : 0) + widths[k] + tail <= room) {
+    used += (k ? gap : 0) + widths[k]
+    k++
+  }
+  /* The first chip always shows — cut with an ellipsis if it alone is too long. */
+  metaShown.value = Math.max(1, k)
+}
+
+let observer: ResizeObserver | undefined
+onMounted(() => {
+  fit()
+  if (typeof ResizeObserver === 'undefined') return
+  observer = new ResizeObserver(() => fit())
+  if (linkEl.value) observer.observe(linkEl.value)
+  if (metaEl.value) observer.observe(metaEl.value)
+})
+onBeforeUnmount(() => observer?.disconnect())
+watch(() => [props.title, props.meta, props.state], async () => {
+  await nextTick()
+  observer?.disconnect()
+  if (linkEl.value) observer?.observe(linkEl.value)
+  if (metaEl.value) observer?.observe(metaEl.value)
+  fit()
+}, { deep: true })
 </script>
 
 <template>
@@ -365,25 +428,44 @@ const spread = computed(() => {
               variant="illustration"
               size="var(--project-card-mark)"
             />
-            <!-- Nothing to open while it computes: the title is a title. -->
-            <span v-if="isComputing" class="ds-project-card__link">{{ title }}</span>
-            <component
-              v-else
-              :is="href ? 'a' : 'button'"
-              class="ds-project-card__link"
-              :type="href ? undefined : 'button'"
-              :href="href"
-              @click="emit('click', $event)"
-            >{{ title }}</component>
+            <!-- One line, and the whole name in a tooltip, only when it is cut
+                 (ADR-0109). The overlay is the link's, so pointing
+                 anywhere on the card asks for it. -->
+            <Tooltip :title="title" :disabled="!titleCut" placement="top-start">
+              <!-- Nothing to open while it computes: the title is a title. -->
+              <span v-if="isComputing" ref="linkEl" class="ds-project-card__link">{{ title }}</span>
+              <component
+                v-else
+                ref="linkEl"
+                :is="href ? 'a' : 'button'"
+                class="ds-project-card__link"
+                :type="href ? undefined : 'button'"
+                :href="href"
+                @click="emit('click', $event)"
+              >{{ title }}</component>
+            </Tooltip>
           </h3>
           <Badge v-if="demo" :label="demoLabel" tone="neutral" size="md" />
         </div>
 
-        <ul v-if="meta.length" class="ds-project-card__meta">
+        <ul v-if="meta.length" ref="metaEl" class="ds-project-card__meta">
+          <li
+            v-for="(m, i) in meta"
+            :key="m.label"
+            :class="{ 'ds-project-card__hidden': i >= metaShown }"
+          >
+            <Icon :name="m.icon" :size="16" aria-hidden="true" />
+            <span>{{ m.label }}</span>
+          </li>
+          <li v-if="metaHidden" class="ds-project-card__meta-more" aria-hidden="true">+{{ metaHidden }}</li>
+        </ul>
+        <!-- What every chip would measure, whole: the line is fitted from it. -->
+        <ul v-if="meta.length" ref="metaProbe" class="ds-project-card__meta ds-project-card__meta--probe" aria-hidden="true">
           <li v-for="m in meta" :key="m.label">
             <Icon :name="m.icon" :size="16" aria-hidden="true" />
             <span>{{ m.label }}</span>
           </li>
+          <li class="ds-project-card__meta-more">+9</li>
         </ul>
 
         <div class="ds-project-card__insight">
@@ -725,6 +807,12 @@ const spread = computed(() => {
   color: var(--ds-text-strong);
 }
 
+/* The tooltip's anchor is the flex item now, so it is what shrinks. */
+.ds-project-card__title > :deep(.ds-tooltip-anchor) {
+  flex: 1 1 auto;
+  min-width: 1px;
+}
+
 /*
   A `<button>` unless there is an `href`, and it inherits everything so the
   heading still looks like a heading. The truncation lives here rather than on
@@ -789,10 +877,38 @@ const spread = computed(() => {
 .ds-project-card__meta li {
   display: inline-flex;
   align-items: center;
+  flex: 0 1 auto;
   gap: var(--ds-spacing-xxs);
+  min-width: 0;
   white-space: nowrap;
   font: var(--ds-font-label-lg);
   color: var(--ds-text-subtle);
+}
+
+/* Only a first chip too long for the whole line ever shrinks: the others that
+   would not fit are counted instead (ADR-0109). */
+.ds-project-card__meta li > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-project-card__meta li > :deep(svg) {
+  flex: none;
+}
+
+.ds-project-card__meta .ds-project-card__meta-more {
+  flex: none;
+  color: var(--ds-text-subtlest);
+}
+
+/* Off the page and out of the flow: it only measures. */
+.ds-project-card__meta--probe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: max-content;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* ── Insight ──────────────────────────────────────────────────────── */
@@ -843,13 +959,24 @@ const spread = computed(() => {
   color: var(--ds-text-subtlest);
 }
 
-/* The figure and its unit sit on one **baseline**, not one line box: a 28px
-   number and a 16px unit centred on each other would float the unit. */
 .ds-project-card__metric-value {
   display: flex;
-  align-items: baseline;
-  gap: var(--ds-spacing-xs);
+  flex-direction: column;
+  align-items: flex-start;
   white-space: nowrap;
+}
+
+/*
+  **A figure is never cut, and never runs into its neighbour** (ADR-0109). The
+  unit sits **under** the number, always — in both columns and on every card.
+  Beside it, « 166 610 tCO2e » ran out of its 106px column; wrapping only when it
+  did not fit put one unit under its figure and the other beside, on one card.
+  The line is held even where there is no unit, so a grid keeps one height.
+  Past ~10 characters the number alone overflows: the product writes it compactly.
+*/
+.ds-project-card__metric-value,
+.ds-project-card__metric-pending {
+  min-height: calc(var(--ds-line-height-heading-lg) + var(--ds-line-height-label-md));
 }
 
 .ds-project-card__metric-number {
