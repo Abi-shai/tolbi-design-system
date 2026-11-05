@@ -37,7 +37,14 @@ navigator 16 / 16 from the top right, 166 × 154.
 `Dialog`'s side panel draws it (ADR-0079) — a rule that runs to the border reads as a seam in the surface. Measured:
 the rule and the action both start 16px inside the panel.
 
-## Still open
+**The fold sits at the end of the head**, after the tabs, as the frames draw it — the owner, 5 Nov., reversing
+ADR-0099's start. The folded panel still becomes its map control at the panel's corner (top left).
 
-- In the frames the panel's fold sits at the **end** of its head; ADR-0099 put it at the **start** (track A, so the
-  control it becomes stands in the same corner). The code keeps ADR-0099 until the owner says otherwise.
+**The motion is the catalogue's, chosen by what moves** (the owner: « que la motion vienne vraiment du design
+system, logique avec ce composant et cette interaction »). `MapPanel lg` stands on a whole side, so it is a **side
+panel** and moves as `Dialog`'s side panel does (ADR-0079): `SurfaceTransition`'s fade and timings (`enter` +
+`easing-out` in, `exit` + `easing-in` out, the exit faster — ADR-0021) with **24px of travel toward its edge** in
+place of the scale; on `end` it goes right (`--map-panel-side`, set by `MapOverlay`). The control it becomes floats
+in a corner, so it keeps the surface's scale. It was the scale for both — which said « a surface appears », not
+« the panel goes back to its side ». Filmed at ×10: the panel travels 0 → −24px with no scale and no reversal, the
+control scales 0.96 → 1, never a frame with both, the focus on the replacing control each way.

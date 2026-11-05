@@ -34,3 +34,6 @@ reserves nothing (no product in the benchmark re-centres).
 was cut. Now in the top layer, flipping when short, with the catalogue's rules — 400ms on hover, keyboard focus
 only, Escape — and without the `aria-expanded` a tooltip does not have. Its `placement` values map onto the
 anchored ones (`top-left` → `top-end`, `top-right` → `top-start`).
+
+**Amended by ADR-0103 (5 Nov.)**: the fold moves to the **end** of the head, after the tabs, as the owner's
+frames draw it; and `lg` folds as a side panel — 24px of travel toward its edge in place of the scale (ADR-0079).

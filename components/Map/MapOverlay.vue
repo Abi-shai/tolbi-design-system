@@ -68,6 +68,8 @@ withDefaults(defineProps<{ position?: MapOverlayPosition }>(), {
 }
 
 .ds-map-overlay--end {
+  /* A side panel here leaves toward the right edge (MapPanel's travel). */
+  --map-panel-side: 1;
   inset-inline-end: var(--ds-spacing-xl);
   align-items: flex-end;
 }

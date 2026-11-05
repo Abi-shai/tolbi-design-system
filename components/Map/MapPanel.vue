@@ -23,12 +23,20 @@ export type MapPanelSize = 'sm' | 'lg'
  * **The fold (track A of `3649:1427`).** A panel with a `#header` folds into a
  * map control at its corner — `Button` icon-only, `secondary-gray`, `sm`, the
  * shape `MapControls` gives every control on a map — and the map is whole
- * again. The fold sits at the head's **start**, so the control that replaces it
- * is in the same corner. The panel goes **to its corner** and the button
- * arrives there (`SurfaceTransition`, out then in): the surface goes where the
- * control will be. The focus follows the fold, to the control that replaced
- * the one pressed; the map is not re-framed — the panel floats, it reserves
- * nothing.
+ * again. The fold sits at the head's **end**, after the tabs, as the owner's
+ * frames draw it (ADR-0103 — ADR-0099 had put it at the start). The focus
+ * follows the fold, to the control that replaced the one pressed; the map is
+ * not re-framed — the panel floats, it reserves nothing.
+ *
+ * **The motion is the catalogue's, chosen by what moves** (`SurfaceTransition`,
+ * out then in: `enter` + `easing-out` in, `exit` + `easing-in` out — the exit
+ * faster, ADR-0021):
+ * - `lg` is a **side panel** — it stands on a whole side of the map — so it
+ *   moves as `Dialog`'s side panel does (ADR-0079): the fade, with **24px of
+ *   travel toward its edge** in place of the scale. The direction says where
+ *   the panel lives; nothing crosses the map. On `end` it goes right.
+ * - `sm` and the control it becomes **float** in a corner, so they keep the
+ *   surface's scale from `--ds-motion-scale-enter`, grown from that corner.
  */
 interface Props {
   title?: string
@@ -116,6 +124,7 @@ function focusArrived() {
         :aria-label="props.title"
       >
         <div v-if="slots.header" class="ds-map-panel__head ds-map-panel__head--slot">
+          <div class="ds-map-panel__header"><slot name="header" /></div>
           <IconButton
             v-if="collapsible"
             data-map-panel-fold
@@ -127,7 +136,6 @@ function focusArrived() {
             :aria-controls="panelId"
             @click="fold(true)"
           />
-          <div class="ds-map-panel__header"><slot name="header" /></div>
         </div>
         <div v-else-if="title" class="ds-map-panel__head">
           <span class="ds-map-panel__title">{{ title }}</span>
@@ -171,6 +179,15 @@ function focusArrived() {
   /* ADR-0021: the consuming surface sets its own origin — it goes to its
      corner, where the control it becomes stands. */
   transform-origin: top left;
+}
+
+/* A side panel leaves toward its edge and comes back from it (ADR-0079's
+   motion, ADR-0103): 24px of travel in place of the scale. The edge is the
+   place's — `MapOverlay` turns it for `end`. Applied to `SurfaceTransition`'s
+   own classes, so the durations and curves stay the catalogue's. */
+.ds-map-panel--lg.ds-surface-enter-from,
+.ds-map-panel--lg.ds-surface-leave-to {
+  transform: translateX(calc(var(--map-panel-side, -1) * var(--ds-spacing-3xl)));
 }
 
 .ds-map-panel__body {
