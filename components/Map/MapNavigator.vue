@@ -11,7 +11,12 @@ import { Tooltip, type TooltipPlacement } from '../Tooltip'
  * - **open**: the mini-map (`#default`, the engine's — the system draws its
  *   frame, ADR-0006) with its fold on its corner, and under it − **the zoom
  *   gauge** + and « Recentrer »;
- * - **folded**: a bar — the mini-map's button, a rule, − + « Recentrer ».
+ * - **folded**: a bar — − + « Recentrer », a rule, and the mini-map's button.
+ *
+ * **The fold and the unfold share a corner** (the owner, 5 Nov.): the
+ * mini-map's button closes the bar, at its top right, where the fold sits on
+ * the open mini-map — so folding and unfolding again is the same press in the
+ * same place, the pointer never moves. The drawing put it first in the bar.
  *
  * The zoom is a model (`v-model:zoom`, between `zoomMin` and `zoomMax`):
  * the gauge shows it and moves it, − and + step it by `zoomStep` and stop at
@@ -112,10 +117,6 @@ function focusArrived() {
 
       <!-- ── Folded: a bar ─────────────────────────────────────────── -->
       <div v-else key="folded" class="ds-map-navigator ds-map-navigator--folded">
-        <Tooltip :title="expandLabel" :placement="tooltipPlacement" data-map-navigator-open>
-          <IconButton icon="map" size="xs" variant="subtle" :ariaLabel="expandLabel" aria-expanded="false" @click="collapsed = false" />
-        </Tooltip>
-        <span class="ds-map-navigator__rule" aria-hidden="true" />
         <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
           <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="atMin" @click="by(-1)" />
         </Tooltip>
@@ -124,6 +125,12 @@ function focusArrived() {
         </Tooltip>
         <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
           <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" />
+        </Tooltip>
+        <!-- Last, so it lands in the corner the fold leaves: the pointer that
+             folded the mini-map is already on the button that opens it. -->
+        <span class="ds-map-navigator__rule" aria-hidden="true" />
+        <Tooltip :title="expandLabel" :placement="tooltipPlacement" data-map-navigator-open>
+          <IconButton icon="map" size="xs" variant="subtle" :ariaLabel="expandLabel" aria-expanded="false" @click="collapsed = false" />
         </Tooltip>
       </div>
     </SurfaceTransition>

@@ -39,7 +39,7 @@ export const Default: Story = {
     components: { MapNavigator },
     setup: () => ({ collapsed: ref(false), zoom: ref(8) }),
     template: `
-      <div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;min-height:220px;display:flex;justify-content:flex-end">
+      <div style="background:var(--ds-bg-neutral);width:320px;box-sizing:border-box;padding:24px;border-radius:12px;min-height:220px;display:flex;justify-content:flex-end">
         <MapNavigator v-model:collapsed="collapsed" v-model:zoom="zoom">${minimap}</MapNavigator>
       </div>
     `,
@@ -52,7 +52,7 @@ export const Collapsed: Story = {
     components: { MapNavigator },
     setup: () => ({ collapsed: ref(true), zoom: ref(8) }),
     template: `
-      <div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;min-height:220px;display:flex;justify-content:flex-end">
+      <div style="background:var(--ds-bg-neutral);width:320px;box-sizing:border-box;padding:24px;border-radius:12px;min-height:220px;display:flex;justify-content:flex-end">
         <MapNavigator v-model:collapsed="collapsed" v-model:zoom="zoom">${minimap}</MapNavigator>
       </div>
     `,
@@ -64,7 +64,7 @@ export const AtLimit: Story = {
   render: () => ({
     components: { MapNavigator },
     template: `
-      <div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;min-height:220px;display:flex;justify-content:flex-end">
+      <div style="background:var(--ds-bg-neutral);width:320px;box-sizing:border-box;padding:24px;border-radius:12px;min-height:220px;display:flex;justify-content:flex-end">
         <MapNavigator :zoom="20">${minimap}</MapNavigator>
       </div>
     `,

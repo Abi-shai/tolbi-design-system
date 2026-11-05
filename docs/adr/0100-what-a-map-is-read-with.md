@@ -55,8 +55,11 @@ The 16px glyphs keep the drawing; their target is a 28px invisible disc. A `bord
 **`MapNavigator`** — the owner's « Carte/Navigateur » (`3552:3437`), **drawn as drawn**, gauge included. Drafted
 first without the gauge and with one shape whose height travelled — **reversed**: the drawing is the
 reference. Open: the mini-map (148 × 96, `#default`, the engine's) with its fold (`IconButton surface xs`) on
-its corner, and under it − **the zoom gauge** + « Recentrer », 2px apart. Folded: a bar — the mini-map's
-button, a rule, − + « Recentrer ». **`v-model:zoom`** between `zoomMin` / `zoomMax`: the gauge (a native range:
+its corner, and under it − **the zoom gauge** + « Recentrer », 2px apart. Folded: a bar — − + « Recentrer », a
+rule, and the mini-map's button **last**. **Amended (the owner, 5 Nov.)**: the drawing put that button first, so
+folding and unfolding again meant chasing the control across the bar. Last, it lands in the corner the fold
+leaves: measured, the two centres are 8px apart on each axis (29px and 21px in from the top-right corner), so a
+pointer that has not moved is still on the target — six presses in one place, open ↔ folded every time. **`v-model:zoom`** between `zoomMin` / `zoomMax`: the gauge (a native range:
 4px `border-subtle` channel, 12px white thumb ringed 2px in `text-default`) shows and moves it, − + step it and
 stop at the ends; « Recentrer » emits. The two forms are two shapes (166 × 154 and 147 × 42), so the fold is
 one surface leaving and the other arriving at the top-right corner (`SurfaceTransition` out-in, MapPanel's fold,

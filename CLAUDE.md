@@ -1175,7 +1175,8 @@ Before working on any component, read:
   (a first draft from `InputDropdown`/`ButtonGroup` was reversed: form controls on a map read as a form) —
   the timeline: raised pill, scale chip (a `Dropdown` trigger), periods as a radio group with the **brand's solid
   pill** sliding, `data` dots, `minor` days as dots, « Comparer » → « 2020 → 2026 » ✕; the navigator: mini-map +
-  − **zoom gauge** (`v-model:zoom`) + ⊙, folded into a bar, two shapes swapped by `SurfaceTransition`.
+  − **zoom gauge** (`v-model:zoom`) + ⊙, folded into a bar whose map button is **last** — in the corner the fold
+  leaves, so open ↔ fold is one press in one place; two shapes swapped by `SurfaceTransition`.
   **`ProjectCard` `computing`**: same card, « En calcul » + clock, `value: null` said « en calcul », nothing to
   open; **`#insight`** slot. **`Sparkline`**: line + dashed comparison on one scale, `label` for a reader.
 
