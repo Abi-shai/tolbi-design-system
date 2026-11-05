@@ -51,3 +51,14 @@ export const Alone: Story = {
     template: `<div style="width:220px"><Sparkline v-bind="args" /></div>`,
   }),
 }
+
+/** Pas encore de série — un calcul en cours : un trait plat en pointillé tient la place de la courbe (ADR-0105). */
+export const Pending: Story = {
+  name: 'Pas encore de données',
+  args: { values: [], comparison: [], label: 'En calcul' },
+  render: (args) => ({
+    components: { Sparkline },
+    setup: () => ({ args }),
+    template: `<div style="width:220px"><Sparkline v-bind="args" /></div>`,
+  }),
+}

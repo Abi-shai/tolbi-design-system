@@ -23,6 +23,7 @@ import { computed } from 'vue'
  * the engine's plot in a `ChartFrame` instead of growing this one.
  */
 interface Props {
+  /** The series. Fewer than two points: not there yet — a flat dashed line holds its place. */
   values: number[]
   comparison?: number[]
   /** What a reader hears instead of the line. */
@@ -47,6 +48,10 @@ const all = computed(() => [...props.values, ...props.comparison])
 const min = computed(() => Math.min(...all.value))
 const max = computed(() => Math.max(...all.value))
 
+/* No series yet: a flat dashed line holds the place — the curve's « — »
+   (ADR-0105). Nothing is compared against nothing, so the comparison waits too. */
+const pending = computed(() => props.values.length < 2)
+
 function path(series: number[]): string {
   if (series.length < 2) return ''
   const span = max.value - min.value || 1
@@ -69,12 +74,13 @@ function path(series: number[]): string {
     :aria-label="label"
   >
     <path
-      v-if="comparison.length > 1"
+      v-if="!pending && comparison.length > 1"
       class="ds-sparkline__comparison"
       :d="path(comparison)"
       vector-effect="non-scaling-stroke"
     />
-    <path class="ds-sparkline__line" :d="path(values)" :style="{ stroke: color }" vector-effect="non-scaling-stroke" />
+    <path v-if="pending" class="ds-sparkline__pending" :d="`M0 ${H / 2} L${W} ${H / 2}`" vector-effect="non-scaling-stroke" />
+    <path v-else class="ds-sparkline__line" :d="path(values)" :style="{ stroke: color }" vector-effect="non-scaling-stroke" />
   </svg>
 </template>
 
@@ -96,6 +102,13 @@ function path(series: number[]): string {
 
 .ds-sparkline__line {
   stroke-width: var(--ds-border-width-strong);
+}
+
+/* The place of a line not there yet (ADR-0105, the owner's « Tracé=Vide »). */
+.ds-sparkline__pending {
+  stroke: var(--ds-border-default);
+  stroke-width: var(--ds-border-width-default);
+  stroke-dasharray: 4 4;
 }
 
 /* `--ds-chart-threshold`: the neutral of a reference line (ADR-0096). */
