@@ -106,18 +106,18 @@ const said = computed(() => {
 <style scoped>
 /*
   As drawn: the surface 8px around, the switch flush with it, the scale and the
-  symbols each 8px further in. **The width of its content, `--ds-width-sm`
-  (480px) at most** (ADR-0116) — the timeline's own rule and the same token:
-  on the GIS screen the two are centred on one axis, the legend at the top of
-  the map and the timeline at its bottom, and with short names neither
-  stretches its parts over 480px for nothing.
+  symbols each 8px further in. **`--ds-width-sm` (480px), declared**
+  (ADR-0116) — the timeline's own width and the same token: on the GIS screen
+  the two are centred on one axis, the legend at the top of the map and the
+  timeline at its bottom, and they are **one width**, edge over edge. A width
+  of content was tried: on one axis, two widths read as a mistake.
 */
 .ds-map-legend {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  width: fit-content;
-  max-width: min(var(--ds-width-sm), 100%);
+  width: var(--ds-width-sm);
+  max-width: 100%;
   padding: var(--ds-spacing-md);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);

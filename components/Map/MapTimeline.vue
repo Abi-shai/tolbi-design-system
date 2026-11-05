@@ -139,6 +139,10 @@ function settle() {
   measure()
   reveal(false)
   edges()
+  /* Read again once laid out and once the face has loaded: a first read in a
+     fallback face left a fade on a strip that did not overflow. */
+  requestAnimationFrame(edges)
+  document.fonts?.ready.then(() => { reveal(false); requestAnimationFrame(edges) })
 }
 /* Revealed again whenever the strip changes width — the type loading (a
    fallback face is narrower, and a choice revealed in it ends up cut at the
@@ -146,12 +150,13 @@ function settle() {
 let ro: ResizeObserver | null = null
 onMounted(() => {
   settle()
-  ro = new ResizeObserver(() => { reveal(false); edges() })
+  ro = new ResizeObserver(() => { reveal(false); edges(); requestAnimationFrame(edges) })
   if (track.value) ro.observe(track.value)
   if (viewport.value) ro.observe(viewport.value)
 })
 onBeforeUnmount(() => ro?.disconnect())
 watch(index, async () => { await nextTick(); measure(); reveal(true) })
+
 watch(() => props.periods, async () => {
   itemRefs.value = []
   await nextTick()
@@ -322,7 +327,9 @@ function exitCompare() {
       :class="{ 'ds-map-timeline__viewport--before': moreBefore, 'ds-map-timeline__viewport--after': moreAfter }"
       @scroll.passive="edges"
     >
-      <div ref="track" class="ds-map-timeline__track" role="radiogroup" :aria-label="label" @keydown="onKeydown">
+      <!-- The pill counts in the strip's scroll width while it slides: the edges
+           are read again when it lands (a stale read faded a strip that fit). -->
+      <div ref="track" class="ds-map-timeline__track" role="radiogroup" :aria-label="label" @keydown="onKeydown" @transitionend="edges">
         <span
           v-if="index !== -1"
           class="ds-map-timeline__pill"
@@ -408,10 +415,9 @@ function exitCompare() {
   screen's instrument, so it is read at 14px and touched on 32px targets. The
   drawing's 42px and 12px type gave 20px targets, under WCAG 2.5.8's 24.
 
-  **48px tall, the width of its content, `--ds-width-sm` (480px) at most**
-  (ADR-0116) — the legend's own rule and the same token, so the two stay on the
-  map's axis whatever they hold. Past it, the periods scroll; a fade at the
-  edge says there are more. The border is `border-subtle` (ADR-0030): in dark
+  **48px tall, `--ds-width-sm` (480px) wide** (ADR-0116) — the legend's width
+  and the same token, so the two are one width on the map's axis, edge over
+  edge. Past it, the periods scroll; a fade at the edge says there are more. The border is `border-subtle` (ADR-0030): in dark
   the shadow cannot separate a surface from the map, the edge does.
 */
 .ds-map-timeline {
@@ -419,8 +425,8 @@ function exitCompare() {
   align-items: center;
   gap: var(--ds-spacing-sm);
   box-sizing: border-box;
-  width: fit-content;
-  max-width: min(var(--ds-width-sm), 100%);
+  width: var(--ds-width-sm);
+  max-width: 100%;
   height: 48px;
   padding: 0 var(--ds-spacing-lg) 0 var(--ds-spacing-md);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
@@ -443,7 +449,6 @@ function exitCompare() {
 */
 .ds-map-timeline__scale-word {
   flex: none;
-  padding-inline-start: var(--ds-spacing-xs);
   font: var(--ds-font-label-lg-strong);
   color: var(--ds-text-subtle);
   white-space: nowrap;
@@ -528,14 +533,19 @@ function exitCompare() {
 .ds-map-timeline__viewport--before { --fade-before: var(--ds-spacing-3xl); }
 .ds-map-timeline__viewport--after  { --fade-after: var(--ds-spacing-3xl); }
 
+/* While the periods fit, they **share the strip** — spread end to end, so a
+   few years leave no void at a declared width (ADR-0116); once they do not,
+   they keep their own width and the strip scrolls. */
 .ds-map-timeline__track {
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-xs);
+  justify-content: space-between;
+  gap: var(--ds-spacing-xxs);
+  box-sizing: border-box;
   width: max-content;
+  min-width: 100%;
   min-height: 32px;
-  margin-inline-start: auto;
 }
 
 /* The chosen period: the brand's solid pill, which slides (ADR-0024). */
@@ -564,10 +574,11 @@ function exitCompare() {
   align-items: center;
   gap: var(--ds-spacing-xxs);
   /* A 32px target: `label-lg`'s 20px line + 6 above and below, and at least
-     32px wide, so a one-digit day is still a square. */
+     32px wide, so a one-digit day is still a square. 6px aside: the pill is
+     the target, and five years with « Comparer » fit the 480 (ADR-0116). */
   box-sizing: border-box;
   min-width: 32px;
-  padding: var(--ds-spacing-sm) var(--ds-spacing-md);
+  padding: var(--ds-spacing-sm);
   border: none;
   border-radius: var(--ds-radius-pill);
   background: transparent;
