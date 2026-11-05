@@ -108,6 +108,17 @@ function setItem(el: unknown, i: number) {
   if (el instanceof HTMLElement) itemRefs.value[i] = el
 }
 
+/* Which edges hide periods — each gets a fade, so a cut period reads as « more
+   this way » rather than as a broken one (ADR-0116). */
+const moreBefore = ref(false)
+const moreAfter = ref(false)
+function edges() {
+  const vp = viewport.value
+  if (!vp) return
+  moreBefore.value = vp.scrollLeft > 1
+  moreAfter.value = vp.scrollLeft + vp.clientWidth < vp.scrollWidth - 1
+}
+
 /* The strip only moves when the choice would leave it. */
 function reveal(smooth: boolean) {
   const vp = viewport.value
@@ -127,6 +138,7 @@ function settle() {
   if (vp) vp.scrollLeft = vp.scrollWidth
   measure()
   reveal(false)
+  edges()
 }
 /* Revealed again whenever the strip changes width — the type loading (a
    fallback face is narrower, and a choice revealed in it ends up cut at the
@@ -134,8 +146,9 @@ function settle() {
 let ro: ResizeObserver | null = null
 onMounted(() => {
   settle()
-  ro = new ResizeObserver(() => reveal(false))
+  ro = new ResizeObserver(() => { reveal(false); edges() })
   if (track.value) ro.observe(track.value)
+  if (viewport.value) ro.observe(viewport.value)
 })
 onBeforeUnmount(() => ro?.disconnect())
 watch(index, async () => { await nextTick(); measure(); reveal(true) })
@@ -261,7 +274,7 @@ function exitCompare() {
 </script>
 
 <template>
-  <div ref="root" class="ds-map-timeline" :class="{ 'ds-map-timeline--dense': dense, 'ds-map-timeline--hug': scales.length < 2 }">
+  <div ref="root" class="ds-map-timeline" :class="{ 'ds-map-timeline--dense': dense }">
     <span class="ds-map-timeline__said" role="status">{{ announced }}</span>
     <template v-if="scales.length > 1">
       <Dropdown v-model:open="scaleOpen" class="ds-map-timeline__scale-menu" :label="scaleLabel" align="start" size="sm">
@@ -303,7 +316,12 @@ function exitCompare() {
       />
     </Tooltip>
 
-    <div ref="viewport" class="ds-map-timeline__viewport">
+    <div
+      ref="viewport"
+      class="ds-map-timeline__viewport"
+      :class="{ 'ds-map-timeline__viewport--before': moreBefore, 'ds-map-timeline__viewport--after': moreAfter }"
+      @scroll.passive="edges"
+    >
       <div ref="track" class="ds-map-timeline__track" role="radiogroup" :aria-label="label" @keydown="onKeydown">
         <span
           v-if="index !== -1"
@@ -390,37 +408,25 @@ function exitCompare() {
   screen's instrument, so it is read at 14px and touched on 32px targets. The
   drawing's 42px and 12px type gave 20px targets, under WCAG 2.5.8's 24.
 
-  **48px tall, 35rem wide** — the drawing's 480 × 14/12, or five years and
-  « Comparer » no longer fit. 35rem is a size: the bar does not breathe with
-  the labels of the scale it shows. The border is `border-subtle` (ADR-0030):
-  in dark the shadow cannot separate a surface from the map, the edge does.
+  **48px tall, the width of its content, `--ds-width-sm` (480px) at most**
+  (ADR-0116) — the legend's own rule and the same token, so the two stay on the
+  map's axis whatever they hold. Past it, the periods scroll; a fade at the
+  edge says there are more. The border is `border-subtle` (ADR-0030): in dark
+  the shadow cannot separate a surface from the map, the edge does.
 */
 .ds-map-timeline {
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-sm);
   box-sizing: border-box;
-  width: 35rem;
-  max-width: 100%;
+  width: fit-content;
+  max-width: min(var(--ds-width-sm), 100%);
   height: 48px;
   padding: 0 var(--ds-spacing-lg) 0 var(--ds-spacing-md);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-pill);
   background: var(--ds-bg-default);
   box-shadow: var(--ds-elevation-raised);
-}
-
-/*
-  **One scale or none: the bar hugs** (ADR-0114). 480 is a size so that
-  switching from years to months never resizes the bar; with nothing to switch,
-  that reason is gone, and five years at the end of a 480px bar left 127px of
-  void before them. It hugs up to 40rem — seven years and « Comparer » measure
-  612px — then scrolls as before, and stays centred where the screen centres it
-  (ADR-0103's axis).
-*/
-.ds-map-timeline--hug {
-  width: fit-content;
-  max-width: min(40rem, 100%);
 }
 
 /* ── The scale chip ───────────────────────────────────────────────── */
@@ -509,10 +515,18 @@ function exitCompare() {
   are the ones read.
 */
 .ds-map-timeline__viewport {
+  --fade-before: 0px;
+  --fade-after: 0px;
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
+  /* A fade on each edge that hides periods (ADR-0116). A mask reads alpha
+     only: any opaque colour draws « shown » — the ground's, a token. */
+  mask-image: linear-gradient(to right, transparent, var(--ds-bg-default) var(--fade-before), var(--ds-bg-default) calc(100% - var(--fade-after)), transparent);
 }
+
+.ds-map-timeline__viewport--before { --fade-before: var(--ds-spacing-3xl); }
+.ds-map-timeline__viewport--after  { --fade-after: var(--ds-spacing-3xl); }
 
 .ds-map-timeline__track {
   position: relative;

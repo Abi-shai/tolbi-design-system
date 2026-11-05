@@ -1266,8 +1266,11 @@ Before working on any component, read:
   label out of the flow**, so every year keeps the chosen pill's line.
 - **ADR-0115**: **a timeline read and touched — one size, the large one** (the owner: no `sm`, for accessibility):
   `MapTimeline` periods `label-lg` 14px on **32px targets** (the chosen one too — the pill is the target), ‹ › 32, a
-  6px data dot inside the target, « Comparer » `Button link sm` on 32px, the bar **48px** and **35rem** (hugging, up to
-  40rem: seven years fit). A `size` prop was tried the same day and removed.
+  6px data dot inside the target, « Comparer » `Button link sm` on 32px, the bar **48px** (width: ADR-0116). A `size` prop was tried the same day and removed.
+- **ADR-0116**: **the legend and the timeline share one cap** — `MapLegend` and `MapTimeline` are `fit-content`, capped
+  at `min(var(--ds-width-sm), 100%)` (480px, one token), so they stay on the map's axis; the legend's gradient takes
+  what is left, never under 16rem; the timeline drops ADR-0115's 35/40rem and fades the edge that hides periods. Five
+  years + « Comparer » are 30px over (510).
 
 ## Architecture
 

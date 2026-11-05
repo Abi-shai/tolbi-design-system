@@ -106,16 +106,18 @@ const said = computed(() => {
 <style scoped>
 /*
   As drawn: the surface 8px around, the switch flush with it, the scale and the
-  symbols each 8px further in. **480px, declared** (ADR-0103) — the timeline's
-  own width: on the GIS screen the two are centred on one axis, the legend at
-  the top of the map and the timeline at its bottom.
+  symbols each 8px further in. **The width of its content, `--ds-width-sm`
+  (480px) at most** (ADR-0116) — the timeline's own rule and the same token:
+  on the GIS screen the two are centred on one axis, the legend at the top of
+  the map and the timeline at its bottom, and with short names neither
+  stretches its parts over 480px for nothing.
 */
 .ds-map-legend {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  width: 30rem;
-  max-width: 100%;
+  width: fit-content;
+  max-width: min(var(--ds-width-sm), 100%);
   padding: var(--ds-spacing-md);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
@@ -144,7 +146,9 @@ const said = computed(() => {
   flex-direction: column;
   align-items: flex-end;
   gap: var(--ds-spacing-xs);
-  min-width: 0;
+  /* The gradient has no width of its own: it takes what the switch and the
+     title leave, and never less than 16rem — a ramp read, not glimpsed. */
+  min-width: 16rem;
 }
 
 .ds-map-legend__unit,

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { computed, ref } from 'vue'
 import MapLegend from './MapLegend.vue'
+import MapTimeline from './MapTimeline.vue'
 
 const meta: Meta<typeof MapLegend> = {
   title: 'Données/Map/Legend',
@@ -72,5 +73,29 @@ export const Symbols: Story = {
       ],
     }),
     template: ground(`<MapLegend title="Indice de stock" :ticks="['0,30', '0,45', '0,60']" :legend="legend" />`),
+  }),
+}
+
+/**
+ * **La largeur du contenu, 480 px au plus** (ADR-0116) — la même règle et le même jeton (`--ds-width-sm`) que la
+ * frise : sur l’écran SIG, la légende en haut et la frise en bas restent sur l’axe central de la carte quoi qu’elles
+ * tiennent. Le dégradé prend la place que laissent la bascule et le titre, jamais moins de 16rem.
+ */
+export const OnTheAxis: Story = {
+  name: 'Sur l’axe de la frise',
+  render: () => ({
+    components: { MapLegend, MapTimeline },
+    setup: () => ({
+      year: ref('2024'),
+      SCALE: [{ value: 'year', label: 'Année' }],
+      YEARS: ['2020', '2021', '2022', '2023', '2024'].map((y) => ({ value: y, label: y, data: true })),
+      metric: ref('carbon'),
+      TWO: [{ value: 'carbon', label: 'Carbone' }, { value: 'cover', label: 'Couvert' }],
+    }),
+    template: `<div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;width:720px;display:flex;flex-direction:column;align-items:center;gap:24px;">
+      <MapLegend title="Carbone" unit="tCO2e/ha" :ticks="['0', '8', '16']" />
+      <MapLegend v-model:metric="metric" :metrics="TWO" title="Carbone" unit="tCO2e/ha" :ticks="['0', '8', '16']" />
+      <MapTimeline v-model="year" :scales="SCALE" :periods="YEARS" label="Année" />
+    </div>`,
   }),
 }
