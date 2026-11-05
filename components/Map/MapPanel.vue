@@ -23,12 +23,12 @@ export type MapPanelSize = 'sm' | 'lg'
  * **The fold (track A of `3649:1427`).** A panel with a `#header` folds into a
  * map control at its corner — `Button` icon-only, `secondary-gray`, `sm`, the
  * shape `MapControls` gives every control on a map — and the map is whole
- * again. The fold sits at the head's **start**, so the control that replaces
- * it stands in the same corner: folding and unfolding again is one press in
- * one place, the pointer barely moves (ADR-0099 — briefly moved to the end
- * after the frames, and brought back for that reason, ADR-0103). The focus
- * follows the fold, to the control that replaced the one pressed; the map is
- * not re-framed — the panel floats, it reserves nothing.
+ * again. The fold sits at the head's **start**; folded, the control stands
+ * **at the overlay's corner** — 16px from the map's edges, on the grid of the
+ * map's other controls (ADR-0117, the owner's frame `3691:9170`), 18px from
+ * where the fold was. The focus follows the fold, to the control that
+ * replaced the one pressed; the map is not re-framed — the panel floats, it
+ * reserves nothing.
  *
  * **The motion is the catalogue's, chosen by what moves** (`SurfaceTransition`,
  * out then in: `enter` + `easing-out` in, `exit` + `easing-in` out — the exit
@@ -74,33 +74,23 @@ const named = (verb: string) => (props.title ? `${verb} ${props.title}` : verb)
 const iconFold = computed(() => !!slots.header)
 
 /*
-  The control the panel becomes stands **exactly where the fold was** (the
-  owner, 5 Nov.): fold, unfold, fold again is one press in one place, the
-  pointer does not move. The fold's offset inside the panel is measured as it
-  is pressed — it depends on the head's content — and the control takes it as
-  its margin. Folded from the start (nothing measured), it sits in the corner.
+  The control the panel becomes stands **at the overlay's corner** (ADR-0117,
+  the owner's frame « Panneau replié », `3691:9170`): 16px from the map's
+  edges, on the grid of the map's other controls. It used to take the fold's
+  own place, measured on press (ADR-0103) — 18px further in, a button floating
+  off the grid with nothing left to justify the offset once the panel is gone.
+  On a place that holds its children at the end (`MapOverlay` `end`), it grows
+  from the right corner.
 */
-const offset = ref({ x: 0, y: 0 })
-/* On a place that holds its children at the end (`MapOverlay` `end`), the
-   offset is taken from the right edge and the control grows from there. */
 const atEnd = ref(false)
 let pressed = false
 async function fold(next: boolean) {
-  if (next) {
-    const panel = host.value?.querySelector<HTMLElement>('.ds-map-panel')?.getBoundingClientRect()
-    const btn = host.value?.querySelector<HTMLElement>('[data-map-panel-fold]')?.getBoundingClientRect()
-    atEnd.value = !!host.value?.closest('.ds-map-overlay--end, .ds-map-overlay--top-end, .ds-map-overlay--bottom-end')
-    if (panel && btn) offset.value = { x: atEnd.value ? panel.right - btn.right : btn.left - panel.left, y: btn.top - panel.top }
-  }
+  if (next) atEnd.value = !!host.value?.closest('.ds-map-overlay--end, .ds-map-overlay--top-end, .ds-map-overlay--bottom-end')
   pressed = true
   collapsed.value = next
   await nextTick()
 }
-const unfoldAt = computed(() => ({
-  [atEnd.value ? 'marginRight' : 'marginLeft']: `${offset.value.x}px`,
-  marginTop: `${offset.value.y}px`,
-  transformOrigin: atEnd.value ? 'top right' : 'top left',
-}))
+const unfoldAt = computed(() => ({ transformOrigin: atEnd.value ? 'top right' : 'top left' }))
 /* Only when the fold was pressed here: a product folding the panel through
    `v-model:collapsed` does not take the reader's focus (ADR-0062). */
 function focusArrived() {

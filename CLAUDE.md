@@ -1272,6 +1272,10 @@ Before working on any component, read:
   reverted — two widths on one axis read as a mistake). The legend's gradient takes what is left, never under 16rem; the
   timeline's periods **share the strip** while they fit (no void), scroll past it with a **fade on the hiding edge**;
   periods padded 6px so five years + « Comparer » fit.
+- **ADR-0117**: **the folded panel sits on the map's grid** — folded, `MapPanel`'s control stands **at the overlay's
+  corner, 16px in** (the owner's frame `3691:9170`), on the grid of the map's other controls — no longer at the fold's
+  measured place (~34px, ADR-0103's « one press in one place »). The 18px are accepted; the panel leaves toward its edge,
+  the control arrives in its corner; the focus follows.
 
 ## Architecture
 
