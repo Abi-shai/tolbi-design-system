@@ -29,6 +29,15 @@ export type IconButtonSize = 'xs' | 'sm'
  */
 export type IconButtonVariant = 'ghost' | 'primary' | 'surface' | 'neutral' | 'subtle'
 
+/**
+ * `danger` — an action that destroys (delete, remove). **Neutral at rest, red
+ * on approach** (ADR-0112): the ink is the variant's until the pointer, the
+ * keyboard or an open menu comes to it, then a red veil and the error ink. A
+ * row of actions stays calm; the danger is said when it is aimed at. Meant for
+ * `ghost` and `subtle`; the filled variants keep their own colours.
+ */
+export type IconButtonTone = 'neutral' | 'danger'
+
 interface Props {
   /** The glyph. Mirrors the `Icône` instance-swap on the Figma component. */
   icon: IconName
@@ -50,6 +59,8 @@ interface Props {
   disabled?: boolean
   size?: IconButtonSize
   variant?: IconButtonVariant
+  /** `danger` for an action that destroys: red on approach only (ADR-0112). */
+  tone?: IconButtonTone
   type?: 'button' | 'submit' | 'reset'
 }
 
@@ -58,6 +69,7 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   size: 'sm',
   variant: 'ghost',
+  tone: 'neutral',
   type: 'button',
 })
 
@@ -80,7 +92,7 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
     :disabled="disabled"
     :aria-label="ariaLabel"
     class="ds-icon-button"
-    :class="[`ds-icon-button--${size}`, `ds-icon-button--${variant}`, { 'ds-icon-button--active': active }]"
+    :class="[`ds-icon-button--${size}`, `ds-icon-button--${variant}`, { 'ds-icon-button--active': active, 'ds-icon-button--danger': tone === 'danger' }]"
     @click="emit('click', $event)"
   >
     <!-- The glyph, by default. A composite that animates its glyph — a check
@@ -147,6 +159,25 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 .ds-icon-button--subtle:hover:not(:disabled),
 .ds-icon-button--subtle.ds-icon-button--active {
   color: var(--ds-text-default);
+}
+
+/*
+  ── Danger: neutral at rest, red on approach (ADR-0112) ────────────────
+  Track A of `3785:1465`, after a 13-system benchmark: the red **veil**, not a
+  fill — `text-error` at 12 % (18 % pressed), translucent, so it reads on white
+  and on a hovered table row alike (1.212:1 light, 1.183:1 dark on the row) —
+  and the ink of an error tint, `text-on-error-subtle` (5.19:1, 4.09:1 dark).
+  The veil takes `text-error` rather than `bg-error-solid` because the red
+  travels toward the light end in dark (ADR-0029): the solid's 10 % vanished
+  there (1.053:1).
+*/
+.ds-icon-button--danger:is(.ds-icon-button--ghost, .ds-icon-button--subtle):is(:hover, .ds-icon-button--active):not(:disabled) {
+  background: color-mix(in srgb, var(--ds-text-error) 12%, transparent);
+  color: var(--ds-text-on-error-subtle);
+}
+
+.ds-icon-button--danger:is(.ds-icon-button--ghost, .ds-icon-button--subtle):active:not(:disabled) {
+  background: color-mix(in srgb, var(--ds-text-error) 18%, transparent);
 }
 
 /* ── Primary: the brand fill, as Button's primary ─────────────────── */

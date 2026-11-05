@@ -147,6 +147,25 @@ export const Subtle: Story = {
   }),
 }
 
+/**
+ * `tone="danger"` (ADR-0112) : une action qui détruit reste **neutre au repos** et devient rouge **à
+ * l’approche** — un voile `text-error` à 12 % (18 % à l’appui) et l’encre `text-on-error-subtle`, au survol, au
+ * focus, ou tant que son menu est ouvert. Ici la seconde est maintenue `active` pour montrer l’état.
+ */
+export const Danger: Story = {
+  name: 'Danger',
+  render: () => ({
+    components: { IconButton },
+    template: `
+      <div style="display:flex;align-items:center;gap:var(--ds-spacing-xxs);">
+        <IconButton icon="pencil" ariaLabel="Modifier le projet" size="xs" variant="subtle" />
+        <IconButton icon="trash-2" ariaLabel="Supprimer le projet" size="xs" variant="subtle" tone="danger" />
+        <IconButton icon="trash-2" ariaLabel="Supprimer le projet (survolé)" size="xs" variant="subtle" tone="danger" active />
+      </div>
+    `,
+  }),
+}
+
 export const TheNavSet: Story = {
   name: 'Le jeu de la barre de navigation',
   render: () => ({

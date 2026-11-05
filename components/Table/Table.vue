@@ -697,19 +697,20 @@ const showPagination = computed(() =>
   light or dark — and stays visible (1.154:1 light, 1.194:1 dark, measured). Six
   of ten systems benchmarked do this; none draws a contour. The ink steps to
   `text-strong` with it. Ghost and subtle `IconButton`s and a ghost `Button`;
-  the filled ones (primary, surface, neutral) keep their own hover.
+  the filled ones (primary, surface, neutral) keep their own hover, and a
+  `tone="danger"` one its red veil (ADR-0112).
 */
 .ds-table__actions {
   --table-action-veil: color-mix(in srgb, var(--ds-text-strong) 7%, transparent);
   --table-action-veil-pressed: color-mix(in srgb, var(--ds-text-strong) 12%, transparent);
 }
 
-.ds-table__actions :deep(:is(.ds-icon-button--ghost, .ds-icon-button--subtle, .ds-button--ghost):is(:hover, .ds-icon-button--active, [aria-expanded='true']):not(:disabled)) {
+.ds-table__actions :deep(:is(.ds-icon-button--ghost, .ds-icon-button--subtle, .ds-button--ghost):not(.ds-icon-button--danger):is(:hover, .ds-icon-button--active, [aria-expanded='true']):not(:disabled)) {
   background: var(--table-action-veil);
   color: var(--ds-text-strong);
 }
 
-.ds-table__actions :deep(:is(.ds-icon-button--ghost, .ds-icon-button--subtle, .ds-button--ghost):active:not(:disabled)) {
+.ds-table__actions :deep(:is(.ds-icon-button--ghost, .ds-icon-button--subtle, .ds-button--ghost):not(.ds-icon-button--danger):active:not(:disabled)) {
   background: var(--table-action-veil-pressed);
 }
 

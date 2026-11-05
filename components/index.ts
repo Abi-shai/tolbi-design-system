@@ -66,7 +66,7 @@ export { ModulesList } from './ModulesList'
 export type { ModulesListItem } from './ModulesList'
 
 export { IconButton } from './IconButton'
-export type { IconButtonSize, IconButtonVariant } from './IconButton'
+export type { IconButtonSize, IconButtonVariant, IconButtonTone } from './IconButton'
 export { HorizontalNavigation } from './HorizontalNavigation'
 export type { BreadcrumbItem, NavModule, HorizontalNavigationHomeIcon } from './HorizontalNavigation'
 

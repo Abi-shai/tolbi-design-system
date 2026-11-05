@@ -323,7 +323,7 @@ export const ProjectList: Story = {
           <template #cell-actions="{ row }">
             <div style="display:flex; justify-content:flex-end;">
               <IconButton icon="pencil" size="xs" variant="subtle" :ariaLabel="'Modifier ' + row.name" @click="opened = 'modifier ' + row.name" />
-              <IconButton icon="trash-2" size="xs" variant="subtle" :ariaLabel="'Supprimer ' + row.name" @click="opened = 'supprimer ' + row.name" />
+              <IconButton icon="trash-2" size="xs" variant="subtle" tone="danger" :ariaLabel="'Supprimer ' + row.name" @click="opened = 'supprimer ' + row.name" />
             </div>
           </template>
         </Table>
@@ -349,7 +349,7 @@ export const FixedColumns: Story = {
           <template #cell-actions="{ row }">
             <div style="display:flex; justify-content:flex-end;">
               <IconButton icon="pencil" size="xs" variant="subtle" :ariaLabel="'Modifier ' + row.name" />
-              <IconButton icon="trash-2" size="xs" variant="subtle" :ariaLabel="'Supprimer ' + row.name" />
+              <IconButton icon="trash-2" size="xs" variant="subtle" tone="danger" :ariaLabel="'Supprimer ' + row.name" />
             </div>
           </template>
         </Table>
@@ -451,7 +451,7 @@ export const StickyHeader: Story = {
             <template #cell-actions="{ row }">
               <div style="display:flex; justify-content:flex-end;">
                 <IconButton icon="pencil" size="xs" variant="subtle" :ariaLabel="'Modifier ' + row.name" />
-                <IconButton icon="trash-2" size="xs" variant="subtle" :ariaLabel="'Supprimer ' + row.name" />
+                <IconButton icon="trash-2" size="xs" variant="subtle" tone="danger" :ariaLabel="'Supprimer ' + row.name" />
               </div>
             </template>
           </Table>

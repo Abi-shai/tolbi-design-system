@@ -1249,6 +1249,10 @@ Before working on any component, read:
   (`hover: hover`). The row's name is **no longer underlined** on hover. **Amended**: an action pointed at on a hovered row took `bg-hover`,
   the row's own ground (1.000:1) — after a 13-system benchmark (veil 6/10), ghost/subtle actions take a **veil**,
   `text-strong` 7 % (12 % pressed), that stacks on any row: 1.154 light, 1.194 dark.
+- **ADR-0112**: **a destructive action is red on approach** — `IconButton` gains **`tone: 'neutral' | 'danger'`**:
+  neutral at rest, and under the pointer, the focus or an open menu a **red veil** (`text-error` 12 %, 18 % pressed) and
+  the ink `text-on-error-subtle` (1.212 / 1.183:1 on a hovered row; ink 5.19 / 4.09). From a 13-system benchmark (danger
+  variants red at rest 9/9, but inline table trash neutral at Primer and MUI). `Table`'s neutral veil leaves it alone.
 
 ## Architecture
 
