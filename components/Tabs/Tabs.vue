@@ -3,7 +3,13 @@ import { computed, watch, nextTick } from 'vue'
 import { useSlidingIndicator } from '../../composables/useSlidingIndicator'
 import { Badge } from '../Badge'
 
-export type TabsSize = 'sm' | 'md'
+/**
+ * `md` and `sm` head a page or a panel. `xs` switches what an instrument shows —
+ * the indicator a map's legend reads (ADR-0102): 28px tabs in `label-md-strong`
+ * on a 2px rail, the size of the 12px type around it. Figma's proposal of
+ * 22 Oct., brought to the package.
+ */
+export type TabsSize = 'xs' | 'sm' | 'md'
 
 export interface TabsItem {
   value: string
@@ -123,6 +129,12 @@ function onKeydown(e: KeyboardEvent, i: number) {
   border-radius: var(--ds-radius-surface-sm);
 }
 
+.ds-tabs--xs {
+  gap: var(--ds-spacing-xxs);
+  padding: var(--ds-spacing-xxs);
+  border-radius: var(--ds-radius-control);
+}
+
 /* ── Sliding indicator ─────────────────────────────────────────────── */
 .ds-tabs__indicator {
   position: absolute;
@@ -171,6 +183,17 @@ function onKeydown(e: KeyboardEvent, i: number) {
   height: 36px;
 }
 
+/* The radius scales with the element (ADR-0013): 4px inside a 28px tab. */
+.ds-tabs--xs .ds-tabs__tab,
+.ds-tabs--xs .ds-tabs__indicator {
+  border-radius: var(--ds-radius-inner-sm);
+}
+
+.ds-tabs--xs .ds-tabs__tab {
+  height: 28px;
+  padding: var(--ds-spacing-sm) var(--ds-spacing-md);
+}
+
 /* ── Hover — subtle tint, text promotes, clearly lighter than active ── */
 .ds-tabs__tab:not(.ds-tabs__tab--active):hover {
   background-color: color-mix(in srgb, var(--ds-bg-default) 50%, transparent);
@@ -205,5 +228,9 @@ function onKeydown(e: KeyboardEvent, i: number) {
 
 .ds-tabs--sm .ds-tabs__label {
   font: var(--ds-font-heading-sm);
+}
+
+.ds-tabs--xs .ds-tabs__label {
+  font: var(--ds-font-label-md-strong);
 }
 </style>

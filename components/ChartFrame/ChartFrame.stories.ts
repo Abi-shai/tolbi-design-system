@@ -33,7 +33,7 @@ const meta: Meta<typeof ChartFrame> = {
           'la ligne dit seulement *dans quel sens il est allé* : ni axe, ni titre, ni interaction. Une sparkline dans un ' +
           'cadre gagnerait des axes et cesserait d\'en être une ; un cadre qui dessinerait sa courbe serait un moteur. ' +
           'La famille : `ChartLegend` et `ChartTooltip` vont avec `ChartFrame` ; `Sparkline` se pose seule, à côté ' +
-          'd\'un chiffre ; `ColorScale` et `MapTooltip` sont ceux d\'une carte.',
+          'd\'un chiffre ; `MapLegend` et `MapTooltip` sont ceux d\'une carte.',
       },
     },
   },

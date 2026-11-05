@@ -11,7 +11,7 @@ resource row: the panel will change, no effort in what will go), took the recomm
 
 ## Decisions
 
-**`ColorScale`** (track A). The title above, a **continuous** gradient — the index is continuous, steps would
+**`ColorScale`** (track A) — **renamed `MapLegend` and redrawn by ADR-0102**. The title above, a **continuous** gradient — the index is continuous, steps would
 invent thresholds — three values under it, the symbols' key below (`ChartLegend`, ADR-0096's shapes). The ramp is
 `--ds-chart-sequential-*` unless given. A gradient is not text: the bar is `role="img"` named once (« Indice de
 stock, de 0,30 à 0,60 »), the ticks `aria-hidden`.
@@ -83,5 +83,5 @@ hears. Not an engine (ADR-0006): no tooltip, no interaction.
 
 ## Still open
 
-- `ColorScale`'s middle tick is centred by `space-between`, exact only while the ticks are the same width
+- `MapLegend`'s middle tick is centred by `space-between`, exact only while the ticks are the same width
   (tabular figures make three values so).

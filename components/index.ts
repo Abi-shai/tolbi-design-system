@@ -233,10 +233,9 @@ export { ResizableSplit } from './ResizableSplit'
 
 export { ChartTooltip } from './ChartTooltip'
 export type { ChartTooltipSeries } from './ChartTooltip'
-export { ColorScale } from './ColorScale'
 export { Sparkline } from './Sparkline'
 
-export { MapOverlay, MapPanel, MapControls, MapNavigator, MapTimeline, MapTooltip } from './Map'
+export { MapOverlay, MapPanel, MapControls, MapNavigator, MapTimeline, MapTooltip, MapLegend } from './Map'
 export type { MapOverlayPosition, MapControl, MapTimelinePeriod, MapTooltipRow } from './Map'
 
 export { ChartLegend } from './ChartLegend'

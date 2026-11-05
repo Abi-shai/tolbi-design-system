@@ -1167,8 +1167,7 @@ Before working on any component, read:
   because `Button`'s own `transition` outweighed it), focus moves as it arrives; the map is not re-framed.
   **`HelpIcon` is the anchored `Tooltip`** (top layer, 400ms, Escape; it was cut in a scrolling panel).
 
-- **ADR-0100**: what a map is read with (ARR lots 6–8; lot 5 dropped). **`ColorScale`**: title, a continuous
-  `chart-sequential` gradient named once (`role="img"`), three ticks, `ChartLegend`'s symbols below.
+- **ADR-0100**: what a map is read with (ARR lots 6–8; lot 5 dropped). `ColorScale` became **`MapLegend`** (ADR-0102).
   **`MapTooltip`** is its own component (`Données/Map/Tooltip`), not a mode of `ChartTooltip` — reversed the same
   day: a thing is filed where it is looked for; a click opens it, a close makes it a non-modal dialog, focus in
   and back, Escape. **`MapTimeline`** and **`MapNavigator`** are the owner's Figma components drawn as drawn
@@ -1185,6 +1184,12 @@ Before working on any component, read:
   unanimous rule; `Dropdown` takes its own **`size`** (`md` 40/14, `sm` 34/12 and a 160px panel), declared on the
   panel and read by its rows. **`side: 'below' | 'above'`** is a *preference*: still turned when its side is
   short (ADR-0078); `Pagination` prefers `above`. Track B (one compact list) declined.
+- **ADR-0102**: **`MapLegend`** (`Données/Map/Legend`, Figma « Indicateur ») — the legend of a map in full GIS mode,
+  named for what it is (`ColorScale` named a part; renamed before release). It **switches the indicator** the map
+  shows (`metrics` + `v-model:metric`, above the scale it changes), then one line: the name, the unit above a
+  continuous gradient, the bounds; the symbols' key below; its own surface, as drawn. **`Tabs size="xs"`** (28px,
+  `label-md-strong`, 2px rail) joins the package. The drawing's red → green ramp is declined: a magnitude is
+  sequential (ADR-0096).
 
 ## Architecture
 

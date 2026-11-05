@@ -17,7 +17,7 @@ import { EmptyState } from '../EmptyState'
  * sparkline in a frame grows axes and stops being one; a frame that drew its own
  * line would be an engine. The family: `ChartLegend` and `ChartTooltip` go with
  * a `ChartFrame`; `Sparkline` stands alone, beside a figure (`ProjectCard`'s
- * `#insight`, a `StatTile`); `ColorScale` and `MapTooltip` are a map's.
+ * `#insight`, a `StatTile`); `MapLegend` and `MapTooltip` are a map's.
  */
 interface Props {
   title?: string
