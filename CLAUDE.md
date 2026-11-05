@@ -1252,7 +1252,9 @@ Before working on any component, read:
 - **ADR-0112**: **a destructive action is red on approach** — `IconButton` gains **`tone: 'neutral' | 'danger'`**:
   neutral at rest, and under the pointer, the focus or an open menu a **red veil** (`text-error` 12 %, 18 % pressed) and
   the ink `text-on-error-subtle` (1.212 / 1.183:1 on a hovered row; ink 5.19 / 4.09). From a 13-system benchmark (danger
-  variants red at rest 9/9, but inline table trash neutral at Primer and MUI). `Table`'s neutral veil leaves it alone.
+  variants red at rest 9/9, but inline table trash neutral at Primer and MUI). `Table`'s neutral veil leaves it alone. **Amended**: a row's action has **one shape** —
+  `IconButton xs subtle` (round), the destructive one last with `tone="danger"` — never `Button` icon-only (a square);
+  two stories still drew the old one.
 
 ## Architecture
 

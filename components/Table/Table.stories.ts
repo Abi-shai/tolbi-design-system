@@ -6,7 +6,6 @@ import type { TableColumn, TableRow, TableSort } from './Table.vue'
 import { IconButton } from '../IconButton'
 import { Avatar } from '../Avatar'
 import { Badge } from '../Badge'
-import { Button } from '../Button'
 
 const meta: Meta<typeof Table> = {
   title: 'Données/Table',
@@ -71,7 +70,7 @@ function initials(name: string) {
 export const Default: Story = {
   name: 'Membres de l\'équipe',
   render: () => ({
-    components: { Table, Avatar, Badge, Button },
+    components: { Table, Avatar, Badge, IconButton },
     setup() {
       const selected = ref<(string | number)[]>([])
       return { selected, COLUMNS, ROWS, TAG_COLORS, statusColor, initials }
@@ -116,9 +115,9 @@ export const Default: Story = {
         </template>
 
         <template #cell-actions="{ row }">
-          <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px">
-            <Button variant="ghost" size="sm" :icon-only="true" icon-leading="trash-2" :label="'Supprimer ' + row.name" />
-            <Button variant="ghost" size="sm" :icon-only="true" icon-leading="square-pen" :label="'Modifier ' + row.name" />
+          <div style="display:flex;align-items:center;justify-content:flex-end;">
+            <IconButton icon="pencil" size="xs" variant="subtle" :ariaLabel="'Modifier ' + row.name" />
+            <IconButton icon="trash-2" size="xs" variant="subtle" tone="danger" :ariaLabel="'Supprimer ' + row.name" />
           </div>
         </template>
       </Table>
@@ -129,7 +128,7 @@ export const Default: Story = {
 export const WithPagination: Story = {
   name: 'Avec pagination',
   render: () => ({
-    components: { Table, Avatar, Badge, Button },
+    components: { Table, Avatar, Badge, IconButton },
     setup() {
       const PAGE_SIZE = 5
       const currentPage = ref(1)
@@ -170,9 +169,9 @@ export const WithPagination: Story = {
           </div>
         </template>
         <template #cell-actions="{ row }">
-          <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px">
-            <Button variant="ghost" size="sm" :icon-only="true" icon-leading="trash-2" :label="'Supprimer ' + row.name" />
-            <Button variant="ghost" size="sm" :icon-only="true" icon-leading="square-pen" :label="'Modifier ' + row.name" />
+          <div style="display:flex;align-items:center;justify-content:flex-end;">
+            <IconButton icon="pencil" size="xs" variant="subtle" :ariaLabel="'Modifier ' + row.name" />
+            <IconButton icon="trash-2" size="xs" variant="subtle" tone="danger" :ariaLabel="'Supprimer ' + row.name" />
           </div>
         </template>
       </Table>

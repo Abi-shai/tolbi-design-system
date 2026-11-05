@@ -31,7 +31,10 @@ export interface TableColumn {
   /**
    * The row's actions (ADR-0111): hidden at rest, they fade in when the row is
    * pointed at, reached by the keyboard or selected, and stay while one of them
-   * holds an open menu. Always shown on a screen with no hover.
+   * holds an open menu. Always shown on a screen with no hover. **One shape**:
+   * each action is an `IconButton` `xs` `subtle` — round — the destructive one
+   * last, with `tone="danger"` (ADR-0112). Not a `Button` icon-only, whose
+   * square box and hover are another control's.
    */
   actions?: boolean
 }

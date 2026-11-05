@@ -42,3 +42,13 @@ red under the pointer (the loudest, for a gesture a confirmation modal already g
 
 - No « ⋯ » menu pattern for a row's actions, and no change after the click: the confirmation stays `ConfirmDialog`
   (ADR-0075/0076).
+
+## Amended (5 Nov.) — one shape for a row's actions
+
+The owner saw two tables side by side: round buttons with a red trash on one, rounded squares and a grey trash on the
+other. Both were our stories — `Liste des projets` drew `IconButton xs subtle` (a 32px disc, `pencil`, the trash
+`danger`, last), while `Par défaut` and `Avec pagination`, the first a reader copies, still drew `Button ghost sm`
+icon-only (a 38px `radius-control` square, `square-pen`, the trash first and neutral). Two controls for one pattern is
+ADR-0001's defect inside our own catalogue. **The rule now**: a row's action is an **`IconButton` `xs` `subtle`** —
+round, the control the catalogue gives an action riding on content (ADR-0066) — edit before delete, the **destructive
+one last with `tone="danger"`**. Every `Table` story draws it so, and `TableColumn.actions` says it.
