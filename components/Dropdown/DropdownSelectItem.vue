@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { InputDropdownSize } from './InputDropdown.vue'
 import { Avatar } from '../Avatar'
 import { Checkbox } from '../Checkbox'
 import { Flag } from '../Flag'
@@ -24,7 +25,7 @@ interface Props {
    * The list's size, which is its field's (ADR-0101): `md` 46px in `label-xl`,
    * `sm` 38px in `label-lg` — a row is the height of the field that opened it.
    */
-  size?: 'sm' | 'md'
+  size?: InputDropdownSize
   disabled?: boolean
   /**
    * One choice among several (ADR-0085): a box leads the row and carries the

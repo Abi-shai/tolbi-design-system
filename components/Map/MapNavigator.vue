@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { IconButton } from '../IconButton'
 import { SurfaceTransition } from '../SurfaceTransition'
 import { Tooltip, type TooltipPlacement } from '../Tooltip'
@@ -67,10 +67,32 @@ const zoom = defineModel<number>('zoom', { default: 10 })
 const clamp = (z: number) => Math.min(props.zoomMax, Math.max(props.zoomMin, z))
 const atMin = computed(() => zoom.value <= props.zoomMin)
 const atMax = computed(() => zoom.value >= props.zoomMax)
-const by = (d: number) => { zoom.value = clamp(zoom.value + d * props.zoomStep) }
+/* − or + that reaches its end disables itself, and a disabled button drops the
+   focus to the page (ADR-0059): it goes to the gauge open, to the other step
+   folded. */
+function by(d: number) {
+  zoom.value = clamp(zoom.value + d * props.zoomStep)
+  nextTick(() => {
+    const a = document.activeElement as HTMLButtonElement | null
+    if (a && a !== document.body && !a.disabled) return
+    const to = host.value?.querySelector<HTMLElement>('.ds-map-navigator__gauge')
+      ?? host.value?.querySelector<HTMLElement>(`[aria-label="${d > 0 ? props.zoomOutLabel : props.zoomInLabel}"]`)
+    to?.focus()
+  })
+}
 
 const host = ref<HTMLElement | null>(null)
+/* The focus follows the fold only when the fold was pressed here: a product
+   folding it through `v-model:collapsed` does not take the reader's focus
+   (ADR-0062 — a focus is not held hostage). */
+let pressed = false
+function fold(next: boolean) {
+  pressed = true
+  collapsed.value = next
+}
 function focusArrived() {
+  if (!pressed) return
+  pressed = false
   host.value?.querySelector<HTMLElement>(collapsed.value ? '[data-map-navigator-open] button' : '[data-map-navigator-fold] button')?.focus()
 }
 </script>
@@ -89,7 +111,7 @@ function focusArrived() {
               variant="surface"
               :ariaLabel="collapseLabel"
               aria-expanded="true"
-              @click="collapsed = true"
+              @click="fold(true)"
             />
           </Tooltip>
         </div>
@@ -130,7 +152,7 @@ function focusArrived() {
              folded the mini-map is already on the button that opens it. -->
         <span class="ds-map-navigator__rule" aria-hidden="true" />
         <Tooltip :title="expandLabel" :placement="tooltipPlacement" data-map-navigator-open>
-          <IconButton icon="map" size="xs" variant="subtle" :ariaLabel="expandLabel" aria-expanded="false" @click="collapsed = false" />
+          <IconButton icon="map" size="xs" variant="subtle" :ariaLabel="expandLabel" aria-expanded="false" @click="fold(false)" />
         </Tooltip>
       </div>
     </SurfaceTransition>

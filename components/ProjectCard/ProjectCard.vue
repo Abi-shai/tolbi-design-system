@@ -235,8 +235,11 @@ const statusTone  = computed(() => STATUS[props.state].tone)
  * has passed, and `loading` renders no badge at all.
  */
 const metricBadge = computed(() => {
-  const badge = props.metrics.find((m) => m.badge)?.badge
-  if (!badge) return null
+  const badged = props.metrics.find((m) => m.badge)
+  const badge = badged?.badge
+  /* A second reading of a number the card does not have is no reading: while
+     it computes, or where the value is `null`, the badge goes too (ADR-0100). */
+  if (!badge || badged?.value === null || props.state === 'computing') return null
   const done = props.state === 'done'
   return {
     label: typeof badge === 'string' ? badge : done ? badge.done : badge.running,
@@ -813,9 +816,6 @@ const spread = computed(() => {
   color: var(--ds-text-subtle);
 }
 
-/* Nothing has been measured yet, so the figure is a placeholder and drops to
-   its own label's colour. Derived from the state, not from the value being a
-   dash — a planned project has no number to make strong. */
 /*
   A figure not known yet keeps the figure's line — the outer box is the
   heading's line box, the words inside it are body text in the receding ink —
@@ -839,6 +839,9 @@ const spread = computed(() => {
   min-width: 0;
 }
 
+/* Nothing has been measured yet, so the figure is a placeholder and drops to
+   its own label's colour. Derived from the state, not from the value being a
+   dash — a planned project has no number to make strong. */
 .ds-project-card--planned .ds-project-card__metric-number {
   color: var(--ds-text-subtlest);
 }

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { Dropdown, DropdownItem } from '../Dropdown'
-import { Icon } from '../Icon'
+import { Button } from '../Button'
+import { Divider } from '../Divider'
+import { Dropdown, DropdownItem, DropdownTrigger } from '../Dropdown'
 import { IconButton } from '../IconButton'
+import { Tooltip } from '../Tooltip'
 import { useSlidingIndicator } from '../../composables/useSlidingIndicator'
 
 /** One step of the timeline — a year, a month, a day. */
@@ -63,6 +65,10 @@ interface Props {
   /** Said at the end while the second period is awaited. */
   compareHint?: string
   exitCompareLabel?: string
+  /** Said after the compared period (the second pill). */
+  comparedLabel?: string
+  /** Said after a period with a data dot. */
+  dataLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -75,6 +81,8 @@ const props = withDefaults(defineProps<Props>(), {
   compareLabel: 'Comparer',
   compareHint: 'Choisir une date',
   exitCompareLabel: 'Quitter la comparaison',
+  comparedLabel: 'comparée',
+  dataLabel: 'mesure disponible',
 })
 
 const value = defineModel<string>({ required: true })
@@ -86,7 +94,9 @@ const picking = ref(false)
 const comparing = computed(() => picking.value || comparison.value !== null)
 
 const index = computed(() => props.periods.findIndex((p) => p.value === value.value))
-const scaleName = computed(() => props.scales.find((s) => s.value === scale.value)?.label ?? props.scales[0]?.label)
+/* With no scale given, the first is the one shown — and the one the menu marks. */
+const currentScale = computed(() => props.scales.find((s) => s.value === scale.value) ?? props.scales[0])
+const scaleName = computed(() => currentScale.value?.label)
 
 /* A step that carries a mark under it (a data dot) or between which dots
    stand is set one size down: the bar keeps its height. */
@@ -161,24 +171,62 @@ function step(from: number, by: number): number {
 const previous = computed(() => step(index.value, -1))
 const next = computed(() => step(index.value, 1))
 
+/*
+  ‹ or › that reaches the end disables itself — and a disabled button drops the
+  focus to the page (ADR-0059). So the focus goes to the period just chosen.
+*/
 function go(i: number, focus = false) {
   if (i < 0 || !enabled(i)) return
   value.value = props.periods[i].value
-  if (focus) nextTick(() => itemRefs.value[i]?.focus())
+  nextTick(() => {
+    const lost = document.activeElement === document.body || (document.activeElement as HTMLButtonElement | null)?.disabled
+    if (focus || lost) itemRefs.value[i]?.focus()
+  })
+}
+
+/*
+  The keyboard moves **the end being chosen**: the period, or — while comparing
+  — the compared one, stepping over the period it is compared with. That end
+  is also the strip's one tab stop; with neither in the strip (the product just
+  swapped the periods), the first that can be chosen is.
+*/
+const compIndex = computed(() => (comparison.value === null ? -1 : props.periods.findIndex((p) => p.value === comparison.value)))
+const activeIndex = computed(() => {
+  if (comparing.value) return compIndex.value !== -1 ? compIndex.value : index.value
+  return index.value
+})
+const tabIndex = computed(() => (activeIndex.value !== -1 ? activeIndex.value : step(-1, 1)))
+
+function stepOver(from: number, by: number): number {
+  let i = step(from, by)
+  if (comparing.value && i === index.value) i = step(i, by)
+  return i
 }
 
 function onKeydown(event: KeyboardEvent) {
   const last = props.periods.length - 1
+  const from = activeIndex.value
+  const first = stepOver(-1, 1)
+  const end = stepOver(last + 1, -1)
   const to = {
-    ArrowLeft: previous.value,
-    ArrowRight: next.value,
-    Home: enabled(0) ? 0 : step(0, 1),
-    End: enabled(last) ? last : step(last, -1),
+    ArrowLeft: stepOver(from, -1),
+    ArrowRight: stepOver(from, 1),
+    Home: first,
+    End: end,
   }[event.key]
   if (to === undefined) return
   event.preventDefault()
-  go(to, true)
+  if (to < 0) return
+  if (comparing.value) {
+    choose(props.periods[to])
+    nextTick(() => itemRefs.value[to]?.focus())
+  } else go(to, true)
 }
+
+/* Said once a text has changed, never on arrival (ADR-0058): the region is
+   there from the start, empty, and filled by what changes. */
+const announced = ref('')
+watch(comparison, (c) => { announced.value = c === null ? '' : rangeText() })
 
 const scaleOpen = ref(false)
 const root = ref<HTMLElement | null>(null)
@@ -194,17 +242,18 @@ function pickScale(s: MapTimelineScale) {
   focus('.ds-map-timeline__scale')
 }
 
-function startCompare() {
-  picking.value = true
-  focus('.ds-map-timeline__exit')
-}
-
-const range = computed(() => {
-  if (comparison.value === null) return null
-  const a = props.periods.findIndex((p) => p.value === comparison.value)
+function rangeText() {
+  const a = compIndex.value
   const [from, to] = a < index.value ? [a, index.value] : [index.value, a]
   return `${props.periods[from]?.label} → ${props.periods[to]?.label}`
-})
+}
+
+function startCompare() {
+  picking.value = true
+  focus('.ds-map-timeline__exit button')
+}
+
+const range = computed(() => (comparison.value === null ? null : rangeText()))
 
 function exitCompare() {
   picking.value = false
@@ -215,41 +264,40 @@ function exitCompare() {
 
 <template>
   <div ref="root" class="ds-map-timeline" :class="{ 'ds-map-timeline--small': small, 'ds-map-timeline--dense': dense }">
+    <span class="ds-map-timeline__said" role="status">{{ announced }}</span>
     <template v-if="scales.length > 1">
       <Dropdown v-model:open="scaleOpen" class="ds-map-timeline__scale-menu" :label="scaleLabel" align="start" size="sm">
         <template #trigger="{ open, toggle }">
-          <button
-            type="button"
+          <DropdownTrigger
             class="ds-map-timeline__scale"
-            :aria-label="`${scaleLabel} : ${scaleName}`"
-            aria-haspopup="menu"
-            :aria-expanded="open"
+            chrome="chip"
+            chevron
+            :open="open"
+            :ariaLabel="`${scaleLabel} : ${scaleName}`"
             @click="toggle"
-          >
-            <span>{{ scaleName }}</span>
-            <Icon name="chevron-down" :size="16" aria-hidden="true" />
-          </button>
+          >{{ scaleName }}</DropdownTrigger>
         </template>
         <DropdownItem
           v-for="s in scales"
           :key="s.value"
           :label="s.label"
-          :selected="s.value === scale"
+          :selected="s.value === currentScale?.value"
           @click="pickScale(s)"
         />
       </Dropdown>
-      <span class="ds-map-timeline__rule" aria-hidden="true" />
+      <Divider class="ds-map-timeline__rule" orientation="vertical" />
     </template>
 
-    <IconButton
-      class="ds-map-timeline__step"
-      icon="chevron-left"
-      size="xs"
-      variant="subtle"
-      :ariaLabel="previousLabel"
-      :disabled="previous < 0"
-      @click="go(previous)"
-    />
+    <Tooltip :title="previousLabel" placement="top" class="ds-map-timeline__step">
+      <IconButton
+        icon="chevron-left"
+        size="xs"
+        variant="subtle"
+        :ariaLabel="previousLabel"
+        :disabled="previous < 0"
+        @click="go(previous)"
+      />
+    </Tooltip>
 
     <div ref="viewport" class="ds-map-timeline__viewport">
       <div ref="track" class="ds-map-timeline__track" role="radiogroup" :aria-label="label" @keydown="onKeydown">
@@ -275,10 +323,13 @@ function exitCompare() {
           }"
           :aria-checked="p.value === value"
           :aria-disabled="p.disabled || undefined"
-          :tabindex="p.value === value ? 0 : -1"
+          :tabindex="i === tabIndex ? 0 : -1"
           @click="choose(p)"
         >
           <span class="ds-map-timeline__label">{{ p.label }}</span>
+          <!-- Said, not seen: the second pill, and a measure behind a dot. -->
+          <span v-if="p.value === comparison" class="ds-map-timeline__said">, {{ comparedLabel }}</span>
+          <span v-else-if="p.data" class="ds-map-timeline__said">, {{ dataLabel }}</span>
           <span
             v-if="p.data || p.minor"
             class="ds-map-timeline__dot"
@@ -289,36 +340,40 @@ function exitCompare() {
       </div>
     </div>
 
-    <IconButton
-      class="ds-map-timeline__step"
-      icon="chevron-right"
-      size="xs"
-      variant="subtle"
-      :ariaLabel="nextLabel"
-      :disabled="next < 0"
-      @click="go(next)"
-    />
+    <Tooltip :title="nextLabel" placement="top" class="ds-map-timeline__step">
+      <IconButton
+        icon="chevron-right"
+        size="xs"
+        variant="subtle"
+        :ariaLabel="nextLabel"
+        :disabled="next < 0"
+        @click="go(next)"
+      />
+    </Tooltip>
 
     <template v-if="compare">
-      <span class="ds-map-timeline__rule" aria-hidden="true" />
-      <button
+      <Divider class="ds-map-timeline__rule" orientation="vertical" />
+      <Button
         v-if="!comparing"
-        type="button"
         class="ds-map-timeline__action"
+        variant="link"
+        size="xs"
+        :label="compareLabel"
         @click="startCompare"
-      >{{ compareLabel }}</button>
+      />
       <template v-else>
-        <span class="ds-map-timeline__range" :class="{ 'ds-map-timeline__range--hint': !range }" aria-live="polite">
+        <span class="ds-map-timeline__range" :class="{ 'ds-map-timeline__range--hint': !range }" aria-hidden="true">
           {{ range ?? compareHint }}
         </span>
-        <IconButton
-          class="ds-map-timeline__exit"
-          icon="x"
-          size="xs"
-          variant="subtle"
-          :ariaLabel="exitCompareLabel"
-          @click="exitCompare"
-        />
+        <Tooltip :title="exitCompareLabel" placement="top" class="ds-map-timeline__exit">
+          <IconButton
+            icon="x"
+            size="xs"
+            variant="subtle"
+            :ariaLabel="exitCompareLabel"
+            @click="exitCompare"
+          />
+        </Tooltip>
       </template>
     </template>
   </div>
@@ -347,54 +402,26 @@ function exitCompare() {
 }
 
 /* ── The scale chip ───────────────────────────────────────────────── */
+/* `DropdownTrigger`'s `chip` chrome: the trigger owns its chrome (ADR-0033). */
 .ds-map-timeline__scale-menu {
   flex: none;
 }
 
-/* A chip, not a field: the scale is a setting of the instrument, so it is a
-   tinted pill with its word and its chevron. 10px at the start is the
-   control padding the chevron's own 4px of air balances at the end. */
-.ds-map-timeline__scale {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-spacing-xxs);
-  padding: var(--ds-spacing-xs) var(--ds-spacing-sm) var(--ds-spacing-xs) 10px;
-  border: none;
-  border-radius: var(--ds-radius-pill);
-  background: var(--ds-bg-neutral);
-  font: var(--ds-font-label-md-strong);
-  color: var(--ds-text-strong);
-  white-space: nowrap;
-  cursor: pointer;
-  outline: none;
-  transition:
-    background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
-    box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
-}
-
-.ds-map-timeline__scale:hover,
-.ds-map-timeline__scale[aria-expanded='true'] {
-  background: var(--ds-bg-neutral-strong);
-}
-
-.ds-map-timeline__scale:focus-visible {
-  box-shadow: var(--ds-focus-ring-gray);
-}
-
+/* `Divider`, vertical — 20px tall, as drawn, not the bar's height. */
 .ds-map-timeline__rule {
   flex: none;
-  width: var(--ds-border-width-default);
+  align-self: center;
   height: 20px;
-  background: var(--ds-border-subtle);
 }
 
 /* ── The arrows and the exit ─────────────────────────────────────── */
 /*
   The catalogue's round button (`IconButton xs subtle`, 32px — a 16px glyph in
   its own disc, hover and focus included), not bare glyphs: a control that steps
-  through the periods is a button and looks like one (the owner, 5 Nov.). The
-  bar is 42px, so 5px of it above and below. Ending on the exit, the bar's end
-  padding gives back the disc's own 8px of air, so the glyph keeps its place.
+  through the periods is a button and looks like one (the owner, 5 Nov.), named
+  by a tooltip like every icon-only control on a map (ADR-0087). The bar is
+  42px, so 5px of it above and below. Ending on the exit, the bar's end padding
+  gives back the disc's own 8px of air, so the glyph keeps its place.
 */
 .ds-map-timeline__step,
 .ds-map-timeline__exit {
@@ -405,38 +432,31 @@ function exitCompare() {
   padding-inline-end: var(--ds-spacing-xs);
 }
 
-.ds-map-timeline__action:focus-visible {
-  box-shadow: var(--ds-focus-ring-brand);
-}
-
-
-/* The end of the bar speaks in the brand's ink: it is the one action there. */
+/* « Comparer » is `Button link xs`; the range it becomes speaks in the same
+   brand ink — the one action at the end of the bar. */
 .ds-map-timeline__action,
 .ds-map-timeline__range {
   flex: none;
+}
+
+.ds-map-timeline__range {
   font: var(--ds-font-label-md-strong);
   color: var(--ds-text-brand);
   white-space: nowrap;
 }
 
-.ds-map-timeline__action {
-  padding: 0;
-  border: none;
-  border-radius: var(--ds-radius-inner-sm);
-  background: none;
-  cursor: pointer;
-  outline: none;
-  transition:
-    color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
-    box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
-}
-
-.ds-map-timeline__action:hover {
-  color: var(--ds-text-brand-hover);
-}
-
 .ds-map-timeline__range--hint {
   color: var(--ds-text-subtle);
+}
+
+/* What a reader hears and nobody sees. */
+.ds-map-timeline__said {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* ── The strip ────────────────────────────────────────────────────── */
@@ -559,10 +579,16 @@ function exitCompare() {
   white-space: nowrap;
 }
 
+/*
+  A day between the labelled ones is 4px drawn on a 12px pitch: its target is
+  the whole pitch (the gap split between neighbours) and 24px tall. Under the
+  24px of WCAG 2.5.8 across, by the drawing — met by its exception: ‹ › and the
+  arrow keys reach every day one press at a time (ADR-0100).
+*/
 .ds-map-timeline__tick--minor::before {
   content: '';
   position: absolute;
-  inset: calc(-1 * var(--ds-spacing-xs));
+  inset: -10px calc(-1 * var(--ds-spacing-xs));
 }
 
 .ds-map-timeline--dense .ds-map-timeline__tick--current,
@@ -578,8 +604,12 @@ function exitCompare() {
   background: var(--ds-bg-brand-solid);
 }
 
+/* No measure: a **ring**, not a paler dot — the shape says it, not the colour
+   alone (ADR-0006), and its ink holds 3:1 on white where `border-subtle`'s
+   1.18:1 drew nothing (WCAG 1.4.11). */
 .ds-map-timeline__dot--empty {
-  background: var(--ds-border-subtle);
+  background: transparent;
+  box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-text-subtlest);
 }
 
 .ds-map-timeline__tick--current .ds-map-timeline__dot,

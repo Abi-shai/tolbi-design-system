@@ -81,17 +81,31 @@ const iconFold = computed(() => !!slots.header)
   its margin. Folded from the start (nothing measured), it sits in the corner.
 */
 const offset = ref({ x: 0, y: 0 })
+/* On a place that holds its children at the end (`MapOverlay` `end`), the
+   offset is taken from the right edge and the control grows from there. */
+const atEnd = ref(false)
+let pressed = false
 async function fold(next: boolean) {
   if (next) {
     const panel = host.value?.querySelector<HTMLElement>('.ds-map-panel')?.getBoundingClientRect()
     const btn = host.value?.querySelector<HTMLElement>('[data-map-panel-fold]')?.getBoundingClientRect()
-    if (panel && btn) offset.value = { x: btn.left - panel.left, y: btn.top - panel.top }
+    atEnd.value = !!host.value?.closest('.ds-map-overlay--end, .ds-map-overlay--top-end, .ds-map-overlay--bottom-end')
+    if (panel && btn) offset.value = { x: atEnd.value ? panel.right - btn.right : btn.left - panel.left, y: btn.top - panel.top }
   }
+  pressed = true
   collapsed.value = next
   await nextTick()
 }
-const unfoldAt = computed(() => ({ marginLeft: `${offset.value.x}px`, marginTop: `${offset.value.y}px` }))
+const unfoldAt = computed(() => ({
+  [atEnd.value ? 'marginRight' : 'marginLeft']: `${offset.value.x}px`,
+  marginTop: `${offset.value.y}px`,
+  transformOrigin: atEnd.value ? 'top right' : 'top left',
+}))
+/* Only when the fold was pressed here: a product folding the panel through
+   `v-model:collapsed` does not take the reader's focus (ADR-0062). */
 function focusArrived() {
+  if (!pressed) return
+  pressed = false
   host.value?.querySelector<HTMLElement>(collapsed.value ? '[data-map-panel-open]' : '[data-map-panel-fold]')?.focus()
 }
 </script>

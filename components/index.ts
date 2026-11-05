@@ -236,7 +236,7 @@ export type { ChartTooltipSeries } from './ChartTooltip'
 export { Sparkline } from './Sparkline'
 
 export { MapOverlay, MapPanel, MapControls, MapNavigator, MapTimeline, MapTooltip, MapLegend } from './Map'
-export type { MapOverlayPosition, MapControl, MapTimelinePeriod, MapTooltipRow } from './Map'
+export type { MapOverlayPosition, MapControl, MapTimelinePeriod, MapTimelineScale, MapTooltipRow, MapPanelSize } from './Map'
 
 export { ChartLegend } from './ChartLegend'
 export type { ChartLegendItem, ChartLegendShape, ChartLegendOrientation } from './ChartLegend'

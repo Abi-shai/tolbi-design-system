@@ -60,7 +60,7 @@ import { Icon } from '../Icon'
 export type DropdownTriggerSize = 'sm' | 'md'
 
 /** Which of the three chromes the trigger wears. */
-export type DropdownTriggerChrome = 'boxed' | 'quiet' | 'surface' | 'ghost'
+export type DropdownTriggerChrome = 'boxed' | 'quiet' | 'surface' | 'ghost' | 'chip'
 
 interface Props {
   /**
@@ -75,7 +75,8 @@ interface Props {
    * only on a recessed ground — on `bg-default`, `quiet`'s resting form and its
    * hover are the same pixel, and `surface` disappears into the page. `ghost`
    * is for `bg-default`: nothing at rest, and the hover of the `IconButton`s
-   * it stands among.
+   * it stands among. `chip` is a setting of an instrument — the map timeline's
+   * scale (ADR-0100): a `bg-neutral` pill in `label-md-strong`, 24px tall.
    */
   chrome?:    DropdownTriggerChrome
   /** Drives `aria-expanded` and which way the chevron points. */
@@ -114,7 +115,7 @@ withDefaults(defineProps<Props>(), {
     <Icon
       v-if="chevron"
       :name="open ? 'chevron-up' : 'chevron-down'"
-      :size="chrome === 'ghost' ? 16 : 20"
+      :size="chrome === 'ghost' || chrome === 'chip' ? 16 : 20"
       class="ds-dropdown-trigger__chevron"
       aria-hidden="true"
     />
@@ -240,6 +241,31 @@ withDefaults(defineProps<Props>(), {
 
 .ds-dropdown-trigger--ghost:disabled {
   background-color: transparent;
+}
+
+/* ── Chip ─────────────────────────────────────────────────────────── */
+/*
+  A setting of the instrument it sits in — the map timeline's scale (ADR-0100,
+  the owner's « Frise du temps ») — so a tinted pill with its word and its
+  chevron, not a field. 24px: `control-padding-xs` around `label-md-strong`,
+  the end giving back what the chevron's own air already holds. Hover and open
+  take the next neutral step; on white no lighter tint reads (ADR-0044).
+*/
+.ds-dropdown-trigger--chip {
+  gap: var(--ds-spacing-xxs);
+  padding: var(--ds-control-padding-xs);
+  padding-inline-end: var(--ds-spacing-sm);
+  border: none;
+  border-radius: var(--ds-radius-pill);
+  background-color: var(--ds-bg-neutral);
+  box-shadow: none;
+  font: var(--ds-font-label-md-strong);
+  color: var(--ds-text-strong);
+}
+
+.ds-dropdown-trigger--chip:hover:not(:disabled),
+.ds-dropdown-trigger--chip.ds-dropdown-trigger--open {
+  background-color: var(--ds-bg-neutral-strong);
 }
 
 /* ── Shared states ────────────────────────────────────────────────── */

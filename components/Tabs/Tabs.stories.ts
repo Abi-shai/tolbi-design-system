@@ -28,7 +28,7 @@ const meta: Meta<typeof Tabs> = {
     modelValue: { control: false },
     size: {
       control: 'select',
-      options: ['sm', 'md'],
+      options: ['xs', 'sm', 'md'],
       table: { category: 'Apparence', defaultValue: { summary: "'md'" } },
     },
     tabs: { control: false },
@@ -59,6 +59,25 @@ export const SizeSm: Story = {
       return { args, active, defaultTabs }
     },
     template: `<Tabs v-model="active" :tabs="defaultTabs" size="sm" />`,
+  }),
+}
+
+/** `xs` (ADR-0102) : changer ce qu’un instrument montre — l’indicateur d’une légende de carte. 28 px, `label-md-strong`, rail de 2 px. */
+export const SizeXs: Story = {
+  name: 'Size — xs',
+  render: (args) => ({
+    components: { Tabs },
+    setup() {
+      const active = ref('carbon')
+      const tabs = [
+        { value: 'carbon', label: 'Carbone' },
+        { value: 'biomass', label: 'Biomasse' },
+        { value: 'cover', label: 'Couvert' },
+        { value: 'height', label: 'Hauteur' },
+      ]
+      return { args, active, tabs }
+    },
+    template: `<div style="max-width:480px"><Tabs v-model="active" :tabs="tabs" size="xs" aria-label="Indicateur affiché" /></div>`,
   }),
 }
 

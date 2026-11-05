@@ -29,7 +29,7 @@ type Story = StoryObj<typeof MapOverlay>
 
 const POSITIONS = ['top-start', 'top', 'top-end', 'bottom-start', 'bottom', 'bottom-end'] as const
 
-/** Les six places, sur une carte figurée. */
+/** Les six places, sur une carte figurée — plus les deux bords entiers, `start` et `end` (ADR-0103), plus bas. */
 export const Default: Story = {
   name: 'Les six places',
   render: () => ({
@@ -40,6 +40,36 @@ export const Default: Story = {
         <MapOverlay v-for="p in POSITIONS" :key="p" :position="p">
           <span style="padding:8px 12px;border:1px solid var(--ds-border-subtle);border-radius:var(--ds-radius-control);
                        background:var(--ds-bg-default);font:var(--ds-font-label-md);color:var(--ds-text-strong)">{{ p }}</span>
+        </MapOverlay>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * Un bord entier (ADR-0103) : `start` et `end` vont de 16 px sous le haut à 16 px au-dessus du bas. Un
+ * `MapPanel lg` y prend toute la hauteur et y part vers son bord ; replié, il devient son contrôle **là où
+ * était le repli** — à gauche comme à droite.
+ */
+export const Sides: Story = {
+  name: 'Les deux bords entiers',
+  render: () => ({
+    components: { MapOverlay, MapPanel },
+    template: `
+      <div style="position:relative;height:520px;border-radius:12px;background:var(--ds-bg-neutral);overflow:hidden">
+        <MapOverlay position="start">
+          <MapPanel size="lg" title="Côté start" collapsible>
+            <template #header><span style="font:var(--ds-font-label-md-strong);color:var(--ds-text-strong)">Côté start</span></template>
+            <p style="margin:0;font:var(--ds-font-body-sm);color:var(--ds-text-subtle)">Toute la hauteur ; le pied reste en bas.</p>
+            <template #footer><span style="font:var(--ds-font-label-md);color:var(--ds-text-subtle)">Pied</span></template>
+          </MapPanel>
+        </MapOverlay>
+        <MapOverlay position="end">
+          <MapPanel size="lg" title="Côté end" collapsible>
+            <template #header><span style="font:var(--ds-font-label-md-strong);color:var(--ds-text-strong)">Côté end</span></template>
+            <p style="margin:0;font:var(--ds-font-body-sm);color:var(--ds-text-subtle)">Il part vers la droite.</p>
+            <template #footer><span style="font:var(--ds-font-label-md);color:var(--ds-text-subtle)">Pied</span></template>
+          </MapPanel>
         </MapOverlay>
       </div>
     `,

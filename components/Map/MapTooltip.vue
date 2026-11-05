@@ -50,6 +50,7 @@ defineSlots<{
 
 const root = ref<HTMLElement | null>(null)
 const titleId = `ds-map-tooltip-${useId()}`
+const descriptionId = `${titleId}-description`
 
 let opener: HTMLElement | null = null
 onMounted(() => {
@@ -73,6 +74,7 @@ function onKeydown(event: KeyboardEvent) {
     class="ds-map-tooltip"
     role="dialog"
     :aria-labelledby="titleId"
+    :aria-describedby="description ? descriptionId : undefined"
     tabindex="-1"
     @keydown="onKeydown"
   >
@@ -80,7 +82,7 @@ function onKeydown(event: KeyboardEvent) {
       <span :id="titleId" class="ds-map-tooltip__title">{{ title }}</span>
       <CloseButton class="ds-map-tooltip__close" size="xs" :ariaLabel="closeLabel" @click="emit('close')" />
     </div>
-    <p v-if="description" class="ds-map-tooltip__description">{{ description }}</p>
+    <p v-if="description" :id="descriptionId" class="ds-map-tooltip__description">{{ description }}</p>
     <ul v-if="rows.length" class="ds-map-tooltip__rows">
       <li v-for="(r, i) in rows" :key="i" class="ds-map-tooltip__row">
         <span class="ds-map-tooltip__mark" :style="{ backgroundColor: r.color }" aria-hidden="true" />

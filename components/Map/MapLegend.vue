@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useId } from 'vue'
 import { ChartLegend, type ChartLegendItem } from '../ChartLegend'
-import { Tabs, type TabsItem } from '../Tabs'
+import { TabPanel, Tabs, type TabsItem } from '../Tabs'
 
 /**
  * The legend of a map in full GIS mode (ADR-0102, Figma « Indicateur »
@@ -54,6 +54,13 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const metric = defineModel<string>('metric')
+const current = computed(() => metric.value ?? props.metrics[0]?.value ?? '')
+
+/* The switch is a tab list, so what it shows is its panel (ADR-0098): the
+   scale of the chosen indicator. Changing indicator is a swap — `TabPanel`'s
+   cross-fade, out then in at `quick` (ADR-0026) — and a reader is told which
+   indicator the scale now reads. */
+const tabsId = `ds-map-legend-${useId()}`
 
 const gradient = computed(() => `linear-gradient(to right, ${props.colors.join(', ')})`)
 const said = computed(() => {
@@ -67,24 +74,31 @@ const said = computed(() => {
   <div class="ds-map-legend">
     <Tabs
       v-if="metrics.length > 1"
-      :model-value="metric ?? metrics[0].value"
+      :id="tabsId"
+      :model-value="current"
       class="ds-map-legend__metrics"
       size="xs"
       :tabs="metrics"
       :aria-label="metricsLabel"
       @update:model-value="metric = $event"
     />
-    <div class="ds-map-legend__scale-row">
-      <span class="ds-map-legend__title">{{ title }}</span>
-      <div class="ds-map-legend__scale">
-        <span v-if="unit" class="ds-map-legend__unit" aria-hidden="true">{{ unit }}</span>
-        <div class="ds-map-legend__bar" role="img" :aria-label="said" :style="{ backgroundImage: gradient }" />
-        <!-- Said by the bar's name; on screen, a bound sits under its place. -->
-        <div class="ds-map-legend__ticks" aria-hidden="true">
-          <span v-for="t in ticks" :key="t">{{ t }}</span>
+    <component
+      :is="metrics.length > 1 ? TabPanel : 'div'"
+      v-bind="metrics.length > 1 ? { tabsId, value: current } : {}"
+      class="ds-map-legend__panel"
+    >
+      <div class="ds-map-legend__scale-row">
+        <span class="ds-map-legend__title">{{ title }}</span>
+        <div class="ds-map-legend__scale">
+          <span v-if="unit" class="ds-map-legend__unit" aria-hidden="true">{{ unit }}</span>
+          <div class="ds-map-legend__bar" role="img" :aria-label="said" :style="{ backgroundImage: gradient }" />
+          <!-- Said by the bar's name; on screen, a bound sits under its place. -->
+          <div class="ds-map-legend__ticks" aria-hidden="true">
+            <span v-for="t in ticks" :key="t">{{ t }}</span>
+          </div>
         </div>
       </div>
-    </div>
+    </component>
     <ChartLegend v-if="legend.length" :items="legend" class="ds-map-legend__symbols" />
   </div>
 </template>

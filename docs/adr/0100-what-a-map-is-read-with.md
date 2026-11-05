@@ -85,3 +85,32 @@ hears. Not an engine (ADR-0006): no tooltip, no interaction.
 
 - `MapLegend`'s middle tick is centred by `space-between`, exact only while the ticks are the same width
   (tabular figures make three values so).
+
+## Audit before release (5 Nov.)
+
+An independent pass over everything since 0.85.0 found what the linter cannot see; fixed before publishing:
+
+- **`MapTimeline`** — the comparison had no keyboard: the arrows now move **the end being chosen** (the period, or
+  while comparing the compared one, stepping over the period itself), that end is the strip's one tab stop, and with
+  neither in the strip the first enabled period is (APG radio group). The compared tick says « comparée », a tick
+  with a dot « mesure disponible », and the range is announced once it changes (a status region mounted empty,
+  ADR-0058). « Comparer » is **`Button link xs`**, the rules are **`Divider` vertical**, the scale chip is
+  **`DropdownTrigger chrome="chip"`** (the trigger owns its chrome, ADR-0033; padding `control-padding-xs`), and ‹ ›
+  ✕ carry tooltips (ADR-0087). ‹ or › reaching its end hands the focus to the period chosen. A day without a measure
+  is a **ring**, not a paler dot — shape, not colour alone, and 4.97:1 where `border-subtle` drew 1.18:1. The minor
+  days' 12px pitch is under WCAG 2.5.8's 24px by the drawing; its exception holds — ‹ › and the arrows reach every
+  day. With no `scale` given, the menu marks the first.
+- **`MapNavigator`** — − or + reaching its end hands the focus to the gauge (the other step, folded); the fold moves
+  the focus only when it was pressed here, never on a product's `v-model:collapsed` (ADR-0062).
+- **`MapPanel`** — same rule for the fold's focus; on an `end` place the control lands under the fold too (offset
+  from the right, grows from the top right): measured 0px.
+- **`MapLegend`** — the switch is a tab list, so the scale is its **`TabPanel`** (ADR-0098): named by its tab, and
+  changing indicator is `TabPanel`'s swap (ADR-0026).
+- **`MapTooltip`** — its sentence is the dialog's `aria-describedby`.
+- **`ProjectCard`** — no metric badge without its number (`computing`, or a `null` value).
+- **Exports** — `MapTimelineScale`, `MapPanelSize`. **Stories** — `Tabs` shows `xs`; `MapOverlay` shows `start` /
+  `end`.
+
+Kept, and why: the gauge's thumb rings in `text-default` — a non-text control needs 3:1 and no `border-*` token
+reaches it on white; the data dot is `bg-brand-solid` — it marks a period **you can choose that has a measure**, an
+affordance of the control, not a chart series (ADR-0016's rule is for series).
