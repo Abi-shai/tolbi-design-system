@@ -27,13 +27,11 @@ export interface MapTimelineScale {
   value: string
   label: string
   /**
-   * Offered but unavailable here (ADR-0119): listed in the menu, greyed,
-   * reachable and read as unavailable — so the reader learns the scale exists
-   * and that it does not apply to this project.
+   * Offered but unavailable here (ADR-0119): listed in the menu, greyed —
+   * nothing written — reachable and read as unavailable, so the reader learns
+   * the scale exists and that it does not apply to this project.
    */
   disabled?: boolean
-  /** Why, on the row under its name — « Pas de mesure mensuelle pour ce projet ». */
-  disabledReason?: string
 }
 
 /**
@@ -320,7 +318,7 @@ function exitCompare() {
   <div ref="root" class="ds-map-timeline" :class="{ 'ds-map-timeline--dense': dense, 'ds-map-timeline--lone': lone }">
     <span class="ds-map-timeline__said" role="status">{{ announced }}</span>
     <template v-if="scales.length > 1">
-      <Dropdown v-model:open="scaleOpen" class="ds-map-timeline__scale-menu" :label="scaleLabel" align="start" size="sm" :width="scales.some((s) => s.disabledReason) ? '19rem' : undefined">
+      <Dropdown v-model:open="scaleOpen" class="ds-map-timeline__scale-menu" :label="scaleLabel" align="start" size="sm">
         <template #trigger="{ open, toggle }">
           <DropdownTrigger
             class="ds-map-timeline__scale"
@@ -337,7 +335,6 @@ function exitCompare() {
           :label="s.label"
           :selected="s.value === currentScale?.value"
           :disabled="s.disabled"
-          :description="s.disabled ? s.disabledReason : undefined"
           @click="pickScale(s)"
         />
       </Dropdown>

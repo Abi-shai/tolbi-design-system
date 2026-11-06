@@ -9,17 +9,15 @@ elsewhere, but not for this module or this project.
 
 ## Decisions
 
-- **`MapTimelineScale` takes `disabled` and `disabledReason`.** The chip « Année ⌄ » shows whenever two scales or more
-  are passed, even if only one can be chosen: its chevron and its menu are what say other scales exist. The menu lists
-  them all; an unavailable one is **greyed, with its reason on the row under its name** (« Pas de mesure mensuelle pour
-  ce projet »), and choosing it does nothing. The word alone, no menu (ADR-0114), stays the case where the product
-  passes one scale.
-- **`DropdownItem` takes `description`** — a second line under the name, the row's `aria-describedby`. On a disabled
-  row only the name and its mark recede (`text-disabled`); the description stays `text-subtle`, because at the row's
-  usual half opacity it measured ~2:1 and a reason must be read.
-- **A disabled `DropdownItem` stays reachable** — in the tab order, `aria-disabled`, read with its description, inert
-  when pressed (the APG menu rule; it used to be `tabindex="-1"`, so a keyboard never met the reason). Catalogue-wide.
-- The scale menu widens to 19rem when a reason is shown, so a reason holds one line (it wrapped at 15 and 17).
+- **`MapTimelineScale` takes `disabled`.** The chip « Année ⌄ » shows whenever two scales or more are passed, even if
+  only one can be chosen: its chevron and its menu are what say other scales exist. The menu lists them all; an
+  unavailable one is **greyed, and nothing is written to say why** — the owner: « on rend juste la variante inactive,
+  pas besoin d'écrire ». Choosing it does nothing. The word alone, no menu (ADR-0114), stays the case where the
+  product passes one scale.
+- **A disabled `DropdownItem` stays reachable** — in the tab order, `aria-disabled`, inert when pressed (the APG menu
+  rule; it used to be `tabindex="-1"`, so a keyboard never met it). Catalogue-wide.
+- First drawn with the reason on the row under the name (`disabledReason`, a `DropdownItem.description` line, a 19rem
+  menu) and **reverted the same day** on the owner's render: the greyed row is the statement. Neither prop shipped.
 
-Measured (story « Échelles indisponibles »): « Mois » and « Jour » reached by Tab, `aria-disabled="true"`, described by
-their reason; Enter on « Mois » leaves the menu open and the scale « Année »; rows 34 / 52 / 52px in a 306px panel.
+Measured (story « Échelles indisponibles »): menu 162px (`sm`), « Mois » and « Jour » `aria-disabled="true"` and in
+the tab order; Enter on « Mois » leaves the scale « Année ».

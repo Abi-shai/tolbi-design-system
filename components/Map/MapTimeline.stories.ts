@@ -136,8 +136,8 @@ export const OneToThree: Story = {
 
 /**
  * **Échelles indisponibles** (ADR-0119) — un projet mesuré à l’année seulement. La puce « Année ⌄ » garde son menu :
- * c’est ce qui dit qu’il existe d’autres échelles. « Mois » et « Jour » y sont **grisés, avec leur raison** sous le
- * nom ; au clavier ils restent atteignables, s’annoncent indisponibles avec leur raison, et ne font rien.
+ * c’est ce qui dit qu’il existe d’autres échelles. « Mois » et « Jour » y sont **inactifs, sans rien d’écrit** ; au
+ * clavier ils restent atteignables, s’annoncent indisponibles, et ne font rien.
  * Le mot seul, sans menu (ADR-0114), reste le cas où le produit ne passe qu’une échelle.
  */
 export const UnavailableScales: Story = {
@@ -149,8 +149,8 @@ export const UnavailableScales: Story = {
       value: ref('2024'), scale: ref('year'),
       SCALES: [
         { value: 'year', label: 'Année' },
-        { value: 'month', label: 'Mois', disabled: true, disabledReason: 'Pas de mesure mensuelle pour ce projet' },
-        { value: 'day', label: 'Jour', disabled: true, disabledReason: 'Pas de mesure journalière pour ce projet' },
+        { value: 'month', label: 'Mois', disabled: true },
+        { value: 'day', label: 'Jour', disabled: true },
       ],
       YEARS: ['2022', '2023', '2024'].map((y) => ({ value: y, label: y, data: true })),
     }),

@@ -1281,11 +1281,10 @@ Before working on any component, read:
   only one period can be chosen; **amended**: with one choosable period the timeline is a statement — « Comparer » leaves too
   and the bar **hugs** (a 480px bar of one greyed « Comparer » was « horrible »);
   a disabled `subtle` `IconButton` is **half `text-disabled`** (gray 500 beside its gray 600 rest read as live).
-- **ADR-0119**: **unavailable scales stay visible** — `MapTimelineScale` takes `disabled` + `disabledReason`: the chip
-  keeps its chevron and menu even with one choosable scale (that is what says others exist); unavailable ones are
-  greyed **with their reason under the name**. `DropdownItem` gains **`description`** (a second line, its
-  `aria-describedby`, legible on a disabled row) and a **disabled row stays reachable** (`aria-disabled`, in the tab
-  order — the APG menu rule; it was `tabindex=-1`).
+- **ADR-0119**: **unavailable scales stay visible** — `MapTimelineScale` takes `disabled`: the chip keeps its chevron
+  and menu even with one choosable scale (that is what says others exist); unavailable ones are **greyed, nothing
+  written** (a reason under the name was drawn and reverted — « pas besoin d'écrire »). A **disabled `DropdownItem`
+  stays reachable** (`aria-disabled`, in the tab order — the APG menu rule; it was `tabindex=-1`).
 
 ## Architecture
 

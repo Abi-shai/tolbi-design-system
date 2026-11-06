@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, useId } from 'vue'
+import { computed, inject } from 'vue'
 import { DROPDOWN_SIZE_KEY } from './context'
 import { Avatar } from '../Avatar'
 import { Checkbox } from '../Checkbox'
@@ -25,16 +25,9 @@ interface Props {
    */
   meta?:      string
   /**
-   * A second line under the name — what the row is, or why it cannot be
-   * chosen (« Pas de mesure mensuelle pour ce projet », ADR-0119). It is the
-   * row's description (`aria-describedby`), and on a disabled row it stays
-   * legible: only the name recedes.
-   */
-  description?: string
-  /**
    * Unavailable. **Still reachable** — in the tab order, read as unavailable
-   * (`aria-disabled`) with its description (ADR-0119, the APG menu rule) —
-   * and it does nothing when pressed.
+   * (`aria-disabled`, ADR-0119, the APG menu rule) — and it does nothing when
+   * pressed. Nothing is written to say why: the greyed row is the statement.
    */
   disabled?:  boolean
   /**
@@ -103,7 +96,6 @@ const rootAttrs = computed(() =>
         role: isCheck.value ? 'menuitemcheckbox' : isChoice.value ? 'menuitemradio' : 'menuitem',
         'aria-checked': isCheck.value ? props.checked : isChoice.value ? props.selected : undefined,
         'aria-disabled': props.disabled || undefined,
-        'aria-describedby': props.description ? descriptionId : undefined,
         tabindex: 0,
       },
 )
@@ -118,8 +110,6 @@ function onKeydown(event: KeyboardEvent) {
   }
 }
 
-const descriptionId = `ds-dropdown-item-${useId()}`
-
 const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
 </script>
 
@@ -132,7 +122,6 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
       'ds-dropdown-item--selected': selected,
       'ds-dropdown-item--sm': size() === 'sm',
       'ds-dropdown-item--danger': tone === 'danger',
-      'ds-dropdown-item--described': !!description,
     }"
     v-bind="rootAttrs"
     @click="!disabled && emit('click')"
@@ -159,11 +148,7 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
             class="ds-dropdown-item__icon"
           />
         </span>
-        <span v-if="description" class="ds-dropdown-item__text">
-          <span class="ds-dropdown-item__label">{{ label }}</span>
-          <span :id="descriptionId" class="ds-dropdown-item__description">{{ description }}</span>
-        </span>
-        <span v-else class="ds-dropdown-item__label">{{ label }}</span>
+        <span class="ds-dropdown-item__label">{{ label }}</span>
       </div>
       <span v-if="shortcut || meta" class="ds-dropdown-item__shortcut">{{ shortcut || meta }}</span>
     </div>
@@ -234,30 +219,6 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
   opacity: 0.5;
 }
 
-/* A described row (ADR-0119): the name over its description. Disabled, only
-   the name and its mark recede — the description says why, so it must be
-   read (at half opacity it measured ~2:1). */
-.ds-dropdown-item__text {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  gap: var(--ds-spacing-xxs);
-  min-width: 0;
-}
-
-.ds-dropdown-item__description {
-  font: var(--ds-font-label-md);
-  color: var(--ds-text-subtle);
-  white-space: normal;
-}
-
-.ds-dropdown-item--disabled.ds-dropdown-item--described {
-  opacity: 1;
-}
-
-.ds-dropdown-item--disabled.ds-dropdown-item--described :is(.ds-dropdown-item__label, .ds-dropdown-item__leading) {
-  color: var(--ds-text-disabled);
-}
 
 .ds-dropdown-item__icon-text {
   display: flex;
