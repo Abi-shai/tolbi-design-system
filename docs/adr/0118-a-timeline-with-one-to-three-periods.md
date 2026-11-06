@@ -64,3 +64,9 @@ products drop the timeline for something smaller. So, **when one period can be c
   « Année », 223 with two years ahead.
 
 With two choosable periods or more, nothing changes: 480px, arrows, « Comparer ».
+
+**Validated (6 Nov.)** on the board « ↪ Frise à peu de périodes · benchmark et pistes » (Figma `3798:1427`), after a second
+benchmark (18 products, `.context/timeline-few/single/`: with one date nobody draws a control, the date is written;
+2–3 dates go to a dropdown). Three tracks were drawn against this one — A the legend says the year and the timeline
+goes, B a stepper ‹ 2024 ›, C « Année · 2024 ▾ ». **The owner kept this one**: the year is worth showing in the selector
+even alone, the bar shrinking to it; with more, the bar keeps ADR-0116's 480px as its ceiling.
