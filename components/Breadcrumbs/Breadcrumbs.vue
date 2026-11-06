@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { Icon } from '../Icon'
+import { Skeleton } from '../Skeleton'
 import { Tooltip } from '../Tooltip'
 
 export interface BreadcrumbsItem {
   label: string
   href?: string
+  /**
+   * The name is being read (ADR-0123): the crumb keeps its place and draws a
+   * placeholder a name wide, `strong` so it reads on the current crumb's white
+   * as on the bar's ground. It is not a link while it waits, and `label` is
+   * what a reader hears — « Projet », or « Chargement du projet ».
+   */
+  loading?: boolean
 }
 
 interface Props {
@@ -207,17 +215,22 @@ function leave(): void {
           <!-- Un maillon -->
           <component
             v-else-if="node.item"
-            :is="node.current ? 'span' : (node.item.href ? 'a' : 'button')"
-            :type="!node.current && !node.item.href ? 'button' : undefined"
-            :href="node.current ? undefined : node.item.href"
+            :is="node.current || node.item.loading ? 'span' : (node.item.href ? 'a' : 'button')"
+            :type="!node.current && !node.item.loading && !node.item.href ? 'button' : undefined"
+            :href="node.current || node.item.loading ? undefined : node.item.href"
             :class="[
               'ds-breadcrumbs__crumb',
               node.current ? 'ds-breadcrumbs__crumb--current' : 'ds-breadcrumbs__crumb--link',
             ]"
             :aria-current="node.current ? 'page' : undefined"
-            @click="node.current || onSelect(node.item, $event)"
+            :aria-busy="node.item.loading || undefined"
+            @click="node.current || node.item.loading || onSelect(node.item, $event)"
           >
-            {{ node.item.label }}
+            <template v-if="node.item.loading">
+              <Skeleton class="ds-breadcrumbs__pending" emphasis="strong" width="10rem" height="0.625rem" />
+              <span class="ds-breadcrumbs__said">{{ node.item.label }}</span>
+            </template>
+            <template v-else>{{ node.item.label }}</template>
           </component>
 
           <!--
@@ -225,7 +238,7 @@ function leave(): void {
             n'apparaît que sur un libellé coupé, ou sur l'ellipse.
           -->
           <Tooltip
-            v-if="hovered === node.key && (node.hidden || clipped)"
+            v-if="hovered === node.key && (node.hidden || (clipped && !node.item?.loading))"
             class="ds-breadcrumbs__tip"
             :title="node.hidden
               ? node.hidden.map(h => h.label).join(' › ')
@@ -405,6 +418,22 @@ function leave(): void {
   margin-top: var(--ds-spacing-sm);
   z-index: var(--ds-z-popover);
   pointer-events: none;
+  white-space: nowrap;
+}
+
+/* A name being read: a placeholder a name wide, in the crumb's line box. */
+.ds-breadcrumbs__pending {
+  display: inline-block;
+  max-width: var(--breadcrumb-label-max);
+  vertical-align: middle;
+}
+
+.ds-breadcrumbs__said {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 </style>

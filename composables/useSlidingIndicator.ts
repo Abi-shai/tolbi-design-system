@@ -91,6 +91,20 @@ export function useSlidingIndicator(activeIndex: Ref<number>) {
 
   watch(activeIndex, async () => { await nextTick(); measure() })
 
+  /* A container that arrives after mount — a strip behind a `v-if`, its
+     placeholders replaced (ADR-0122) — is observed in its turn, or nothing
+     ever measures it again and the indicator stays where the first layout
+     left it. Its first placement is not a movement: no transition until the
+     frame after. */
+  watch(containerRef, (el, old) => {
+    if (!ro) return
+    if (old) ro.unobserve(old)
+    if (!el) return
+    ready.value = false
+    ro.observe(el)
+    requestAnimationFrame(() => requestAnimationFrame(() => { ready.value = !reducedMotion.value }))
+  })
+
   return {
     containerRef,
     itemRefs,

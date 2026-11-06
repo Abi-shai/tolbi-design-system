@@ -215,6 +215,17 @@ watch(() => props.loading, async (loading) => {
   if (track.value) ro?.observe(track.value)
 })
 
+/* The gap is a style: it lands on the next render, after the pass that set it,
+   and moves the periods inside a track whose size does not change — so no
+   observer sees it. The choice is placed again once it has landed (0.103: the
+   pill sat 12px off « 2024 », cut by the strip's edge). */
+watch(free, async () => {
+  await nextTick()
+  measure()
+  reveal(false)
+  edges()
+})
+
 function enabled(i: number) {
   const p = props.periods[i]
   return !!p && !p.disabled

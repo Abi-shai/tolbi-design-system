@@ -132,6 +132,18 @@ export const Project: Story = {
   },
 }
 
+/** Le nom du projet en cours de lecture (ADR-0123) : un repère à sa place, la barre ne bouge pas quand il arrive. */
+export const ProjectLoading: Story = {
+  name: 'Carbone — le projet en cours de lecture',
+  args: {
+    module: 'Carbone',
+    breadcrumbs: [
+      { label: 'Monitoring', href: '#' },
+      { label: 'Chargement du projet', loading: true },
+    ],
+  },
+}
+
 export const Tabs: Story = {
   name: 'Data OS — 6 nœuds, replié',
   args: {

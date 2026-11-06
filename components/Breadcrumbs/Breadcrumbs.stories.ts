@@ -234,3 +234,18 @@ export const SansMaison: Story = {
     ],
   },
 }
+
+export const Loading: Story = {
+  name: 'Un nom en cours de lecture',
+  args: { items: [{ label: 'Monitoring', href: '#' }, { label: 'Chargement du projet', loading: true }] },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`loading` sur un maillon (ADR-0123) : il garde sa place et dessine un repère de la largeur d’un nom, `strong` ' +
+          'pour se voir sur le blanc du maillon courant comme sur le fond de la barre. Ce n’est pas un lien tant qu’il ' +
+          'attend ; `label` est ce qu’entend un lecteur.',
+      },
+    },
+  },
+}
