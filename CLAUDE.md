@@ -1301,13 +1301,16 @@ Before working on any component, read:
   then **faded in whole** (`ambient`), shown anyway **2 s after `loading`**. Parcels are **dashed outlines until their
   data** (`--ds-map-pending`, `mapPending` in `./tokens/js`) — they arrive with the basemap, not before it (one canvas).
   **`MapStatus`**: a pill above the timeline, the state picks glyph and ink (`loading` counts « 33 sur 89 »,
-  `fallback`, `partial`, `empty`, `failed`), on the map, never in its place; words announced once.
+  `partial`, `empty`, `failed`), on the map, never in its place; words announced once.
 - **ADR-0123**: what the first loading integration found — **a strip that arrives after mount is measured like one that
   was there**: `useSlidingIndicator` observed its container once, at mount (the placeholders'), and `MapTimeline`'s gap
   lands a render later inside a track that does not resize, so the pill sat 12px off « 2024 », cut; the composable now
   observes a later container (placed without a transition) and the timeline places the choice again once its gap has
   landed (−0.33px on 102 frames). **`BreadcrumbsItem.loading`**: a placeholder a name wide (`strong`), not a link, the
   crumb's 28px, `label` for the reader.
+- **ADR-0124**: **the basemap fallback is silent** (product decision) — `MapStatus` loses `fallback`: a satellite under
+  the same data changes no reading and asks for no action, so nothing says it. A state earns a word when it changes
+  what the reader does or reads (`partial`, `empty`, `failed`).
 
 ## Architecture
 

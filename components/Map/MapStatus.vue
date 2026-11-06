@@ -5,7 +5,7 @@ import { Icon, type IconName } from '../Icon'
 import { Spinner } from '../Spinner'
 import { SurfaceTransition } from '../SurfaceTransition'
 
-export type MapStatusState = 'loading' | 'fallback' | 'partial' | 'empty' | 'failed'
+export type MapStatusState = 'loading' | 'partial' | 'empty' | 'failed'
 
 /**
  * What a map is missing, said on the map (ADR-0122) — a pill, at the bottom
@@ -18,11 +18,12 @@ export type MapStatusState = 'loading' | 'fallback' | 'partial' | 'empty' | 'fai
  *
  * - `loading` — the data layers are arriving: a spinner and, with `loaded` /
  *   `total`, the count (« 33 sur 89 »), the one thing NN/g asks of a series;
- * - `fallback` — the TOLBI basemap failed and the map fell back to satellite.
- *   1 product of 25 says so; this one does;
  * - `partial` — some features have no data, in the warning ink;
  * - `empty` — nothing to show yet (a project being computed);
  * - `failed` — the data could not be read, in the error ink, with its action.
+ *
+ * A basemap that falls back to satellite is **not** a state: the map stays
+ * readable and the reader has nothing to do with the news (ADR-0124).
  *
  * `null` is nothing: the pill leaves as a surface does (`SurfaceTransition`)
  * and takes no room in the overlay. A change of state is the pill leaving and
@@ -59,14 +60,12 @@ const emit = defineEmits<{ action: [] }>()
 
 const DEFAULTS: Record<MapStatusState, string> = {
   loading: 'Chargement des données',
-  fallback: 'Fond satellite : le fond Tolbi est indisponible',
   partial: 'Certaines données manquent',
   empty: 'Pas encore de mesure',
   failed: 'Les données n’ont pas pu être lues',
 }
 
 const GLYPH: Record<Exclude<MapStatusState, 'loading'>, IconName> = {
-  fallback: 'satellite',
   partial: 'image-off',
   empty: 'clock',
   failed: 'circle-alert',
@@ -74,7 +73,6 @@ const GLYPH: Record<Exclude<MapStatusState, 'loading'>, IconName> = {
 
 const TONE: Record<MapStatusState, 'neutral' | 'warning' | 'error'> = {
   loading: 'neutral',
-  fallback: 'neutral',
   partial: 'warning',
   empty: 'neutral',
   failed: 'error',

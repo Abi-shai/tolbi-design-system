@@ -201,12 +201,12 @@ export const GisScreen: Story = {
 const ASSETS = './stories/map-loading'
 const ENGINE = {
   components: {},
-  props: { arrived: { type: Array, default: () => [] }, outlines: { type: Boolean, default: true }, ground: { type: String, default: 'tolbi' } },
+  props: { arrived: { type: Array, default: () => [] }, outlines: { type: Boolean, default: true } },
   setup: () => ({ PARCELS: SOUBRE_PARCELS, W: SOUBRE_SIZE.width, H: SOUBRE_SIZE.height, ASSETS }),
   template: `
     <svg :viewBox="'0 0 ' + W + ' ' + H" preserveAspectRatio="xMidYMid slice" style="display:block">
       <defs><clipPath v-for="(p, i) in PARCELS" :id="'soubre-' + i" :key="i"><polygon :points="p" /></clipPath></defs>
-      <image :href="ASSETS + '/base.webp'" :width="W" :height="H" :style="ground === 'satellite' ? 'filter: grayscale(1) sepia(.35) hue-rotate(50deg) saturate(1.6) brightness(.62) contrast(1.15)' : ''" />
+      <image :href="ASSETS + '/base.webp'" :width="W" :height="H" />
       <g v-for="(p, i) in PARCELS" :key="i">
         <polygon v-if="outlines" :points="p" fill="none" stroke="var(--ds-map-pending)" stroke-width="1.5" stroke-dasharray="3 2.25" vector-effect="non-scaling-stroke"
           :style="{ opacity: arrived.includes(i) ? 0 : 1, transition: 'opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-out)' }" />
@@ -218,7 +218,7 @@ const ENGINE = {
 
 const LOADING_SCREEN = `
   <MapCanvas :basemap="basemap" style="height:828px; margin:var(--ds-spacing-md); border-radius:var(--ds-radius-surface)">
-    <template #engine><MapEngine :arrived="arrived" :outlines="outlines" :ground="ground" /></template>
+    <template #engine><MapEngine :arrived="arrived" :outlines="outlines" /></template>
     <MapOverlay position="start">
       <MapPanel size="lg" title="Suivi" :loading="!data">
         <template #header>
@@ -277,7 +277,7 @@ export const Loading: Story = {
       }
       play()
       onBeforeUnmount(() => timers.forEach(clearTimeout))
-      return { tab, zoom, year, metric, metrics, years, data, basemap, arrived, status, play, empty: false, outlines: true, ground: 'tolbi', statusLabel: 'Images des parcelles', actionLabel: undefined }
+      return { tab, zoom, year, metric, metrics, years, data, basemap, arrived, status, play, empty: false, outlines: true, statusLabel: 'Images des parcelles', actionLabel: undefined }
     },
     template: `
       <div>
@@ -293,9 +293,9 @@ export const Loading: Story = {
 
 /**
  * Les quatre états, chacun **sur la carte et non à sa place** (ADR-0122) : la pastille de `MapStatus` au-dessus de la
- * frise, son glyphe et son encre choisis par l’état. Fond indisponible (ici une teinte tient lieu de satellite),
- * données partielles (les 12 parcelles sans image gardent leur contour), rien à montrer (un projet en calcul : les
- * valeurs en « — », pas de frise), échec (le fond reste, l’action est sur la pastille).
+ * frise, son glyphe et son encre choisis par l’état. Le chargement des couches (la pastille qui compte), données partielles (les 12 parcelles sans image gardent leur contour), rien à montrer (un projet en calcul : les
+ * valeurs en « — », pas de frise), échec (le fond reste, l’action est sur la pastille). Le repli au satellite n’est pas
+ * un état : il reste silencieux (ADR-0124).
  */
 export const LoadingStates: Story = {
   name: 'Chargement — les quatre états',
@@ -305,12 +305,12 @@ export const LoadingStates: Story = {
       const tab = ref('data'); const zoom = ref(11); const year = ref('2026'); const metric = ref('carbon')
       const metrics = [{ value: 'carbon', label: 'Carbone' }, { value: 'biomass', label: 'Biomasse' }, { value: 'cover', label: 'Couvert' }, { value: 'height', label: 'Hauteur' }]
       const years = ['2020', '2021', '2022', '2023', '2024', '2025', '2026'].map(y => ({ value: y, label: y }))
-      const which = ref<'fallback' | 'partial' | 'empty' | 'failed'>('fallback')
+      const which = ref<'loading' | 'partial' | 'empty' | 'failed'>('loading')
       const all = SOUBRE_PARCELS.map((_, i) => i)
       const missing = shuffled().slice(0, 12)
-      const arrived = computed(() => which.value === 'partial' ? all.filter(i => !missing.includes(i)) : which.value === 'fallback' ? all : [])
+      const arrived = computed(() => which.value === 'partial' ? all.filter(i => !missing.includes(i)) : which.value === 'loading' ? shuffled().slice(0, 33) : [])
       const COPY = {
-        fallback: { label: undefined, action: undefined },
+        loading: { label: 'Images des parcelles', action: undefined },
         partial: { label: '12 parcelles sur 89 sans image', action: 'Voir lesquelles' },
         empty: { label: 'Pas encore de mesure : le premier calcul est en cours', action: undefined },
         failed: { label: 'Les mesures n’ont pas pu être lues', action: 'Réessayer' },
@@ -323,14 +323,13 @@ export const LoadingStates: Story = {
         actionLabel: computed(() => COPY[which.value].action),
         empty: computed(() => which.value === 'empty' || which.value === 'failed'),
         outlines: computed(() => which.value !== 'failed'),
-        ground: computed(() => which.value === 'fallback' ? 'satellite' : 'tolbi'),
       }
     },
     template: `
       <div>
         <div style="margin:var(--ds-spacing-md) var(--ds-spacing-md) 0">
           <ButtonGroup v-model="which" size="sm" aria-label="État">
-            <ButtonGroupItem value="fallback" label="Fond indisponible" />
+            <ButtonGroupItem value="loading" label="Couches en cours" />
             <ButtonGroupItem value="partial" label="Données partielles" />
             <ButtonGroupItem value="empty" label="Rien à montrer" />
             <ButtonGroupItem value="failed" label="Échec" />

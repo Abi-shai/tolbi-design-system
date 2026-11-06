@@ -42,11 +42,11 @@ phases and four states each. **Track C chosen** by the owner.
 - **`MapStatus`** says what the map is missing, **on the map, never in its place**: a pill above the timeline
   (`MapOverlay position="bottom"`, after the timeline — the overlay stacks toward the centre), the map's surface
   chrome. One `state`; **the state picks the glyph and the ink** (ADR-0006), the product writes the words:
-  `loading` (a spinner and the count, « 33 sur 89 » — NN/g: count a series; no product of 30 does), `fallback` (the
-  TOLBI style failed and the map fell back to satellite — 1 product of 25 says so), `partial` (warning ink,
+  `loading` (a spinner and the count, « 33 sur 89 » — NN/g: count a series; no product of 30 does), `partial` (warning ink,
   `image-off`), `empty` (a project being computed), `failed` (error ink, with its action). `null` is nothing: the pill
   leaves as a surface and takes no room. A reader hears **the words once**, not every count; `failed` is said at once.
-  `image-off` joins the icons.
+  `image-off` joins the icons. **Amended by ADR-0124**: a fourth state, `fallback` (the satellite fallback said on
+  the map), shipped in 0.103 and was removed — the fallback is silent.
 - **Not done:** nothing under a second gets an indicator of its own (NN/g, Atlassian) — the instruments' placeholders
   are the signal until the count starts. No percentage: the wait is 2–11 s chained, the band for a looped indicator,
   and the count already says how much is left. The breadcrumb's project name while it is read stays the product's.
