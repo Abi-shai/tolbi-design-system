@@ -140,6 +140,15 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   background: var(--ds-bg-hover);
 }
 
+/* Pressed (ADR-0121): the press is seen before what it causes arrives — a map
+   that zooms over 300ms, a panel that opens. `Table`'s pressed veil, catalogue
+   wide (`text-strong` 12 %, stacks on any ground), and it comes in at `instant`
+   so a 80ms click shows it; the release fades back on the button's own pace. */
+.ds-icon-button:is(.ds-icon-button--ghost, .ds-icon-button--subtle):active:not(:disabled) {
+  background: color-mix(in srgb, var(--ds-text-strong) 12%, transparent);
+  transition-duration: var(--ds-motion-duration-instant);
+}
+
 /* ADR-0006: one focus treatment, and no component defines its own. */
 .ds-icon-button:focus-visible {
   outline: none;

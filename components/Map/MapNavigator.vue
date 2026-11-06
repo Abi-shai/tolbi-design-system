@@ -3,6 +3,7 @@ import { computed, nextTick, ref, useSlots } from 'vue'
 import { IconButton } from '../IconButton'
 import { SurfaceTransition } from '../SurfaceTransition'
 import { Tooltip, type TooltipPlacement } from '../Tooltip'
+import MapZoomGauge from './MapZoomGauge.vue'
 
 /**
  * The map's navigator (ADR-0100, Figma « Carte/Navigateur » `3552:3437`), at
@@ -24,8 +25,9 @@ import { Tooltip, type TooltipPlacement } from '../Tooltip'
  * button, and `v-model:collapsed` is ignored.
  *
  * The zoom is a model (`v-model:zoom`, between `zoomMin` and `zoomMax`):
- * the gauge shows it and moves it, − and + step it by `zoomStep` and stop at
- * the ends. « Recentrer » emits; the engine knows where the centre is.
+ * the gauge shows it — **any** value, the product passes the map's zoom as it
+ * moves — and moves it; − and + step it by `zoomStep` and stop at the ends, and
+ * the thumb travels with the map (`MapZoomGauge`, ADR-0121). « Recentrer » emits; the engine knows where the centre is.
  *
  * The two forms are two surfaces of two shapes, so the fold is a surface
  * leaving and another arriving at the same corner (`SurfaceTransition`, out
@@ -68,8 +70,8 @@ defineSlots<{
 
 const collapsed = defineModel<boolean>('collapsed', { default: false })
 /* No mini-map, nothing to fold: the slot's presence decides (ADR-0120). */
-const slots = useSlots()
-const hasMinimap = computed(() => !!slots.default)
+const slots = useSlots() as Record<string, unknown>
+const hasMinimap = computed<boolean>(() => !!slots.default)
 const zoom = defineModel<number>('zoom', { default: 10 })
 
 const clamp = (z: number) => Math.min(props.zoomMax, Math.max(props.zoomMin, z))
@@ -78,12 +80,16 @@ const atMax = computed(() => zoom.value >= props.zoomMax)
 /* − or + that reaches its end disables itself, and a disabled button drops the
    focus to the page (ADR-0059): it goes to the gauge open, to the other step
    folded. */
+const gauge = ref<InstanceType<typeof MapZoomGauge> | null>(null)
 function by(d: number) {
-  zoom.value = clamp(zoom.value + d * props.zoomStep)
+  /* With a gauge, the step is the gauge's: from where its thumb is going, and
+     the thumb travels with the map (ADR-0121). */
+  if (gauge.value) gauge.value.stepBy(d)
+  else zoom.value = clamp(zoom.value + d * props.zoomStep)
   nextTick(() => {
     const a = document.activeElement as HTMLButtonElement | null
     if (a && a !== document.body && !a.disabled) return
-    const to = host.value?.querySelector<HTMLElement>('.ds-map-navigator__gauge')
+    const to = host.value?.querySelector<HTMLElement>('.ds-map-zoom-gauge__input')
       ?? host.value?.querySelector<HTMLElement>(`[aria-label="${d > 0 ? props.zoomOutLabel : props.zoomInLabel}"]`)
     to?.focus()
   })
@@ -113,15 +119,7 @@ function focusArrived() {
         <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
           <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="atMin" @click="by(-1)" />
         </Tooltip>
-        <input
-          v-model.number="zoom"
-          class="ds-map-navigator__gauge"
-          type="range"
-          :min="zoomMin"
-          :max="zoomMax"
-          :step="zoomStep"
-          :aria-label="zoomLabel"
-        />
+        <MapZoomGauge ref="gauge" v-model="zoom" :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" />
         <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
           <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="atMax" @click="by(1)" />
         </Tooltip>
@@ -151,15 +149,7 @@ function focusArrived() {
           <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
             <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="atMin" @click="by(-1)" />
           </Tooltip>
-          <input
-            v-model.number="zoom"
-            class="ds-map-navigator__gauge"
-            type="range"
-            :min="zoomMin"
-            :max="zoomMax"
-            :step="zoomStep"
-            :aria-label="zoomLabel"
-          />
+          <MapZoomGauge ref="gauge" v-model="zoom" :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" />
           <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
             <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="atMax" @click="by(1)" />
           </Tooltip>
@@ -258,64 +248,5 @@ function focusArrived() {
   width: var(--ds-border-width-default);
   height: 20px;
   background: var(--ds-border-subtle);
-}
-
-/*
-  The gauge, as drawn: a 4px `border-subtle` channel and a 12px thumb — white,
-  ringed 2px in the text's ink — that says where the zoom is and moves it.
-  A native range, so the keyboard and a reader get it for free; the part of the
-  channel already travelled is not filled, as drawn.
-*/
-.ds-map-navigator__gauge {
-  flex: 1 1 auto;
-  min-width: 0;
-  height: 32px;
-  margin: 0;
-  background: transparent;
-  cursor: pointer;
-  appearance: none;
-  outline: none;
-}
-
-.ds-map-navigator__gauge::-webkit-slider-runnable-track {
-  height: 4px;
-  border-radius: var(--ds-radius-pill);
-  background: var(--ds-border-subtle);
-}
-
-.ds-map-navigator__gauge::-moz-range-track {
-  height: 4px;
-  border-radius: var(--ds-radius-pill);
-  background: var(--ds-border-subtle);
-}
-
-.ds-map-navigator__gauge::-webkit-slider-thumb {
-  width: 12px;
-  height: 12px;
-  margin-top: -4px;
-  box-sizing: border-box;
-  border: var(--ds-border-width-strong) solid var(--ds-text-default);
-  border-radius: var(--ds-radius-pill);
-  background: var(--ds-bg-default);
-  appearance: none;
-  transition: box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
-}
-
-.ds-map-navigator__gauge::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  box-sizing: border-box;
-  border: var(--ds-border-width-strong) solid var(--ds-text-default);
-  border-radius: var(--ds-radius-pill);
-  background: var(--ds-bg-default);
-  transition: box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
-}
-
-.ds-map-navigator__gauge:focus-visible::-webkit-slider-thumb {
-  box-shadow: var(--ds-focus-ring-gray);
-}
-
-.ds-map-navigator__gauge:focus-visible::-moz-range-thumb {
-  box-shadow: var(--ds-focus-ring-gray);
 }
 </style>

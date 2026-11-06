@@ -1288,6 +1288,12 @@ Before working on any component, read:
 - **ADR-0120**: **a navigator without a mini-map** — `MapNavigator` with no `#default` (the presence decides, ADR-0053;
   no `minimap` prop) has nothing to fold: the bar alone, − **the gauge** + « Recentrer », in the folded form's chrome
   (42px, `radius-surface-sm`), no rule, no mini-map button, `v-model:collapsed` ignored; names and tooltips unchanged.
+- **ADR-0121**: **a gauge that follows a moving map** — `MapNavigator`'s gauge shows **any** value (`step="any"`;
+  `zoomStep` is − / + and the keys'). A value arriving frame by frame is **followed** (no transition, or it lags a
+  duration); a step **glides** over `duration-process` + `easing-in-out`, **pinned to its target** so the map's values
+  on the way cannot pull it back; dragging pins it under the finger; nothing under reduced motion. The thumb is
+  **drawn** (internal `MapZoomGauge`), the native one transparent. `IconButton` ghost/subtle gain a **pressed veil**
+  (`text-strong` 12 %, at `instant`).
 
 ## Architecture
 
