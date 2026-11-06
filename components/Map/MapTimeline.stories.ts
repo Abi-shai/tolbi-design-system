@@ -134,6 +134,32 @@ export const OneToThree: Story = {
   }),
 }
 
+/**
+ * **Échelles indisponibles** (ADR-0119) — un projet mesuré à l’année seulement. La puce « Année ⌄ » garde son menu :
+ * c’est ce qui dit qu’il existe d’autres échelles. « Mois » et « Jour » y sont **grisés, avec leur raison** sous le
+ * nom ; au clavier ils restent atteignables, s’annoncent indisponibles avec leur raison, et ne font rien.
+ * Le mot seul, sans menu (ADR-0114), reste le cas où le produit ne passe qu’une échelle.
+ */
+export const UnavailableScales: Story = {
+  name: 'Échelles indisponibles',
+  parameters: { docs: { story: { height: '360px' } } },
+  render: () => ({
+    components: { MapTimeline },
+    setup: () => ({
+      value: ref('2024'), scale: ref('year'),
+      SCALES: [
+        { value: 'year', label: 'Année' },
+        { value: 'month', label: 'Mois', disabled: true, disabledReason: 'Pas de mesure mensuelle pour ce projet' },
+        { value: 'day', label: 'Jour', disabled: true, disabledReason: 'Pas de mesure journalière pour ce projet' },
+      ],
+      YEARS: ['2022', '2023', '2024'].map((y) => ({ value: y, label: y, data: true })),
+    }),
+    template: `<div style="background:var(--ds-bg-neutral);padding:32px 32px 220px;border-radius:12px">
+      <MapTimeline v-model="value" v-model:scale="scale" :scales="SCALES" :periods="YEARS" label="Année" compare />
+    </div>`,
+  }),
+}
+
 export const Months: Story = {
   name: 'Mois — mesures et mois à venir',
   render: () => ({
