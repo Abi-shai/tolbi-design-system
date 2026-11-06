@@ -161,6 +161,14 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   color: var(--ds-text-default);
 }
 
+/* Off, it must look off (ADR-0118): `text-disabled` is gray 500 and `subtle`'s
+   rest is gray 600 — 4.97 against 7.69:1, two greys nobody tells apart, so a
+   timeline's spent ‹ › still read as live. Half of it, then: a disabled
+   control owes no contrast, it owes being seen as unavailable. */
+.ds-icon-button--subtle:disabled {
+  color: color-mix(in srgb, var(--ds-text-disabled) 50%, transparent);
+}
+
 /*
   ── Danger: neutral at rest, red on approach (ADR-0112) ────────────────
   Track A of `3785:1465`, after a 13-system benchmark: the red **veil**, not a

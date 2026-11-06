@@ -1276,6 +1276,10 @@ Before working on any component, read:
   corner, 16px in** (the owner's frame `3691:9170`), on the grid of the map's other controls — no longer at the fold's
   measured place (~34px, ADR-0103's « one press in one place »). The 18px are accepted; the panel leaves toward its edge,
   the control arrives in its corner; the focus follows.
+- **ADR-0118**: **a timeline with one to three periods** — the gap between periods is **capped at `spacing-3xl`**
+  (measured room, clamped), past which the row stays grouped and centred in the 480px bar; **‹ › leave the bar** when
+  only one period can be chosen; **« Comparer » is off** under two, its reason in a tooltip (`compareUnavailableLabel`);
+  a disabled `subtle` `IconButton` is **half `text-disabled`** (gray 500 beside its gray 600 rest read as live).
 
 ## Architecture
 

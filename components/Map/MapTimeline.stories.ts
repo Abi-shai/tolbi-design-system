@@ -102,6 +102,37 @@ export const Lengths: Story = {
   }),
 }
 
+/**
+ * **Une à trois années** (ADR-0118) — un projet mesuré une seule année, la frise allant jusqu’à l’année en cours.
+ * Les périodes restent **groupées et centrées** : jamais plus de 24px entre deux. Avec **une seule période
+ * choisissable**, ‹ › quittent la barre (ils promettraient une navigation qui n’existe pas) et « Comparer » est
+ * éteint, en disant pourquoi au survol. Les années à venir sont `disabled`.
+ */
+export const OneToThree: Story = {
+  name: 'Une à trois années',
+  render: () => ({
+    components: { MapTimeline },
+    setup: () => ({
+      a: ref('2024'), b: ref('2024'), c: ref('2025'), d: ref('2024'),
+      SCALE: [{ value: 'year', label: 'Année' }],
+      ONE: [{ value: '2024', label: '2024', data: true }],
+      ONE_AHEAD: [
+        { value: '2024', label: '2024', data: true },
+        { value: '2025', label: '2025', disabled: true },
+        { value: '2026', label: '2026', disabled: true },
+      ],
+      TWO: [{ value: '2024', label: '2024', data: true }, { value: '2025', label: '2025', data: true }],
+      THREE: ['2022', '2023', '2024'].map((y) => ({ value: y, label: y, data: true })),
+    }),
+    template: ground(`<div style="display:flex; flex-direction:column; align-items:center; gap:24px;">
+      <MapTimeline v-model="a" :scales="SCALE" :periods="ONE" label="Année" compare compare-unavailable-label="Une seule année mesurée" />
+      <MapTimeline v-model="b" :scales="SCALE" :periods="ONE_AHEAD" label="Année" compare compare-unavailable-label="Une seule année mesurée" />
+      <MapTimeline v-model="c" :scales="SCALE" :periods="TWO" label="Année" compare />
+      <MapTimeline v-model="d" :scales="SCALE" :periods="THREE" label="Année" compare />
+    </div>`),
+  }),
+}
+
 export const Months: Story = {
   name: 'Mois — mesures et mois à venir',
   render: () => ({

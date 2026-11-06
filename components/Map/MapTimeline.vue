@@ -62,6 +62,8 @@ interface Props {
   /** Offers « Comparer » at the end of the bar. */
   compare?: boolean
   compareLabel?: string
+  /** Why « Comparer » is off: fewer than two periods can be chosen (ADR-0118). */
+  compareUnavailableLabel?: string
   /** Said at the end while the second period is awaited. */
   compareHint?: string
   exitCompareLabel?: string
@@ -79,6 +81,7 @@ const props = withDefaults(defineProps<Props>(), {
   nextLabel: 'Période suivante',
   compare: false,
   compareLabel: 'Comparer',
+  compareUnavailableLabel: 'Une seule période disponible',
   compareHint: 'Choisir une date',
   exitCompareLabel: 'Quitter la comparaison',
   comparedLabel: 'comparée',
@@ -108,6 +111,32 @@ function setItem(el: unknown, i: number) {
   if (el instanceof HTMLElement) itemRefs.value[i] = el
 }
 
+/*
+  How many periods can be chosen (ADR-0118). With one, there is nowhere to
+  step to and nothing to compare: ‹ › leave the bar — they would promise a
+  navigation that does not exist — and « Comparer » is off, saying why.
+*/
+const choosable = computed(() => props.periods.filter((p) => !p.disabled).length)
+const canStep = computed(() => choosable.value > 1)
+const canCompare = computed(() => choosable.value > 1)
+
+/*
+  The gap between periods, capped (ADR-0118). Periods that fit share the strip
+  — but three years spread over 480px stood 150px apart and no longer read as
+  one row. So the room left is shared out up to `spacing-3xl` between periods
+  (the CSS clamps it), and past that the row stays grouped and centred.
+*/
+const free = ref(0)
+function fitGap() {
+  const vp = viewport.value
+  const items = itemRefs.value.filter(Boolean)
+  if (!vp || items.length < 2) return
+  /* Sub-pixel widths, and a pixel kept in hand: rounded widths left the strip
+     one pixel over, and a fade on a row that fits. */
+  const used = items.reduce((sum, el) => sum + el.getBoundingClientRect().width, 0)
+  free.value = Math.max(0, (vp.clientWidth - used - 1) / (items.length - 1))
+}
+
 /* Which edges hide periods — each gets a fade, so a cut period reads as « more
    this way » rather than as a broken one (ADR-0116). */
 const moreBefore = ref(false)
@@ -135,6 +164,7 @@ function reveal(smooth: boolean) {
 /* It opens on the latest periods — the ones read — then on the choice. */
 function settle() {
   const vp = viewport.value
+  fitGap()
   if (vp) vp.scrollLeft = vp.scrollWidth
   measure()
   reveal(false)
@@ -142,7 +172,7 @@ function settle() {
   /* Read again once laid out and once the face has loaded: a first read in a
      fallback face left a fade on a strip that did not overflow. */
   requestAnimationFrame(edges)
-  document.fonts?.ready.then(() => { reveal(false); requestAnimationFrame(edges) })
+  document.fonts?.ready.then(() => { fitGap(); reveal(false); requestAnimationFrame(edges) })
 }
 /* Revealed again whenever the strip changes width — the type loading (a
    fallback face is narrower, and a choice revealed in it ends up cut at the
@@ -150,7 +180,7 @@ function settle() {
 let ro: ResizeObserver | null = null
 onMounted(() => {
   settle()
-  ro = new ResizeObserver(() => { reveal(false); edges(); requestAnimationFrame(edges) })
+  ro = new ResizeObserver(() => { fitGap(); reveal(false); edges(); requestAnimationFrame(edges) })
   if (track.value) ro.observe(track.value)
   if (viewport.value) ro.observe(viewport.value)
 })
@@ -310,7 +340,7 @@ function exitCompare() {
       <Divider class="ds-map-timeline__rule" orientation="vertical" />
     </template>
 
-    <Tooltip :title="previousLabel" placement="top" class="ds-map-timeline__step">
+    <Tooltip v-if="canStep" :title="previousLabel" placement="top" class="ds-map-timeline__step">
       <IconButton
         icon="chevron-left"
         size="xs"
@@ -329,7 +359,7 @@ function exitCompare() {
     >
       <!-- The pill counts in the strip's scroll width while it slides: the edges
            are read again when it lands (a stale read faded a strip that fit). -->
-      <div ref="track" class="ds-map-timeline__track" role="radiogroup" :aria-label="label" @keydown="onKeydown" @transitionend="edges">
+      <div ref="track" class="ds-map-timeline__track" :style="{ '--tick-free': `${free}px` }" role="radiogroup" :aria-label="label" @keydown="onKeydown" @transitionend="edges">
         <span
           v-if="index !== -1"
           class="ds-map-timeline__pill"
@@ -369,7 +399,7 @@ function exitCompare() {
       </div>
     </div>
 
-    <Tooltip :title="nextLabel" placement="top" class="ds-map-timeline__step">
+    <Tooltip v-if="canStep" :title="nextLabel" placement="top" class="ds-map-timeline__step">
       <IconButton
         icon="chevron-right"
         size="xs"
@@ -383,13 +413,24 @@ function exitCompare() {
     <template v-if="compare">
       <Divider class="ds-map-timeline__rule" orientation="vertical" />
       <Button
-        v-if="!comparing"
+        v-if="!comparing && canCompare"
         class="ds-map-timeline__action"
         variant="link"
         size="sm"
         :label="compareLabel"
         @click="startCompare"
       />
+      <!-- Off, and saying why — the reason in a tooltip, which a disabled
+           control still shows (ADR-0082). -->
+      <Tooltip v-else-if="!comparing" :title="compareUnavailableLabel" placement="top" class="ds-map-timeline__compare-off">
+        <Button
+          class="ds-map-timeline__action"
+          variant="link"
+          size="sm"
+          :label="compareLabel"
+          disabled
+        />
+      </Tooltip>
       <template v-else>
         <span class="ds-map-timeline__range" :class="{ 'ds-map-timeline__range--hint': !range }" aria-hidden="true">
           {{ range ?? compareHint }}
@@ -471,7 +512,8 @@ function exitCompare() {
   gives back the disc's own 8px of air, so the glyph keeps its place.
 */
 .ds-map-timeline__step,
-.ds-map-timeline__exit {
+.ds-map-timeline__exit,
+.ds-map-timeline__compare-off {
   flex: none;
 }
 
@@ -533,15 +575,16 @@ function exitCompare() {
 .ds-map-timeline__viewport--before { --fade-before: var(--ds-spacing-3xl); }
 .ds-map-timeline__viewport--after  { --fade-after: var(--ds-spacing-3xl); }
 
-/* While the periods fit, they **share the strip** — spread end to end, so a
-   few years leave no void at a declared width (ADR-0116); once they do not,
-   they keep their own width and the strip scrolls. */
+/* While the periods fit, they **share the strip** (ADR-0116) — up to
+   `spacing-3xl` between two, then grouped and centred (ADR-0118); once they do
+   not fit, they keep `spacing-xxs` and the strip scrolls. `--tick-free` is the
+   room left per gap, measured; the clamp is the rule. */
 .ds-map-timeline__track {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-spacing-xxs);
+  justify-content: center;
+  gap: clamp(var(--ds-spacing-xxs), var(--tick-free, 0px), var(--ds-spacing-3xl));
   box-sizing: border-box;
   width: max-content;
   min-width: 100%;
