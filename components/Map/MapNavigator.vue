@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, useSlots } from 'vue'
 import { IconButton } from '../IconButton'
 import { SurfaceTransition } from '../SurfaceTransition'
 import { Tooltip, type TooltipPlacement } from '../Tooltip'
@@ -17,6 +17,11 @@ import { Tooltip, type TooltipPlacement } from '../Tooltip'
  * mini-map's button closes the bar, at its top right, where the fold sits on
  * the open mini-map — so folding and unfolding again is the same press in the
  * same place, the pointer never moves. The drawing put it first in the bar.
+ *
+ * **Without a mini-map** (no `#default`, ADR-0120 — the presence decides,
+ * ADR-0053) there is nothing to fold: the navigator is the bar alone, − the
+ * gauge + « Recentrer », in the folded form's chrome — no rule, no mini-map
+ * button, and `v-model:collapsed` is ignored.
  *
  * The zoom is a model (`v-model:zoom`, between `zoomMin` and `zoomMax`):
  * the gauge shows it and moves it, − and + step it by `zoomStep` and stop at
@@ -62,6 +67,9 @@ defineSlots<{
 }>()
 
 const collapsed = defineModel<boolean>('collapsed', { default: false })
+/* No mini-map, nothing to fold: the slot's presence decides (ADR-0120). */
+const slots = useSlots()
+const hasMinimap = computed(() => !!slots.default)
 const zoom = defineModel<number>('zoom', { default: 10 })
 
 const clamp = (z: number) => Math.min(props.zoomMax, Math.max(props.zoomMin, z))
@@ -99,7 +107,31 @@ function focusArrived() {
 
 <template>
   <div ref="host" class="ds-map-navigator-host">
-    <SurfaceTransition mode="out-in" @enter="focusArrived">
+    <!-- ── Without a mini-map: the bar alone ─────────────────────────── -->
+    <div v-if="!hasMinimap" class="ds-map-navigator ds-map-navigator--folded">
+      <div class="ds-map-navigator__zoom">
+        <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
+          <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="atMin" @click="by(-1)" />
+        </Tooltip>
+        <input
+          v-model.number="zoom"
+          class="ds-map-navigator__gauge"
+          type="range"
+          :min="zoomMin"
+          :max="zoomMax"
+          :step="zoomStep"
+          :aria-label="zoomLabel"
+        />
+        <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
+          <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="atMax" @click="by(1)" />
+        </Tooltip>
+        <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
+          <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" />
+        </Tooltip>
+      </div>
+    </div>
+
+    <SurfaceTransition v-else mode="out-in" @enter="focusArrived">
       <!-- ── Open ──────────────────────────────────────────────────── -->
       <div v-if="!collapsed" key="open" class="ds-map-navigator">
         <div class="ds-map-navigator__minimap">

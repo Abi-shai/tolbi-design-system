@@ -1285,6 +1285,9 @@ Before working on any component, read:
   and menu even with one choosable scale (that is what says others exist); unavailable ones are **greyed, nothing
   written** (a reason under the name was drawn and reverted — « pas besoin d'écrire »). A **disabled `DropdownItem`
   stays reachable** (`aria-disabled`, in the tab order — the APG menu rule; it was `tabindex=-1`).
+- **ADR-0120**: **a navigator without a mini-map** — `MapNavigator` with no `#default` (the presence decides, ADR-0053;
+  no `minimap` prop) has nothing to fold: the bar alone, − **the gauge** + « Recentrer », in the folded form's chrome
+  (42px, `radius-surface-sm`), no rule, no mini-map button, `v-model:collapsed` ignored; names and tooltips unchanged.
 
 ## Architecture
 

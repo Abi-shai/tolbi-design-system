@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { ref } from 'vue'
 import MapNavigator from './MapNavigator.vue'
+import MapOverlay from './MapOverlay.vue'
 
 const meta: Meta<typeof MapNavigator> = {
   title: 'Données/Map/Navigator',
@@ -17,7 +18,9 @@ const meta: Meta<typeof MapNavigator> = {
           'Le zoom est un modèle (`v-model:zoom`, entre `zoomMin` et `zoomMax`) : la jauge le montre et le déplace, ' +
           '− et + le font avancer d’un `zoomStep` et s’arrêtent aux bouts. Le pli est une surface qui part et une autre ' +
           'qui arrive au même coin (`SurfaceTransition`) ; le focus va au bouton qui a remplacé celui pressé. ' +
-          'La mini-carte est celle du moteur (`#default`) : le système dessine son cadre.',
+          'La mini-carte est celle du moteur (`#default`) : le système dessine son cadre.\n\n' +
+          '**Sans mini-carte** (aucun `#default`, ADR-0120 — la présence décide) : la barre seule, − la jauge + et ' +
+          '« Recentrer », dans l’habit de la forme repliée ; ni filet, ni bouton de mini-carte, `v-model:collapsed` ignoré.',
       },
     },
   },
@@ -66,6 +69,30 @@ export const AtLimit: Story = {
     template: `
       <div style="background:var(--ds-bg-neutral);width:320px;box-sizing:border-box;padding:24px;border-radius:12px;min-height:220px;display:flex;justify-content:flex-end">
         <MapNavigator :zoom="20">${minimap}</MapNavigator>
+      </div>
+    `,
+  }),
+}
+
+export const WithoutMinimap: Story = {
+  name: 'Sans mini-carte',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Aucun `#default` : rien à replier. La barre garde la hauteur et le rayon de la forme repliée, ' +
+          'à 16px du coin de la carte (`MapOverlay`, ADR-0117) ; les noms et les infobulles ne changent pas.',
+      },
+    },
+  },
+  render: () => ({
+    components: { MapNavigator, MapOverlay },
+    setup: () => ({ zoom: ref(8) }),
+    template: `
+      <div style="position:relative;width:480px;height:240px;background:var(--ds-bg-neutral);border-radius:12px;overflow:hidden">
+        <MapOverlay position="top-end">
+          <MapNavigator v-model:zoom="zoom" @recenter="zoom = 8" />
+        </MapOverlay>
       </div>
     `,
   }),
