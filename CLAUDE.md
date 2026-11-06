@@ -1294,6 +1294,14 @@ Before working on any component, read:
   on the way cannot pull it back; dragging pins it under the finger; nothing under reduced motion. The thumb is
   **drawn** (internal `MapZoomGauge`), the native one transparent. `IconButton` ghost/subtle gain a **pressed veil**
   (`text-strong` 12 %, at `instant`).
+- **ADR-0122**: **a map that fills in instead of replacing itself** (track C of `3800:1447`, 32 products measured) —
+  the final form from the click, each instrument drawing its own wait: `MapPanel loading`, `MapLegend loading` (ramp
+  drawn, bounds placeholders; no `ticks` = « — »), `MapTimeline loading`, `MapNavigator disabled` (only before the map
+  exists). **`MapCanvas`**: the map's place, a `--ds-map-land` ground, the engine hidden until its basemap is complete
+  then **faded in whole** (`ambient`), shown anyway **2 s after `loading`**. Parcels are **dashed outlines until their
+  data** (`--ds-map-pending`, `mapPending` in `./tokens/js`) — they arrive with the basemap, not before it (one canvas).
+  **`MapStatus`**: a pill above the timeline, the state picks glyph and ink (`loading` counts « 33 sur 89 »,
+  `fallback`, `partial`, `empty`, `failed`), on the map, never in its place; words announced once.
 
 ## Architecture
 

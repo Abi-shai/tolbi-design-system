@@ -46,6 +46,13 @@ interface Props {
   collapseLabel?: string
   /** The tooltips' side: away from the edge the navigator stands on. */
   tooltipPlacement?: TooltipPlacement
+  /**
+   * The map does not exist yet (ADR-0122): every control is there and off, so
+   * the corner keeps its shape and nothing moves when the map arrives. Only
+   * until then — once there is a map, its zoom is always offered (0 of 30
+   * products disable it).
+   */
+  disabled?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -59,6 +66,7 @@ const props = withDefaults(defineProps<Props>(), {
   expandLabel: 'Afficher la mini-carte',
   collapseLabel: 'Masquer la mini-carte',
   tooltipPlacement: 'left',
+  disabled: false,
 })
 
 const emit = defineEmits<{ recenter: [] }>()
@@ -117,14 +125,14 @@ function focusArrived() {
     <div v-if="!hasMinimap" class="ds-map-navigator ds-map-navigator--folded">
       <div class="ds-map-navigator__zoom">
         <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
-          <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="atMin" @click="by(-1)" />
+          <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
         </Tooltip>
-        <MapZoomGauge ref="gauge" v-model="zoom" :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" />
+        <MapZoomGauge ref="gauge" v-model="zoom" :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" :disabled="disabled" />
         <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
-          <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="atMax" @click="by(1)" />
+          <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
         </Tooltip>
         <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
-          <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" />
+          <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" :disabled="disabled" />
         </Tooltip>
       </div>
     </div>
@@ -141,20 +149,21 @@ function focusArrived() {
               variant="surface"
               :ariaLabel="collapseLabel"
               aria-expanded="true"
+              :disabled="disabled"
               @click="fold(true)"
             />
           </Tooltip>
         </div>
         <div class="ds-map-navigator__zoom">
           <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
-            <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="atMin" @click="by(-1)" />
+            <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
           </Tooltip>
-          <MapZoomGauge ref="gauge" v-model="zoom" :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" />
+          <MapZoomGauge ref="gauge" v-model="zoom" :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" :disabled="disabled" />
           <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
-            <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="atMax" @click="by(1)" />
+            <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
           </Tooltip>
           <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
-            <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" />
+            <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" :disabled="disabled" />
           </Tooltip>
         </div>
       </div>
@@ -162,19 +171,19 @@ function focusArrived() {
       <!-- ── Folded: a bar ─────────────────────────────────────────── -->
       <div v-else key="folded" class="ds-map-navigator ds-map-navigator--folded">
         <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
-          <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="atMin" @click="by(-1)" />
+          <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
         </Tooltip>
         <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
-          <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="atMax" @click="by(1)" />
+          <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
         </Tooltip>
         <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
-          <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" />
+          <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" :disabled="disabled" />
         </Tooltip>
         <!-- Last, so it lands in the corner the fold leaves: the pointer that
              folded the mini-map is already on the button that opens it. -->
         <span class="ds-map-navigator__rule" aria-hidden="true" />
         <Tooltip :title="expandLabel" :placement="tooltipPlacement" data-map-navigator-open>
-          <IconButton icon="map" size="xs" variant="subtle" :ariaLabel="expandLabel" aria-expanded="false" @click="fold(false)" />
+          <IconButton icon="map" size="xs" variant="subtle" :ariaLabel="expandLabel" aria-expanded="false" :disabled="disabled" @click="fold(false)" />
         </Tooltip>
       </div>
     </SurfaceTransition>

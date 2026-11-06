@@ -98,7 +98,7 @@ await Promise.all([
   buildTokenFile(
     ['tokens/src/color/primitives.json', 'tokens/src/color/chart.json'],
     'chart.css',
-    { filter: (token) => token.path[0] === 'chart', outputReferences: true },
+    { filter: (token) => token.path[0] === 'chart' || token.path[0] === 'map', outputReferences: true },
   ),
   buildTokenFile('tokens/src/effect/focus-rings.json',  'focus-rings.css'),
 
@@ -264,6 +264,15 @@ export const chartSequential = ${JSON.stringify(sequential)}
 
 /** The colour of a threshold or reference line, drawn dashed. */
 export const chartThreshold = ${JSON.stringify(flat.DsChartThreshold)}
+
+/**
+ * A map waiting for its data (ADR-0122). \`land\` is the ground before the
+ * basemap — the TOLBI style's own land, what \`MapCanvas\` paints. \`pending\` is
+ * a parcel drawn before its data: a dashed outline, for the engine's paint
+ * (\`line-color\`, \`line-width\` in px, \`line-dasharray\` in line widths).
+ */
+export const mapLand = ${JSON.stringify(flat.DsMapLand)}
+export const mapPending = ${JSON.stringify({ color: flat.DsMapPending, width: 1.5, dasharray: [2, 1.5] })}
 `)
   appendFileSync('tokens/dist/index.d.ts', `
 /**
@@ -276,6 +285,10 @@ export const chartCategoricalCeiling: 5
 export const chartSequential: readonly string[]
 /** A threshold or reference line, drawn dashed. */
 export const chartThreshold: string
+/** The ground a map shows before its basemap (ADR-0122). */
+export const mapLand: string
+/** A parcel drawn before its data: a dashed outline, for the engine's paint (ADR-0122). */
+export const mapPending: { readonly color: string; readonly width: number; readonly dasharray: readonly number[] }
 `)
 }
 

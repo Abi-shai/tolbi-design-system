@@ -99,3 +99,21 @@ export const OnTheAxis: Story = {
     </div>`,
   }),
 }
+
+/**
+ * **En attente** (ADR-0122) : la rampe est déjà là — ses couleurs sont celles de l’indicateur, connues avant toute
+ * donnée — l’unité et les bornes sont des repères qui gardent leur ligne. **Sans mesure** : les bornes sont « — »
+ * (ADR-0105), l’unité tombe.
+ */
+export const Loading: Story = {
+  name: 'En attente, puis sans mesure',
+  render: () => ({
+    components: { MapLegend },
+    setup: () => ({ METRICS }),
+    template: ground(`
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <MapLegend :metrics="METRICS" title="Carbone" unit="CO2e/ha" :ticks="[]" loading />
+        <MapLegend :metrics="METRICS" title="Carbone" unit="CO2e/ha" :ticks="[]" />
+      </div>`),
+  }),
+}

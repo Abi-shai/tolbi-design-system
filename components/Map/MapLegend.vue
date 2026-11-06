@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import { ChartLegend, type ChartLegendItem } from '../ChartLegend'
+import { Skeleton } from '../Skeleton'
 import { TabPanel, Tabs, type TabsItem } from '../Tabs'
 
 /**
@@ -42,6 +43,15 @@ interface Props {
   metricsLabel?: string
   /** What a reader hears for the gradient. Defaults to « title, de first à last unit ». */
   summary?: string
+  /**
+   * The bounds are on their way (ADR-0122): the ramp is drawn — its colours are
+   * the indicator's, known before any data — and the unit and the bounds are
+   * placeholders. With no `ticks` and not loading, the bounds are « — »
+   * (ADR-0105): nothing measured yet.
+   */
+  loading?: boolean
+  /** Said with the title while there are no bounds. */
+  emptyLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -51,6 +61,8 @@ const props = withDefaults(defineProps<Props>(), {
   metrics: () => [],
   metricsLabel: 'Indicateur affiché',
   summary: undefined,
+  loading: false,
+  emptyLabel: 'pas encore de mesure',
 })
 
 const metric = defineModel<string>('metric')
@@ -63,7 +75,10 @@ const current = computed(() => metric.value ?? props.metrics[0]?.value ?? '')
 const tabsId = `ds-map-legend-${useId()}`
 
 const gradient = computed(() => `linear-gradient(to right, ${props.colors.join(', ')})`)
+const empty = computed(() => !props.loading && props.ticks.length === 0)
 const said = computed(() => {
+  if (props.loading) return props.title
+  if (empty.value) return `${props.title}, ${props.emptyLabel}`
   if (props.summary) return props.summary
   const range = `de ${props.ticks[0]} à ${props.ticks[props.ticks.length - 1]}`
   return `${props.title}, ${range}${props.unit ? ` ${props.unit}` : ''}`
@@ -71,7 +86,7 @@ const said = computed(() => {
 </script>
 
 <template>
-  <div class="ds-map-legend">
+  <div class="ds-map-legend" :aria-busy="loading || undefined">
     <Tabs
       v-if="metrics.length > 1"
       :id="tabsId"
@@ -90,11 +105,14 @@ const said = computed(() => {
       <div class="ds-map-legend__scale-row">
         <span class="ds-map-legend__title">{{ title }}</span>
         <div class="ds-map-legend__scale">
-          <span v-if="unit" class="ds-map-legend__unit" aria-hidden="true">{{ unit }}</span>
+          <span v-if="loading" class="ds-map-legend__unit" aria-hidden="true"><Skeleton width="3.5em" height="0.5rem" /></span>
+          <span v-else-if="unit && !empty" class="ds-map-legend__unit" aria-hidden="true">{{ unit }}</span>
           <div class="ds-map-legend__bar" role="img" :aria-label="said" :style="{ backgroundImage: gradient }" />
           <!-- Said by the bar's name; on screen, a bound sits under its place. -->
           <div class="ds-map-legend__ticks" aria-hidden="true">
-            <span v-for="t in ticks" :key="t">{{ t }}</span>
+            <template v-if="loading"><Skeleton v-for="i in 3" :key="i" width="2em" height="0.5rem" /></template>
+            <template v-else-if="empty"><span class="ds-map-legend__none">—</span><span class="ds-map-legend__none">—</span></template>
+            <span v-for="t in ticks" v-else :key="t">{{ t }}</span>
           </div>
         </div>
       </div>
@@ -171,7 +189,23 @@ const said = computed(() => {
 .ds-map-legend__ticks {
   display: flex;
   align-self: stretch;
+  align-items: center;
   justify-content: space-between;
+  /* One line box whatever it holds, so the legend keeps its height when the
+     placeholders become values. */
+  min-height: 1lh;
+}
+
+/* A placeholder sits in the line box the unit will take. */
+.ds-map-legend__unit {
+  display: flex;
+  align-items: center;
+  min-height: 1lh;
+}
+
+/* What is not there yet is « — », in the receding ink (ADR-0105). */
+.ds-map-legend__none {
+  color: var(--ds-text-subtlest);
 }
 
 .ds-map-legend__symbols {

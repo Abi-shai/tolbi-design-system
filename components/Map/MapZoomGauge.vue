@@ -35,6 +35,7 @@ const props = defineProps<{
   max: number
   step: number
   label: string
+  disabled?: boolean
 }>()
 
 const value = defineModel<number>({ required: true })
@@ -151,7 +152,7 @@ onBeforeUnmount(() => {
   <span
     ref="root"
     class="ds-map-zoom-gauge"
-    :class="{ 'ds-map-zoom-gauge--gliding': gliding }"
+    :class="{ 'ds-map-zoom-gauge--gliding': gliding, 'ds-map-zoom-gauge--disabled': disabled }"
     :style="{ '--at': at }"
   >
     <input
@@ -162,6 +163,7 @@ onBeforeUnmount(() => {
       step="any"
       :value="shown"
       :aria-label="label"
+      :disabled="disabled"
       :aria-valuetext="String(Math.round(shown * 10) / 10)"
       @input="onInput"
       @keydown="onKey"
@@ -258,6 +260,15 @@ onBeforeUnmount(() => {
   border-radius: var(--ds-radius-pill);
   background: var(--ds-bg-default);
   transition: box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
+}
+
+.ds-map-zoom-gauge--disabled .ds-map-zoom-gauge__input {
+  cursor: not-allowed;
+}
+
+/* Off, it looks off: the ring takes the disabled buttons' half ink (ADR-0118). */
+.ds-map-zoom-gauge--disabled .ds-map-zoom-gauge__thumb {
+  border-color: color-mix(in srgb, var(--ds-text-disabled) 50%, transparent);
 }
 
 .ds-map-zoom-gauge__input:focus-visible + .ds-map-zoom-gauge__span .ds-map-zoom-gauge__thumb {

@@ -69,5 +69,17 @@
       "$type": "color",
       "$description": "a threshold or reference line drawn dashed across a plot (ADR-0096) — 4.8:1 on white, readable on the dark ground too"
     }
+  },
+  "map": {
+    "land": {
+      "$value": "{color.map.land}",
+      "$type": "color",
+      "$description": "decorative — the ground that holds a map's place until its basemap arrives (ADR-0122): the TOLBI style's own land, so the basemap fades in over its own colour"
+    },
+    "pending": {
+      "$value": "{color.gray-light.500}",
+      "$type": "color",
+      "$description": "decorative — the dashed outline of a parcel whose data has not arrived yet (ADR-0122), for the engine's paint (mapPending in ./tokens/js); 4.16:1 on map-land, past the 3:1 a non-text mark needs"
+    }
   }
 }

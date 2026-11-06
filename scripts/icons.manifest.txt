@@ -101,6 +101,7 @@ history
 house
 id-card
 image
+image-off
 inbox
 info
 key

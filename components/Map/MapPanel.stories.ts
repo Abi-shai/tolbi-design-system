@@ -141,3 +141,30 @@ export const ReadingPanel: Story = {
     `,
   }),
 }
+
+/**
+ * **En attente** (ADR-0122) : le panneau est à sa place et à sa taille, sa tête et son pied restent ; son corps est
+ * `#loading` — par défaut un chiffre, des lignes et un bloc, la forme d’un panneau de lecture. Sans `title` ni
+ * `#header`, la ligne de titre est elle aussi un repère.
+ */
+export const Loading: Story = {
+  name: 'En attente',
+  parameters: { layout: 'fullscreen' },
+  render: () => ({
+    components: { MapPanel, MapOverlay, Tabs, Button },
+    setup: () => ({ tab: ref('data'), tabs: [{ value: 'data', label: 'Données' }, { value: 'plots', label: 'Parcelles' }] }),
+    template: `
+      <div style="position:relative;height:100vh;min-height:640px;background:var(--ds-bg-neutral);overflow:hidden">
+        <MapOverlay position="start">
+          <MapPanel size="lg" title="Suivi" loading>
+            <template #header><Tabs v-model="tab" :tabs="tabs" size="sm" /></template>
+            <template #footer><Button label="Voir toutes les données" variant="secondary-gray" size="sm" /></template>
+          </MapPanel>
+        </MapOverlay>
+        <MapOverlay position="top-end">
+          <MapPanel loading>…</MapPanel>
+        </MapOverlay>
+      </div>
+    `,
+  }),
+}

@@ -157,3 +157,20 @@ export const FollowsTheMap: Story = {
     `,
   }),
 }
+
+/**
+ * **Avant la carte** (ADR-0122) : tant que la carte n’existe pas, chaque commande est là et éteinte — le coin garde
+ * sa forme, rien ne bouge quand la carte arrive. Jamais après : une carte se zoome toujours.
+ */
+export const Disabled: Story = {
+  name: 'Avant la carte',
+  render: () => ({
+    components: { MapNavigator },
+    template: `
+      <div style="background:var(--ds-bg-neutral);width:360px;box-sizing:border-box;padding:24px;border-radius:12px;display:flex;flex-direction:column;align-items:flex-end;gap:16px">
+        <MapNavigator disabled>${minimap}</MapNavigator>
+        <MapNavigator disabled />
+      </div>
+    `,
+  }),
+}

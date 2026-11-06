@@ -100,6 +100,7 @@ import History             from './icons/history.vue'
 import House               from './icons/house.vue'
 import IdCard              from './icons/id-card.vue'
 import Image               from './icons/image.vue'
+import ImageOff            from './icons/image-off.vue'
 import Inbox               from './icons/inbox.vue'
 import Info                from './icons/info.vue'
 import Key                 from './icons/key.vue'
@@ -298,6 +299,7 @@ export const icons = {
   'house':                  House,
   'id-card':                IdCard,
   'image':                  Image,
+  'image-off':              ImageOff,
   'inbox':                  Inbox,
   'info':                   Info,
   'key':                    Key,

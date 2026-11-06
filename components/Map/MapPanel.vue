@@ -2,6 +2,7 @@
 import { computed, nextTick, ref, useId } from 'vue'
 import { Button } from '../Button'
 import { IconButton } from '../IconButton'
+import { Skeleton } from '../Skeleton'
 import { SurfaceTransition } from '../SurfaceTransition'
 
 export type MapPanelSize = 'sm' | 'lg'
@@ -48,6 +49,13 @@ interface Props {
   collapseLabel?: string
   /** The unfold's name, on the control the panel became. */
   expandLabel?: string
+  /**
+   * The content is on its way (ADR-0122): the panel is in its place at its
+   * size, its head kept (a title line is a placeholder while there is no
+   * `title`), and its body is `#loading` — by default a figure, lines and a
+   * block, the shape of a reading panel. The foot stays.
+   */
+  loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -56,6 +64,7 @@ const props = withDefaults(defineProps<Props>(), {
   collapsible: false,
   collapseLabel: 'Replier',
   expandLabel: 'Déplier',
+  loading: false,
 })
 
 const slots = defineSlots<{
@@ -64,6 +73,8 @@ const slots = defineSlots<{
   header?: () => unknown
   /** The foot, held at the bottom while the body scrolls — the panel's one action. */
   footer?: () => unknown
+  /** What the body shows while `loading` — placeholders in the shape of the content. */
+  loading?: () => unknown
 }>()
 
 const collapsed = defineModel<boolean>('collapsed', { default: false })
@@ -140,6 +151,7 @@ function focusArrived() {
         class="ds-map-panel"
         :class="`ds-map-panel--${size}`"
         :aria-label="props.title"
+        :aria-busy="loading || undefined"
       >
         <div v-if="slots.header" class="ds-map-panel__head ds-map-panel__head--slot">
           <IconButton
@@ -169,7 +181,20 @@ function focusArrived() {
             @click="fold(true)"
           />
         </div>
-        <div class="ds-map-panel__body"><slot /></div>
+        <div v-else-if="loading" class="ds-map-panel__head" aria-hidden="true">
+          <Skeleton width="40%" />
+        </div>
+        <div class="ds-map-panel__body">
+          <slot v-if="!loading" />
+          <slot v-else name="loading">
+            <div class="ds-map-panel__pending" aria-hidden="true">
+              <Skeleton width="45%" height="2rem" />
+              <Skeleton :lines="3" />
+              <Skeleton variant="rect" height="7.5rem" />
+              <Skeleton :lines="2" />
+            </div>
+          </slot>
+        </div>
         <div v-if="slots.footer" class="ds-map-panel__foot"><slot name="footer" /></div>
       </section>
     </SurfaceTransition>
@@ -263,6 +288,12 @@ function focusArrived() {
 .ds-map-panel--lg .ds-map-panel__head {
   flex: none;
   padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
+}
+
+.ds-map-panel__pending {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-xl);
 }
 
 .ds-map-panel--lg .ds-map-panel__body {

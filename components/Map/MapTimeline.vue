@@ -4,6 +4,7 @@ import { Button } from '../Button'
 import { Divider } from '../Divider'
 import { Dropdown, DropdownItem, DropdownTrigger } from '../Dropdown'
 import { IconButton } from '../IconButton'
+import { Skeleton } from '../Skeleton'
 import { Tooltip } from '../Tooltip'
 import { useSlidingIndicator } from '../../composables/useSlidingIndicator'
 
@@ -75,6 +76,12 @@ interface Props {
   comparedLabel?: string
   /** Said after a period with a data dot. */
   dataLabel?: string
+  /**
+   * The periods are on their way (ADR-0122): the bar keeps its place and its
+   * width, the periods are placeholders, and nothing can be stepped or
+   * compared yet.
+   */
+  loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -89,6 +96,7 @@ const props = withDefaults(defineProps<Props>(), {
   exitCompareLabel: 'Quitter la comparaison',
   comparedLabel: 'comparée',
   dataLabel: 'mesure disponible',
+  loading: false,
 })
 
 const value = defineModel<string>({ required: true })
@@ -121,9 +129,9 @@ function setItem(el: unknown, i: number) {
   a dead control on a 480px bar of nothing), and the bar hugs what is left.
 */
 const choosable = computed(() => props.periods.filter((p) => !p.disabled).length)
-const lone = computed(() => choosable.value <= 1)
-const canStep = computed(() => !lone.value)
-const canCompare = computed(() => !lone.value)
+const lone = computed(() => !props.loading && choosable.value <= 1)
+const canStep = computed(() => !props.loading && !lone.value)
+const canCompare = computed(() => !props.loading && !lone.value)
 
 /*
   The gap between periods, capped (ADR-0118). Periods that fit share the strip
@@ -196,6 +204,15 @@ watch(() => props.periods, async () => {
   itemRefs.value = []
   await nextTick()
   settle()
+})
+
+/* The periods replace their placeholders: a new strip, opened on the choice
+   like a first one, and watched for its width from now on. */
+watch(() => props.loading, async (loading) => {
+  if (loading) return
+  await nextTick()
+  settle()
+  if (track.value) ro?.observe(track.value)
 })
 
 function enabled(i: number) {
@@ -366,7 +383,12 @@ function exitCompare() {
     >
       <!-- The pill counts in the strip's scroll width while it slides: the edges
            are read again when it lands (a stale read faded a strip that fit). -->
-      <div ref="track" class="ds-map-timeline__track" :style="{ '--tick-free': `${free}px` }" role="radiogroup" :aria-label="label" @keydown="onKeydown" @transitionend="edges">
+      <div v-if="loading" class="ds-map-timeline__track" role="radiogroup" :aria-label="label" aria-busy="true">
+        <span v-for="i in 5" :key="i" class="ds-map-timeline__tick ds-map-timeline__tick--pending" aria-hidden="true">
+          <Skeleton width="2.25em" height="0.625rem" />
+        </span>
+      </div>
+      <div v-else ref="track" class="ds-map-timeline__track" :style="{ '--tick-free': `${free}px` }" role="radiogroup" :aria-label="label" @keydown="onKeydown" @transitionend="edges">
         <span
           v-if="index !== -1"
           class="ds-map-timeline__pill"
@@ -641,6 +663,13 @@ function exitCompare() {
 }
 
 /* Between dots, the labelled days are landmarks: they recede. */
+/* A period not known yet: the target's box, a placeholder in its line. */
+.ds-map-timeline__tick--pending {
+  justify-content: center;
+  min-height: 32px;
+  cursor: default;
+}
+
 .ds-map-timeline--dense .ds-map-timeline__tick {
   color: var(--ds-text-subtle);
 }

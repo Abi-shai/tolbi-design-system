@@ -648,6 +648,13 @@
           "$description": "dark mode only — display/purple/500 blended into gray-forest/900 to 1.55:1, the hairline on display/purple/dark-subtle"
         }
       }
+    },
+    "map": {
+      "land": {
+        "$value": "#F2EADA",
+        "$type": "color",
+        "$description": "The TOLBI map style's land — the ground a map shows before its basemap (ADR-0122). Categorical: it is the style's colour, not a role"
+      }
     }
   }
 }

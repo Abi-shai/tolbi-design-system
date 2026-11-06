@@ -211,3 +211,20 @@ export const Playground: Story = {
     `),
   }),
 }
+
+/**
+ * **En attente** (ADR-0122) : la barre tient sa place et sa largeur, les périodes sont des repères, rien ne se
+ * parcourt ni ne se compare encore. Quand elles arrivent, la frise s’ouvre sur la période choisie.
+ */
+export const Loading: Story = {
+  name: 'En attente des périodes',
+  render: () => ({
+    components: { MapTimeline },
+    setup: () => ({ value: ref('2026'), scale: ref('year'), SCALES, YEARS, loading: ref(true) }),
+    template: ground(`
+      <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+        <MapTimeline v-model="value" v-model:scale="scale" :scales="SCALES" :periods="loading ? [] : YEARS" label="Année" compare :loading="loading" />
+        <button type="button" @click="loading = !loading">{{ loading ? 'Les périodes arrivent' : 'Revenir à l’attente' }}</button>
+      </div>`),
+  }),
+}
