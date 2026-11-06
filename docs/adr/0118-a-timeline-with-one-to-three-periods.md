@@ -50,3 +50,17 @@ MapBiomas, ArcGIS TimeSlider, MUI DatePicker, Ant Segmented, Carbon ContentSwitc
 - **Future periods**: map timelines stop at the last vintage (6 of 7 absent); date pickers show them disabled (MUI).
   The component renders what it is given — the product should pass future periods only when they mean something to the
   user (a campaign under way), and omit them otherwise.
+
+## Amended (6 Nov.) — one period is a statement, not an instrument
+
+Released in 0.99, the one-period case reached the product as a 480px bar holding a lone « 2024 » and a greyed
+« Comparer » — the owner: « c'est horrible ». The research had said it: with one date, nobody offers comparison, and
+products drop the timeline for something smaller. So, **when one period can be chosen**:
+
+- **« Comparer » leaves the bar** (it was a dead control, disabled and explained); `compareUnavailableLabel` is removed.
+- ‹ › leave it too (as before).
+- **The bar hugs** what is left — the period, the scale's word, any disabled periods passed — and stays centred on the
+  map's axis. ADR-0116's 480 is for a bar that has a row to show. Measured: 68px for « 2024 » alone, 127 with
+  « Année », 223 with two years ahead.
+
+With two choosable periods or more, nothing changes: 480px, arrows, « Comparer ».

@@ -62,8 +62,6 @@ interface Props {
   /** Offers « Comparer » at the end of the bar. */
   compare?: boolean
   compareLabel?: string
-  /** Why « Comparer » is off: fewer than two periods can be chosen (ADR-0118). */
-  compareUnavailableLabel?: string
   /** Said at the end while the second period is awaited. */
   compareHint?: string
   exitCompareLabel?: string
@@ -81,7 +79,6 @@ const props = withDefaults(defineProps<Props>(), {
   nextLabel: 'Période suivante',
   compare: false,
   compareLabel: 'Comparer',
-  compareUnavailableLabel: 'Une seule période disponible',
   compareHint: 'Choisir une date',
   exitCompareLabel: 'Quitter la comparaison',
   comparedLabel: 'comparée',
@@ -112,13 +109,15 @@ function setItem(el: unknown, i: number) {
 }
 
 /*
-  How many periods can be chosen (ADR-0118). With one, there is nowhere to
-  step to and nothing to compare: ‹ › leave the bar — they would promise a
-  navigation that does not exist — and « Comparer » is off, saying why.
+  How many periods can be chosen (ADR-0118, amended). With one, the timeline
+  is not an instrument any more but a statement — « 2024 » — so it says it and
+  nothing else: ‹ › and « Comparer » leave the bar (a disabled « Comparer » was
+  a dead control on a 480px bar of nothing), and the bar hugs what is left.
 */
 const choosable = computed(() => props.periods.filter((p) => !p.disabled).length)
-const canStep = computed(() => choosable.value > 1)
-const canCompare = computed(() => choosable.value > 1)
+const lone = computed(() => choosable.value <= 1)
+const canStep = computed(() => !lone.value)
+const canCompare = computed(() => !lone.value)
 
 /*
   The gap between periods, capped (ADR-0118). Periods that fit share the strip
@@ -309,7 +308,7 @@ function exitCompare() {
 </script>
 
 <template>
-  <div ref="root" class="ds-map-timeline" :class="{ 'ds-map-timeline--dense': dense }">
+  <div ref="root" class="ds-map-timeline" :class="{ 'ds-map-timeline--dense': dense, 'ds-map-timeline--lone': lone }">
     <span class="ds-map-timeline__said" role="status">{{ announced }}</span>
     <template v-if="scales.length > 1">
       <Dropdown v-model:open="scaleOpen" class="ds-map-timeline__scale-menu" :label="scaleLabel" align="start" size="sm">
@@ -410,29 +409,16 @@ function exitCompare() {
       />
     </Tooltip>
 
-    <template v-if="compare">
+    <template v-if="compare && canCompare">
       <Divider class="ds-map-timeline__rule" orientation="vertical" />
       <Button
-        v-if="!comparing && canCompare"
+        v-if="!comparing"
         class="ds-map-timeline__action"
         variant="link"
         size="sm"
         :label="compareLabel"
         @click="startCompare"
       />
-      <!-- Off, and saying why (ADR-0118). `aria-disabled`, not `disabled`: a
-           disabled button takes no focus, so the reason in its tooltip reached
-           the pointer only. It stays in the tab order, is read as unavailable
-           with the reason as its description, and does nothing when pressed. -->
-      <Tooltip v-else-if="!comparing" :title="compareUnavailableLabel" placement="top" class="ds-map-timeline__compare-off">
-        <Button
-          class="ds-map-timeline__action ds-map-timeline__action--off"
-          variant="link"
-          size="sm"
-          :label="compareLabel"
-          aria-disabled="true"
-        />
-      </Tooltip>
       <template v-else>
         <span class="ds-map-timeline__range" :class="{ 'ds-map-timeline__range--hint': !range }" aria-hidden="true">
           {{ range ?? compareHint }}
@@ -478,6 +464,15 @@ function exitCompare() {
   box-shadow: var(--ds-elevation-raised);
 }
 
+/*
+  One period can be chosen: a statement, not an instrument (ADR-0118,
+  amended) — the bar hugs the word and the period(s), and keeps its place on
+  the map's axis. The 480 of ADR-0116 is for a bar that has a row to show.
+*/
+.ds-map-timeline--lone {
+  width: fit-content;
+}
+
 /* ── The scale chip ───────────────────────────────────────────────── */
 /* `DropdownTrigger`'s `chip` chrome: the trigger owns its chrome (ADR-0033). */
 .ds-map-timeline__scale-menu {
@@ -514,8 +509,7 @@ function exitCompare() {
   gives back the disc's own 8px of air, so the glyph keeps its place.
 */
 .ds-map-timeline__step,
-.ds-map-timeline__exit,
-.ds-map-timeline__compare-off {
+.ds-map-timeline__exit {
   flex: none;
 }
 
@@ -534,15 +528,6 @@ function exitCompare() {
    periods' 32px (it measured 18). */
 .ds-map-timeline__action {
   min-height: 32px;
-}
-
-/* Off but focusable (`aria-disabled`): the disabled ink, no underline, the
-   not-allowed hand — what `Button`'s own `:disabled` rule would give. */
-.ds-map-timeline__action--off,
-.ds-map-timeline__action--off:hover {
-  color: var(--ds-text-disabled);
-  text-decoration: none;
-  cursor: not-allowed;
 }
 
 .ds-map-timeline__range {

@@ -105,8 +105,8 @@ export const Lengths: Story = {
 /**
  * **Une à trois années** (ADR-0118) — un projet mesuré une seule année, la frise allant jusqu’à l’année en cours.
  * Les périodes restent **groupées et centrées** : jamais plus de 24px entre deux. Avec **une seule période
- * choisissable**, ‹ › quittent la barre (ils promettraient une navigation qui n’existe pas) et « Comparer » est
- * éteint, en disant pourquoi au survol. Les années à venir sont `disabled`.
+ * choisissable**, la frise n’est plus un instrument mais une mention — « 2024 » : ‹ › et « Comparer » quittent la
+ * barre, qui épouse ce qui reste. Les années à venir sont `disabled` (à ne passer que si elles ont un sens).
  */
 export const OneToThree: Story = {
   name: 'Une à trois années',
@@ -125,8 +125,9 @@ export const OneToThree: Story = {
       THREE: ['2022', '2023', '2024'].map((y) => ({ value: y, label: y, data: true })),
     }),
     template: ground(`<div style="display:flex; flex-direction:column; align-items:center; gap:24px;">
-      <MapTimeline v-model="a" :scales="SCALE" :periods="ONE" label="Année" compare compare-unavailable-label="Une seule année mesurée" />
-      <MapTimeline v-model="b" :scales="SCALE" :periods="ONE_AHEAD" label="Année" compare compare-unavailable-label="Une seule année mesurée" />
+      <MapTimeline v-model="a" :periods="ONE" label="Année" compare />
+      <MapTimeline v-model="a" :scales="SCALE" :periods="ONE" label="Année" compare />
+      <MapTimeline v-model="b" :scales="SCALE" :periods="ONE_AHEAD" label="Année" compare />
       <MapTimeline v-model="c" :scales="SCALE" :periods="TWO" label="Année" compare />
       <MapTimeline v-model="d" :scales="SCALE" :periods="THREE" label="Année" compare />
     </div>`),

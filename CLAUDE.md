@@ -1278,7 +1278,8 @@ Before working on any component, read:
   the control arrives in its corner; the focus follows.
 - **ADR-0118**: **a timeline with one to three periods** — the gap between periods is **capped at `spacing-3xl`**
   (measured room, clamped), past which the row stays grouped and centred in the 480px bar; **‹ › leave the bar** when
-  only one period can be chosen; **« Comparer » is off** under two, its reason in a tooltip (`compareUnavailableLabel`);
+  only one period can be chosen; **amended**: with one choosable period the timeline is a statement — « Comparer » leaves too
+  and the bar **hugs** (a 480px bar of one greyed « Comparer » was « horrible »);
   a disabled `subtle` `IconButton` is **half `text-disabled`** (gray 500 beside its gray 600 rest read as live).
 
 ## Architecture
