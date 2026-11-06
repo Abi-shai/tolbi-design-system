@@ -420,15 +420,17 @@ function exitCompare() {
         :label="compareLabel"
         @click="startCompare"
       />
-      <!-- Off, and saying why — the reason in a tooltip, which a disabled
-           control still shows (ADR-0082). -->
+      <!-- Off, and saying why (ADR-0118). `aria-disabled`, not `disabled`: a
+           disabled button takes no focus, so the reason in its tooltip reached
+           the pointer only. It stays in the tab order, is read as unavailable
+           with the reason as its description, and does nothing when pressed. -->
       <Tooltip v-else-if="!comparing" :title="compareUnavailableLabel" placement="top" class="ds-map-timeline__compare-off">
         <Button
-          class="ds-map-timeline__action"
+          class="ds-map-timeline__action ds-map-timeline__action--off"
           variant="link"
           size="sm"
           :label="compareLabel"
-          disabled
+          aria-disabled="true"
         />
       </Tooltip>
       <template v-else>
@@ -532,6 +534,15 @@ function exitCompare() {
    periods' 32px (it measured 18). */
 .ds-map-timeline__action {
   min-height: 32px;
+}
+
+/* Off but focusable (`aria-disabled`): the disabled ink, no underline, the
+   not-allowed hand — what `Button`'s own `:disabled` rule would give. */
+.ds-map-timeline__action--off,
+.ds-map-timeline__action--off:hover {
+  color: var(--ds-text-disabled);
+  text-decoration: none;
+  cursor: not-allowed;
 }
 
 .ds-map-timeline__range {
