@@ -50,9 +50,10 @@ import { pushModal, removeModal } from '../../composables/useModalStack'
  * action on top.
  *
  * `size` is one scale for both: `sm` 24rem, `md` 32rem (the default), `lg`
- * 45rem, `xl` 60rem — each a width the catalogue already used — `2xl` 82rem,
- * and `full`. `2xl` is a window of data (ADR-0098): it takes the full height
- * too, so changing what it shows never resizes it.
+ * 45rem, `xl` 60rem — each a width the catalogue already used — `2xl`, and
+ * `full`. `2xl` is a window of data (ADR-0098): it takes the full height too,
+ * so changing what it shows never resizes it, and **the screen's width less
+ * 64px each side** (ADR-0125) — no ceiling.
  */
 export type DialogPlacement = 'centre' | 'side'
 export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
@@ -538,6 +539,20 @@ function onClick(event: MouseEvent) {
 .ds-dialog--centre.ds-dialog--full .ds-dialog__surface,
 .ds-dialog--centre.ds-dialog--2xl .ds-dialog__surface {
   height: 100%;
+}
+
+/*
+  A window of data follows the screen (ADR-0125): no ceiling, the screen less
+  64px each side and 40px above and below — the owner's frame (`3610:12923`,
+  at 1440). An 82rem ceiling left ~285px of scrim each side on a 1880px screen,
+  room the data needed. The margins give on a small screen (5% of it, never
+  under the dialog's usual 16px), so the window never leaves less than it has.
+*/
+.ds-dialog--centre.ds-dialog--2xl {
+  --dialog-width: none;
+  padding:
+    clamp(var(--ds-spacing-xl), 5vh, var(--ds-spacing-5xl))
+    clamp(var(--ds-spacing-xl), 5vw, var(--ds-spacing-7xl));
 }
 
 /* The body takes what the head, the nav and the foot leave: a short tab does

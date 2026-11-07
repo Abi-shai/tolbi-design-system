@@ -421,8 +421,8 @@ export const ForeignList: Story = {
 
 
 /**
- * ADR-0098 — une fenêtre de données : `size="2xl"` (82rem, un plafond ; toute la hauteur, donc changer d’onglet ne
- * la redimensionne jamais), les `Tabs` dans `#nav` — fixes, le corps défile dessous — et chaque onglet relié à son
+ * ADR-0098 — une fenêtre de données : `size="2xl"` (**la largeur de l’écran moins 64 px de chaque côté, 40 px en haut et en
+ * bas**, sans plafond — ADR-0125 ; toute la hauteur, donc changer d’onglet ne la redimensionne jamais), les `Tabs` dans `#nav` — fixes, le corps défile dessous — et chaque onglet relié à son
  * `TabPanel` par le même `id`. **Pas de pied** : en lecture seule, × et Échap ferment ; un « Fermer » ferait doublon.
  * Les tableaux dans une carte : `framed=false` ; les colonnes de chiffres : `numeric`.
  */

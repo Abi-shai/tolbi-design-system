@@ -1155,7 +1155,7 @@ Before working on any component, read:
   stays its alias. **`ShareBar`** leaves `ProjectCard` (which renders it) with a neutral `rest`. `StatTile`
   gains `caption` and spans **three of its parent's rows as a subgrid**, so a row's figures stay level
   whatever the label or caption runs to (0.83's `margin-top: auto` broke on a two-line caption).
-- **ADR-0098**: a window of data — `Dialog size="2xl"` (82rem, full height so a tab never resizes it), a fixed
+- **ADR-0098**: a window of data — `Dialog size="2xl"` (82rem — **amended by ADR-0125**: the screen less 64 / 40px — full height so a tab never resizes it), a fixed
   **`#nav`** between head and body, **no foot** when it only reads. `Tabs` gains `id` + **`TabPanel`** (it named
   no panels); `.ds-tabs` ran 10px past its box (`border-box` now). `Table`: **`numeric`** (right, tabular, 6rem
   floor) and **`framed: false`** inside a surface that draws its own frame.
@@ -1311,6 +1311,9 @@ Before working on any component, read:
 - **ADR-0124**: **the basemap fallback is silent** (product decision) — `MapStatus` loses `fallback`: a satellite under
   the same data changes no reading and asks for no action, so nothing says it. A state earns a word when it changes
   what the reader does or reads (`partial`, `empty`, `failed`).
+- **ADR-0125**: **a window of data follows the screen** — `Dialog size="2xl"` (centred) is the screen less **64px each
+  side and 40px above and below** (the owner's frame `3610:12923`), **no ceiling** (82rem left ~285px of scrim on 1880px);
+  the margins give on a small screen (`clamp(xl, 5vw/5vh, 7xl/5xl)`). The side placement keeps 82rem.
 
 ## Architecture
 
