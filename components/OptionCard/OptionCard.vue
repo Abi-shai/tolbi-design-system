@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, useId } from 'vue'
 import { Avatar } from '../Avatar'
+import { Button } from '../Button'
 import { Checkbox } from '../Checkbox'
 import { Flag } from '../Flag'
 import { Icon, type IconName } from '../Icon'
@@ -24,6 +25,14 @@ import { OPTION_LIST_KEY, type OptionValue } from './context'
  * Alone, with `href` or a click, it is **a row that leads**: the same drawing
  * with a chevron, a link or a button, and no chosen state — no system mixes a
  * chevron with a selection.
+ *
+ * With `actionLabel` it is **a row that holds one action** (ADR-0126) — a file
+ * to download, not a place to go: the row is no longer a control (no link, no
+ * button, no hover contour), the chevron gives way to a `Button`
+ * `secondary-gray` `sm` at the end, on the top line, and the focus goes to
+ * that button. One action per row; it emits `action`, and `actionLoading`
+ * holds it busy while the file is made. Never in an `OptionList`: a row is a
+ * choice or carries an action, not both.
  */
 interface Props {
   /** The title. */
@@ -41,6 +50,11 @@ interface Props {
   disabled?: boolean
   /** A row that leads somewhere: a link. Without it and outside a list, a button. */
   href?: string
+  /** The row's one action, at its end in place of the chevron — « Télécharger ». Emits `action`. */
+  actionLabel?: string
+  actionIcon?: IconName
+  /** The action is under way — the file being made. */
+  actionLoading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -53,24 +67,28 @@ const props = withDefaults(defineProps<Props>(), {
   flag: undefined,
   disabled: false,
   href: undefined,
+  actionLabel: undefined,
+  actionIcon: undefined,
+  actionLoading: false,
 })
 
-const emit = defineEmits<{ click: [event: MouseEvent] }>()
+const emit = defineEmits<{ click: [event: MouseEvent]; action: [] }>()
 
 const list = inject(OPTION_LIST_KEY, null)
 const uid = useId()
 const titleId = `ds-option-card-title-${uid}`
 const descriptionId = `ds-option-card-description-${uid}`
 
-/* A choice inside a list; a row that leads outside one. */
-const choosing = computed(() => Boolean(list) && props.value !== undefined)
+/* A row that holds an action; else a choice inside a list; else a row that leads. */
+const holds = computed(() => Boolean(props.actionLabel))
+const choosing = computed(() => !holds.value && Boolean(list) && props.value !== undefined)
 const checked = computed(() => choosing.value && list!.isChecked(props.value!))
 const isDisabled = computed(() => props.disabled || (list?.disabled.value ?? false))
 const kind = computed(() => (list?.multiple.value ? 'checkbox' : 'radio'))
 
-const tag = computed(() => (choosing.value ? 'label' : props.href ? 'a' : 'button'))
+const tag = computed(() => (holds.value ? 'div' : choosing.value ? 'label' : props.href ? 'a' : 'button'))
 const rootAttrs = computed(() => {
-  if (choosing.value) return {}
+  if (choosing.value || holds.value) return {}
   /* Named by its title, described by its sentence — not the whole row read as one name. */
   const named = { 'aria-labelledby': titleId, 'aria-describedby': props.description ? descriptionId : undefined }
   if (props.href) return { ...named, href: isDisabled.value ? undefined : props.href, 'aria-disabled': isDisabled.value || undefined }
@@ -82,8 +100,12 @@ function onChange() {
 }
 
 function onClick(event: MouseEvent) {
-  if (!choosing.value && !isDisabled.value) emit('click', event)
+  if (!choosing.value && !holds.value && !isDisabled.value) emit('click', event)
 }
+
+/* The button is named by its word and described by the row: five « Télécharger »
+   in a list each say which file. */
+const actionDescribedBy = computed(() => [titleId, props.description ? descriptionId : null].filter(Boolean).join(' '))
 </script>
 
 <template>
@@ -94,7 +116,8 @@ function onClick(event: MouseEvent) {
     :class="{
       'ds-option-card--checked': checked,
       'ds-option-card--disabled': isDisabled,
-      'ds-option-card--leads': !choosing,
+      'ds-option-card--leads': !choosing && !holds,
+      'ds-option-card--holds': holds,
     }"
     @click="onClick"
   >
@@ -127,7 +150,19 @@ function onClick(event: MouseEvent) {
 
     <span v-if="meta" class="ds-option-card__meta"><span class="ds-option-card__meta-text">{{ meta }}</span></span>
 
-    <span class="ds-option-card__control" aria-hidden="true">
+    <span v-if="holds" class="ds-option-card__action">
+      <Button
+        variant="secondary-gray"
+        size="sm"
+        :label="actionLabel!"
+        :icon-leading="actionIcon"
+        :loading="actionLoading"
+        :disabled="isDisabled"
+        :aria-describedby="actionDescribedBy"
+        @click="emit('action')"
+      />
+    </span>
+    <span v-else class="ds-option-card__control" aria-hidden="true">
       <Checkbox v-if="choosing" visual-only size="sm" :type="kind" :model-value="checked" :disabled="isDisabled" />
       <Icon v-else name="chevron-right" :size="20" class="ds-option-card__chevron" />
     </span>
@@ -166,8 +201,9 @@ function onClick(event: MouseEvent) {
     box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
-/* Hover is the contour alone: a ground would swallow the icon's tile. */
-.ds-option-card:hover:not(.ds-option-card--disabled):not(.ds-option-card--checked) {
+/* Hover is the contour alone: a ground would swallow the icon's tile. A row
+   that holds an action is not a control: only its button answers. */
+.ds-option-card:hover:not(.ds-option-card--disabled):not(.ds-option-card--checked):not(.ds-option-card--holds) {
   border-color: var(--ds-border-default);
 }
 
@@ -184,6 +220,10 @@ function onClick(event: MouseEvent) {
   --option-card-focus: var(--ds-focus-ring-brand);
 
   outline: none;
+}
+
+.ds-option-card--holds {
+  cursor: default;
 }
 
 .ds-option-card--disabled {
@@ -252,6 +292,13 @@ function onClick(event: MouseEvent) {
   align-items: center;
   height: 1lh;
   font: var(--ds-font-label-lg-strong);
+}
+
+/* The action on the title's line, at the end: its top on the content's top. */
+.ds-option-card__action {
+  display: inline-flex;
+  flex: none;
+  align-self: flex-start;
 }
 
 .ds-option-card__meta-text {

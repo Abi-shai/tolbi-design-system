@@ -1314,6 +1314,10 @@ Before working on any component, read:
 - **ADR-0125**: **a window of data follows the screen** — `Dialog size="2xl"` (centred) is the screen less **64px each
   side and 40px above and below** (the owner's frame `3610:12923`), **no ceiling** (82rem left ~285px of scrim on 1880px);
   the margins give on a small screen (`clamp(xl, 5vw/5vh, 7xl/5xl)`). The side placement keeps 82rem.
+- **ADR-0126**: **a row that holds an action** — `OptionCard` with `actionLabel` (+ `actionIcon`, `actionLoading`,
+  emits `action`) is a file to download, not a place to go: the row is no longer a control (a `<div>`, no hover
+  contour), the chevron gives way to a `Button secondary-gray sm` at the end on the top line, the focus goes to it,
+  `disabled` greys both, the button is described by the row. Props, not a slot: one shape. Not in an `OptionList`.
 
 ## Architecture
 

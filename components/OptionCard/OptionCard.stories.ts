@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import { ref } from 'vue'
 import OptionCard from './OptionCard.vue'
 
 const meta: Meta<typeof OptionCard> = {
@@ -15,7 +16,8 @@ const meta: Meta<typeof OptionCard> = {
           'Dans une `OptionList`, c’est une **vraie case ou un vrai bouton radio caché**, dont la carte est ' +
           'le label : le clavier est celui du navigateur, pas le nôtre. **Seule**, avec `href` ou un clic, ' +
           'c’est le même dessin mais **une rangée qui mène** — un `<a>` ou un `<button>`, un chevron à la ' +
-          'place du contrôle, et **aucun état choisi** : une rangée qui mène ne se choisit pas.\n\n' +
+          'place du contrôle, et **aucun état choisi** : une rangée qui mène ne se choisit pas. Avec `actionLabel`, ' +
+          'c’est **une rangée qui porte une action** (ADR-0126) : un fichier à télécharger, pas un endroit où aller.\n\n' +
           'Le survol est le **contour seul**, parce qu’un fond avalerait la tuile de l’icône — `bg-hover` ' +
           'est justement son primitif.',
       },
@@ -75,6 +77,47 @@ export const Disabled: Story = {
     template: `
       <div style="max-width:420px">
         <OptionCard icon="leaf" label="Café" description="Coffea canephora — SH 0901" meta="22 ha" disabled />
+      </div>
+    `,
+  }),
+}
+
+/**
+ * **Une rangée qui porte une action** (ADR-0126) — les documents d’un rapport ARR : un fichier à télécharger, pas un
+ * endroit où aller. La rangée n’est plus un bouton ni un lien ; le chevron laisse la place à un `Button`
+ * `secondary-gray` `sm` en haut à droite, et c’est lui qui prend le focus. `actionLoading` le tient occupé pendant la
+ * génération du fichier ; `disabled` grise la rangée et le bouton. Une seule action par rangée.
+ */
+export const WithAction: Story = {
+  name: 'Une rangée qui porte une action',
+  render: () => ({
+    components: { OptionCard },
+    setup() {
+      const busy = ref<string | null>(null)
+      const download = (id: string) => { busy.value = id; setTimeout(() => { busy.value = null }, 1600) }
+      const docs = [
+        { id: 'report', icon: 'file-text', label: 'Rapport de 2026', description: 'La baseline, les points de contrôle et le carbone gagné, en PDF' },
+        { id: 'points', icon: 'map-pin', label: 'Points du projet et de contrôle', description: 'Les 240 points et leurs mesures, en CSV' },
+        { id: 'method', icon: 'book-open', label: 'Méthode', description: 'VM0047, ce qui a été appliqué et pourquoi' },
+        { id: 'pd', icon: 'clipboard-list', label: 'PD pré-remplie', description: 'Le document de projet, prêt à compléter' },
+        { id: 'audit', icon: 'folder', label: 'Dossier auditeur', description: 'Tout ce qu’un auditeur demande, en une archive', disabled: true },
+      ]
+      return { docs, busy, download }
+    },
+    template: `
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:560px">
+        <OptionCard
+          v-for="d in docs"
+          :key="d.id"
+          :icon="d.icon"
+          :label="d.label"
+          :description="d.description"
+          :disabled="d.disabled"
+          action-label="Télécharger"
+          action-icon="download"
+          :action-loading="busy === d.id"
+          @action="download(d.id)"
+        />
       </div>
     `,
   }),
