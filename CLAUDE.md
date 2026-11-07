@@ -1325,6 +1325,9 @@ Before working on any component, read:
 - **ADR-0128**: **a reading panel folds one way** — `MapPanel size="lg"` folds by the square at the start of its head
   into the corner control (ADR-0117) **with or without `#header`**; without it the head is the square then the title.
   The title + chevron fold stays `sm`'s. The title is read in the button's name.
+- **ADR-0129**: **a legend by category** — `MapLegend` `ticks` is optional: absent with a `legend`, the legend is the
+  map's **key** (title + `ChartLegend` entries, shape `zone`, figure optional), no ramp, no bounds, same surface, width
+  and place as the cockpit's; said once (« Parcelles : Éligibles 85 %, … »). `ticks: []` still means « — ».
 
 ## Architecture
 

@@ -29,8 +29,12 @@ import { TabPanel, Tabs, type TabsItem } from '../Tabs'
  */
 interface Props {
   title: string
-  /** The values under the gradient, evenly spaced: the first at its start, the last at its end. */
-  ticks: string[]
+  /**
+   * The values under the gradient, evenly spaced: the first at its start, the
+   * last at its end. **Absent, with a `legend`, there is no gradient**: the map
+   * is coloured by category, and the legend is its key (ADR-0129).
+   */
+  ticks?: string[]
   /** Above the gradient's end — `CO2e/ha`. Said with the bounds to a reader. */
   unit?: string
   /** The ramp, low to high. Any CSS colour — pass tokens. */
@@ -55,6 +59,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  ticks: undefined,
   unit: undefined,
   colors: () => [1, 2, 3, 4, 5].map((i) => `var(--ds-chart-sequential-${i})`),
   legend: () => [],
@@ -75,12 +80,18 @@ const current = computed(() => metric.value ?? props.metrics[0]?.value ?? '')
 const tabsId = `ds-map-legend-${useId()}`
 
 const gradient = computed(() => `linear-gradient(to right, ${props.colors.join(', ')})`)
-const empty = computed(() => !props.loading && props.ticks.length === 0)
+/* A map coloured by category has no ramp: no ticks, a legend (ADR-0129). */
+const categorical = computed(() => props.ticks === undefined && props.legend.length > 0)
+const ticks = computed(() => props.ticks ?? [])
+const empty = computed(() => !props.loading && ticks.value.length === 0)
+/* Said once, as the gradient is: the title, then each entry with its figure. */
+const keySaid = computed(() =>
+  `${props.title} : ${props.legend.map((i) => (i.value ? `${i.label} ${i.value}` : i.label)).join(', ')}`)
 const said = computed(() => {
   if (props.loading) return props.title
   if (empty.value) return `${props.title}, ${props.emptyLabel}`
   if (props.summary) return props.summary
-  const range = `de ${props.ticks[0]} à ${props.ticks[props.ticks.length - 1]}`
+  const range = `de ${ticks.value[0]} à ${ticks.value[ticks.value.length - 1]}`
   return `${props.title}, ${range}${props.unit ? ` ${props.unit}` : ''}`
 })
 </script>
@@ -102,7 +113,16 @@ const said = computed(() => {
       v-bind="metrics.length > 1 ? { tabsId, value: current } : {}"
       class="ds-map-legend__panel"
     >
-      <div class="ds-map-legend__scale-row">
+      <!-- By category: the title, then the key on the same line — the line the
+           gradient would take, so a screen of each kind reads the same. -->
+      <div v-if="categorical" class="ds-map-legend__scale-row" role="img" :aria-label="loading ? title : keySaid">
+        <span class="ds-map-legend__title" aria-hidden="true">{{ title }}</span>
+        <div v-if="loading" class="ds-map-legend__key ds-map-legend__key--pending" aria-hidden="true">
+          <Skeleton v-for="i in legend.length" :key="i" width="5.5em" height="0.5rem" />
+        </div>
+        <ChartLegend v-else :items="legend" shape="zone" class="ds-map-legend__key" aria-hidden="true" />
+      </div>
+      <div v-else class="ds-map-legend__scale-row">
         <span class="ds-map-legend__title">{{ title }}</span>
         <div class="ds-map-legend__scale">
           <span v-if="loading" class="ds-map-legend__unit" aria-hidden="true"><Skeleton width="3.5em" height="0.5rem" /></span>
@@ -117,7 +137,7 @@ const said = computed(() => {
         </div>
       </div>
     </component>
-    <ChartLegend v-if="legend.length" :items="legend" class="ds-map-legend__symbols" />
+    <ChartLegend v-if="legend.length && !categorical" :items="legend" class="ds-map-legend__symbols" />
   </div>
 </template>
 
@@ -206,6 +226,20 @@ const said = computed(() => {
 /* What is not there yet is « — », in the receding ink (ADR-0105). */
 .ds-map-legend__none {
   color: var(--ds-text-subtlest);
+}
+
+/* The key takes what the title leaves and wraps there, never under the title. */
+.ds-map-legend__key {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ds-map-legend__key--pending {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-spacing-md) var(--ds-spacing-xl);
+  min-height: 1lh;
 }
 
 .ds-map-legend__symbols {

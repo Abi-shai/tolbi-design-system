@@ -117,3 +117,29 @@ export const Loading: Story = {
       </div>`),
   }),
 }
+
+/**
+ * **Par catégories, sans rampe** (ADR-0129) — la page d’une zone éligible ARR colore ses parcelles par motif. Sans
+ * `ticks`, avec `legend`, la légende est la clé : le titre puis les entrées (forme `zone`, couleur, libellé, part), sur
+ * la ligne qu’aurait prise le dégradé et sur la même surface, à la même place (`MapOverlay position="top"`). Les couleurs
+ * sont `--ds-chart-categorical-1…3`, dans l’ordre des parts (ADR-0016). Un lecteur entend « Parcelles : Éligibles 85 %,
+ * Forêt en 2014 12 %, Contour invalide 4 % ».
+ */
+export const Categorical: Story = {
+  name: 'Par catégories, sans rampe',
+  render: () => ({
+    components: { MapLegend },
+    setup: () => ({
+      items: [
+        { key: 'eligible', label: 'Éligibles', value: '85 %', color: 'var(--ds-chart-categorical-1)' },
+        { key: 'forest', label: 'Forêt en 2014', value: '12 %', color: 'var(--ds-chart-categorical-2)' },
+        { key: 'invalid', label: 'Contour invalide', value: '4 %', color: 'var(--ds-chart-categorical-3)' },
+      ],
+    }),
+    template: ground(`
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <MapLegend title="Parcelles" :legend="items" />
+        <MapLegend title="Parcelles" :legend="items" loading />
+      </div>`),
+  }),
+}
