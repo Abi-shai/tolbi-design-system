@@ -24,3 +24,11 @@ the title folded on two or three lines, the sentence on four.
   pressed veil), not a bordered square: 32px, measured in the 26rem column, every title on one line.
 - Busy, it keeps its focus and its place: a `Spinner` in the glyph's 16px box, `aria-busy`, the press ignored —
   not `disabled`, which would drop the focus from the button just pressed (ADR-0059). 32 → 32px.
+- **No word, ever** (the owner, the same day: « sans texte… je veux sans texte »). The glyph is **the only form** of a
+  row's action: the worded `Button` is gone and `actionIconOnly` is ignored (deprecated, kept so 0.108 callers still
+  compile). `actionIcon` is the glyph (`download` when absent); `actionLabel` stays required — the name and the
+  tooltip. ADR-0126's `Button` `secondary-gray` `sm` is superseded.
+- Found on the way: a disabled `ghost` `Button` grew the filled buttons' grey box (`bg-disabled` + `border-subtle`).
+  What has nothing at rest has nothing off — it now stays transparent and greys its ink, as `tertiary` and `link`
+  already did — and its ink is **half** `text-disabled`, ADR-0118's rule for the subtle `IconButton`: gray 500 off
+  beside gray 600 at rest read as live. Catalogue-wide.

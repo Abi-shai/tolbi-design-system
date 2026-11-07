@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, useId } from 'vue'
 import { Avatar } from '../Avatar'
-import { Button } from '../Button'
 import { Checkbox } from '../Checkbox'
 import { Flag } from '../Flag'
 import { Icon, type IconName } from '../Icon'
@@ -31,17 +30,13 @@ import { OPTION_LIST_KEY, type OptionValue } from './context'
  *
  * With `actionLabel` it is **a row that holds one action** (ADR-0126) — a file
  * to download, not a place to go: the row is no longer a control (no link, no
- * button, no hover contour), the chevron gives way to a `Button`
- * `secondary-gray` `sm` at the end, on the top line, and the focus goes to
- * that button. One action per row; it emits `action`, and `actionLoading`
- * holds it busy while the file is made. Never in an `OptionList`: a row is a
- * choice or carries an action, not both.
- *
- * In a narrow column the word takes a third of the row and folds the title on
- * two or three lines: `actionIconOnly` draws the action as its glyph alone —
- * a row's action shape, `IconButton` `xs` `subtle` (ADR-0112): round, no
- * border, nothing at rest but the glyph (ADR-0127, amended). The word stays:
- * it is the button's name and its tooltip, still described by the row.
+ * button, no hover contour), the chevron gives way to **the action's glyph**
+ * at the end, on the top line — a row's action shape, `IconButton` `xs`
+ * `subtle` (ADR-0112): round, no border, no word (ADR-0127). The word is
+ * `actionLabel`: the button's name and its tooltip, the button described by
+ * the row. The focus goes to that button. One action per row; it emits
+ * `action`, and `actionLoading` holds it busy while the file is made. Never in
+ * an `OptionList`: a row is a choice or carries an action, not both.
  */
 interface Props {
   /** The title. */
@@ -59,12 +54,13 @@ interface Props {
   disabled?: boolean
   /** A row that leads somewhere: a link. Without it and outside a list, a button. */
   href?: string
-  /** The row's one action, at its end in place of the chevron — « Télécharger ». Emits `action`. */
+  /** The row's one action, its name and its tooltip — « Télécharger ». Emits `action`. */
   actionLabel?: string
+  /** The action's glyph, alone at the row's end. */
   actionIcon?: IconName
   /** The action is under way — the file being made. */
   actionLoading?: boolean
-  /** The action as its glyph alone (`actionIcon`), `actionLabel` its name and its tooltip — for a narrow column. */
+  /** @deprecated 0.108's switch: the action is always its glyph alone now (ADR-0127). Ignored. */
   actionIconOnly?: boolean
 }
 
@@ -117,8 +113,6 @@ function onClick(event: MouseEvent) {
 
 /* The button is named by its word and described by the row: five « Télécharger »
    in a list each say which file. */
-/* A glyph alone needs a glyph: without `actionIcon` the word stays on screen. */
-const actionGlyphOnly = computed(() => props.actionIconOnly && Boolean(props.actionIcon))
 const actionDescribedBy = computed(() => [titleId, props.description ? descriptionId : null].filter(Boolean).join(' '))
 </script>
 
@@ -165,13 +159,13 @@ const actionDescribedBy = computed(() => [titleId, props.description ? descripti
     <span v-if="meta" class="ds-option-card__meta"><span class="ds-option-card__meta-text">{{ meta }}</span></span>
 
     <span v-if="holds" class="ds-option-card__action">
-      <Tooltip v-if="actionGlyphOnly" :title="actionLabel!" placement="top">
+      <Tooltip :title="actionLabel!" placement="top">
         <!-- Busy, it keeps its focus and its place: a spinner in the glyph's
              box, the press ignored (ADR-0059 — disabling would drop the focus). -->
         <IconButton
           size="xs"
           variant="subtle"
-          :icon="actionIcon!"
+          :icon="actionIcon ?? 'download'"
           :ariaLabel="actionLabel!"
           :disabled="isDisabled"
           :aria-describedby="actionDescribedBy"
@@ -180,21 +174,10 @@ const actionDescribedBy = computed(() => [titleId, props.description ? descripti
         >
           <template #default="{ size }">
             <Spinner v-if="actionLoading" :size="size" :thickness="2" />
-            <Icon v-else :name="actionIcon!" :size="size" />
+            <Icon v-else :name="actionIcon ?? 'download'" :size="size" />
           </template>
         </IconButton>
       </Tooltip>
-      <Button
-        v-else
-        variant="secondary-gray"
-        size="sm"
-        :label="actionLabel!"
-        :icon-leading="actionIcon"
-        :loading="actionLoading"
-        :disabled="isDisabled"
-        :aria-describedby="actionDescribedBy"
-        @click="emit('action')"
-      />
     </span>
     <span v-else class="ds-option-card__control" aria-hidden="true">
       <Checkbox v-if="choosing" visual-only size="sm" :type="kind" :model-value="checked" :disabled="isDisabled" />

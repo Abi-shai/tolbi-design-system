@@ -1316,11 +1316,12 @@ Before working on any component, read:
   the margins give on a small screen (`clamp(xl, 5vw/5vh, 7xl/5xl)`). The side placement keeps 82rem.
 - **ADR-0126**: **a row that holds an action** — `OptionCard` with `actionLabel` (+ `actionIcon`, `actionLoading`,
   emits `action`) is a file to download, not a place to go: the row is no longer a control (a `<div>`, no hover
-  contour), the chevron gives way to a `Button secondary-gray sm` at the end on the top line, the focus goes to it,
+  contour), the chevron gives way to **the action's glyph** (ADR-0127; was a worded `Button`) at the end on the top line, the focus goes to it,
   `disabled` greys both, the button is described by the row. Props, not a slot: one shape. Not in an `OptionList`.
-- **ADR-0127**: **the action as its glyph** — `OptionCard actionIconOnly`: **amended** — `IconButton xs subtle`
-  (ADR-0112's row-action shape: round, no border, « plus clean »; busy = a spinner in the glyph's box, focus kept) for a narrow column, where the word folded the title on 2–3 lines; `actionLabel` stays its name and its
-  anchored `Tooltip`, still described by the row; loading in the same square; no `actionIcon` → the word stays.
+- **ADR-0127**: **the action is its glyph, no word** — `OptionCard`'s action is `IconButton xs subtle` (ADR-0112's
+  row-action shape: round, borderless, « sans texte »), `actionIcon` its glyph (`download` by default), `actionLabel` its
+  name and anchored `Tooltip`, described by the row; busy = a spinner in the glyph's box, focus kept. `actionIconOnly`
+  (0.108) is deprecated and ignored. A disabled `ghost` `Button` stays transparent, ink half `text-disabled`.
 
 ## Architecture
 

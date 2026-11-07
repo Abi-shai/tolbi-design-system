@@ -385,10 +385,20 @@ function handleClick(event: MouseEvent) {
   cursor: not-allowed;
 }
 
+/* What has nothing at rest has nothing off: a ghost greys its ink, it does not
+   grow a box (ADR-0127). */
 .ds-button--tertiary:disabled,
-.ds-button--link:disabled {
+.ds-button--link:disabled,
+.ds-button--ghost:disabled {
   background-color: transparent;
   border-color: transparent;
+}
+
+/* A ghost rests in `text-subtle` (gray 600); `text-disabled` is gray 500 — two
+   greys nobody tells apart, so off read as live. Half of it, as the subtle
+   `IconButton` (ADR-0118). */
+.ds-button--ghost:disabled {
+  color: color-mix(in srgb, var(--ds-text-disabled) 50%, transparent);
 }
 
 /* ── Spinner ──────────────────────────────────────────────────────── */

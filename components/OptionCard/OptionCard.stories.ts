@@ -83,10 +83,11 @@ export const Disabled: Story = {
 }
 
 /**
- * **Une rangée qui porte une action** (ADR-0126) — les documents d’un rapport ARR : un fichier à télécharger, pas un
- * endroit où aller. La rangée n’est plus un bouton ni un lien ; le chevron laisse la place à un `Button`
- * `secondary-gray` `sm` en haut à droite, et c’est lui qui prend le focus. `actionLoading` le tient occupé pendant la
- * génération du fichier ; `disabled` grise la rangée et le bouton. Une seule action par rangée.
+ * **Une rangée qui porte une action** (ADR-0126, ADR-0127) — les documents d’un rapport ARR : un fichier à télécharger,
+ * pas un endroit où aller. La rangée n’est plus un bouton ni un lien ; le chevron laisse la place au **glyphe seul** de
+ * l’action — `IconButton xs subtle`, rond, sans bordure, sans mot — en haut à droite, et c’est lui qui prend le focus.
+ * `actionLabel` est son nom et son infobulle ; `actionLoading` fait tourner le glyphe pendant la génération du
+ * fichier ; `disabled` grise la rangée et le bouton. Une seule action par rangée.
  */
 export const WithAction: Story = {
   name: 'Une rangée qui porte une action',
@@ -115,46 +116,6 @@ export const WithAction: Story = {
           :disabled="d.disabled"
           action-label="Télécharger"
           action-icon="download"
-          :action-loading="busy === d.id"
-          @action="download(d.id)"
-        />
-      </div>
-    `,
-  }),
-}
-
-/**
- * **L’action en glyphe seul** (ADR-0127) — dans une colonne étroite (`MapPanel lg`, ~26 rem), le mot prenait un tiers
- * de la rangée et le titre passait sur deux ou trois lignes. `action-icon-only` : la forme des actions de rangée,
- * `IconButton xs subtle` — ronde, sans bordure, le glyphe seul au repos (ADR-0127, amendé) ; `actionLabel` reste son nom et son infobulle, toujours décrit par la rangée.
- */
-export const WithIconAction: Story = {
-  name: 'Une action en glyphe seul (colonne étroite)',
-  render: () => ({
-    components: { OptionCard },
-    setup() {
-      const busy = ref<string | null>(null)
-      const download = (id: string) => { busy.value = id; setTimeout(() => { busy.value = null }, 1600) }
-      const docs = [
-        { id: 'report', icon: 'file-text', label: 'Rapport de 2026', description: 'La baseline, les points de contrôle et le carbone gagné, en PDF' },
-        { id: 'points', icon: 'map-pin', label: 'Points du projet et de contrôle', description: 'Les 240 points et leurs mesures, en CSV' },
-        { id: 'method', icon: 'book-open', label: 'Méthode', description: 'VM0047, ce qui a été appliqué et pourquoi' },
-        { id: 'audit', icon: 'folder', label: 'Dossier auditeur', description: 'Tout ce qu’un auditeur demande, en une archive', disabled: true },
-      ]
-      return { docs, busy, download }
-    },
-    template: `
-      <div style="display:flex;flex-direction:column;gap:12px;width:26rem;box-sizing:border-box;padding:var(--ds-spacing-xl);border:1px solid var(--ds-border-subtle);border-radius:var(--ds-radius-surface)">
-        <OptionCard
-          v-for="d in docs"
-          :key="d.id"
-          :icon="d.icon"
-          :label="d.label"
-          :description="d.description"
-          :disabled="d.disabled"
-          action-label="Télécharger"
-          action-icon="download"
-          action-icon-only
           :action-loading="busy === d.id"
           @action="download(d.id)"
         />
