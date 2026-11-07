@@ -16,3 +16,11 @@ the title folded on two or three lines, the sentence on four.
 - `actionLoading` spins in the same square (38 → 38px, ADR-0027); `disabled` greys the row and the button.
 - A glyph alone needs a glyph: without `actionIcon` the word stays on screen rather than draw an empty square.
 - The rest of ADR-0126 holds: the row is not a control and carries one action.
+
+## Amended (7 Nov.)
+
+- On the owner's render: **no border** — « plus clean ». The glyph takes the catalogue's shape for a row's action,
+  **`IconButton` `xs` `subtle`** (ADR-0112: round, borderless, the glyph alone at rest, `bg-hover` on approach, the
+  pressed veil), not a bordered square: 32px, measured in the 26rem column, every title on one line.
+- Busy, it keeps its focus and its place: a `Spinner` in the glyph's 16px box, `aria-busy`, the press ignored —
+  not `disabled`, which would drop the focus from the button just pressed (ADR-0059). 32 → 32px.

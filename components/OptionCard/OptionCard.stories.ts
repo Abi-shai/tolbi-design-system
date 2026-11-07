@@ -125,8 +125,8 @@ export const WithAction: Story = {
 
 /**
  * **L’action en glyphe seul** (ADR-0127) — dans une colonne étroite (`MapPanel lg`, ~26 rem), le mot prenait un tiers
- * de la rangée et le titre passait sur deux ou trois lignes. `action-icon-only` : un `Button` icône seule
- * `secondary-gray` `sm` (38 px) ; `actionLabel` reste son nom et son infobulle, toujours décrit par la rangée.
+ * de la rangée et le titre passait sur deux ou trois lignes. `action-icon-only` : la forme des actions de rangée,
+ * `IconButton xs subtle` — ronde, sans bordure, le glyphe seul au repos (ADR-0127, amendé) ; `actionLabel` reste son nom et son infobulle, toujours décrit par la rangée.
  */
 export const WithIconAction: Story = {
   name: 'Une action en glyphe seul (colonne étroite)',

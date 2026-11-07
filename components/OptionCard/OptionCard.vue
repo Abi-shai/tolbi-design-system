@@ -5,6 +5,8 @@ import { Button } from '../Button'
 import { Checkbox } from '../Checkbox'
 import { Flag } from '../Flag'
 import { Icon, type IconName } from '../Icon'
+import { IconButton } from '../IconButton'
+import { Spinner } from '../Spinner'
 import { Tooltip } from '../Tooltip'
 import { OPTION_LIST_KEY, type OptionValue } from './context'
 
@@ -37,8 +39,9 @@ import { OPTION_LIST_KEY, type OptionValue } from './context'
  *
  * In a narrow column the word takes a third of the row and folds the title on
  * two or three lines: `actionIconOnly` draws the action as its glyph alone —
- * `Button` icon-only `secondary-gray` `sm`, a 38px square (ADR-0127). The word
- * stays: it is the button's name and its tooltip, still described by the row.
+ * a row's action shape, `IconButton` `xs` `subtle` (ADR-0112): round, no
+ * border, nothing at rest but the glyph (ADR-0127, amended). The word stays:
+ * it is the button's name and its tooltip, still described by the row.
  */
 interface Props {
   /** The title. */
@@ -163,17 +166,23 @@ const actionDescribedBy = computed(() => [titleId, props.description ? descripti
 
     <span v-if="holds" class="ds-option-card__action">
       <Tooltip v-if="actionGlyphOnly" :title="actionLabel!" placement="top">
-        <Button
-          variant="secondary-gray"
-          size="sm"
-          icon-only
-          :label="actionLabel!"
-          :icon-leading="actionIcon"
-          :loading="actionLoading"
+        <!-- Busy, it keeps its focus and its place: a spinner in the glyph's
+             box, the press ignored (ADR-0059 — disabling would drop the focus). -->
+        <IconButton
+          size="xs"
+          variant="subtle"
+          :icon="actionIcon!"
+          :ariaLabel="actionLabel!"
           :disabled="isDisabled"
           :aria-describedby="actionDescribedBy"
-          @click="emit('action')"
-        />
+          :aria-busy="actionLoading || undefined"
+          @click="actionLoading || emit('action')"
+        >
+          <template #default="{ size }">
+            <Spinner v-if="actionLoading" :size="size" :thickness="2" />
+            <Icon v-else :name="actionIcon!" :size="size" />
+          </template>
+        </IconButton>
       </Tooltip>
       <Button
         v-else
