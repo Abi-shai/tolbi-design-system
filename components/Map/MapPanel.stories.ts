@@ -168,3 +168,32 @@ export const Loading: Story = {
     `,
   }),
 }
+
+/**
+ * **Un panneau de lecture sans onglets** (ADR-0128) — la page d’une zone éligible ARR : pas de `#header`. Le repli est
+ * celui de tout panneau `lg` (ADR-0117) : le bouton carré au début de la tête, puis le titre ; replié, le contrôle au
+ * coin. Le titre est lu dans le nom du bouton (« Replier Soubré nord »). Le titre + chevron reste propre à `sm`.
+ */
+export const ReadingPanelUntabbed: Story = {
+  name: 'Panneau de lecture sans onglets (lg)',
+  parameters: { layout: 'fullscreen' },
+  render: () => ({
+    components: { MapPanel, MapOverlay, SectionCard, StatTile, Button },
+    setup: () => ({ collapsed: ref(false) }),
+    template: `
+      <div style="position:relative;height:100vh;min-height:640px;background:var(--ds-bg-neutral);overflow:hidden">
+        <MapOverlay position="start">
+          <MapPanel v-model:collapsed="collapsed" size="lg" title="Soubré nord" collapsible collapse-label="Replier" expand-label="Déplier">
+            <SectionCard title="Éligibilité">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--ds-spacing-md)">
+                <StatTile label="Surface éligible" value="1 284" caption="ha" />
+                <StatTile label="Couvert en 2016" value="12" caption="%" />
+              </div>
+            </SectionCard>
+            <template #footer><Button label="Créer une baseline" size="sm" /></template>
+          </MapPanel>
+        </MapOverlay>
+      </div>
+    `,
+  }),
+}

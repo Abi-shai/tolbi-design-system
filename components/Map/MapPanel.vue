@@ -82,7 +82,12 @@ const collapsed = defineModel<boolean>('collapsed', { default: false })
 const host = ref<HTMLElement | null>(null)
 const panelId = `ds-map-panel-${useId()}`
 const named = (verb: string) => (props.title ? `${verb} ${props.title}` : verb)
-const iconFold = computed(() => !!slots.header)
+/* The fold is the size's, not the head's (ADR-0128): a `lg` panel folds by the
+   square at the start of its head into a control at the corner, tabs or no
+   tabs; the title + chevron and the titled button are `sm`'s. */
+const iconFold = computed(() => props.size === 'lg' || !!slots.header)
+/* A `lg` head without `#header` carries the title after the fold. */
+const slotHead = computed(() => !!slots.header || (props.size === 'lg' && (!!props.title || props.collapsible || props.loading)))
 
 /*
   The control the panel becomes stands **at the overlay's corner** (ADR-0117,
@@ -153,7 +158,7 @@ function focusArrived() {
         :aria-label="props.title"
         :aria-busy="loading || undefined"
       >
-        <div v-if="slots.header" class="ds-map-panel__head ds-map-panel__head--slot">
+        <div v-if="slotHead" class="ds-map-panel__head ds-map-panel__head--slot">
           <IconButton
             v-if="collapsible"
             data-map-panel-fold
@@ -165,7 +170,12 @@ function focusArrived() {
             :aria-controls="panelId"
             @click="fold(true)"
           />
-          <div class="ds-map-panel__header"><slot name="header" /></div>
+          <div class="ds-map-panel__header">
+            <slot name="header">
+              <span v-if="title" class="ds-map-panel__title">{{ title }}</span>
+              <Skeleton v-else-if="loading" width="40%" aria-hidden="true" />
+            </slot>
+          </div>
         </div>
         <div v-else-if="title" class="ds-map-panel__head">
           <span class="ds-map-panel__title">{{ title }}</span>
@@ -311,6 +321,11 @@ function focusArrived() {
 .ds-map-panel__header {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+/* The title in a `lg` head without tabs: one line, cut, after the fold. */
+.ds-map-panel__header > .ds-map-panel__title {
+  display: block;
 }
 
 .ds-map-panel__foot {

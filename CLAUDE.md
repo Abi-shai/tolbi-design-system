@@ -1322,6 +1322,9 @@ Before working on any component, read:
   row-action shape: round, borderless, « sans texte »), `actionIcon` its glyph (`download` by default), `actionLabel` its
   name and anchored `Tooltip`, described by the row; busy = a spinner in the glyph's box, focus kept. `actionIconOnly`
   (0.108) is deprecated and ignored. A disabled `ghost` `Button` stays transparent, ink half `text-disabled`.
+- **ADR-0128**: **a reading panel folds one way** — `MapPanel size="lg"` folds by the square at the start of its head
+  into the corner control (ADR-0117) **with or without `#header`**; without it the head is the square then the title.
+  The title + chevron fold stays `sm`'s. The title is read in the button's name.
 
 ## Architecture
 
