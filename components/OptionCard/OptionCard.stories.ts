@@ -122,3 +122,43 @@ export const WithAction: Story = {
     `,
   }),
 }
+
+/**
+ * **L’action en glyphe seul** (ADR-0127) — dans une colonne étroite (`MapPanel lg`, ~26 rem), le mot prenait un tiers
+ * de la rangée et le titre passait sur deux ou trois lignes. `action-icon-only` : un `Button` icône seule
+ * `secondary-gray` `sm` (38 px) ; `actionLabel` reste son nom et son infobulle, toujours décrit par la rangée.
+ */
+export const WithIconAction: Story = {
+  name: 'Une action en glyphe seul (colonne étroite)',
+  render: () => ({
+    components: { OptionCard },
+    setup() {
+      const busy = ref<string | null>(null)
+      const download = (id: string) => { busy.value = id; setTimeout(() => { busy.value = null }, 1600) }
+      const docs = [
+        { id: 'report', icon: 'file-text', label: 'Rapport de 2026', description: 'La baseline, les points de contrôle et le carbone gagné, en PDF' },
+        { id: 'points', icon: 'map-pin', label: 'Points du projet et de contrôle', description: 'Les 240 points et leurs mesures, en CSV' },
+        { id: 'method', icon: 'book-open', label: 'Méthode', description: 'VM0047, ce qui a été appliqué et pourquoi' },
+        { id: 'audit', icon: 'folder', label: 'Dossier auditeur', description: 'Tout ce qu’un auditeur demande, en une archive', disabled: true },
+      ]
+      return { docs, busy, download }
+    },
+    template: `
+      <div style="display:flex;flex-direction:column;gap:12px;width:26rem;box-sizing:border-box;padding:var(--ds-spacing-xl);border:1px solid var(--ds-border-subtle);border-radius:var(--ds-radius-surface)">
+        <OptionCard
+          v-for="d in docs"
+          :key="d.id"
+          :icon="d.icon"
+          :label="d.label"
+          :description="d.description"
+          :disabled="d.disabled"
+          action-label="Télécharger"
+          action-icon="download"
+          action-icon-only
+          :action-loading="busy === d.id"
+          @action="download(d.id)"
+        />
+      </div>
+    `,
+  }),
+}

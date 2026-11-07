@@ -5,6 +5,7 @@ import { Button } from '../Button'
 import { Checkbox } from '../Checkbox'
 import { Flag } from '../Flag'
 import { Icon, type IconName } from '../Icon'
+import { Tooltip } from '../Tooltip'
 import { OPTION_LIST_KEY, type OptionValue } from './context'
 
 /**
@@ -33,6 +34,11 @@ import { OPTION_LIST_KEY, type OptionValue } from './context'
  * that button. One action per row; it emits `action`, and `actionLoading`
  * holds it busy while the file is made. Never in an `OptionList`: a row is a
  * choice or carries an action, not both.
+ *
+ * In a narrow column the word takes a third of the row and folds the title on
+ * two or three lines: `actionIconOnly` draws the action as its glyph alone —
+ * `Button` icon-only `secondary-gray` `sm`, a 38px square (ADR-0127). The word
+ * stays: it is the button's name and its tooltip, still described by the row.
  */
 interface Props {
   /** The title. */
@@ -55,6 +61,8 @@ interface Props {
   actionIcon?: IconName
   /** The action is under way — the file being made. */
   actionLoading?: boolean
+  /** The action as its glyph alone (`actionIcon`), `actionLabel` its name and its tooltip — for a narrow column. */
+  actionIconOnly?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -70,6 +78,7 @@ const props = withDefaults(defineProps<Props>(), {
   actionLabel: undefined,
   actionIcon: undefined,
   actionLoading: false,
+  actionIconOnly: false,
 })
 
 const emit = defineEmits<{ click: [event: MouseEvent]; action: [] }>()
@@ -105,6 +114,8 @@ function onClick(event: MouseEvent) {
 
 /* The button is named by its word and described by the row: five « Télécharger »
    in a list each say which file. */
+/* A glyph alone needs a glyph: without `actionIcon` the word stays on screen. */
+const actionGlyphOnly = computed(() => props.actionIconOnly && Boolean(props.actionIcon))
 const actionDescribedBy = computed(() => [titleId, props.description ? descriptionId : null].filter(Boolean).join(' '))
 </script>
 
@@ -151,7 +162,21 @@ const actionDescribedBy = computed(() => [titleId, props.description ? descripti
     <span v-if="meta" class="ds-option-card__meta"><span class="ds-option-card__meta-text">{{ meta }}</span></span>
 
     <span v-if="holds" class="ds-option-card__action">
+      <Tooltip v-if="actionGlyphOnly" :title="actionLabel!" placement="top">
+        <Button
+          variant="secondary-gray"
+          size="sm"
+          icon-only
+          :label="actionLabel!"
+          :icon-leading="actionIcon"
+          :loading="actionLoading"
+          :disabled="isDisabled"
+          :aria-describedby="actionDescribedBy"
+          @click="emit('action')"
+        />
+      </Tooltip>
       <Button
+        v-else
         variant="secondary-gray"
         size="sm"
         :label="actionLabel!"

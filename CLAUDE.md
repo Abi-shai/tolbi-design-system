@@ -1318,6 +1318,9 @@ Before working on any component, read:
   emits `action`) is a file to download, not a place to go: the row is no longer a control (a `<div>`, no hover
   contour), the chevron gives way to a `Button secondary-gray sm` at the end on the top line, the focus goes to it,
   `disabled` greys both, the button is described by the row. Props, not a slot: one shape. Not in an `OptionList`.
+- **ADR-0127**: **the action as its glyph** — `OptionCard actionIconOnly`: a `Button` icon-only `secondary-gray sm` (38px
+  square) for a narrow column, where the word folded the title on 2–3 lines; `actionLabel` stays its name and its
+  anchored `Tooltip`, still described by the row; loading in the same square; no `actionIcon` → the word stays.
 
 ## Architecture
 
