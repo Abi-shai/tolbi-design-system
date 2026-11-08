@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { SwapTransition } from '../SwapTransition'
+import { Tooltip } from '../Tooltip'
 import { Card } from '../Card'
 import { MetricValue, type MetricTrend } from '../MetricValue'
 import { Badge, type BadgeTone } from '../Badge'
@@ -27,6 +29,23 @@ withDefaults(defineProps<Props>(), {
   tagTone: 'neutral',
   loading: false,
 })
+
+/* The label holds two lines; cut, it is given whole in a tooltip — only when
+   cut, or a whole label would be said twice (ProjectCard's title, ADR-0109). */
+const labelEl = ref<HTMLElement | null>(null)
+const labelCut = ref(false)
+let ro: ResizeObserver | null = null
+const measure = () => {
+  const el = labelEl.value
+  labelCut.value = !!el && el.scrollHeight > el.clientHeight + 1
+}
+onMounted(() => {
+  measure()
+  ro = new ResizeObserver(measure)
+  if (labelEl.value) ro.observe(labelEl.value)
+  document.fonts?.ready.then(measure)
+})
+onBeforeUnmount(() => ro?.disconnect())
 </script>
 
 <template>
@@ -37,7 +56,9 @@ withDefaults(defineProps<Props>(), {
   -->
   <Card class="ds-stat-tile">
     <div class="ds-stat-tile__head">
-      <span class="ds-stat-tile__label">{{ label }}</span>
+      <Tooltip :title="label" :disabled="!labelCut" placement="top-start" class="ds-stat-tile__label-tip">
+        <span ref="labelEl" class="ds-stat-tile__label">{{ label }}</span>
+      </Tooltip>
       <Badge v-if="tag" :label="tag" :tone="tagTone" size="sm" />
     </div>
 
@@ -103,6 +124,15 @@ withDefaults(defineProps<Props>(), {
   align-items: flex-start;
   gap: var(--ds-spacing-md);
   min-width: 0;
+  /* At the foot of its row (ADR-0131, track A of `3872:1427`): beside a label of
+     two lines, a label of one sits against its own figure, and the line left
+     over goes above it — where it reads as the card's margin — not between a
+     label and its value. */
+  align-self: end;
+}
+
+.ds-stat-tile__label-tip {
+  min-width: 0;
 }
 
 /* A tile in a row of seven is ~152px wide: two lines before the cut (ADR-0095). */
@@ -119,6 +149,13 @@ withDefaults(defineProps<Props>(), {
 .ds-stat-tile__metric,
 .ds-stat-tile__loading { margin-top: var(--ds-spacing-md); }
 
+/* The figure's size answers the tile's width (ADR-0131) — measured on the
+   figure's own box, the tile's content width: a container on the tile itself
+   would contain its layout, and a contained element cannot be a subgrid. */
+.ds-stat-tile__metric {
+  container-type: inline-size;
+}
+
 .ds-stat-tile__tail {
   display: flex;
   flex-direction: column;
@@ -127,11 +164,31 @@ withDefaults(defineProps<Props>(), {
   min-width: 0;
 }
 
-/* `text-subtle`, not the drawing's `subtlest`: on a raised dark ground that is 4.18:1 (ADR-0048). */
+/* `text-subtle`, not the drawing's `subtlest`: on a raised dark ground that is 4.18:1 (ADR-0048).
+   Two lines at most (ADR-0131). */
 .ds-stat-tile__caption {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
   margin: 0;
   font: var(--ds-font-body-sm);
   color: var(--ds-text-subtle);
+}
+
+/*
+  A narrow tile takes the figure one step down — 32px to 24px under 11rem of
+  content (ADR-0131): « 28 940 tCO2e » is 156px at 32 for the 145 a tile of a
+  25rem panel has, 128px at 24. Every tile of a group shares the width, so they
+  share the size: one size in a group, the rule ADR-0109 kept for the cards.
+  The unit stays on its line.
+*/
+@container (width < 11rem) {
+  .ds-stat-tile__metric :deep(.ds-metric__value) {
+    font: var(--ds-font-heading-xl);
+    letter-spacing: var(--ds-letter-spacing-heading-xl);
+  }
 }
 
 /* MetricValue carries its own label; the tile supplies it above instead. */

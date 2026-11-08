@@ -220,6 +220,7 @@ export type { ConfirmDialogConsequence, DialogPlacement, DialogSize, DialogSumma
 export type { ToastTone, ToastRegionPlacement } from './Toast'
 
 export { StatTile } from './StatTile'
+export { StatGroup } from './StatGroup'
 
 export { AvatarGroup } from './AvatarGroup'
 export type { AvatarGroupItem } from './AvatarGroup'

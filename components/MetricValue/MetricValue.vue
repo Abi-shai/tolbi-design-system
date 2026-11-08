@@ -37,7 +37,7 @@ const arrow = computed(() =>
 
     <div class="ds-metric__row">
       <span class="ds-metric__value">
-        {{ value }}<span v-if="unit" class="ds-metric__unit">{{ unit }}</span>
+        <span class="ds-metric__number">{{ value }}</span><span v-if="unit" class="ds-metric__unit">{{ unit }}</span>
       </span>
 
       <span
@@ -79,6 +79,14 @@ const arrow = computed(() =>
   color: var(--ds-text-strong);
   /* Digits must not jitter as a value updates. */
   font-variant-numeric: tabular-nums;
+}
+
+/* A number never breaks inside: « 28 940 » is one word to the eye, and its
+   French thin space is a breaking one (ADR-0131). If a figure and its unit
+   cannot share the line, the unit is what moves, never half the number. */
+.ds-metric__number,
+.ds-metric__unit {
+  white-space: nowrap;
 }
 
 .ds-metric__unit {

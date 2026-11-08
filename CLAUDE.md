@@ -1331,6 +1331,11 @@ Before working on any component, read:
 - **ADR-0130**: **the fold sits on the first line** — `MapPanel`'s own head is a grid: the fold and `#header`'s first
   child share line one (the fold centred on the tabs), every later child takes the head's whole width, under the fold
   (a search that stays). `#header`'s items must be **direct children** (the header box is `display: contents`).
+- **ADR-0131**: **stat tiles in a group** (track A of `3872:1427`) — **`StatGroup`**: columns from its own width (tiles ≥
+  10rem, ≤ 4 a row; 2 × 2 in a 25rem panel, 4 in 2xl), the package's gap, rows as the tiles' subgrid. Under 11rem of
+  content the figure steps **32 → 24px**, the whole group alike, **the unit stays on its line** (unit-under refused,
+  ADR-0109); a short label sits **against its figure** (the spare line above); a **number never breaks**; label and
+  caption hold two lines, a cut label in a `Tooltip`. A query container cannot be a subgrid: it is the figure's box.
 
 ## Architecture
 
