@@ -295,7 +295,8 @@ const actionDescribedBy = computed(() => [titleId, props.description ? descripti
 }
 
 .ds-option-card__description {
-  font: var(--ds-font-body-sm);
+  /* 12px, 14 in a reading panel (ADR-0132). */
+  font: var(--reading-secondary-font, var(--ds-font-body-sm));
   color: var(--ds-text-subtle);
   overflow-wrap: anywhere;
 }

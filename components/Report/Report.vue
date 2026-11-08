@@ -218,25 +218,25 @@ function print() {
 
   @top-left {
     content: var(--ds-report-head);
-    font: var(--ds-font-label-xs);
+    font: var(--ds-font-body-sm);
     color: var(--ds-text-subtle);
   }
 
   @top-right {
     content: var(--ds-report-date);
-    font: var(--ds-font-label-xs);
+    font: var(--ds-font-body-sm);
     color: var(--ds-text-subtle);
   }
 
   @bottom-left {
     content: var(--ds-report-foot);
-    font: var(--ds-font-label-xs);
+    font: var(--ds-font-body-sm);
     color: var(--ds-text-subtle);
   }
 
   @bottom-right {
     content: var(--ds-report-folio);
-    font: var(--ds-font-label-xs);
+    font: var(--ds-font-body-sm);
     color: var(--ds-text-subtle);
   }
 }

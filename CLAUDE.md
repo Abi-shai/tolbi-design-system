@@ -1336,6 +1336,11 @@ Before working on any component, read:
   content the figure steps **32 → 24px**, the whole group alike, **the unit stays on its line** (unit-under refused,
   ADR-0109); a short label sits **against its figure** (the spare line above); a **number never breaks**; label and
   caption hold two lines, a cut label in a `Tooltip`. A query container cannot be a subgrid: it is the figure's box.
+- **ADR-0132**: **secondary text in a reading panel** — a **12px floor** for read text (`label-xs` unused, deprecated);
+  `MapPanel lg` and `Dialog` set **`--reading-secondary-font`** (`body-md` + `-emphasis`) read by `ShareBar`'s legend,
+  `StatTile`'s caption, `OptionCard`'s sentence, `ChartLegend`'s entries (fallback `body-sm`); a `ProjectCard` resets it.
+  `MetricValue lg`'s unit 16px. `StatGroup` tiles floor at 9.5rem (2 × 2 in a panel's `SectionCard`), a group < 22rem
+  tightens tile inset to 12, a figure < 8rem steps to 20px.
 
 ## Architecture
 

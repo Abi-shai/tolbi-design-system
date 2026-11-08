@@ -86,7 +86,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
-const LABEL = 'font: var(--ds-font-label-xs); color: var(--ds-text-subtle);'
+const LABEL = 'font: var(--ds-font-body-sm); color: var(--ds-text-subtle);'
 
 /**
  * La grille du composant Figma, moins les quatre états de chargement (Gauche,
@@ -149,7 +149,7 @@ export const Surfaces: Story = {
           :key="g.label"
           :style="{ background: g.bg, borderRadius: 'var(--ds-radius-surface)', padding: 'var(--ds-spacing-3xl)', display: 'flex', flexDirection: 'column', gap: 'var(--ds-spacing-xl)' }"
         >
-          <span :style="{ font: 'var(--ds-font-label-xs)', color: g.ink }">{{ g.label }}</span>
+          <span :style="{ font: 'var(--ds-font-body-sm)', color: g.ink }">{{ g.label }}</span>
           <div style="display:flex; align-items:center; gap:var(--ds-spacing-4xl);">
             <TolbiAiSpark v-for="s in sizes" :key="s" :size="s" :surface="g.surface" :aria-label="null" />
             <TolbiAiSpark :size="48" :surface="g.surface" state="off" :aria-label="null" />

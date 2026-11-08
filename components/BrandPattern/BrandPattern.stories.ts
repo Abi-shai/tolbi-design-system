@@ -110,7 +110,7 @@ export const Surfaces: Story = {
     template: `
       <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-3xl);">
         <div v-for="s in surfaces" :key="s.name" style="display:flex; flex-direction:column; gap:var(--ds-spacing-md);">
-          <span style="font: var(--ds-font-label-xs); color:var(--ds-text-subtle);">{{ s.label }}</span>
+          <span style="font: var(--ds-font-body-sm); color:var(--ds-text-subtle);">{{ s.label }}</span>
           <BrandPattern :surface="s.name" padding="lg">
             <div style="min-height:140px; display:flex; align-items:center; font: var(--ds-font-heading-sm);">Tolbi</div>
           </BrandPattern>
@@ -139,7 +139,7 @@ export const Scales: Story = {
     template: `
       <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-3xl);">
         <div v-for="s in scales" :key="s" style="display:flex; flex-direction:column; gap:var(--ds-spacing-md);">
-          <span style="font: var(--ds-font-label-xs); color:var(--ds-text-subtle);">
+          <span style="font: var(--ds-font-body-sm); color:var(--ds-text-subtle);">
             {{ s }}<span v-if="s === 'md'"> — défaut</span>
           </span>
           <BrandPattern :scale="s">

@@ -167,13 +167,14 @@ button.ds-chart-legend__entry:focus-visible {
 }
 
 .ds-chart-legend__label {
-  font: var(--ds-font-body-sm);
+  /* 12px, 14 in a reading panel (ADR-0132). */
+  font: var(--reading-secondary-font, var(--ds-font-body-sm));
   color: var(--ds-text-default);
   white-space: nowrap;
 }
 
 .ds-chart-legend__value {
-  font: var(--ds-font-body-sm-emphasis);
+  font: var(--reading-secondary-font-emphasis, var(--ds-font-body-sm-emphasis));
   color: var(--ds-text-strong);
   font-variant-numeric: tabular-nums;
 }

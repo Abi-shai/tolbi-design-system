@@ -308,6 +308,6 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
 }
 
 .ds-dropdown-item--sm .ds-dropdown-item__shortcut {
-  font: var(--ds-font-label-xs);
+  font: var(--ds-font-body-sm);
 }
 </style>

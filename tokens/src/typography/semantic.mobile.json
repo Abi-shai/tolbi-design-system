@@ -40,7 +40,7 @@
     "label-xs": {
       "$value": "{typography.font-size.11}",
       "$type": "dimension",
-      "$description": "Chrome only — below the 13px mobile floor"
+      "$description": "Deprecated (ADR-0132): no read text under 12px — use body-sm. Kept for products that still name it. Chrome only — below the 13px mobile floor"
     },
     "metric-lg": {
       "$value": "{typography.font-size.28}",

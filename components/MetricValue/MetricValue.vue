@@ -113,6 +113,8 @@ const arrow = computed(() =>
   font: var(--ds-font-heading-lg);
 }
 .ds-metric--lg .ds-metric__value { font: var(--ds-font-metric-xl); letter-spacing: var(--ds-letter-spacing-metric-xl); }
+/* The unit grows with its figure (ADR-0132): 14px beside 40 read as a footnote. */
+.ds-metric--lg .ds-metric__unit { font: var(--ds-font-body-lg); line-height: 1; }
 
 /*
  * Deliberately no brand-surface variant. The metric is only supported on the

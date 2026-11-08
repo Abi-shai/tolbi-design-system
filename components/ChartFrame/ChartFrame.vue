@@ -185,7 +185,7 @@ const gridLines = computed(() => (props.yTicks.length ? props.yTicks.length : 5)
 }
 
 .ds-chart-frame__tick {
-  font: var(--ds-font-label-xs);
+  font: var(--ds-font-body-sm);
   color: var(--ds-text-subtlest);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;

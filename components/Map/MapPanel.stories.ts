@@ -9,6 +9,7 @@ import { SectionCard } from '../SectionCard'
 import { MetricValue } from '../MetricValue'
 import { ShareBar } from '../ShareBar'
 import { StatTile } from '../StatTile'
+import { StatGroup } from '../StatGroup'
 import { InputField } from '../InputField'
 import { Icon } from '../Icon'
 
@@ -109,7 +110,7 @@ export const ReadingPanel: Story = {
   name: 'Panneau de lecture (lg)',
   parameters: { layout: 'fullscreen' },
   render: () => ({
-    components: { MapPanel, MapOverlay, Tabs, SectionCard, MetricValue, ShareBar, StatTile, Button },
+    components: { MapPanel, MapOverlay, Tabs, SectionCard, MetricValue, ShareBar, StatTile, StatGroup, Button },
     setup: () => ({
       collapsed: ref(false),
       tab: ref('vue'),
@@ -129,12 +130,12 @@ export const ReadingPanel: Story = {
               <ShareBar :items="shares" :show-share="false" />
             </SectionCard>
             <SectionCard title="Les chiffres clés">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--ds-spacing-md)">
-                <StatTile label="Crédits estimés" value="65 762" caption="tCO2e" />
-                <StatTile label="|Z|, projet face aux points de contrôle" value="15,8" caption="seuil 1,96" />
-                <StatTile label="Écart des points de contrôle" value="0,029" caption="seuil 0,25" />
-                <StatTile label="Jeux complets" value="39" caption="sur 40 · couverture satellite 98 %" />
-              </div>
+              <StatGroup>
+                <StatTile label="Crédits estimés" value="28 940" unit="tCO2e" />
+                <StatTile label="|Z|" value="7,1" caption="seuil 1,96" />
+                <StatTile label="Écart des points de contrôle" value="0,118" caption="seuil 0,25" />
+                <StatTile label="Points mesurés" value="39" caption="sur 40 · couverture 99 %" />
+              </StatGroup>
             </SectionCard>
             <template #footer><Button variant="secondary-gray" icon-leading="chart-column" label="Voir toutes les données" block /></template>
           </MapPanel>

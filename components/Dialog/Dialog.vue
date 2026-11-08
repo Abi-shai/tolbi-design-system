@@ -509,6 +509,11 @@ function onClick(event: MouseEvent) {
   is. A long body scrolls; the head and the foot stay.
 */
 .ds-dialog__surface {
+  /* A reading panel (ADR-0132): the text that explains a figure is read here,
+     beside figures of 32–40px, and there is room — 14px instead of 12. Read by
+     ShareBar, StatTile, OptionCard and ChartLegend; a ProjectCard resets it. */
+  --reading-secondary-font: var(--ds-font-body-md);
+  --reading-secondary-font-emphasis: var(--ds-font-body-md-emphasis);
   position: relative;
   box-sizing: border-box;
   display: flex;

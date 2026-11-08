@@ -173,7 +173,8 @@ onBeforeUnmount(() => ro?.disconnect())
   line-clamp: 2;
   overflow: hidden;
   margin: 0;
-  font: var(--ds-font-body-sm);
+  /* 12px, 14 in a reading panel (ADR-0132). */
+  font: var(--reading-secondary-font, var(--ds-font-body-sm));
   color: var(--ds-text-subtle);
 }
 
@@ -188,6 +189,15 @@ onBeforeUnmount(() => ro?.disconnect())
   .ds-stat-tile__metric :deep(.ds-metric__value) {
     font: var(--ds-font-heading-xl);
     letter-spacing: var(--ds-letter-spacing-heading-xl);
+  }
+}
+
+/* A second step for narrower still (ADR-0132): 20px under 8rem — the figure
+   gives before the unit is pushed off its line. */
+@container (width < 8rem) {
+  .ds-stat-tile__metric :deep(.ds-metric__value) {
+    font: var(--ds-font-heading-lg);
+    letter-spacing: var(--ds-letter-spacing-heading-lg);
   }
 }
 

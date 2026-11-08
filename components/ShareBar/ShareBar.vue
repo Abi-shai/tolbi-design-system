@@ -183,7 +183,8 @@ function colour(i: number) {
   gap: var(--ds-spacing-xs);
   flex: none;
   white-space: nowrap;
-  font: var(--ds-font-label-xs);
+  /* 12px, 14 in a reading panel (ADR-0132). */
+  font: var(--reading-secondary-font, var(--ds-font-body-sm));
   color: var(--ds-text-subtle);
 }
 

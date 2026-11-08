@@ -283,6 +283,11 @@ function focusArrived() {
   blocks are 16 apart.
 */
 .ds-map-panel--lg {
+  /* A reading panel (ADR-0132): the text that explains a figure is read here,
+     beside figures of 32–40px, and there is room — 14px instead of 12. Read by
+     ShareBar, StatTile, OptionCard and ChartLegend; a ProjectCard resets it. */
+  --reading-secondary-font: var(--ds-font-body-md);
+  --reading-secondary-font-emphasis: var(--ds-font-body-md-emphasis);
   width: 25rem;
   max-width: 100%;
   /* In a place that has a height — a whole side of the map (ADR-0103) — it

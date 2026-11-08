@@ -191,7 +191,7 @@ const said = computed(() => {
 
 .ds-map-legend__unit,
 .ds-map-legend__ticks {
-  font: var(--ds-font-label-xs);
+  font: var(--ds-font-body-sm);
   font-variant-numeric: tabular-nums;
   color: var(--ds-text-subtle);
 }
