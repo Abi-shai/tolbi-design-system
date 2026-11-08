@@ -1328,6 +1328,9 @@ Before working on any component, read:
 - **ADR-0129**: **a legend by category** — `MapLegend` `ticks` is optional: absent with a `legend`, the legend is the
   map's **key** (title + `ChartLegend` entries, shape `zone`, figure optional), no ramp, no bounds, same surface, width
   and place as the cockpit's; said once (« Parcelles : Éligibles 85 %, … »). `ticks: []` still means « — ».
+- **ADR-0130**: **the fold sits on the first line** — `MapPanel`'s own head is a grid: the fold and `#header`'s first
+  child share line one (the fold centred on the tabs), every later child takes the head's whole width, under the fold
+  (a search that stays). `#header`'s items must be **direct children** (the header box is `display: contents`).
 
 ## Architecture
 

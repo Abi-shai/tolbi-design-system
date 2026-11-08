@@ -158,7 +158,7 @@ function focusArrived() {
         :aria-label="props.title"
         :aria-busy="loading || undefined"
       >
-        <div v-if="slotHead" class="ds-map-panel__head ds-map-panel__head--slot">
+        <div v-if="slotHead" class="ds-map-panel__head ds-map-panel__head--slot" :class="{ 'ds-map-panel__head--folds': collapsible }">
           <IconButton
             v-if="collapsible"
             data-map-panel-fold
@@ -314,13 +314,34 @@ function focusArrived() {
   padding: 0 var(--ds-spacing-xl) var(--ds-spacing-xl);
 }
 
+/*
+  A head of its own is a grid (ADR-0130): the fold and the header's **first**
+  child share the first line, the fold centred on it — on the tabs, whatever
+  follows — and every child after that takes the head's whole width, under the
+  fold too: a search that stays while the list scrolls. The header box itself
+  is `display: contents`, so its children are the grid's.
+*/
 .ds-map-panel__head--slot {
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: var(--ds-spacing-lg) var(--ds-spacing-md);
+}
+
+.ds-map-panel__head--folds {
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 .ds-map-panel__header {
-  flex: 1 1 auto;
-  min-width: 0;
+  display: contents;
+}
+
+.ds-map-panel__head--folds .ds-map-panel__header > :deep(:first-child) {
+  grid-column: 2;
+}
+
+.ds-map-panel__header > :deep(:not(:first-child)) {
+  grid-column: 1 / -1;
 }
 
 /* The title in a `lg` head without tabs: one line, cut, after the fold. */

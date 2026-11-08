@@ -9,6 +9,8 @@ import { SectionCard } from '../SectionCard'
 import { MetricValue } from '../MetricValue'
 import { ShareBar } from '../ShareBar'
 import { StatTile } from '../StatTile'
+import { InputField } from '../InputField'
+import { Icon } from '../Icon'
 
 const meta: Meta<typeof MapPanel> = {
   title: 'Données/Map/Panel',
@@ -191,6 +193,42 @@ export const ReadingPanelUntabbed: Story = {
               </div>
             </SectionCard>
             <template #footer><Button label="Créer une baseline" size="sm" /></template>
+          </MapPanel>
+        </MapOverlay>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * **Des onglets et une recherche dans la tête** (ADR-0130) — zone éligible ARR, onglet Parcelles : la recherche reste
+ * fixe pendant que la liste défile. Le bouton de repli se centre sur la **première ligne** du `#header` (les onglets),
+ * quelle que soit la hauteur de la suite ; ce qui suit prend toute la largeur de la tête, sous le bouton compris. Les
+ * éléments sont des enfants directs de `#header`.
+ */
+export const HeaderWithSearch: Story = {
+  name: 'Onglets et recherche dans la tête (lg)',
+  parameters: { layout: 'fullscreen' },
+  render: () => ({
+    components: { MapPanel, MapOverlay, Tabs, InputField, Icon },
+    setup: () => ({
+      collapsed: ref(false),
+      tab: ref('plots'),
+      query: ref(''),
+      tabs: [{ value: 'data', label: 'Données' }, { value: 'plots', label: 'Parcelles' }],
+      plots: Array.from({ length: 30 }, (_, i) => `Parcelle P-${String(i + 1).padStart(3, '0')}`),
+    }),
+    template: `
+      <div style="position:relative;height:100vh;min-height:640px;background:var(--ds-bg-neutral);overflow:hidden">
+        <MapOverlay position="start">
+          <MapPanel v-model:collapsed="collapsed" size="lg" title="Soubré nord" collapsible>
+            <template #header>
+              <Tabs v-model="tab" :tabs="tabs" size="sm" />
+              <InputField v-model="query" size="sm" placeholder="Rechercher une parcelle" aria-label="Rechercher une parcelle">
+                <template #icon-leading><Icon name="search" :size="16" /></template>
+              </InputField>
+            </template>
+            <p v-for="p in plots" :key="p" style="margin:0;font:var(--ds-font-body-md);color:var(--ds-text-default)">{{ p }}</p>
           </MapPanel>
         </MapOverlay>
       </div>
