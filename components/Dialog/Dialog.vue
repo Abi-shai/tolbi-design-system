@@ -514,6 +514,8 @@ function onClick(event: MouseEvent) {
      ShareBar, StatTile, OptionCard and ChartLegend; a ProjectCard resets it. */
   --reading-secondary-font: var(--ds-font-body-md);
   --reading-secondary-font-emphasis: var(--ds-font-body-md-emphasis);
+  --reading-legend-wrap: wrap;
+  --reading-legend-fade: none;
   position: relative;
   box-sizing: border-box;
   display: flex;

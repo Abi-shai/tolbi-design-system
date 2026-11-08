@@ -288,8 +288,13 @@ function focusArrived() {
      ShareBar, StatTile, OptionCard and ChartLegend; a ProjectCard resets it. */
   --reading-secondary-font: var(--ds-font-body-md);
   --reading-secondary-font-emphasis: var(--ds-font-body-md-emphasis);
+  --reading-legend-wrap: wrap;
+  --reading-legend-fade: none;
   width: 25rem;
   max-width: 100%;
+  /* Declared means held: `sm`'s « what cannot wrap widens it » does not apply
+     here — the content adapts to the panel, never the panel to the content. */
+  min-width: 0;
   /* In a place that has a height — a whole side of the map (ADR-0103) — it
      takes it, and its foot sits at the bottom; in a corner, it hugs. */
   flex: 1 1 auto;
@@ -314,6 +319,9 @@ function focusArrived() {
 .ds-map-panel--lg .ds-map-panel__body {
   flex: 1 1 auto;
   min-height: 0;
+  /* A bar only when the content runs past the foot — and never across: a
+     sideways overflow would put a bar under a panel that looks whole. */
+  overflow-x: hidden;
   overflow-y: auto;
   gap: var(--ds-spacing-xl);
   padding: 0 var(--ds-spacing-xl) var(--ds-spacing-xl);

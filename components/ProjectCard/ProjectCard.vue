@@ -609,6 +609,8 @@ watch(() => [props.title, props.meta, props.state], async () => {
   /* A card is its own context, wherever it is shown: 280px holds 12px legends (ADR-0132). */
   --reading-secondary-font: var(--ds-font-body-sm);
   --reading-secondary-font-emphasis: var(--ds-font-body-sm-emphasis);
+  --reading-legend-wrap: nowrap;
+  --reading-legend-fade: block;
   --project-card-gap: 10px;
   /*
     The module mark's box, and the identity row's floor — one value, because the

@@ -158,9 +158,16 @@ function colour(i: number) {
   position: relative;
   display: flex;
   align-items: center;
-  flex: 1 1 auto;
+  /* Takes the room it is given and asks for none: laid out in full, its
+     min-content was the whole legend, and in a reading panel at 14px that
+     widened a 25rem panel to 470 (0.112.0). The cut is the point of the clip. */
+  flex: 1 1 0;
+  width: 0;
   min-width: 1px;
-  gap: var(--ds-spacing-md);
+  /* In a reading panel the legend wraps instead (ADR-0133): there is no grid of
+     cards to keep level, and at 14px the third share was cut. */
+  flex-wrap: var(--reading-legend-wrap, nowrap);
+  gap: var(--ds-spacing-xs) var(--ds-spacing-md);
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -172,6 +179,7 @@ function colour(i: number) {
   position: absolute;
   inset-block: 0;
   right: 0;
+  display: var(--reading-legend-fade, block);
   width: 32px;
   pointer-events: none;
   background: linear-gradient(to right, transparent, var(--share-bar-ground));

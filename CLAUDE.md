@@ -1341,6 +1341,11 @@ Before working on any component, read:
   `StatTile`'s caption, `OptionCard`'s sentence, `ChartLegend`'s entries (fallback `body-sm`); a `ProjectCard` resets it.
   `MetricValue lg`'s unit 16px. `StatGroup` tiles floor at 9.5rem (2 × 2 in a panel's `SectionCard`), a group < 22rem
   tightens tile inset to 12, a figure < 8rem steps to 20px.
+- **ADR-0133**: **a declared panel holds its width** — 0.112.0 widened `MapPanel lg` to 470px: `ShareBar`'s clipped legend
+  still reported its full min-content (411px at 14px) and the panel's `min-width: min-content` (`sm`'s rule) obeyed it.
+  `lg` takes `min-width: 0`, its body `overflow-x: hidden` (a bar only when the content runs past the foot); the legend
+  track asks for no width; in a reading panel the legend **wraps** (`--reading-legend-wrap` / `--reading-legend-fade`,
+  reset by `ProjectCard`). The unit stays on its line.
 
 ## Architecture
 
