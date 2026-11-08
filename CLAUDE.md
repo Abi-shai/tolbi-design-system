@@ -1346,6 +1346,10 @@ Before working on any component, read:
   `lg` takes `min-width: 0`, its body `overflow-x: hidden` (a bar only when the content runs past the foot); the legend
   track asks for no width; in a reading panel the legend **wraps** (`--reading-legend-wrap` / `--reading-legend-fade`,
   reset by `ProjectCard`). The unit stays on its line.
+- **ADR-0134**: **an empty block says one sentence** — `EmptyState` with neither `icon` nor `description` is the title
+  as running text (`body-md`, `text-subtle`, at the start, no padding — the block's margin), the action under it; a
+  second strong title under the block's own outweighed the block. The centred form stays for an empty screen; `icon`
+  lost its `inbox` default so its absence can be read (a description alone still takes `inbox`).
 
 ## Architecture
 

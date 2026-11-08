@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Icon, type IconName } from '../Icon'
 
 export type EmptyStateSize = 'sm' | 'md'
@@ -7,20 +8,40 @@ interface Props {
   title: string
   /** One sentence on what to do about it. */
   description?: string
+  /** `inbox` when a description is given without one. */
   icon?: IconName
   size?: EmptyStateSize
 }
 
-withDefaults(defineProps<Props>(), {
-  icon: 'inbox',
+const props = withDefaults(defineProps<Props>(), {
+  icon: undefined,
+  description: undefined,
   size: 'md',
 })
+
+/*
+  With neither a glyph nor a description, the empty state is **a sentence in a
+  block that already has its title** (ADR-0134): a panel's sunk card titled
+  « Données de terrain » that has nothing yet. Centred and in a strong label it
+  read as a second heading under the block's, and the absence outweighed the
+  block. So it is running text — `body-md`, `text-subtle`, at the block's start,
+  on the block's own margin — and the action, if any, goes under it. The
+  centred form, glyph and title, stays for an empty screen, which says more.
+*/
+const inline = computed(() => !props.icon && !props.description)
 </script>
 
 <template>
-  <div class="ds-empty-state" :class="`ds-empty-state--${size}`">
+  <div v-if="inline" class="ds-empty-state ds-empty-state--inline">
+    <p class="ds-empty-state__sentence">{{ title }}</p>
+    <div v-if="$slots.default" class="ds-empty-state__action">
+      <slot />
+    </div>
+  </div>
+
+  <div v-else class="ds-empty-state" :class="`ds-empty-state--${size}`">
     <span class="ds-empty-state__icon">
-      <Icon :name="icon" :size="size === 'sm' ? 20 : 24" />
+      <Icon :name="icon ?? 'inbox'" :size="size === 'sm' ? 20 : 24" />
     </span>
 
     <div class="ds-empty-state__text">
@@ -87,4 +108,18 @@ withDefaults(defineProps<Props>(), {
 }
 
 .ds-empty-state__action { display: flex; gap: var(--ds-spacing-md); }
+
+/* ── Inline: a sentence in a titled block (ADR-0134) ─────────────────── */
+.ds-empty-state--inline {
+  align-items: flex-start;
+  gap: var(--ds-spacing-md);
+  padding: 0;
+  text-align: start;
+}
+
+.ds-empty-state__sentence {
+  margin: 0;
+  font: var(--ds-font-body-md);
+  color: var(--ds-text-subtle);
+}
 </style>

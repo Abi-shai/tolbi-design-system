@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import EmptyState from './EmptyState.vue'
 import { Button } from '../Button'
 import { Card } from '../Card'
+import { SectionCard } from '../SectionCard'
 
 const meta: Meta<typeof EmptyState> = {
   title: 'Feedback & chargement/EmptyState',
@@ -71,4 +72,29 @@ export const InCard: Story = {
 export const Small: Story = {
   name: 'Compact',
   args: { size: 'sm', description: undefined },
+}
+
+/**
+ * ADR-0134 — **sans icône ni description, une phrase** : dans un bloc déjà titré (une carte en creux d'un panneau de
+ * lecture), l'état vide n'est pas un second titre. Le titre devient du texte courant (`body-md`, `text-subtle`),
+ * aligné au début comme le contenu du bloc, sur sa marge ; l'action se place dessous. La forme centrée, glyphe et
+ * titre fort, reste pour un vrai écran vide.
+ */
+export const InTitledBlock: Story = {
+  name: 'Dans un bloc titré',
+  render: () => ({
+    components: { EmptyState, Button, SectionCard },
+    template: `
+      <div style="display:flex;flex-direction:column;gap:var(--ds-spacing-xl);max-width:23rem">
+        <SectionCard title="Données de terrain">
+          <EmptyState title="Aucune collecte pour l’instant." size="sm">
+            <Button label="Lancer une collecte" variant="secondary-gray" size="sm" />
+          </EmptyState>
+        </SectionCard>
+        <SectionCard title="Demandes de l’auditeur">
+          <EmptyState title="Aucune demande de l’auditeur." size="sm" />
+        </SectionCard>
+      </div>
+    `,
+  }),
 }
