@@ -37,6 +37,14 @@ export interface TableColumn {
    * square box and hover are another control's.
    */
   actions?: boolean
+  /**
+   * A second line under the cell's value (ADR-0136) — the producer under the
+   * parcel's code: a row key, or a function of the row. `body-sm`, `text-subtle`,
+   * one line cut with « … », Figma's `Table/Cellule · Lignes=Deux`. In the
+   * primary cell it sits under the row's link, not in it: the link keeps the
+   * name alone. A `#cell-*` slot replaces the first line only.
+   */
+  secondary?: string | ((row: TableRow) => string | number | null | undefined)
 }
 
 export type TableRow = { id: string | number } & Record<string, unknown>
@@ -154,6 +162,12 @@ const emit = defineEmits<{
 const shown = computed(() =>
   props.columns.filter(c => !props.visibleColumns || c.hideable === false || props.visibleColumns.includes(c.key)),
 )
+
+function secondaryOf(col: TableColumn, row: TableRow) {
+  if (!col.secondary) return null
+  const v = typeof col.secondary === 'function' ? col.secondary(row) : row[col.secondary]
+  return v == null || v === '' ? null : String(v)
+}
 
 const primaryKey = computed(() => (shown.value.find(c => c.primary) ?? shown.value[0])?.key)
 
@@ -465,6 +479,8 @@ const showPagination = computed(() =>
                 :style="fixedStyle(col.key)"
               >
                 <Skeleton variant="text" :width="skeletonWidth(i)" height="14px" />
+                <!-- A two-line cell previews its second line: a skeleton previews the content's shape. -->
+                <Skeleton v-if="col.secondary" class="ds-table__skeleton-secondary" variant="text" width="40%" height="12px" />
               </td>
             </tr>
           </tbody>
@@ -516,6 +532,7 @@ const showPagination = computed(() =>
                 <slot v-else :name="`cell-${col.key}`" :row="row" :value="row[col.key]">
                   <span class="ds-table__cell-text">{{ row[col.key] }}</span>
                 </slot>
+                <span v-if="!col.actions && secondaryOf(col, row) !== null" class="ds-table__cell-secondary">{{ secondaryOf(col, row) }}</span>
               </td>
             </tr>
             <tr v-if="rows.length === 0">
@@ -827,6 +844,26 @@ const showPagination = computed(() =>
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* The second line (ADR-0136): Figma's `Lignes=Deux`, 16px under a 20px line,
+   no gap — the cell goes 52 → 68. One line, cut, in the column's alignment. */
+.ds-table__cell-secondary {
+  display: block;
+  overflow: hidden;
+  font: var(--ds-font-body-sm);
+  color: var(--ds-text-subtle);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Over a second line the row's link is a block of its own: inline, its line box
+   took a strut and the cell stood 2px taller than Figma's 68. */
+.ds-table__td:has(> .ds-table__cell-secondary) > .ds-table__row-link {
+  display: block;
+  width: fit-content;
+}
+
+.ds-table__skeleton-secondary { margin-top: var(--ds-spacing-xs); }
 
 /* Skeleton geometry and shimmer now live in the Skeleton component. */
 </style>

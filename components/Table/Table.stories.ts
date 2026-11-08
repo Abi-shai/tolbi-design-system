@@ -501,3 +501,38 @@ export const RangeWithoutSizes: Story = {
     `,
   }),
 }
+
+/**
+ * ADR-0136 — **une cellule sur deux lignes** : `secondary` (une clé de la ligne, ou une fonction de la ligne) écrit
+ * une seconde ligne sous la valeur — le producteur sous le code de la parcelle, comme `Table/Cellule · Lignes=Deux` dans
+ * Figma (`2709:1510`). `body-sm`, `text-subtle`, sur une ligne coupée en « … », dans l’alignement de la colonne ; la
+ * cellule passe de 52 à 68px. Dans la cellule principale, elle se place **sous** le lien de la ligne, pas dedans : le
+ * lien garde le nom seul. Un clic ailleurs sur la ligne l’ouvre toujours (`@row-click`).
+ */
+export const TwoLines: Story = {
+  name: 'Cellule sur deux lignes',
+  render: () => ({
+    components: { Table },
+    setup: () => {
+      const loading = ref(false)
+      const columns: TableColumn[] = [
+        { key: 'code', label: 'Parcelle', primary: true, secondary: 'producer', width: '16rem' },
+        { key: 'village', label: 'Village' },
+        { key: 'area', label: 'Surface', numeric: true, secondary: (row) => `${row.share} % de la zone` },
+      ]
+      const rows: TableRow[] = [
+        { id: 1, code: 'P-0412', producer: 'Traoré Moussa', village: 'Djoutougbo 2', area: '17,5 ha', share: '1,4' },
+        { id: 2, code: 'P-0413', producer: 'Koné Aminata Fatoumata Bintou', village: 'Djoutougbo 2', area: '4,2 ha', share: '0,3' },
+        { id: 3, code: 'P-0415', producer: 'Diallo Ibrahima', village: 'Sokoura', area: '9,8 ha', share: '0,8' },
+        { id: 4, code: 'P-0419', producer: null, village: 'Kafiné 1', area: '12,1 ha', share: 1 },
+      ]
+      return { columns, rows, loading, open: (row: TableRow) => console.log('open', row.code) }
+    },
+    template: `
+      <div style="max-width:720px;display:flex;flex-direction:column;gap:12px">
+        <label style="font:var(--ds-font-body-sm)"><input type="checkbox" v-model="loading" /> Chargement</label>
+        <Table :columns="columns" :rows="rows" :loading="loading" :page-sizes="[]" @row-click="open" />
+      </div>
+    `,
+  }),
+}

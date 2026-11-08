@@ -1354,6 +1354,10 @@ Before working on any component, read:
   cuts at the edge (`nowrap` + ellipsis — a `line-clamp` of one leaves the line's end empty), more uses `line-clamp`; a
   cut line asks for no width (`width: 0`, or the list grows — ADR-0133 again); the text stays whole for the radio's name
   and description, and comes back in a `Tooltip` on hover **only when cut**.
+- **ADR-0136**: **a cell on two lines** — `TableColumn.secondary` (a row key or `(row) => string`) writes a second line:
+  `body-sm` / `text-subtle`, 16px under the 20px line, no gap (Figma `Lignes=Deux`, 52 → 68), one line cut, in the
+  column's alignment. In the primary cell it sits **under** the row's link (the link keeps the name alone; row click
+  unchanged); a `#cell-*` slot replaces the first line only; loading previews it.
 
 ## Architecture
 
