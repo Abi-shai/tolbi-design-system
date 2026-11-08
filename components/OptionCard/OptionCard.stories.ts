@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { ref } from 'vue'
 import OptionCard from './OptionCard.vue'
+import OptionList from './OptionList.vue'
 
 const meta: Meta<typeof OptionCard> = {
   title: 'Saisie/OptionList/Card',
@@ -119,6 +120,35 @@ export const WithAction: Story = {
           :action-loading="busy === d.id"
           @action="download(d.id)"
         />
+      </div>
+    `,
+  }),
+}
+
+/**
+ * ADR-0135 — **une ligne pour la phrase** : dans une liste de parcelles (`OptionList layout="stack"` dans un
+ * `MapPanel lg`), `descriptionLines: 1` coupe la phrase en « … » et toutes les rangées gardent la même hauteur.
+ * Coupée, elle se lit entière au survol (une infobulle, **seulement quand elle est coupée**) ; un lecteur d’écran
+ * l’entend toujours entière. `labelLines` fait de même pour le titre.
+ */
+export const OneLine: Story = {
+  name: 'Phrase sur une ligne',
+  render: () => ({
+    components: { OptionCard, OptionList },
+    setup: () => ({
+      parcel: ref('P-0412'),
+      parcels: [
+        { code: 'P-0412', who: 'Traoré Moussa · Djoutougbo 2', ha: '17,5 ha' },
+        { code: 'P-0413', who: 'Koné Aminata Fatoumata · Djoutougbo 2 — bas-fond nord, près du marigot', ha: '4,2 ha' },
+        { code: 'P-0415', who: 'Diallo Ibrahima · Sokoura', ha: '9,8 ha' },
+        { code: 'P-0419', who: 'Ouattara Salimata · Kafiné 1 — parcelle partagée avec la coopérative', ha: '12,1 ha' },
+      ],
+    }),
+    template: `
+      <div style="width:23rem;--reading-secondary-font:var(--ds-font-body-md)">
+        <OptionList v-model="parcel" layout="stack" aria-label="Parcelles">
+          <OptionCard v-for="p in parcels" :key="p.code" :value="p.code" :label="p.code" :description="p.who" :meta="p.ha" :description-lines="1" />
+        </OptionList>
       </div>
     `,
   }),

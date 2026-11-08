@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, useId } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 import { Avatar } from '../Avatar'
 import { Checkbox } from '../Checkbox'
 import { Flag } from '../Flag'
@@ -60,6 +60,17 @@ interface Props {
   actionIcon?: IconName
   /** The action is under way — the file being made. */
   actionLoading?: boolean
+  /**
+   * How many lines the title may take before it is cut with « … » (ADR-0135).
+   * Unset, it wraps freely. Cut, it is given whole in a tooltip on hover; a
+   * reader always hears it whole.
+   */
+  labelLines?: number
+  /**
+   * How many lines the sentence may take — `1` keeps every row of a list one
+   * height (ADR-0135). Unset, it wraps freely.
+   */
+  descriptionLines?: number
   /** @deprecated 0.108's switch: the action is always its glyph alone now (ADR-0127). Ignored. */
   actionIconOnly?: boolean
 }
@@ -78,6 +89,8 @@ const props = withDefaults(defineProps<Props>(), {
   actionIcon: undefined,
   actionLoading: false,
   actionIconOnly: false,
+  labelLines: undefined,
+  descriptionLines: undefined,
 })
 
 const emit = defineEmits<{ click: [event: MouseEvent]; action: [] }>()
@@ -110,6 +123,38 @@ function onChange() {
 function onClick(event: MouseEvent) {
   if (!choosing.value && !holds.value && !isDisabled.value) emit('click', event)
 }
+
+/*
+  A capped line count cuts the text with « … » (ADR-0135); the whole text stays
+  in the DOM — the visual clamp is all that is cut, so the name and the
+  description a reader hears are whole. On hover, a tooltip gives it back —
+  **only when it is cut**, or a whole sentence would be said twice (ADR-0109).
+*/
+const titleEl = ref<HTMLElement | null>(null)
+const descriptionEl = ref<HTMLElement | null>(null)
+const titleCut = ref(false)
+const descriptionCut = ref(false)
+const isCut = (el: HTMLElement | null) =>
+  !!el && (el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1)
+function measure() {
+  titleCut.value = props.labelLines != null && isCut(titleEl.value)
+  descriptionCut.value = props.descriptionLines != null && isCut(descriptionEl.value)
+}
+let ro: ResizeObserver | null = null
+function observe() {
+  ro?.disconnect()
+  if (props.labelLines == null && props.descriptionLines == null) return
+  ro ??= new ResizeObserver(measure)
+  if (titleEl.value) ro.observe(titleEl.value)
+  if (descriptionEl.value) ro.observe(descriptionEl.value)
+  measure()
+}
+onMounted(() => {
+  observe()
+  document.fonts?.ready.then(measure)
+})
+watch(() => [props.label, props.description, props.labelLines, props.descriptionLines], () => requestAnimationFrame(observe))
+onBeforeUnmount(() => ro?.disconnect())
 
 /* The button is named by its word and described by the row: five « Télécharger »
    in a list each say which file. */
@@ -152,8 +197,24 @@ const actionDescribedBy = computed(() => [titleId, props.description ? descripti
     </span>
 
     <span class="ds-option-card__text">
-      <span :id="titleId" class="ds-option-card__title">{{ label }}</span>
-      <span v-if="description" :id="descriptionId" class="ds-option-card__description">{{ description }}</span>
+      <Tooltip :title="label" :disabled="!titleCut" placement="top-start" class="ds-option-card__tip">
+        <span
+          :id="titleId"
+          ref="titleEl"
+          class="ds-option-card__title"
+          :class="{ 'ds-option-card__clamp': labelLines != null, 'ds-option-card__clamp--one': labelLines === 1 }"
+          :style="labelLines != null ? { '--option-card-lines': labelLines } : undefined"
+        >{{ label }}</span>
+      </Tooltip>
+      <Tooltip v-if="description" :title="description" :disabled="!descriptionCut" placement="top-start" class="ds-option-card__tip">
+        <span
+          :id="descriptionId"
+          ref="descriptionEl"
+          class="ds-option-card__description"
+          :class="{ 'ds-option-card__clamp': descriptionLines != null, 'ds-option-card__clamp--one': descriptionLines === 1 }"
+          :style="descriptionLines != null ? { '--option-card-lines': descriptionLines } : undefined"
+        >{{ description }}</span>
+      </Tooltip>
     </span>
 
     <span v-if="meta" class="ds-option-card__meta"><span class="ds-option-card__meta-text">{{ meta }}</span></span>
@@ -299,6 +360,38 @@ const actionDescribedBy = computed(() => [titleId, props.description ? descripti
   font: var(--reading-secondary-font, var(--ds-font-body-sm));
   color: var(--ds-text-subtle);
   overflow-wrap: anywhere;
+}
+
+/* The tooltip's anchor is a box of the column, as wide as the text. */
+.ds-option-card__tip {
+  display: flex;
+  min-width: 0;
+}
+
+.ds-option-card__tip > * {
+  min-width: 0;
+}
+
+/* A capped line count (ADR-0135): cut with « … » at the last line allowed. */
+.ds-option-card__clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--option-card-lines);
+  line-clamp: var(--option-card-lines);
+  overflow: hidden;
+}
+
+/* One line is cut at the edge, not at the last whole word: a clamp breaks the
+   line before the word that would not fit and leaves the rest of it empty. */
+.ds-option-card__clamp--one {
+  display: block;
+  /* Takes the width it is given and asks for none: an unbroken line otherwise
+     reports its whole length as the card's minimum and widens the list
+     (ADR-0133's defect, in a row). */
+  flex: 1 1 auto;
+  width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* The meta and the control sit on the title's line: each is a box one title

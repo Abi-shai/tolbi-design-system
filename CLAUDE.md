@@ -1350,6 +1350,10 @@ Before working on any component, read:
   as running text (`body-md`, `text-subtle`, at the start, no padding — the block's margin), the action under it; a
   second strong title under the block's own outweighed the block. The centred form stays for an empty screen; `icon`
   lost its `inbox` default so its absence can be read (a description alone still takes `inbox`).
+- **ADR-0135**: **a row holds its lines** — `OptionCard` takes `descriptionLines` / `labelLines` (unset = wraps); `1`
+  cuts at the edge (`nowrap` + ellipsis — a `line-clamp` of one leaves the line's end empty), more uses `line-clamp`; a
+  cut line asks for no width (`width: 0`, or the list grows — ADR-0133 again); the text stays whole for the radio's name
+  and description, and comes back in a `Tooltip` on hover **only when cut**.
 
 ## Architecture
 
