@@ -1385,6 +1385,9 @@ Before working on any component, read:
 - **ADR-0141**: **a tab never cuts its content** — `Tabs` tabs are `flex: 1 1 auto` (at least their content, the room left
   shared; were equal widths that clipped « Parcelles 128 » in a `MapPanel lg` head); past the strip's width only the
   label ellipsises and the badge stays whole (`flex: none`). The indicator follows the measured widths as before.
+- **ADR-0142**: **a closable panel keeps its name** — `MapPanel` `closable` + `title` + `#header`: the title stays on the
+  close's line and `#header` goes under it, full width (derived, no prop: a sheet the reader opened is about one thing);
+  without a close, `#header` is still the head (ADR-0099).
 
 ## Architecture
 

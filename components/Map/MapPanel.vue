@@ -107,6 +107,11 @@ const named = (verb: string) => (props.title ? `${verb} ${props.title}` : verb)
 const iconFold = computed(() => props.size === 'lg' || !!slots.header)
 /* A `lg` head without `#header` carries the title after the fold. */
 const slotHead = computed(() => !!slots.header || (props.size === 'lg' && (!!props.title || props.collapsible || props.loading)))
+/* A panel the reader opened and closes — a parcel's sheet — is about one thing,
+   and its name stays on the close's line; `#header` (its tabs, its search)
+   comes under it (ADR-0142). Without a close, `#header` is the head, as before:
+   the screen's reading panel is named by the screen. */
+const titled = computed(() => props.closable && !!props.title && !!slots.header)
 
 /*
   The control the panel becomes stands **at the overlay's corner** (ADR-0117,
@@ -182,7 +187,7 @@ function focusArrived() {
         <div
           v-if="slotHead"
           class="ds-map-panel__head ds-map-panel__head--slot"
-          :class="{ 'ds-map-panel__head--folds': collapsible, 'ds-map-panel__head--closes': closable }"
+          :class="{ 'ds-map-panel__head--folds': collapsible, 'ds-map-panel__head--closes': closable, 'ds-map-panel__head--titled': titled }"
         >
           <IconButton
             v-if="collapsible"
@@ -195,6 +200,7 @@ function focusArrived() {
             :aria-controls="panelId"
             @click="fold(true)"
           />
+          <span v-if="titled" class="ds-map-panel__title ds-map-panel__head-title">{{ title }}</span>
           <div class="ds-map-panel__header">
             <slot name="header">
               <span v-if="title" class="ds-map-panel__title">{{ title }}</span>
@@ -386,6 +392,18 @@ function focusArrived() {
 
 .ds-map-panel__head--folds.ds-map-panel__head--closes {
   grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+/* Titled (ADR-0142): the title takes the first line beside the fold and the
+   close, and every child of `#header` goes under, at the head's whole width. */
+.ds-map-panel__head-title {
+  grid-row: 1;
+  display: block;
+}
+
+.ds-map-panel__head--titled .ds-map-panel__header > :deep(*),
+.ds-map-panel__head--titled.ds-map-panel__head--folds .ds-map-panel__header > :deep(:first-child) {
+  grid-column: 1 / -1;
 }
 
 .ds-map-panel__head--slot > .ds-map-panel__close {

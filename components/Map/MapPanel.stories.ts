@@ -264,7 +264,10 @@ export const ClosableAndFolded: Story = {
           <Button v-else variant="secondary-gray" size="sm" label="Rouvrir la fiche" @click="open = true" />
         </MapOverlay>
         <MapOverlay position="bottom-end">
-          <MapPanel size="lg" title="Fiche lg" closable style="height:180px"><p style="margin:0;font:var(--ds-font-body-md)">Une fiche en grand format.</p></MapPanel>
+          <MapPanel size="lg" title="Parcelle P-0412 · Traoré Moussa" closable style="height:220px">
+            <template #header><Tabs v-model="tab" :tabs="tabs" size="sm" /></template>
+            <p style="margin:0;font:var(--ds-font-body-md)">Fermable avec un #header : le titre reste sur la ligne de la croix, les onglets dessous.</p>
+          </MapPanel>
         </MapOverlay>
       </div>
     `,
