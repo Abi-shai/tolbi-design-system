@@ -52,6 +52,12 @@ interface Props {
    */
   badge?: string
   badgeTone?: BadgeTone
+  /**
+   * `row` — one 40px line (ADR-0143): the icon on a 28px tile, the title cut
+   * on its line, the badge right after it, the meta at the end, then the
+   * control or the chevron. No sentence. An alert in a panel, a next step.
+   */
+  density?: 'default' | 'row'
   /** In an `OptionList`, what this option stands for. */
   value?: OptionValue
   icon?: IconName
@@ -88,6 +94,7 @@ const props = withDefaults(defineProps<Props>(), {
   meta: undefined,
   badge: undefined,
   badgeTone: 'neutral',
+  density: 'default',
   value: undefined,
   icon: undefined,
   avatarSrc: undefined,
@@ -144,6 +151,9 @@ function onClick(event: MouseEvent) {
   description a reader hears are whole. On hover, a tooltip gives it back —
   **only when it is cut**, or a whole sentence would be said twice (ADR-0109).
 */
+const row = computed(() => props.density === 'row')
+/* A row's title holds one line. */
+const titleLines = computed(() => props.labelLines ?? (row.value ? 1 : undefined))
 const titleEl = ref<HTMLElement | null>(null)
 const descriptionEl = ref<HTMLElement | null>(null)
 const titleCut = ref(false)
@@ -151,13 +161,13 @@ const descriptionCut = ref(false)
 const isCut = (el: HTMLElement | null) =>
   !!el && (el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1)
 function measure() {
-  titleCut.value = props.labelLines != null && isCut(titleEl.value)
+  titleCut.value = titleLines.value != null && isCut(titleEl.value)
   descriptionCut.value = props.descriptionLines != null && isCut(descriptionEl.value)
 }
 let ro: ResizeObserver | null = null
 function observe() {
   ro?.disconnect()
-  if (props.labelLines == null && props.descriptionLines == null) return
+  if (titleLines.value == null && props.descriptionLines == null) return
   ro ??= new ResizeObserver(measure)
   if (titleEl.value) ro.observe(titleEl.value)
   if (descriptionEl.value) ro.observe(descriptionEl.value)
@@ -167,7 +177,7 @@ onMounted(() => {
   observe()
   document.fonts?.ready.then(measure)
 })
-watch(() => [props.label, props.description, props.labelLines, props.descriptionLines], () => requestAnimationFrame(observe))
+watch(() => [props.label, props.description, titleLines.value, props.descriptionLines], () => requestAnimationFrame(observe))
 onBeforeUnmount(() => ro?.disconnect())
 
 /* The button is named by its word and described by the row: five « Télécharger »
@@ -185,6 +195,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
       'ds-option-card--disabled': isDisabled,
       'ds-option-card--leads': !choosing && !holds,
       'ds-option-card--holds': holds,
+      'ds-option-card--row': row,
     }"
     @click="onClick"
   >
@@ -204,7 +215,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
 
     <span v-if="$slots.media || icon || avatarSrc || avatarInitials || flag" class="ds-option-card__media" aria-hidden="true">
       <slot name="media">
-        <span v-if="icon" class="ds-option-card__tile"><Icon :name="icon" :size="20" /></span>
+        <span v-if="icon" class="ds-option-card__tile"><Icon :name="icon" :size="row ? 16 : 20" /></span>
         <Avatar v-else-if="avatarSrc || avatarInitials" :src="avatarSrc" :initials="avatarInitials" size="sm" />
         <Flag v-else-if="flag" :code="flag" :size="24" />
       </slot>
@@ -216,11 +227,13 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
           :id="titleId"
           ref="titleEl"
           class="ds-option-card__title"
-          :class="{ 'ds-option-card__clamp': labelLines != null, 'ds-option-card__clamp--one': labelLines === 1 }"
-          :style="labelLines != null ? { '--option-card-lines': labelLines } : undefined"
+          :class="{ 'ds-option-card__clamp': titleLines != null, 'ds-option-card__clamp--one': titleLines === 1 }"
+          :style="titleLines != null ? { '--option-card-lines': titleLines } : undefined"
         >{{ label }}</span>
       </Tooltip>
-      <Tooltip v-if="description" :title="description" :disabled="!descriptionCut" placement="top-start" class="ds-option-card__tip">
+      <!-- A row's badge follows its title on the line, before the meta's end. -->
+      <span v-if="badge && row" :id="badgeId" class="ds-option-card__row-badge"><Badge :label="badge" :tone="badgeTone" size="sm" /></span>
+      <Tooltip v-if="description && !row" :title="description" :disabled="!descriptionCut" placement="top-start" class="ds-option-card__tip">
         <span
           :id="descriptionId"
           ref="descriptionEl"
@@ -232,7 +245,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
     </span>
 
     <span v-if="meta" class="ds-option-card__meta"><span class="ds-option-card__meta-text">{{ meta }}</span></span>
-    <span v-if="badge" :id="badgeId" class="ds-option-card__meta ds-option-card__badge"><Badge :label="badge" :tone="badgeTone" size="sm" /></span>
+    <span v-if="badge && !row" :id="badgeId" class="ds-option-card__meta ds-option-card__badge"><Badge :label="badge" :tone="badgeTone" size="sm" /></span>
 
     <span v-if="holds" class="ds-option-card__action">
       <Tooltip :title="actionLabel!" placement="top">
@@ -257,7 +270,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
     </span>
     <span v-else class="ds-option-card__control" aria-hidden="true">
       <Checkbox v-if="choosing" visual-only size="sm" :type="kind" :model-value="checked" :disabled="isDisabled" />
-      <Icon v-else name="chevron-right" :size="20" class="ds-option-card__chevron" />
+      <Icon v-else name="chevron-right" :size="row ? 16 : 20" class="ds-option-card__chevron" />
     </span>
   </component>
 </template>
@@ -442,5 +455,54 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
 .ds-option-card--disabled .ds-option-card__meta-text,
 .ds-option-card--disabled .ds-option-card__chevron {
   color: var(--ds-text-disabled);
+}
+
+/* ── Row (ADR-0143): one 40px line ──────────────────────────────────── */
+/* 28 tile + 5 above and below + the 1px border = 40. */
+.ds-option-card--row {
+  align-items: center;
+  gap: var(--ds-spacing-md);
+  min-height: 40px; /* token-lint-disable spacing-on-ramp — a row's height, the tile's 28 + its inset; not rhythm */
+  padding: 0 var(--ds-spacing-lg) 0 var(--ds-spacing-sm);
+  border-radius: var(--ds-radius-control);
+}
+
+.ds-option-card--row .ds-option-card__tile {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--ds-radius-inner);
+  background: var(--ds-bg-neutral);
+}
+
+/* The title and its badge on one line; the title gives, the badge does not. */
+.ds-option-card--row .ds-option-card__text {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--ds-spacing-md);
+}
+
+.ds-option-card--row .ds-option-card__title {
+  font: var(--ds-font-label-md-strong);
+}
+
+/* At its own width, cut only when the line runs out — so the badge stays
+   against it rather than at the line's far end. */
+.ds-option-card--row .ds-option-card__tip {
+  flex: 0 1 auto;
+}
+
+.ds-option-card--row .ds-option-card__clamp--one {
+  flex: 0 1 auto;
+  width: auto;
+}
+
+.ds-option-card__row-badge {
+  display: inline-flex;
+  flex: none;
+}
+
+.ds-option-card--row .ds-option-card__meta,
+.ds-option-card--row .ds-option-card__control {
+  height: auto;
 }
 </style>

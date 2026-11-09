@@ -174,3 +174,22 @@ export const WithStatus: Story = {
     `,
   }),
 }
+
+/**
+ * ADR-0143 — **densité « ligne »** : une ligne de 40 px — l’icône sur sa tuile de 28, le titre coupé sur sa ligne, le
+ * badge juste après, la meta au bout, le chevron. Pas de phrase. Les alertes repliées (badge = gravité, meta = délai)
+ * et les suites (sans badge).
+ */
+export const RowDensity: Story = {
+  name: 'Densité « ligne »',
+  render: () => ({
+    components: { OptionCard },
+    template: `
+      <div style="width:23rem;display:flex;flex-direction:column;gap:6px;padding:12px;background:var(--ds-bg-neutral-subtle);border-radius:16px">
+        <OptionCard density="row" icon="sprout" label="C1 · FPH-SBR-005" badge="Bloque" badge-tone="error" meta="sous 15 j" />
+        <OptionCard density="row" icon="satellite" label="B3 · FPH-SBR-008" badge="À revoir" badge-tone="neutral" meta="avant consolidation" />
+        <OptionCard density="row" icon="sprout" label="Resserrer la zone sur les parties plantées autour du village" />
+      </div>
+    `,
+  }),
+}

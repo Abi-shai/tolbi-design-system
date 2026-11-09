@@ -68,6 +68,23 @@
       "$value": "{color.gray-light.500}",
       "$type": "color",
       "$description": "a threshold or reference line drawn dashed across a plot (ADR-0096) — 4.8:1 on white, readable on the dark ground too"
+    },
+    "status": {
+      "critical": {
+        "$value": "{color.error.500}",
+        "$type": "color",
+        "$description": "decorative — a parcel or a key entry whose alert blocks (« Bloque », ADR-0143): the hue of Badge's error tone at its middle step, for a map's outline and its legend. Measured: 3.14:1 on map-land, 2.07:1 on dark imagery — no single step clears 3:1 on both grounds, so an outline on imagery wants a light casing"
+      },
+      "warning": {
+        "$value": "{color.warning.500}",
+        "$type": "color",
+        "$description": "decorative — an alert to watch (« À surveiller », ADR-0143): Badge's warning hue at its middle step. 1.96:1 on map-land, 3.31:1 on dark imagery"
+      },
+      "neutral": {
+        "$value": "{color.gray-light.400}",
+        "$type": "color",
+        "$description": "decorative — an alert to review (« À revoir », ADR-0143): Badge's neutral hue at its middle step — 400, not 500, which is the pending outline's colour (map-pending) and must not be mistaken for it. 2.15:1 on map-land, 3.02:1 on dark imagery"
+      }
     }
   },
   "map": {

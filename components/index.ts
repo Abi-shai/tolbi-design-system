@@ -182,7 +182,10 @@ export { FormSection, FormLayout } from './FormSection'
 export type { FormSectionHeadingLevel } from './FormSection'
 
 export { SectionCard } from './SectionCard'
-export type { SectionCardHeadingLevel } from './SectionCard'
+export type { SectionCardHeadingLevel, SectionCardDensity } from './SectionCard'
+export { PanelBlock } from './PanelBlock'
+export { AlertsBlock } from './AlertsBlock'
+export type { AlertsBlockItem, AlertsBlockSeverity } from './AlertsBlock'
 
 export { ShareBar } from './ShareBar'
 export type { ShareBarItem } from './ShareBar'

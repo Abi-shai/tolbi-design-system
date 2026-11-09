@@ -266,6 +266,13 @@ export const chartSequential = ${JSON.stringify(sequential)}
 export const chartThreshold = ${JSON.stringify(flat.DsChartThreshold)}
 
 /**
+ * An alert's severity on a map (ADR-0143) — a parcel's outline and its key:
+ * \`critical\` blocks, \`warning\` is to watch, \`neutral\` to review. Badge's
+ * error / warning / neutral hues at their middle step.
+ */
+export const chartStatus = ${JSON.stringify({ critical: flat.DsChartStatusCritical, warning: flat.DsChartStatusWarning, neutral: flat.DsChartStatusNeutral })}
+
+/**
  * A map waiting for its data (ADR-0122). \`land\` is the ground before the
  * basemap — the TOLBI style's own land, what \`MapCanvas\` paints. \`pending\` is
  * a parcel drawn before its data: a dashed outline, for the engine's paint
@@ -285,6 +292,8 @@ export const chartCategoricalCeiling: 5
 export const chartSequential: readonly string[]
 /** A threshold or reference line, drawn dashed. */
 export const chartThreshold: string
+/** An alert's severity on a map — a parcel's outline and its key (ADR-0143). */
+export const chartStatus: { readonly critical: string; readonly warning: string; readonly neutral: string }
 /** The ground a map shows before its basemap (ADR-0122). */
 export const mapLand: string
 /** A parcel drawn before its data: a dashed outline, for the engine's paint (ADR-0122). */

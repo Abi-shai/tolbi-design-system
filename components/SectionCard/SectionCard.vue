@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { Card } from '../Card'
+import { HelpIcon } from '../HelpIcon'
 
 export type SectionCardHeadingLevel = 2 | 3 | 4 | 5 | 6
+/**
+ * `compact` — a block read in a map's panel (ADR-0143, `PanelBlock`): 12 around
+ * and 8 between, where a form's section breathes at 20 and 16.
+ */
+export type SectionCardDensity = 'default' | 'compact'
 
 /**
  * A titled block: a title, an optional sentence, then its content (ADR-0097).
@@ -26,10 +32,15 @@ interface Props {
   description?: string
   /** The title's level in the page's outline — 3 inside a panel titled in `h2`. */
   headingLevel?: SectionCardHeadingLevel
+  density?: SectionCardDensity
+  /** What the title's term means — a `HelpIcon` beside it, named by the title. */
+  help?: string
 }
 
 withDefaults(defineProps<Props>(), {
   headingLevel: 3,
+  density: 'default',
+  help: undefined,
 })
 
 const slots = defineSlots<{
@@ -42,11 +53,14 @@ const slots = defineSlots<{
 </script>
 
 <template>
-  <Card variant="sunk" padding="none" class="ds-section-card">
+  <Card variant="sunk" padding="none" class="ds-section-card" :class="`ds-section-card--${density}`">
     <div class="ds-section-card__inner">
       <div class="ds-section-card__head">
         <div class="ds-section-card__heading">
-          <component :is="`h${headingLevel}`" class="ds-section-card__title">{{ title }}</component>
+          <div class="ds-section-card__title-line">
+            <component :is="`h${headingLevel}`" class="ds-section-card__title">{{ title }}</component>
+            <HelpIcon v-if="help" :title="title" :supporting-text="help" />
+          </div>
           <p v-if="slots.description || description" class="ds-section-card__description">
             <slot name="description">{{ description }}</slot>
           </p>
@@ -95,6 +109,13 @@ const slots = defineSlots<{
   min-width: 0;
 }
 
+.ds-section-card__title-line {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-xs);
+  min-width: 0;
+}
+
 .ds-section-card__title {
   margin: 0;
   font: var(--ds-font-label-lg-strong);
@@ -120,5 +141,16 @@ const slots = defineSlots<{
   flex-direction: column;
   gap: var(--ds-spacing-xl);
   min-width: 0;
+}
+
+/* Compact (ADR-0143): a panel's block — 12 around, 8 between the head and the
+   body and between the body's children. */
+.ds-section-card--compact .ds-section-card__inner {
+  gap: var(--ds-spacing-md);
+  padding: var(--ds-spacing-lg);
+}
+
+.ds-section-card--compact .ds-section-card__body {
+  gap: var(--ds-spacing-md);
 }
 </style>
