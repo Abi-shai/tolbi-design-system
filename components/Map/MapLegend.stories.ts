@@ -149,11 +149,11 @@ export const Categorical: Story = {
 }
 
 /**
- * **Rampe et symboles** — le cockpit ARR : les quatre symboles ne tiennent pas dans 480 avec leurs noms (747) ; leurs
- * pastilles restent visibles dans une puce « Symboles », leurs noms dans son panneau.
+ * **Symboles, replié** — le cockpit ARR : les quatre symboles ne tiennent pas dans 480 avec leurs noms (747) ; leurs
+ * pastilles restent visibles dans la puce « Symboles », qui déplie le bloc sous la ligne (ADR-0138).
  */
 export const Symbols: Story = {
-  name: 'Rampe et symboles',
+  name: 'Symboles, replié',
   render: () => ({
     components: { MapLegend },
     setup: () => ({
@@ -210,86 +210,133 @@ export const WithTimeline: Story = {
 }
 
 
-/*
-  The panels open, and close back onto their chip (0.116.0 shipped with both
-  chips toggling nothing — their `Dropdown` is controlled and was given no
-  state). Each check runs as the story's `play`: click → the panel is shown,
-  Escape → it is gone and the focus is on the chip; ↓ opens it too; and one
-  panel at a time.
-*/
-const shownPanel = (label: string) =>
-  document.querySelector<HTMLElement>(`[role="dialog"][aria-label="${label}"]`)?.matches(':popover-open') ?? false
 
-async function opensAndCloses(canvasElement: HTMLElement, chipName: string, panelLabel: string) {
-  const canvas = within(canvasElement)
-  const chip = await canvas.findByRole('button', { name: chipName })
-  await userEvent.click(chip)
-  await waitFor(() => expect(shownPanel(panelLabel)).toBe(true))
-  await userEvent.keyboard('{Escape}')
-  await waitFor(() => expect(shownPanel(panelLabel)).toBe(false))
-  await expect(chip).toHaveFocus()
-  await userEvent.keyboard('{ArrowDown}')
-  await waitFor(() => expect(shownPanel(panelLabel)).toBe(true))
-  await userEvent.keyboard('{Escape}')
-  await waitFor(() => expect(shownPanel(panelLabel)).toBe(false))
-  await expect(chip).toHaveFocus()
+const SYMBOLS = [
+  { key: 'project', label: 'Point du projet', shape: 'square', color: 'var(--ds-text-strong)', value: '40' },
+  { key: 'control', label: 'Point de contrôle', shape: 'circle', color: 'var(--ds-chart-sequential-4)', value: '200' },
+  { key: 'reserve', label: 'Réserve', shape: 'point', color: 'var(--ds-chart-threshold)', value: '2 180' },
+  { key: 'excluded', label: 'Zone exclue', shape: 'zone', color: 'var(--ds-chart-categorical-3)', value: '2' },
+]
+const COCKPIT = `<MapLegend v-model:expanded="expanded" title="Indice de stock" :ticks="['0,30', '0,45', '0,60']" :legend="legend" />`
+
+/*
+  The block unfolds and folds back onto its chip (ADR-0138), and a click on the
+  map leaves it open — it is read while looking at the map. Run as the story's
+  `play`: click → the block is shown and the chip says `aria-expanded="true"`;
+  a click elsewhere → still open; Escape → folded, the focus on the chip.
+*/
+const unfolded = (el: HTMLElement) => {
+  const region = el.querySelector<HTMLElement>('[role="region"]')
+  return !!region && getComputedStyle(region.parentElement!).visibility === 'visible'
 }
 
+async function unfoldsAndStays(canvasElement: HTMLElement, chipName: string) {
+  const canvas = within(canvasElement)
+  const chip = await canvas.findByRole('button', { name: chipName })
+  await expect(chip).toHaveAttribute('aria-expanded', 'false')
+  await userEvent.click(chip)
+  await expect(chip).toHaveAttribute('aria-expanded', 'true')
+  await expect(chip).toHaveAttribute('aria-controls', canvasElement.querySelector('[role="region"]')!.id)
+  await waitFor(() => expect(unfolded(canvasElement)).toBe(true))
+  await userEvent.click(canvasElement.querySelector<HTMLElement>('.legend-map__spot')!)
+  await new Promise((r) => setTimeout(r, 300))
+  await expect(unfolded(canvasElement)).toBe(true)
+  chip.focus()
+  await userEvent.keyboard('{Escape}')
+  await expect(chip).toHaveAttribute('aria-expanded', 'false')
+  await waitFor(() => expect(unfolded(canvasElement)).toBe(false))
+  await expect(chip).toHaveFocus()
+  await userEvent.keyboard('{Enter}')
+  await expect(chip).toHaveAttribute('aria-expanded', 'true')
+}
+
+const onMap = (inner: string) =>
+  `<div class="legend-map" style="background:var(--ds-map-land, var(--ds-bg-neutral));padding:24px;border-radius:12px;max-width:640px;min-height:260px;display:flex;flex-direction:column;justify-content:space-between">${inner}<div class="legend-map__spot" style="height:32px"></div></div>`
+
 /**
- * **« Symboles » s’ouvre** — le cockpit ARR : un clic déplie le panneau des symboles (aligné à droite), Échap le referme
- * et rend le focus à la puce ; ↓ l’ouvre aussi. Ouvrir le menu des indicateurs le referme : un panneau à la fois.
+ * **Symboles, déplié** (ADR-0138, rangement R1 de `3922:1671`) — la légende s’agrandit sur place : la ligne ne bouge
+ * pas, un filet puis quatre colonnes égales, centrées — la forme, le nombre (`value`), le nom. Un clic sur la carte ne
+ * replie pas : on lit la légende en regardant la carte. Échap replie et laisse le focus sur la puce.
  */
-export const SymbolsOpen: Story = {
-  name: 'Symboles, ouvert',
+export const SymbolsUnfolded: Story = {
+  name: 'Symboles, déplié',
+  render: () => ({
+    components: { MapLegend },
+    setup: () => ({ legend: SYMBOLS, expanded: ref(false) }),
+    template: onMap(COCKPIT),
+  }),
+  play: async ({ canvasElement }) => {
+    await unfoldsAndStays(canvasElement, 'Symboles')
+  },
+}
+
+/** **Symboles, sans nombres** — sans `value`, chaque colonne montre la forme et le nom seulement. */
+export const SymbolsWithoutFigures: Story = {
+  name: 'Symboles, sans nombres',
+  render: () => ({
+    components: { MapLegend },
+    setup: () => ({ legend: SYMBOLS.map(({ value: _v, ...s }) => s), expanded: ref(true) }),
+    template: onMap(COCKPIT),
+  }),
+}
+
+/** **« +N », déplié** — les catégories qui ne tiennent pas sur la ligne se déplient dessous, de la même façon. */
+export const MoreUnfolded: Story = {
+  name: '+N, déplié',
   render: () => ({
     components: { MapLegend },
     setup: () => ({
+      expanded: ref(false),
+      many: [
+        ...PARTS,
+        { key: 'fallow', label: 'Jachère', color: 'var(--ds-chart-categorical-4)' },
+        { key: 'crop', label: 'Culture annuelle', color: 'var(--ds-chart-categorical-5)' },
+      ],
+    }),
+    template: onMap(`<MapLegend v-model:expanded="expanded" title="Parcelles" :legend="many" />`),
+  }),
+  play: async ({ canvasElement }) => {
+    await unfoldsAndStays(canvasElement, 'Autres catégories')
+  },
+}
+
+/**
+ * **Déplié, et le menu des indicateurs ouvert** — choisir n’est pas lire : le menu reste un menu, et l’ouvrir laisse
+ * le bloc déplié.
+ */
+export const UnfoldedWithMenu: Story = {
+  name: 'Déplié + menu des indicateurs',
+  render: () => ({
+    components: { MapLegend },
+    setup: () => ({
+      legend: SYMBOLS,
+      expanded: ref(true),
       metric: ref('stock'),
       metrics: [
         { value: 'stock', label: 'Indice de stock' },
         { value: 'carbon', label: 'Carbone', unit: 'tCO2e/ha' },
       ],
-      legend: [
-        { key: 'project', label: 'Point du projet', shape: 'square', color: 'var(--ds-text-strong)' },
-        { key: 'control', label: 'Point de contrôle', shape: 'circle', color: 'var(--ds-chart-sequential-4)' },
-        { key: 'reserve', label: 'Réserve', shape: 'point', color: 'var(--ds-chart-threshold)' },
-        { key: 'excluded', label: 'Zone exclue', shape: 'zone', color: 'var(--ds-chart-categorical-3)' },
-      ],
     }),
-    template: ground(`<MapLegend v-model:metric="metric" :metrics="metrics" title="Indice de stock" :ticks="['0,30', '0,45', '0,60']" :legend="legend" />`),
+    template: onMap(`<MapLegend v-model:expanded="expanded" v-model:metric="metric" :metrics="metrics" title="Indice de stock" :ticks="['0,30', '0,45', '0,60']" :legend="legend" />`),
   }),
   play: async ({ canvasElement }) => {
-    await opensAndCloses(canvasElement, 'Symboles', 'Symboles')
     const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole('button', { name: 'Symboles' }))
-    await waitFor(() => expect(shownPanel('Symboles')).toBe(true))
     await userEvent.click(await canvas.findByRole('button', { name: /Indicateur affiché/ }))
-    await waitFor(() => expect(shownPanel('Symboles')).toBe(false))
-    await userEvent.click(await canvas.findByRole('button', { name: 'Symboles' }))
-    await waitFor(() => expect(shownPanel('Symboles')).toBe(true))
+    await waitFor(() => expect(document.querySelector('[role="menu"]')?.matches(':popover-open')).toBe(true))
+    await expect(unfolded(canvasElement)).toBe(true)
   },
 }
 
 /**
- * **« +N » s’ouvre** — au-delà de 480, les dernières catégories passent dans la puce « +2 » ; un clic déplie leur
- * panneau (aligné à gauche), Échap le referme et rend le focus à la puce ; ↓ l’ouvre aussi.
+ * **Mouvement réduit** — sous `prefers-reduced-motion`, la hauteur ne s’anime pas : le bloc est là ou pas, comme toute
+ * transition du paquet (`motion.css`). Cette story est la même que « Symboles, déplié » ; activez la réduction des
+ * animations du système pour la voir.
  */
-export const MoreOpen: Story = {
-  name: '+N, ouvert',
+export const ReducedMotion: Story = {
+  name: 'Mouvement réduit',
   render: () => ({
     components: { MapLegend },
-    setup: () => ({
-      many: [
-        ...PARTS,
-        { key: 'water', label: 'Plan d’eau', color: 'var(--ds-chart-categorical-4)' },
-        { key: 'urban', label: 'Zone bâtie', color: 'var(--ds-chart-categorical-5)' },
-      ],
-    }),
-    template: ground(`<MapLegend title="Parcelles" :legend="many" />`),
+    setup: () => ({ legend: SYMBOLS, expanded: ref(false) }),
+    template: onMap(COCKPIT),
   }),
-  play: async ({ canvasElement }) => {
-    await opensAndCloses(canvasElement, 'Autres catégories', 'Autres catégories')
-    await userEvent.click(await within(canvasElement).findByRole('button', { name: 'Autres catégories' }))
-    await waitFor(() => expect(shownPanel('Autres catégories')).toBe(true))
-  },
 }

@@ -85,9 +85,16 @@ interface Props {
   chevron?:   boolean
   ariaLabel?: string
   disabled?:  boolean
+  /**
+   * `false`: the chip unfolds something in place rather than opening a popup —
+   * a disclosure, `aria-expanded` without `aria-haspopup` (ADR-0138, the map
+   * legend's « Symboles »). Same chrome, another control.
+   */
+  popup?:     boolean
 }
 
 withDefaults(defineProps<Props>(), {
+  popup:     true,
   size:      'md',
   chrome:    'boxed',
   open:      false,
@@ -109,7 +116,7 @@ withDefaults(defineProps<Props>(), {
     :aria-expanded="open"
     :aria-label="ariaLabel"
     :disabled="disabled || undefined"
-    aria-haspopup="true"
+    :aria-haspopup="popup ? 'true' : undefined"
   >
     <slot />
     <Icon

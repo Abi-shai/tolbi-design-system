@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 import { ChartLegend, type ChartLegendItem } from '../ChartLegend'
 import { Divider } from '../Divider'
 import { Dropdown, DropdownItem, DropdownTrigger } from '../Dropdown'
@@ -167,15 +167,18 @@ function fitKeys() {
   if (!categorical.value || !root.value || !sizer.value) return
   const items = [...sizer.value.querySelectorAll<HTMLElement>('.ds-chart-legend__item')]
   const more = sizer.value.querySelector<HTMLElement>('.ds-map-legend__more-sizer')
-  const style = getComputedStyle(root.value)
+  const line = root.value.querySelector<HTMLElement>('.ds-map-legend__line')
+  if (!line) return
+  const style = getComputedStyle(line)
   /* At its size, `--ds-width-sm` at most — and never past its container. */
   const cap = sizer.value.querySelector<HTMLElement>('.ds-map-legend__cap')?.getBoundingClientRect().width || Number.POSITIVE_INFINITY
   const max = Math.min(cap, root.value.parentElement?.clientWidth ?? cap)
-  const fixed = [...root.value.querySelectorAll<HTMLElement>(':scope > .ds-map-legend__word, :scope > .ds-map-legend__rule')]
+  const fixed = [...line.querySelectorAll<HTMLElement>(':scope > .ds-map-legend__word, :scope > .ds-map-legend__rule')]
     .reduce((sum, el) => sum + el.getBoundingClientRect().width, 0)
   const gap = parseFloat(style.columnGap) || 0
+  const frame = getComputedStyle(root.value)
   const room = max - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
-    - parseFloat(style.borderLeftWidth) - parseFloat(style.borderRightWidth) - fixed - 2 * gap
+    - parseFloat(frame.borderLeftWidth) - parseFloat(frame.borderRightWidth) - fixed - 2 * gap
   const widths = items.map((el) => el.getBoundingClientRect().width)
   const all = widths.reduce((s, w, i) => s + w + (i ? KEY_GAP : 0), 0)
   if (all <= room) { shown.value = items.length; return }
@@ -212,36 +215,37 @@ watch(() => [props.legend, props.title, current.value, props.ticks, props.unit],
   fit()
 })
 
-/* ── Its panels: one open at a time ─────────────────────────────── */
+/* ── Unfolding in place (ADR-0138) ──────────────────────────────── */
 /*
-  Each chip's `Dropdown` is controlled (it emits `update:open`), so the legend
-  holds the state — one value for its three panels, which is also what keeps
-  one open at a time: opening « Symboles » closes the indicators' menu, and the
-  other way round. 0.116.0 bound it on the menu alone, and the two panels'
-  chips toggled nothing.
+  What does not fit on the line — the symbols, the categories past 480 — is not
+  a menu: a menu closes at the first click on the map, and a legend is read
+  while looking at the map. The legend grows downward instead, the line not
+  moving a pixel, and stays open until its chip is pressed again or Escape.
+  `v-model:expanded` lets the product keep it for the session; unbound, the
+  state is the legend's own.
 */
-type Panel = 'metrics' | 'more' | 'symbols'
-const openPanel = ref<Panel | null>(null)
-const isOpen = (panel: Panel) => openPanel.value === panel
-function setOpen(panel: Panel, value: boolean) {
-  if (value) openPanel.value = panel
-  else if (openPanel.value === panel) openPanel.value = null
+const expanded = defineModel<boolean>('expanded', { default: false })
+const foldable = computed(() => symbols.value || (categorical.value && rest.value.length > 0))
+const open = computed(() => foldable.value && expanded.value)
+const foldId = `ds-map-legend-fold-${useId()}`
+const foldItems = computed(() => (symbols.value ? props.legend : rest.value))
+const foldLabel = computed(() => (symbols.value ? props.symbolsLabel : props.moreLabel))
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key !== 'Escape' || !open.value) return
+  e.preventDefault()
+  e.stopPropagation()
+  expanded.value = false
 }
-/* Closed by a click on the map, the focus would fall to the page: it goes back
-   to the chip that opened the panel. A click on another control keeps its own. */
-watch(openPanel, (now, before) => {
-  if (now !== null || before === null) return
-  nextTick(() => {
-    const active = document.activeElement
-    if (active && active !== document.body) return
-    root.value?.querySelector<HTMLElement>(`.ds-map-legend__chip[data-panel="${before}"]`)?.focus()
-  })
-})
+
+/* ── The indicators' menu ───────────────────────────────────────── */
+/* Choosing is not reading: it stays a menu, and opening it leaves the block as it is. */
+const menuOpen = ref(false)
 
 /* ── Choosing ───────────────────────────────────────────────────── */
 function pick(m: MapLegendMetric) {
   if (m.disabled) return
-  openPanel.value = null
+  menuOpen.value = false
   if (m.value !== current.value?.value) {
     metric.value = m.value
     pending = true
@@ -269,164 +273,165 @@ onBeforeUnmount(() => clearTimeout(timer))
   <div
     ref="root"
     class="ds-map-legend"
-    :class="{ 'ds-map-legend--categorical': categorical }"
+    :class="{ 'ds-map-legend--categorical': categorical, 'ds-map-legend--open': open }"
     :aria-busy="loading || undefined"
+    @keydown="onKeydown"
   >
     <span class="ds-map-legend__said" role="status">{{ announced }}</span>
 
-    <!-- The chip: MapTimeline's scale chip, menu and all. -->
-    <Dropdown
-      v-if="choosing"
-      :open="isOpen('metrics')"
-      class="ds-map-legend__menu"
-      :label="metricsLabel"
-      align="start"
-      size="sm"
-      width="max-content"
-      @update:open="setOpen('metrics', $event)"
-    >
-      <template #trigger="{ open: opened, toggle }">
-        <DropdownTrigger
-          class="ds-map-legend__chip"
-          data-panel="metrics"
-          chrome="chip"
-          chevron
-          :open="opened"
-          :ariaLabel="`${metricsLabel} : ${name}`"
-          @click="toggle"
-        >{{ chipWord }}</DropdownTrigger>
-      </template>
-      <DropdownItem
-        v-for="m in metrics"
-        :key="m.value"
-        :label="m.label"
-        :meta="m.unit"
-        :selected="m.value === current?.value"
-        :disabled="m.disabled"
-        @click="pick(m)"
+    <div class="ds-map-legend__line">
+      <!-- The chip: MapTimeline's scale chip, menu and all. -->
+      <Dropdown
+        v-if="choosing"
+        v-model:open="menuOpen"
+        class="ds-map-legend__menu"
+        :label="metricsLabel"
+        align="start"
+        size="sm"
+        width="max-content"
       >
-        <template #trailing><span class="ds-map-legend__preview" :style="{ backgroundImage: preview(m) }" /></template>
-      </DropdownItem>
-    </Dropdown>
-    <!-- Nothing to choose (ADR-0114): the word the chip would carry, no chip. -->
-    <span v-else class="ds-map-legend__word ds-map-legend__chip-word">{{ chipWord }}</span>
-    <Divider class="ds-map-legend__rule" orientation="vertical" />
-
-    <!-- By category: the keys after the rule, what does not fit in « +N ». -->
-    <template v-if="categorical">
-      <div v-if="loading" class="ds-map-legend__keys" aria-hidden="true">
-        <Skeleton v-for="i in legend.length" :key="i" width="5.5em" height="0.5rem" />
-      </div>
-      <template v-else>
-        <ChartLegend :items="keys" shape="zone" class="ds-map-legend__keys" role="img" :aria-label="keySaid" />
-        <Dropdown
-          v-if="rest.length"
-          :open="isOpen('more')"
-          class="ds-map-legend__more"
-          role="dialog"
-          :label="moreLabel"
-          align="start"
-          size="sm"
-          width="auto"
-          @update:open="setOpen('more', $event)"
+        <template #trigger="{ open: opened, toggle }">
+          <DropdownTrigger
+            class="ds-map-legend__chip"
+            chrome="chip"
+            chevron
+            :open="opened"
+            :ariaLabel="`${metricsLabel} : ${name}`"
+            @click="toggle"
+          >{{ chipWord }}</DropdownTrigger>
+        </template>
+        <DropdownItem
+          v-for="m in metrics"
+          :key="m.value"
+          :label="m.label"
+          :meta="m.unit"
+          :selected="m.value === current?.value"
+          :disabled="m.disabled"
+          @click="pick(m)"
         >
-          <template #trigger="{ open: opened, toggle }">
-            <DropdownTrigger class="ds-map-legend__chip" data-panel="more" chrome="chip" chevron :open="opened" :ariaLabel="moreLabel" @click="toggle">+{{ rest.length }}</DropdownTrigger>
-          </template>
-          <ChartLegend :items="rest" shape="zone" orientation="vertical" class="ds-map-legend__panel-keys" />
-        </Dropdown>
-      </template>
-      <!-- Every key at its width, out of sight: what is measured to know what fits. -->
-      <div class="ds-map-legend__sizer" aria-hidden="true">
-        <div ref="sizer" class="ds-map-legend__sizer-row">
-          <ChartLegend :items="legend" shape="zone" />
-          <DropdownTrigger class="ds-map-legend__more-sizer" chrome="chip" chevron tabindex="-1">+{{ legend.length }}</DropdownTrigger>
-          <!-- The token's length, resolved: `--ds-width-sm` is written in rem. -->
-          <span class="ds-map-legend__cap" />
+          <template #trailing><span class="ds-map-legend__preview" :style="{ backgroundImage: preview(m) }" /></template>
+        </DropdownItem>
+      </Dropdown>
+      <!-- Nothing to choose (ADR-0114): the word the chip would carry, no chip. -->
+      <span v-else class="ds-map-legend__word ds-map-legend__chip-word">{{ chipWord }}</span>
+      <Divider class="ds-map-legend__rule" orientation="vertical" />
+
+      <!-- By category: the keys after the rule, what does not fit unfolds under « +N ». -->
+      <template v-if="categorical">
+        <div v-if="loading" class="ds-map-legend__keys" aria-hidden="true">
+          <Skeleton v-for="i in legend.length" :key="i" width="5.5em" height="0.5rem" />
         </div>
-      </div>
-    </template>
-
-    <!-- The scale: the low bound, the ramp, the high bound, the unit. -->
-    <template v-else>
-      <span v-if="aside" class="ds-map-legend__aside">{{ aside }}</span>
-      <span class="ds-map-legend__bound" aria-hidden="true">
-        <SwapTransition>
-          <Skeleton v-if="loading" key="loading" width="1.5em" height="0.625rem" />
-          <span v-else-if="empty" key="empty" class="ds-map-legend__none">—</span>
-          <span v-else :key="`low-${low}`">{{ low }}</span>
-        </SwapTransition>
-      </span>
-      <div ref="bar" class="ds-map-legend__bar" role="img" :aria-label="said">
-        <!-- One indicator's ramp fades in over the last's, which stays under it
-             until the fade has played. -->
-        <Transition name="ds-map-legend-ramp">
-          <span :key="gradient" class="ds-map-legend__ramp" :style="{ backgroundImage: gradient }" />
-        </Transition>
-      </div>
-      <span class="ds-map-legend__bound" aria-hidden="true">
-        <SwapTransition>
-          <Skeleton v-if="loading" key="loading" width="1.5em" height="0.625rem" />
-          <span v-else-if="empty" key="empty" class="ds-map-legend__none">—</span>
-          <span v-else :key="`high-${high}`">{{ high }}</span>
-        </SwapTransition>
-      </span>
-      <span v-if="loading || (unit && !empty)" class="ds-map-legend__unit" aria-hidden="true">
-        <SwapTransition>
-          <Skeleton v-if="loading" key="loading" width="3.5em" height="0.625rem" />
-          <span v-else :key="`unit-${unit}`">{{ unit }}</span>
-        </SwapTransition>
-      </span>
-
-      <!-- The symbols: their marks in a chip, their names in its panel. -->
-      <template v-if="symbols">
-        <Divider class="ds-map-legend__rule" orientation="vertical" />
-        <Dropdown
-          :open="isOpen('symbols')"
-          class="ds-map-legend__more"
-          role="dialog"
-          :label="symbolsLabel"
-          align="end"
-          size="sm"
-          width="auto"
-          @update:open="setOpen('symbols', $event)"
-        >
-          <template #trigger="{ open: opened, toggle }">
-            <DropdownTrigger class="ds-map-legend__chip" data-panel="symbols" chrome="chip" chevron :open="opened" :ariaLabel="symbolsLabel" @click="toggle">
-              <span class="ds-map-legend__dots" aria-hidden="true">
-                <span v-for="s in legend" :key="s.key" class="ds-map-legend__dot" :style="{ background: s.color }" />
-              </span>
-              {{ symbolsLabel }}
-            </DropdownTrigger>
-          </template>
-          <ChartLegend :items="legend" orientation="vertical" class="ds-map-legend__panel-keys" />
-        </Dropdown>
+        <template v-else>
+          <ChartLegend :items="keys" shape="zone" class="ds-map-legend__keys" role="img" :aria-label="keySaid" />
+          <DropdownTrigger
+            v-if="rest.length"
+            class="ds-map-legend__chip ds-map-legend__unfold"
+            chrome="chip"
+            chevron
+            :popup="false"
+            :open="open"
+            :ariaLabel="moreLabel"
+            :aria-controls="foldId"
+            @click="expanded = !expanded"
+          >+{{ rest.length }}</DropdownTrigger>
+        </template>
+        <!-- Every key at its width, out of sight: what is measured to know what fits. -->
+        <div class="ds-map-legend__sizer" aria-hidden="true">
+          <div ref="sizer" class="ds-map-legend__sizer-row">
+            <ChartLegend :items="legend" shape="zone" />
+            <DropdownTrigger class="ds-map-legend__more-sizer" chrome="chip" chevron tabindex="-1">+{{ legend.length }}</DropdownTrigger>
+            <!-- The token's length, resolved: `--ds-width-sm` is written in rem. -->
+            <span class="ds-map-legend__cap" />
+          </div>
+        </div>
       </template>
-    </template>
+
+      <!-- The scale: the low bound, the ramp, the high bound, the unit. -->
+      <template v-else>
+        <span v-if="aside" class="ds-map-legend__aside">{{ aside }}</span>
+        <span class="ds-map-legend__bound" aria-hidden="true">
+          <SwapTransition>
+            <Skeleton v-if="loading" key="loading" width="1.5em" height="0.625rem" />
+            <span v-else-if="empty" key="empty" class="ds-map-legend__none">—</span>
+            <span v-else :key="`low-${low}`">{{ low }}</span>
+          </SwapTransition>
+        </span>
+        <div ref="bar" class="ds-map-legend__bar" role="img" :aria-label="said">
+          <!-- One indicator's ramp fades in over the last's, which stays under it
+               until the fade has played. -->
+          <Transition name="ds-map-legend-ramp">
+            <span :key="gradient" class="ds-map-legend__ramp" :style="{ backgroundImage: gradient }" />
+          </Transition>
+        </div>
+        <span class="ds-map-legend__bound" aria-hidden="true">
+          <SwapTransition>
+            <Skeleton v-if="loading" key="loading" width="1.5em" height="0.625rem" />
+            <span v-else-if="empty" key="empty" class="ds-map-legend__none">—</span>
+            <span v-else :key="`high-${high}`">{{ high }}</span>
+          </SwapTransition>
+        </span>
+        <span v-if="loading || (unit && !empty)" class="ds-map-legend__unit" aria-hidden="true">
+          <SwapTransition>
+            <Skeleton v-if="loading" key="loading" width="3.5em" height="0.625rem" />
+            <span v-else :key="`unit-${unit}`">{{ unit }}</span>
+          </SwapTransition>
+        </span>
+
+        <!-- The symbols: their marks in the chip; pressed, they unfold below. -->
+        <template v-if="symbols">
+          <Divider class="ds-map-legend__rule" orientation="vertical" />
+          <DropdownTrigger
+            class="ds-map-legend__chip ds-map-legend__unfold"
+            chrome="chip"
+            chevron
+            :popup="false"
+            :open="open"
+            :ariaLabel="symbolsLabel"
+            :aria-controls="foldId"
+            @click="expanded = !expanded"
+          >
+            <span class="ds-map-legend__dots" aria-hidden="true">
+              <span v-for="s in legend" :key="s.key" class="ds-map-legend__dot" :style="{ background: s.color }" />
+            </span>
+            {{ symbolsLabel }}
+          </DropdownTrigger>
+        </template>
+      </template>
+    </div>
+
+    <!-- What did not fit, unfolded under the line (ADR-0138): a rule, then the
+         key in columns — its mark, its figure, its name. -->
+    <div v-if="foldable" class="ds-map-legend__fold">
+      <div :id="foldId" class="ds-map-legend__region" role="region" :aria-label="foldLabel">
+        <ChartLegend :items="foldItems" :shape="symbols ? 'dot' : 'zone'" orientation="columns" class="ds-map-legend__columns" />
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 /*
-  `MapTimeline`'s pill, to the pixel (ADR-0137): 48px tall, 8 in at the start
+  `MapTimeline`'s pill, to the pixel (ADR-0137): a 48px line, 8 in at the start
   and 12 at the end, 6 between its parts, `bg-default` + `border-subtle` +
-  `elevation-raised`, a pill's radius. **`--ds-width-sm` (480px), declared**
-  for a scale (ADR-0116): the timeline's width and the same token, so the two
-  are one width on the map's axis; the ramp alone stretches. A key by category
-  hugs, up to the same 480.
+  `elevation-raised`. **`--ds-width-sm` (480px), declared** for a scale
+  (ADR-0116); a key by category hugs, up to the same 480.
+
+  The surface is the legend, not the line (ADR-0138): unfolded, it grows
+  downward under the line, which does not move. So the radius is the line's —
+  half its height — and not a pill's, which on a taller surface would round
+  the whole side.
 */
 .ds-map-legend {
+  --map-legend-row: 48px;
+
   position: relative;
   display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-sm);
+  flex-direction: column;
   box-sizing: border-box;
   width: var(--ds-width-sm);
   max-width: 100%;
-  height: 48px;
-  padding: 0 var(--ds-spacing-lg) 0 var(--ds-spacing-md);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
-  border-radius: var(--ds-radius-pill);
+  border-radius: calc(var(--map-legend-row) / 2);
   background: var(--ds-bg-default);
   box-shadow: var(--ds-elevation-raised);
   font-family: var(--ds-typography-font-family-poppins);
@@ -437,9 +442,76 @@ onBeforeUnmount(() => clearTimeout(timer))
   max-width: min(100%, var(--ds-width-sm));
 }
 
+.ds-map-legend__line {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-sm);
+  box-sizing: border-box;
+  height: calc(var(--map-legend-row) - 2 * var(--ds-border-width-default));
+  padding: 0 var(--ds-spacing-lg) 0 var(--ds-spacing-md);
+}
+
+/* ── Unfolded (ADR-0138) ──────────────────────────────────────────── */
+/*
+  ADR-0025's `0fr → 1fr`, on the element that transitions. It takes the
+  legend's width and asks for none (`contain: inline-size`), so a key by
+  category is as wide as its line, folded or not.
+
+  In: the height over `enter` on `easing-out` — the block makes room — and its
+  content fades in over the second half. Out, faster, the other way round: the
+  content first (`instant`), then the height over `exit`; the block is hidden
+  from a reader once closed.
+*/
+.ds-map-legend__fold {
+  display: grid;
+  grid-template-rows: 0fr;
+  contain: inline-size;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--ds-motion-duration-exit) var(--ds-motion-easing-in) var(--ds-motion-duration-instant),
+    visibility 0s linear calc(var(--ds-motion-duration-instant) + var(--ds-motion-duration-exit));
+}
+
+.ds-map-legend--open .ds-map-legend__fold {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--ds-motion-duration-enter) var(--ds-motion-easing-out),
+    visibility 0s;
+}
+
+.ds-map-legend__region {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity var(--ds-motion-duration-instant) var(--ds-motion-easing-in);
+}
+
+.ds-map-legend--open .ds-map-legend__region {
+  opacity: 1;
+  transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-out) var(--ds-motion-duration-quick);
+}
+
+/* Reduced motion: the package's rule cuts every transition (`motion.css`); the
+   delays stay unless removed, and the block would stand empty for 100ms. */
+@media (prefers-reduced-motion: reduce) {
+  .ds-map-legend__fold,
+  .ds-map-legend--open .ds-map-legend__fold,
+  .ds-map-legend--open .ds-map-legend__region {
+    transition-delay: 0s;
+  }
+}
+
+/* A rule inset 16 under the line, then the key: 12 above it, 16 below and at the sides. */
+.ds-map-legend__columns {
+  margin: 0 var(--ds-spacing-xl);
+  padding: var(--ds-spacing-lg) 0 var(--ds-spacing-xl);
+  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+}
+
 /* ── The chip ─────────────────────────────────────────────────────── */
 .ds-map-legend__menu,
-.ds-map-legend__more {
+.ds-map-legend__unfold {
   flex: none;
 }
 
@@ -559,10 +631,6 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .ds-map-legend__chip-word {
   font: var(--ds-font-label-lg-strong);
-}
-
-.ds-map-legend__panel-keys {
-  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
 }
 
 /* ── The symbols' marks, overlapping ──────────────────────────────── */

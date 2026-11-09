@@ -1367,6 +1367,12 @@ Before working on any component, read:
   over `process`; announced once. `Dropdown role="menu"` gains arrow keys (↓/↑ from the trigger, Home/End).
   **Amended (0.116.1)**: a controlled `Dropdown` needs its state — the « Symboles » / « +N » chips opened nothing; one
   value now holds the three panels (one open at a time), ↓ opens a `dialog` dropdown, and `play` tests guard it.
+- **ADR-0138**: **a legend unfolds in place** — « Symboles » and « +N » are no longer menus (a menu closes at the first
+  click on the map): the legend grows downward, the line fixed, a rule inset 16 then `ChartLegend orientation="columns"`
+  (new: four equal centred columns — mark in a 16px box, `value` in `label-xl-strong`, name in `label-md`). The chip is a
+  disclosure (`DropdownTrigger popup: false` — `aria-expanded`, `aria-controls` a `role="region"`); Escape folds, a map
+  click does not; `v-model:expanded`. Radius = half the line (24). Height `0fr → 1fr`: `enter`/`easing-out` in with the
+  content in the second half, content then height out (`instant` + `exit`).
 
 ## Architecture
 

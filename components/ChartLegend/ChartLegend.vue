@@ -28,7 +28,13 @@ export type ChartLegendShape = 'dot' | 'line' | 'dashed' | 'square' | 'circle' |
  * map, in a `MapPanel` (ADR-0087): one entry per row, the figure at its end in
  * the receding ink, a count read after its label.
  */
-export type ChartLegendOrientation = 'horizontal' | 'vertical'
+/**
+ * `columns` — a key that is read, not scanned (ADR-0138): each entry a column
+ * of its own, four to a row, equal widths, centred — its mark in a 16px box,
+ * its figure (`value`) in `label-xl-strong`, its name under it in `label-md`.
+ * A map legend's unfolded symbols: « 40 / Point du projet ».
+ */
+export type ChartLegendOrientation = 'horizontal' | 'vertical' | 'columns'
 
 interface Props {
   items?: ChartLegendItem[]
@@ -202,5 +208,54 @@ button.ds-chart-legend__entry:focus-visible {
   font: var(--ds-font-body-sm);
   font-variant-numeric: tabular-nums;
   color: var(--ds-text-subtle);
+}
+
+/* ── Columns: a key that is read (ADR-0138) ───────────────────────── */
+.ds-chart-legend--columns {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--ds-spacing-lg) 0;
+}
+
+.ds-chart-legend--columns .ds-chart-legend__item {
+  flex: 0 0 25%;
+  justify-content: center;
+}
+
+.ds-chart-legend--columns .ds-chart-legend__entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-spacing-xs);
+  min-width: 0;
+  padding-inline: var(--ds-spacing-xs);
+  text-align: center;
+}
+
+/* The mark at its own size, centred in a 16px box: the shapes keep their
+   proportions, and every column starts its words on one line. */
+.ds-chart-legend--columns .ds-chart-legend__mark {
+  margin-block: calc((16px - var(--chart-legend-mark-h, 8px)) / 2);
+}
+
+.ds-chart-legend--columns .ds-chart-legend__mark--zone { --chart-legend-mark-h: 10px; }
+.ds-chart-legend--columns .ds-chart-legend__mark--line { --chart-legend-mark-h: 3px; }
+.ds-chart-legend--columns .ds-chart-legend__mark--point { --chart-legend-mark-h: 5px; }
+.ds-chart-legend--columns .ds-chart-legend__mark--dashed { --chart-legend-mark-h: 2px; }
+
+.ds-chart-legend--columns .ds-chart-legend__value {
+  order: 1;
+  font: var(--ds-font-label-xl-strong);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-strong);
+}
+
+.ds-chart-legend--columns .ds-chart-legend__label {
+  order: 2;
+  max-width: 100%;
+  overflow: hidden;
+  font: var(--ds-font-label-md);
+  color: var(--ds-text-subtle);
+  text-overflow: ellipsis;
 }
 </style>
