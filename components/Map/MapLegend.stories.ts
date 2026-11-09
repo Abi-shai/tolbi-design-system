@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { computed, ref } from 'vue'
-import MapLegend from './MapLegend.vue'
+import MapLegend, { type MapLegendMetric } from './MapLegend.vue'
 import MapTimeline from './MapTimeline.vue'
 
 const meta: Meta<typeof MapLegend> = {
@@ -12,15 +12,16 @@ const meta: Meta<typeof MapLegend> = {
     docs: {
       description: {
         component:
-          'La **légende d’une carte** en mode SIG (ADR-0102, Figma « Indicateur ») : ce que veulent dire les couleurs — ' +
-          'le nom de l’indicateur, son échelle continue (un dégradé, son unité, ses bornes) — et ce que sont les symboles.\n\n' +
-          'Quand l’écran offre plusieurs indicateurs, la légende **bascule de l’un à l’autre** (`metrics` + ' +
-          '`v-model:metric`, des `Tabs xs`) : le sélecteur est au-dessus de l’échelle qu’il change, on ne cherche jamais ' +
-          'la clé de ce qu’on vient de choisir. Quels indicateurs existent, c’est le module qui le dit ; le produit répond ' +
-          'au changement par un autre `title`, `unit`, `ticks` et une autre carte.\n\n' +
-          'La rampe est `--ds-chart-sequential-*` (ADR-0096) sauf si l’appelant donne la sienne. Un lecteur d’écran ' +
-          'entend le dégradé **une fois** — « Carbone, de 0 t à 16 t CO2e/ha ». `ChartLegend` nomme les séries d’un ' +
-          'graphique ; `MapLegend` dit comment lire une carte.',
+          'La **légende d’une carte** en mode SIG, **sur une ligne, dans la grammaire de la frise** (ADR-0137, piste A ' +
+          'de `3919:1427`) : une puce qui choisit, un trait, les valeurs. La même pilule que `MapTimeline` — même puce, ' +
+          'même trait, même hauteur, **480 px** — : en haut de la carte ce qu’elle montre, en bas quand.\n\n' +
+          '- **La puce nomme l’indicateur** et, avec deux `metrics` ou plus, le choisit (`v-model:metric`) ; son menu ' +
+          'montre pour chacun le nom, l’unité et un aperçu de sa rampe. Le titre n’est plus répété.\n' +
+          '- **L’échelle sur une ligne** : borne basse, rampe, borne haute, unité. Les crans du milieu ne sont plus écrits, ' +
+          'ils sont lus (`summary`). **La ligne fait toujours 480 et la rampe est sa seule part élastique** ; sous 120 px ' +
+          'de rampe, la puce prend le nom court (`shortLabel`).\n' +
+          '- **Par catégories** : les clés après le trait, à leur taille jusqu’à 480 ; au-delà, « +N ».\n' +
+          '- **Rampe et symboles** : une puce « Symboles » en fin de ligne, leurs noms dans son panneau.',
       },
     },
   },
@@ -29,25 +30,25 @@ const meta: Meta<typeof MapLegend> = {
 export default meta
 type Story = StoryObj<typeof MapLegend>
 
-const ground = (inner: string) =>
-  `<div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;max-width:640px">${inner}</div>`
+const ground = (inner: string, width = 640) =>
+  `<div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;max-width:${width}px;min-height:72px">${inner}</div>`
 
-const METRICS = [
-  { value: 'carbon', label: 'Carbone' },
-  { value: 'biomass', label: 'Biomasse' },
-  { value: 'cover', label: 'Couvert' },
-  { value: 'height', label: 'Hauteur' },
+const METRICS: MapLegendMetric[] = [
+  { value: 'carbon', label: 'Carbone', unit: 'tCO2e/ha' },
+  { value: 'biomass', label: 'Biomasse', unit: 't/ha' },
+  { value: 'cover', label: 'Couverture forestière', shortLabel: 'Couvert', unit: 'ha' },
+  { value: 'height', label: 'Hauteur de canopée', unit: 'm' },
 ]
 const SCALES: Record<string, { title: string; unit: string; ticks: string[] }> = {
-  carbon: { title: 'Carbone', unit: 'CO2e/ha', ticks: ['0 t', '8 t', '16 t'] },
+  carbon: { title: 'Carbone', unit: 'tCO2e/ha', ticks: ['0', '8', '16'] },
   biomass: { title: 'Biomasse', unit: 't/ha', ticks: ['0', '60', '120'] },
-  cover: { title: 'Couvert', unit: '%', ticks: ['0', '50', '100'] },
-  height: { title: 'Hauteur', unit: 'm', ticks: ['0', '15', '30'] },
+  cover: { title: 'Couverture forestière', unit: 'ha', ticks: ['0', '625', '1 250'] },
+  height: { title: 'Hauteur de canopée', unit: 'm', ticks: ['0', '15', '30'] },
 }
 
-/** Le dessin « Indicateur » : quatre indicateurs, la légende de celui qui est choisi. */
-export const Metrics: Story = {
-  name: 'Avec le choix de l’indicateur',
+/** Au repos : la puce nomme l’indicateur choisi, puis la rampe entre ses deux bornes et son unité. 480 × 48. */
+export const Rest: Story = {
+  name: 'Au repos',
   render: () => ({
     components: { MapLegend },
     setup() {
@@ -59,9 +60,99 @@ export const Metrics: Story = {
   }),
 }
 
-/** Un seul indicateur : pas de sélecteur ; la clé des symboles de l’ARR dessous. */
+/**
+ * **Le menu ouvert** : le menu de la puce de la frise, à l’identique — chaque indicateur avec son unité et l’aperçu
+ * de sa rampe, l’indisponible grisé mais atteignable (ADR-0119). Choisir ferme le menu, la rampe et les bornes
+ * changent sur place, la ligne ne bouge pas.
+ */
+export const MenuOpen: Story = {
+  name: 'Menu ouvert',
+  render: () => ({
+    components: { MapLegend },
+    setup() {
+      const metric = ref('carbon')
+      const scale = computed(() => SCALES[metric.value])
+      const metrics = [...METRICS, { value: 'soil', label: 'Carbone du sol', unit: 'tC/ha', disabled: true }]
+      return { metric, scale, metrics }
+    },
+    mounted() {
+      setTimeout(() => (document.querySelector('.ds-map-legend__chip') as HTMLElement | null)?.click(), 300)
+    },
+    template: ground(`<MapLegend v-model:metric="metric" :metrics="metrics" :title="scale.title" :unit="scale.unit" :ticks="scale.ticks" />`, 640),
+  }),
+}
+
+/**
+ * **En attente, puis sans mesure** : la pilule est à 480 dès le clic, la puce lisible, la rampe aux couleurs de
+ * l’indicateur ; bornes et unité en squelettes (ADR-0122). Sans mesure, les bornes sont « — » et l’unité tombe
+ * (ADR-0105).
+ */
+export const Loading: Story = {
+  name: 'En attente, puis sans mesure',
+  render: () => ({
+    components: { MapLegend },
+    setup: () => ({ METRICS }),
+    template: ground(`
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <MapLegend :metrics="METRICS" title="Carbone" unit="tCO2e/ha" :ticks="[]" loading />
+        <MapLegend :metrics="METRICS" title="Carbone" unit="tCO2e/ha" :ticks="[]" />
+      </div>`),
+  }),
+}
+
+/**
+ * **Comparer** : le produit passe une rampe divergente, des bornes signées et un `title` court — « 2021 → 2024 » —
+ * écrit après le trait, avant la rampe ; la puce garde l’indicateur.
+ */
+export const Compare: Story = {
+  name: 'Comparer',
+  render: () => ({
+    components: { MapLegend },
+    setup: () => ({
+      METRICS,
+      metric: ref('carbon'),
+      diverging: ['var(--ds-text-error)', 'var(--ds-bg-neutral)', 'var(--ds-chart-sequential-4)'],
+    }),
+    template: ground(`<MapLegend v-model:metric="metric" :metrics="METRICS" title="2021 → 2024" unit="tCO2e/ha" :ticks="['−4', '0', '+4']" :colors="diverging" summary="Carbone, écart de 2021 à 2024, de −4 à +4 tCO2e/ha" />`),
+  }),
+}
+
+const PARTS = [
+  { key: 'eligible', label: 'Éligibles', color: 'var(--ds-chart-categorical-1)' },
+  { key: 'forest', label: 'Forêt en 2016', color: 'var(--ds-chart-categorical-2)' },
+  { key: 'invalid', label: 'Contour invalide', color: 'var(--ds-chart-categorical-3)' },
+]
+
+/**
+ * **Par catégories** (ADR-0129) : rien à choisir, le mot nomme ce qui est coloré, les clés suivent le trait. À sa
+ * taille, 480 au plus ; au-delà, les dernières clés passent dans une puce « +N » dont le panneau les liste.
+ */
+export const Categorical: Story = {
+  name: 'Par catégories',
+  render: () => ({
+    components: { MapLegend },
+    setup: () => ({
+      PARTS,
+      many: [
+        ...PARTS,
+        { key: 'water', label: 'Plan d’eau', color: 'var(--ds-chart-categorical-4)' },
+        { key: 'urban', label: 'Zone bâtie', color: 'var(--ds-chart-categorical-5)' },
+      ],
+    }),
+    template: ground(`
+      <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+        <MapLegend title="Parcelles" :legend="PARTS" />
+        <MapLegend title="Parcelles" :legend="many" />
+      </div>`),
+  }),
+}
+
+/**
+ * **Rampe et symboles** — le cockpit ARR : les quatre symboles ne tiennent pas dans 480 avec leurs noms (747) ; leurs
+ * pastilles restent visibles dans une puce « Symboles », leurs noms dans son panneau.
+ */
 export const Symbols: Story = {
-  name: 'Un indicateur et ses symboles',
+  name: 'Rampe et symboles',
   render: () => ({
     components: { MapLegend },
     setup: () => ({
@@ -77,69 +168,43 @@ export const Symbols: Story = {
 }
 
 /**
- * **La largeur du contenu, 480 px au plus** (ADR-0116) — la même règle et le même jeton (`--ds-width-sm`) que la
- * frise : sur l’écran SIG, la légende en haut et la frise en bas restent sur l’axe central de la carte quoi qu’elles
- * tiennent. Le dégradé prend la place que laissent la bascule et le titre, jamais moins de 16rem.
+ * **Le pire cas, et le nom court** : « Couverture forestière » avec « 1 250 ha » laisse encore ~200 px de rampe dans
+ * 480. Plus étroite (ici 360), la rampe passerait sous 120 px : la puce prend le nom court, « Couvert ».
  */
-export const OnTheAxis: Story = {
-  name: 'Sur l’axe de la frise',
+export const WorstCase: Story = {
+  name: 'Pire cas et nom court',
+  render: () => ({
+    components: { MapLegend },
+    setup: () => ({ METRICS, s: SCALES.cover, h: SCALES.height }),
+    template: ground(`
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <MapLegend metric="cover" :metrics="METRICS" :title="s.title" :unit="s.unit" :ticks="s.ticks" />
+        <MapLegend metric="height" :metrics="METRICS" :title="h.title" :unit="h.unit" :ticks="h.ticks" />
+        <div style="width:360px"><MapLegend metric="cover" :metrics="METRICS" :title="s.title" :unit="s.unit" :ticks="s.ticks" /></div>
+      </div>`),
+  }),
+}
+
+/** **En situation** : la légende en haut, la frise en bas — la même famille, la même largeur, sur un même axe. */
+export const WithTimeline: Story = {
+  name: 'Avec la frise',
   render: () => ({
     components: { MapLegend, MapTimeline },
-    setup: () => ({
-      year: ref('2024'),
-      SCALE: [{ value: 'year', label: 'Année' }],
-      YEARS: ['2020', '2021', '2022', '2023', '2024'].map((y) => ({ value: y, label: y, data: true })),
-      metric: ref('carbon'),
-      TWO: [{ value: 'carbon', label: 'Carbone' }, { value: 'cover', label: 'Couvert' }],
-    }),
-    template: `<div style="background:var(--ds-bg-neutral);padding:24px;border-radius:12px;width:720px;display:flex;flex-direction:column;align-items:center;gap:24px;">
-      <MapLegend title="Carbone" unit="tCO2e/ha" :ticks="['0', '8', '16']" />
-      <MapLegend v-model:metric="metric" :metrics="TWO" title="Carbone" unit="tCO2e/ha" :ticks="['0', '8', '16']" />
-      <MapTimeline v-model="year" :scales="SCALE" :periods="YEARS" label="Année" />
+    setup() {
+      const metric = ref('carbon')
+      const scale = computed(() => SCALES[metric.value])
+      return {
+        metric, scale, METRICS,
+        year: ref('2024'),
+        scaleT: ref('year'),
+        SCALE: [{ value: 'year', label: 'Année' }, { value: 'month', label: 'Mois' }],
+        YEARS: ['2020', '2021', '2022', '2023', '2024'].map((y) => ({ value: y, label: y, data: true })),
+      }
+    },
+    template: `<div style="background:var(--ds-map-land, var(--ds-bg-neutral));padding:24px;border-radius:12px;width:900px;height:420px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;">
+      <MapLegend v-model:metric="metric" :metrics="METRICS" :title="scale.title" :unit="scale.unit" :ticks="scale.ticks" />
+      <MapTimeline v-model="year" v-model:scale="scaleT" :scales="SCALE" :periods="YEARS" label="Année" compare />
     </div>`,
   }),
 }
 
-/**
- * **En attente** (ADR-0122) : la rampe est déjà là — ses couleurs sont celles de l’indicateur, connues avant toute
- * donnée — l’unité et les bornes sont des repères qui gardent leur ligne. **Sans mesure** : les bornes sont « — »
- * (ADR-0105), l’unité tombe.
- */
-export const Loading: Story = {
-  name: 'En attente, puis sans mesure',
-  render: () => ({
-    components: { MapLegend },
-    setup: () => ({ METRICS }),
-    template: ground(`
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <MapLegend :metrics="METRICS" title="Carbone" unit="CO2e/ha" :ticks="[]" loading />
-        <MapLegend :metrics="METRICS" title="Carbone" unit="CO2e/ha" :ticks="[]" />
-      </div>`),
-  }),
-}
-
-/**
- * **Par catégories, sans rampe** (ADR-0129) — la page d’une zone éligible ARR colore ses parcelles par motif. Sans
- * `ticks`, avec `legend`, la légende est la clé : le titre puis les entrées (forme `zone`, couleur, libellé, part), sur
- * la ligne qu’aurait prise le dégradé et sur la même surface, à la même place (`MapOverlay position="top"`). Les couleurs
- * sont `--ds-chart-categorical-1…3`, dans l’ordre des parts (ADR-0016). Un lecteur entend « Parcelles : Éligibles 85 %,
- * Forêt en 2014 12 %, Contour invalide 4 % ».
- */
-export const Categorical: Story = {
-  name: 'Par catégories, sans rampe',
-  render: () => ({
-    components: { MapLegend },
-    setup: () => ({
-      items: [
-        { key: 'eligible', label: 'Éligibles', value: '85 %', color: 'var(--ds-chart-categorical-1)' },
-        { key: 'forest', label: 'Forêt en 2014', value: '12 %', color: 'var(--ds-chart-categorical-2)' },
-        { key: 'invalid', label: 'Contour invalide', value: '4 %', color: 'var(--ds-chart-categorical-3)' },
-      ],
-    }),
-    template: ground(`
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <MapLegend title="Parcelles" :legend="items" />
-        <MapLegend title="Parcelles" :legend="items" loading />
-      </div>`),
-  }),
-}

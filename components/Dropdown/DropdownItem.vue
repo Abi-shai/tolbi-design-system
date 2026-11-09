@@ -151,11 +151,20 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
         <span class="ds-dropdown-item__label">{{ label }}</span>
       </div>
       <span v-if="shortcut || meta" class="ds-dropdown-item__shortcut">{{ shortcut || meta }}</span>
+      <!-- A picture of what the row stands for, after its words — a legend's
+           ramp (ADR-0137). Decorative: the label is the row's name. -->
+      <span v-if="$slots.trailing" class="ds-dropdown-item__trailing" aria-hidden="true"><slot name="trailing" /></span>
     </div>
   </component>
 </template>
 
 <style scoped>
+.ds-dropdown-item__trailing {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+
 .ds-dropdown-item {
   display: flex;
   align-items: center;

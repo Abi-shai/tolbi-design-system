@@ -1358,6 +1358,13 @@ Before working on any component, read:
   `body-sm` / `text-subtle`, 16px under the 20px line, no gap (Figma `Lignes=Deux`, 52 → 68), one line cut, in the
   column's alignment. In the primary cell it sits **under** the row's link (the link keeps the name alone; row click
   unchanged); a `#cell-*` slot replaces the first line only; loading previews it.
+- **ADR-0137**: **the legend on one line** — `MapLegend` takes `MapTimeline`'s grammar and pill (48px, 480 for a scale):
+  a chip that names the indicator and, with 2+ `metrics`, chooses it (the timeline's chip and menu; rows show unit +
+  a ramp preview via `DropdownItem #trailing`; items gain `unit`/`colors`/`shortLabel`/`disabled`), a rule, then low
+  bound · ramp · high bound · unit. The ramp is the only elastic part; under 120px the chip says `shortLabel`. `title`
+  is written after the rule only when it differs from the chip (Comparer). Nothing to choose = the word, no chip
+  (ADR-0114). By category: at its size ≤ 480, overflow in « +N »; with symbols, a « Symboles » chip. Ramp cross-fades
+  over `process`; announced once. `Dropdown role="menu"` gains arrow keys (↓/↑ from the trigger, Home/End).
 
 ## Architecture
 

@@ -1,62 +1,92 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ChartLegend, type ChartLegendItem } from '../ChartLegend'
+import { Divider } from '../Divider'
+import { Dropdown, DropdownItem, DropdownTrigger } from '../Dropdown'
 import { Skeleton } from '../Skeleton'
-import { TabPanel, Tabs, type TabsItem } from '../Tabs'
+import { SwapTransition } from '../SwapTransition'
+
+/** One indicator the map can show (ADR-0137). */
+export interface MapLegendMetric {
+  value: string
+  label: string
+  /** Said in the chip when the ramp would go under 120px — « Couvert ». */
+  shortLabel?: string
+  /** Shown in the menu beside the name, so the reader knows what they will read. */
+  unit?: string
+  /** The indicator's ramp, low to high — its preview in the menu. */
+  colors?: string[]
+  /**
+   * Offered but unavailable here (ADR-0119's rule): listed, greyed, reachable,
+   * read as unavailable.
+   */
+  disabled?: boolean
+}
 
 /**
- * The legend of a map in full GIS mode (ADR-0102, Figma « Indicateur »
- * `3670:39635`): **what the colours on the map mean** — the indicator's name,
- * its continuous scale (a gradient, its unit, its bounds) — and what the
- * symbols on it are. When the screen offers several indicators, the legend
- * **switches between them** (`metrics` + `v-model:metric`, `Tabs xs`): the
- * switch sits above the scale it changes, so the reader never looks for the
- * key to what they just chose. Which indicators exist is the module's; the
- * product answers a switch with another `title`, `unit`, `ticks` and map.
+ * The legend of a map in full GIS mode — **on one line, in the timeline's
+ * grammar** (ADR-0137, track A of `3919:1427`): a chip that chooses, a rule,
+ * the values. The same raised pill as `MapTimeline`, the same chip, the same
+ * rule, the same height, the same 480px: on the GIS screen the two are one
+ * family, the legend at the top (what the map shows), the timeline at the
+ * bottom (when).
  *
- * It was `ColorScale` for an afternoon — a name for one of its parts: the
- * gradient is what it draws, the legend is what it is, and the switch is not a
- * scale at all. `ChartLegend` names a chart's series; `MapLegend` says how to
- * read a map.
+ * - **The chip names the indicator** and, with two or more `metrics`, chooses
+ *   it — `MapTimeline`'s scale chip, menu and all (`v-model:metric`); each row
+ *   shows the indicator's name, unit and a preview of its ramp. The title is
+ *   not repeated: with `metrics`, `title` is written after the rule only when
+ *   it says something the chip does not (« 2021 → 2024 » while comparing);
+ *   without, it is the chip's word.
+ * - **The scale on one line**: the low bound, the ramp, the high bound, the
+ *   unit. The middle ticks are no longer written — they are said, in
+ *   `summary`. **The line is always 480 and the ramp is its only elastic
+ *   part**: the legend never changes width from one indicator or one year to
+ *   the next. Under 120px of ramp, the chip says the indicator's `shortLabel`.
+ * - **By category** (`legend` without `ticks`, ADR-0129): the word, then the
+ *   keys, at their size up to 480; past it, the last keys go into a « +N »
+ *   chip whose panel lists them.
+ * - **A ramp and symbols** (`legend` with `ticks`): after the unit, a rule and
+ *   a « Symboles » chip carrying the symbols' marks, their names in its panel.
  *
- * The ramp is `--ds-chart-sequential-*` (ADR-0096) unless the caller gives its
- * own: lightness falls at every step, so it reads in every vision. A gradient
- * is not text, so it says itself once — « Carbone, de 0 t à 16 t CO2e/ha » —
- * and the bounds are not read a second time.
- *
- * Its own surface, as drawn — a map's instrument, like `MapNavigator`:
- * `bg-default`, `border-subtle`, `elevation-raised`, 8px around.
+ * Changing indicator, the ramp cross-fades over `process` and the bounds swap
+ * in place; nothing moves. A reader hears the new scale once.
  */
 interface Props {
   title: string
   /**
-   * The values under the gradient, evenly spaced: the first at its start, the
-   * last at its end. **Absent, with a `legend`, there is no gradient**: the map
-   * is coloured by category, and the legend is its key (ADR-0129).
+   * The values of the scale, low to high; the first and the last are written,
+   * the others said. **Absent, with a `legend`, there is no ramp**: the map is
+   * coloured by category, and the legend is its key (ADR-0129).
    */
   ticks?: string[]
-  /** Above the gradient's end — `CO2e/ha`. Said with the bounds to a reader. */
+  /** After the high bound — `tCO2e/ha`. */
   unit?: string
   /** The ramp, low to high. Any CSS colour — pass tokens. */
   colors?: string[]
-  /** The symbols drawn on the map — `ChartLegend`'s shapes (ADR-0096). */
+  /** The symbols drawn on the map, or the categories' key — `ChartLegend`'s shapes. */
   legend?: ChartLegendItem[]
-  /** The indicators the map can show. Two or more draw the switch. */
-  metrics?: TabsItem[]
-  /** The switch's name. */
+  /** The indicators the map can show. Two or more make the chip a choice. */
+  metrics?: MapLegendMetric[]
+  /** The chip's name. */
   metricsLabel?: string
-  /** What a reader hears for the gradient. Defaults to « title, de first à last unit ». */
+  /** What a reader hears for the scale. Defaults to « title, de first à last unit ». */
   summary?: string
   /**
-   * The bounds are on their way (ADR-0122): the ramp is drawn — its colours are
-   * the indicator's, known before any data — and the unit and the bounds are
-   * placeholders. With no `ticks` and not loading, the bounds are « — »
-   * (ADR-0105): nothing measured yet.
+   * The bounds are on their way (ADR-0122): the chip is readable and the ramp
+   * drawn — its colours are the indicator's, known before any data — the
+   * bounds and the unit are placeholders. With no `ticks` and not loading, the
+   * bounds are « — » (ADR-0105).
    */
   loading?: boolean
   /** Said with the title while there are no bounds. */
   emptyLabel?: string
+  /** The symbols' chip. */
+  symbolsLabel?: string
+  /** The panel of the keys that did not fit. */
+  moreLabel?: string
 }
+
+const SEQUENTIAL = [1, 2, 3, 4, 5].map((i) => `var(--ds-chart-sequential-${i})`)
 
 const props = withDefaults(defineProps<Props>(), {
   ticks: undefined,
@@ -68,181 +98,451 @@ const props = withDefaults(defineProps<Props>(), {
   summary: undefined,
   loading: false,
   emptyLabel: 'pas encore de mesure',
+  symbolsLabel: 'Symboles',
+  moreLabel: 'Autres catégories',
 })
 
 const metric = defineModel<string>('metric')
-const current = computed(() => metric.value ?? props.metrics[0]?.value ?? '')
+const choosing = computed(() => props.metrics.length > 1)
+const current = computed(() => props.metrics.find((m) => m.value === metric.value) ?? props.metrics[0])
 
-/* The switch is a tab list, so what it shows is its panel (ADR-0098): the
-   scale of the chosen indicator. Changing indicator is a swap — `TabPanel`'s
-   cross-fade, out then in at `quick` (ADR-0026) — and a reader is told which
-   indicator the scale now reads. */
-const tabsId = `ds-map-legend-${useId()}`
-
-const gradient = computed(() => `linear-gradient(to right, ${props.colors.join(', ')})`)
 /* A map coloured by category has no ramp: no ticks, a legend (ADR-0129). */
 const categorical = computed(() => props.ticks === undefined && props.legend.length > 0)
+const symbols = computed(() => !categorical.value && props.legend.length > 0)
 const ticks = computed(() => props.ticks ?? [])
 const empty = computed(() => !props.loading && ticks.value.length === 0)
-/* Said once, as the gradient is: the title, then each entry with its figure. */
+const low = computed(() => ticks.value[0])
+const high = computed(() => ticks.value[ticks.value.length - 1])
+
+const gradient = computed(() => `linear-gradient(to right, ${props.colors.join(', ')})`)
+const preview = (m: MapLegendMetric) => `linear-gradient(to right, ${(m.colors ?? SEQUENTIAL).join(', ')})`
+
+/* The chip's word: the chosen indicator, or the title when there is nothing to choose. */
+const name = computed(() => (props.metrics.length ? current.value?.label ?? props.title : props.title))
+/* The title after the rule, only when it says what the chip does not. */
+const aside = computed(() => {
+  if (!props.metrics.length || !current.value) return null
+  return props.title !== current.value.label && props.title !== current.value.shortLabel ? props.title : null
+})
+
+const said = computed(() => {
+  if (props.loading) return name.value
+  if (empty.value) return `${name.value}, ${props.emptyLabel}`
+  if (props.summary) return props.summary
+  const range = `de ${low.value} à ${high.value}`
+  return `${aside.value ? `${name.value}, ${aside.value}` : name.value}, ${range}${props.unit ? ` ${props.unit}` : ''}`
+})
 const keySaid = computed(() =>
   `${props.title} : ${props.legend.map((i) => (i.value ? `${i.label} ${i.value}` : i.label)).join(', ')}`)
-const said = computed(() => {
-  if (props.loading) return props.title
-  if (empty.value) return `${props.title}, ${props.emptyLabel}`
-  if (props.summary) return props.summary
-  const range = `de ${ticks.value[0]} à ${ticks.value[ticks.value.length - 1]}`
-  return `${props.title}, ${range}${props.unit ? ` ${props.unit}` : ''}`
+
+/* ── The short name: under 120px of ramp, the chip gives way ─────── */
+const root = ref<HTMLElement | null>(null)
+const bar = ref<HTMLElement | null>(null)
+const short = ref(false)
+const RAMP_FLOOR = 120
+let canvas: CanvasRenderingContext2D | null = null
+function textWidth(text: string, el: Element) {
+  canvas ??= document.createElement('canvas').getContext('2d')
+  if (!canvas) return 0
+  canvas.font = getComputedStyle(el).font
+  return canvas.measureText(text).width
+}
+function fitName() {
+  const m = current.value
+  const el = bar.value
+  const chip = root.value?.querySelector('.ds-map-legend__chip')
+  if (!m?.shortLabel || !el || !chip) { short.value = false; return }
+  /* What the ramp would have with the long name — from the short one when it
+     is shown, so the two never take turns. */
+  const extra = short.value ? textWidth(m.label, chip) - textWidth(m.shortLabel, chip) : 0
+  short.value = el.getBoundingClientRect().width - extra < RAMP_FLOOR
+}
+const chipWord = computed(() => (short.value && current.value?.shortLabel ? current.value.shortLabel : name.value))
+
+/* ── The keys that fit, by category ─────────────────────────────── */
+const sizer = ref<HTMLElement | null>(null)
+const shown = ref(Number.POSITIVE_INFINITY)
+const KEY_GAP = 12 // token-lint-disable no-literal-dimension-js — spacing-lg, ChartLegend's own gap between entries
+function fitKeys() {
+  if (!categorical.value || !root.value || !sizer.value) return
+  const items = [...sizer.value.querySelectorAll<HTMLElement>('.ds-chart-legend__item')]
+  const more = sizer.value.querySelector<HTMLElement>('.ds-map-legend__more-sizer')
+  const style = getComputedStyle(root.value)
+  /* At its size, `--ds-width-sm` at most — and never past its container. */
+  const cap = sizer.value.querySelector<HTMLElement>('.ds-map-legend__cap')?.getBoundingClientRect().width || Number.POSITIVE_INFINITY
+  const max = Math.min(cap, root.value.parentElement?.clientWidth ?? cap)
+  const fixed = [...root.value.querySelectorAll<HTMLElement>(':scope > .ds-map-legend__word, :scope > .ds-map-legend__rule')]
+    .reduce((sum, el) => sum + el.getBoundingClientRect().width, 0)
+  const gap = parseFloat(style.columnGap) || 0
+  const room = max - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
+    - parseFloat(style.borderLeftWidth) - parseFloat(style.borderRightWidth) - fixed - 2 * gap
+  const widths = items.map((el) => el.getBoundingClientRect().width)
+  const all = widths.reduce((s, w, i) => s + w + (i ? KEY_GAP : 0), 0)
+  if (all <= room) { shown.value = items.length; return }
+  const moreW = (more?.getBoundingClientRect().width ?? 40) + gap
+  let used = 0
+  let n = 0
+  for (const w of widths) {
+    const next = used + (n ? KEY_GAP : 0) + w
+    if (next + moreW > room) break
+    used = next
+    n += 1
+  }
+  shown.value = Math.max(1, n)
+}
+const keys = computed(() => props.legend.slice(0, shown.value))
+const rest = computed(() => props.legend.slice(shown.value))
+
+function fit() {
+  fitName()
+  fitKeys()
+}
+let ro: ResizeObserver | null = null
+onMounted(() => {
+  fit()
+  ro = new ResizeObserver(() => fit())
+  if (root.value) ro.observe(root.value)
+  if (bar.value) ro.observe(bar.value)
+  document.fonts?.ready.then(fit)
 })
+onBeforeUnmount(() => ro?.disconnect())
+watch(() => [props.legend, props.title, current.value, props.ticks, props.unit], async () => {
+  short.value = false
+  await nextTick()
+  fit()
+})
+
+/* ── Choosing ───────────────────────────────────────────────────── */
+const open = ref(false)
+function pick(m: MapLegendMetric) {
+  if (m.disabled) return
+  open.value = false
+  if (m.value !== current.value?.value) {
+    metric.value = m.value
+    pending = true
+  }
+  nextTick(() => root.value?.querySelector<HTMLElement>('.ds-map-legend__chip')?.focus())
+}
+
+/* Said once a scale has changed, never on arrival (ADR-0058): the region is
+   there from the start, empty, and filled when the chosen indicator's scale
+   has landed — not while it is still loading. */
+const announced = ref('')
+let pending = false
+let timer: ReturnType<typeof setTimeout> | undefined
+watch([said, () => props.loading], ([s, loading]) => {
+  if (!pending || loading) return
+  pending = false
+  announced.value = ''
+  clearTimeout(timer)
+  timer = setTimeout(() => { announced.value = s }, 100)
+})
+onBeforeUnmount(() => clearTimeout(timer))
 </script>
 
 <template>
-  <div class="ds-map-legend" :aria-busy="loading || undefined">
-    <Tabs
-      v-if="metrics.length > 1"
-      :id="tabsId"
-      :model-value="current"
-      class="ds-map-legend__metrics"
-      size="xs"
-      :tabs="metrics"
-      :aria-label="metricsLabel"
-      @update:model-value="metric = $event"
-    />
-    <component
-      :is="metrics.length > 1 ? TabPanel : 'div'"
-      v-bind="metrics.length > 1 ? { tabsId, value: current } : {}"
-      class="ds-map-legend__panel"
-    >
-      <!-- By category: the title, then the key on the same line — the line the
-           gradient would take, so a screen of each kind reads the same. -->
-      <div v-if="categorical" class="ds-map-legend__scale-row" role="img" :aria-label="loading ? title : keySaid">
-        <span class="ds-map-legend__title" aria-hidden="true">{{ title }}</span>
-        <div v-if="loading" class="ds-map-legend__key ds-map-legend__key--pending" aria-hidden="true">
-          <Skeleton v-for="i in legend.length" :key="i" width="5.5em" height="0.5rem" />
-        </div>
-        <ChartLegend v-else :items="legend" shape="zone" class="ds-map-legend__key" aria-hidden="true" />
+  <div
+    ref="root"
+    class="ds-map-legend"
+    :class="{ 'ds-map-legend--categorical': categorical }"
+    :aria-busy="loading || undefined"
+  >
+    <span class="ds-map-legend__said" role="status">{{ announced }}</span>
+
+    <!-- The chip: MapTimeline's scale chip, menu and all. -->
+    <Dropdown v-if="choosing" v-model:open="open" class="ds-map-legend__menu" :label="metricsLabel" align="start" size="sm" width="max-content">
+      <template #trigger="{ open: isOpen, toggle }">
+        <DropdownTrigger
+          class="ds-map-legend__chip"
+          chrome="chip"
+          chevron
+          :open="isOpen"
+          :ariaLabel="`${metricsLabel} : ${name}`"
+          @click="toggle"
+        >{{ chipWord }}</DropdownTrigger>
+      </template>
+      <DropdownItem
+        v-for="m in metrics"
+        :key="m.value"
+        :label="m.label"
+        :meta="m.unit"
+        :selected="m.value === current?.value"
+        :disabled="m.disabled"
+        @click="pick(m)"
+      >
+        <template #trailing><span class="ds-map-legend__preview" :style="{ backgroundImage: preview(m) }" /></template>
+      </DropdownItem>
+    </Dropdown>
+    <!-- Nothing to choose (ADR-0114): the word the chip would carry, no chip. -->
+    <span v-else class="ds-map-legend__word ds-map-legend__chip-word">{{ chipWord }}</span>
+    <Divider class="ds-map-legend__rule" orientation="vertical" />
+
+    <!-- By category: the keys after the rule, what does not fit in « +N ». -->
+    <template v-if="categorical">
+      <div v-if="loading" class="ds-map-legend__keys" aria-hidden="true">
+        <Skeleton v-for="i in legend.length" :key="i" width="5.5em" height="0.5rem" />
       </div>
-      <div v-else class="ds-map-legend__scale-row">
-        <span class="ds-map-legend__title">{{ title }}</span>
-        <div class="ds-map-legend__scale">
-          <span v-if="loading" class="ds-map-legend__unit" aria-hidden="true"><Skeleton width="3.5em" height="0.5rem" /></span>
-          <span v-else-if="unit && !empty" class="ds-map-legend__unit" aria-hidden="true">{{ unit }}</span>
-          <div class="ds-map-legend__bar" role="img" :aria-label="said" :style="{ backgroundImage: gradient }" />
-          <!-- Said by the bar's name; on screen, a bound sits under its place. -->
-          <div class="ds-map-legend__ticks" aria-hidden="true">
-            <template v-if="loading"><Skeleton v-for="i in 3" :key="i" width="2em" height="0.5rem" /></template>
-            <template v-else-if="empty"><span class="ds-map-legend__none">—</span><span class="ds-map-legend__none">—</span></template>
-            <span v-for="t in ticks" v-else :key="t">{{ t }}</span>
-          </div>
+      <template v-else>
+        <ChartLegend :items="keys" shape="zone" class="ds-map-legend__keys" role="img" :aria-label="keySaid" />
+        <Dropdown v-if="rest.length" class="ds-map-legend__more" role="dialog" :label="moreLabel" align="start" size="sm" width="auto">
+          <template #trigger="{ open: isOpen, toggle }">
+            <DropdownTrigger class="ds-map-legend__chip" chrome="chip" chevron :open="isOpen" :ariaLabel="moreLabel" @click="toggle">+{{ rest.length }}</DropdownTrigger>
+          </template>
+          <ChartLegend :items="rest" shape="zone" orientation="vertical" class="ds-map-legend__panel-keys" />
+        </Dropdown>
+      </template>
+      <!-- Every key at its width, out of sight: what is measured to know what fits. -->
+      <div class="ds-map-legend__sizer" aria-hidden="true">
+        <div ref="sizer" class="ds-map-legend__sizer-row">
+          <ChartLegend :items="legend" shape="zone" />
+          <DropdownTrigger class="ds-map-legend__more-sizer" chrome="chip" chevron tabindex="-1">+{{ legend.length }}</DropdownTrigger>
+          <!-- The token's length, resolved: `--ds-width-sm` is written in rem. -->
+          <span class="ds-map-legend__cap" />
         </div>
       </div>
-    </component>
-    <ChartLegend v-if="legend.length && !categorical" :items="legend" class="ds-map-legend__symbols" />
+    </template>
+
+    <!-- The scale: the low bound, the ramp, the high bound, the unit. -->
+    <template v-else>
+      <span v-if="aside" class="ds-map-legend__aside">{{ aside }}</span>
+      <span class="ds-map-legend__bound" aria-hidden="true">
+        <SwapTransition>
+          <Skeleton v-if="loading" key="loading" width="1.5em" height="0.625rem" />
+          <span v-else-if="empty" key="empty" class="ds-map-legend__none">—</span>
+          <span v-else :key="`low-${low}`">{{ low }}</span>
+        </SwapTransition>
+      </span>
+      <div ref="bar" class="ds-map-legend__bar" role="img" :aria-label="said">
+        <!-- One indicator's ramp fades in over the last's, which stays under it
+             until the fade has played. -->
+        <Transition name="ds-map-legend-ramp">
+          <span :key="gradient" class="ds-map-legend__ramp" :style="{ backgroundImage: gradient }" />
+        </Transition>
+      </div>
+      <span class="ds-map-legend__bound" aria-hidden="true">
+        <SwapTransition>
+          <Skeleton v-if="loading" key="loading" width="1.5em" height="0.625rem" />
+          <span v-else-if="empty" key="empty" class="ds-map-legend__none">—</span>
+          <span v-else :key="`high-${high}`">{{ high }}</span>
+        </SwapTransition>
+      </span>
+      <span v-if="loading || (unit && !empty)" class="ds-map-legend__unit" aria-hidden="true">
+        <SwapTransition>
+          <Skeleton v-if="loading" key="loading" width="3.5em" height="0.625rem" />
+          <span v-else :key="`unit-${unit}`">{{ unit }}</span>
+        </SwapTransition>
+      </span>
+
+      <!-- The symbols: their marks in a chip, their names in its panel. -->
+      <template v-if="symbols">
+        <Divider class="ds-map-legend__rule" orientation="vertical" />
+        <Dropdown class="ds-map-legend__more" role="dialog" :label="symbolsLabel" align="end" size="sm" width="auto">
+          <template #trigger="{ open: isOpen, toggle }">
+            <DropdownTrigger class="ds-map-legend__chip" chrome="chip" chevron :open="isOpen" :ariaLabel="symbolsLabel" @click="toggle">
+              <span class="ds-map-legend__dots" aria-hidden="true">
+                <span v-for="s in legend" :key="s.key" class="ds-map-legend__dot" :style="{ background: s.color }" />
+              </span>
+              {{ symbolsLabel }}
+            </DropdownTrigger>
+          </template>
+          <ChartLegend :items="legend" orientation="vertical" class="ds-map-legend__panel-keys" />
+        </Dropdown>
+      </template>
+    </template>
   </div>
 </template>
 
 <style scoped>
 /*
-  As drawn: the surface 8px around, the switch flush with it, the scale and the
-  symbols each 8px further in. **`--ds-width-sm` (480px), declared**
-  (ADR-0116) — the timeline's own width and the same token: on the GIS screen
-  the two are centred on one axis, the legend at the top of the map and the
-  timeline at its bottom, and they are **one width**, edge over edge. A width
-  of content was tried: on one axis, two widths read as a mistake.
+  `MapTimeline`'s pill, to the pixel (ADR-0137): 48px tall, 8 in at the start
+  and 12 at the end, 6 between its parts, `bg-default` + `border-subtle` +
+  `elevation-raised`, a pill's radius. **`--ds-width-sm` (480px), declared**
+  for a scale (ADR-0116): the timeline's width and the same token, so the two
+  are one width on the map's axis; the ramp alone stretches. A key by category
+  hugs, up to the same 480.
 */
 .ds-map-legend {
+  position: relative;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-spacing-sm);
   box-sizing: border-box;
   width: var(--ds-width-sm);
   max-width: 100%;
-  padding: var(--ds-spacing-md);
+  height: 48px;
+  padding: 0 var(--ds-spacing-lg) 0 var(--ds-spacing-md);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
-  border-radius: var(--ds-radius-surface);
+  border-radius: var(--ds-radius-pill);
   background: var(--ds-bg-default);
   box-shadow: var(--ds-elevation-raised);
+  font-family: var(--ds-typography-font-family-poppins);
 }
 
-/* The name at the start, the scale beside it, 16px apart: one line to read. */
-.ds-map-legend__scale-row {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-xl);
-  padding: var(--ds-spacing-md);
+.ds-map-legend--categorical {
+  width: fit-content;
+  max-width: min(100%, var(--ds-width-sm));
 }
 
-.ds-map-legend__title {
+/* ── The chip ─────────────────────────────────────────────────────── */
+.ds-map-legend__menu,
+.ds-map-legend__more {
   flex: none;
-  font: var(--ds-font-label-md-strong);
-  color: var(--ds-text-strong);
+}
+
+/* Nothing to choose: the chip's type and ink without its ground or chevron —
+   the timeline's lone scale word (ADR-0114). */
+.ds-map-legend__word {
+  flex: none;
+  font: var(--ds-font-label-lg-strong);
+  color: var(--ds-text-subtle);
   white-space: nowrap;
 }
 
-.ds-map-legend__scale {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--ds-spacing-xs);
-  /* The gradient has no width of its own: it takes what the switch and the
-     title leave, and never less than 16rem — a ramp read, not glimpsed. */
-  min-width: 16rem;
+/* `Divider`, vertical — 20px tall, as the timeline's. */
+.ds-map-legend__rule {
+  flex: none;
+  align-self: center;
+  height: 20px;
 }
 
-.ds-map-legend__unit,
-.ds-map-legend__ticks {
-  font: var(--ds-font-body-sm);
+/* ── The scale ────────────────────────────────────────────────────── */
+.ds-map-legend__aside {
+  flex: none;
+  font: var(--ds-font-label-lg-strong);
+  color: var(--ds-text-default);
+  white-space: nowrap;
+}
+
+.ds-map-legend__bound,
+.ds-map-legend__unit {
+  display: inline-grid;
+  flex: none;
+  font: var(--ds-font-label-lg);
   font-variant-numeric: tabular-nums;
+  color: var(--ds-text-default);
+  white-space: nowrap;
+}
+
+.ds-map-legend__unit {
   color: var(--ds-text-subtle);
 }
 
-/* 8px, read rather than glanced at; the hairline keeps the light end on white
-   (`border-inset`, ChartLegend's rule). */
-.ds-map-legend__bar {
-  align-self: stretch;
-  height: 8px;
-  border-radius: var(--ds-radius-inner-sm);
-  box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-border-inset);
-}
-
-/* The first bound starts at the bar's start, the last ends at its end. */
-.ds-map-legend__ticks {
-  display: flex;
-  align-self: stretch;
-  align-items: center;
-  justify-content: space-between;
-  /* One line box whatever it holds, so the legend keeps its height when the
-     placeholders become values. */
-  min-height: 1lh;
-}
-
-/* A placeholder sits in the line box the unit will take. */
-.ds-map-legend__unit {
-  display: flex;
-  align-items: center;
-  min-height: 1lh;
-}
-
-/* What is not there yet is « — », in the receding ink (ADR-0105). */
 .ds-map-legend__none {
   color: var(--ds-text-subtlest);
 }
 
-/* The key takes what the title leaves and wraps there, never under the title. */
-.ds-map-legend__key {
-  flex: 1 1 auto;
+/* The one elastic part of the line. */
+.ds-map-legend__bar {
+  position: relative;
+  flex: 1 1 0;
   min-width: 0;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--ds-radius-pill);
 }
 
-.ds-map-legend__key--pending {
+.ds-map-legend__ramp {
+  position: absolute;
+  inset: 0;
+}
+
+/* The incoming ramp fades in over the outgoing one, which stays put until the
+   fade has played: a cross-fade with no frame of bare ground. */
+.ds-map-legend-ramp-enter-active {
+  z-index: 1;
+  transition: opacity var(--ds-motion-duration-process) var(--ds-motion-easing-default);
+}
+
+.ds-map-legend-ramp-enter-from {
+  opacity: 0;
+}
+
+.ds-map-legend-ramp-leave-active {
+  transition: opacity 0s linear var(--ds-motion-duration-process);
+}
+
+.ds-map-legend-ramp-leave-to {
+  opacity: 0;
+}
+
+/* ── The keys, by category ────────────────────────────────────────── */
+.ds-map-legend__keys {
   display: flex;
-  flex-wrap: wrap;
+  flex: none;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: var(--ds-spacing-md) var(--ds-spacing-xl);
-  min-height: 1lh;
+  gap: var(--ds-spacing-lg);
+  white-space: nowrap;
 }
 
-.ds-map-legend__symbols {
-  padding: 0 var(--ds-spacing-md) var(--ds-spacing-md);
+/* Out of sight and out of the scroll: a box of nothing that clips what it holds. */
+.ds-map-legend__sizer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.ds-map-legend__sizer-row {
+  display: flex;
+  width: max-content;
+  gap: var(--ds-spacing-lg);
+  white-space: nowrap;
+}
+
+.ds-map-legend__cap {
+  position: absolute;
+  width: var(--ds-width-sm);
+}
+
+.ds-map-legend__sizer :deep(.ds-chart-legend) {
+  flex-wrap: nowrap;
+}
+
+.ds-map-legend__chip-word {
+  font: var(--ds-font-label-lg-strong);
+}
+
+.ds-map-legend__panel-keys {
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
+}
+
+/* ── The symbols' marks, overlapping ──────────────────────────────── */
+.ds-map-legend__dots {
+  display: inline-flex;
+  margin-inline-end: var(--ds-spacing-xs);
+}
+
+.ds-map-legend__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--ds-radius-pill);
+  box-shadow: 0 0 0 var(--ds-border-width-default) var(--ds-bg-default);
+}
+
+.ds-map-legend__dot + .ds-map-legend__dot {
+  margin-inline-start: calc(-1 * var(--ds-spacing-xxs));
+}
+
+/* ── The menu's ramp preview, 40 × 6 ──────────────────────────────── */
+.ds-map-legend__preview {
+  display: block;
+  width: 40px;
+  height: 6px;
+  border-radius: var(--ds-radius-pill);
+}
+
+/* What a reader hears and nobody sees. */
+.ds-map-legend__said {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 </style>

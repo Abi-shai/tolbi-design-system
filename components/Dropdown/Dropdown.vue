@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SurfaceTransition } from '../SurfaceTransition'
-import { ref, onMounted, onUnmounted, provide } from 'vue'
+import { nextTick, ref, onMounted, onUnmounted, provide } from 'vue'
 import { useAnchoredSurface } from '../../composables/useAnchoredSurface'
 import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
@@ -156,10 +156,50 @@ function onKeyDown(e: KeyboardEvent) {
   into the dialog's `cancel` either.
 */
 function onRootKeyDown(e: KeyboardEvent) {
+  if (props.role === 'menu' && ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) {
+    arrows(e)
+    return
+  }
   if (e.key !== 'Escape' || !props.open) return
   e.stopPropagation()
   e.preventDefault()
   escape()
+}
+
+/*
+  The arrows move through a menu's rows (ADR-0137, the WAI-ARIA menu button):
+  from the trigger, ↓ or ↑ opens the menu on its checked row — or its first,
+  or its last for ↑ — and inside it ↓ ↑ go round, Home and End to the ends. A
+  disabled row is still a stop (ADR-0119). Tab still walks the rows as before.
+*/
+function rows() {
+  return [...(panelEl.value?.querySelectorAll<HTMLElement>('[role^="menuitem"]') ?? [])]
+}
+
+function arrows(e: KeyboardEvent) {
+  const panel = panelEl.value
+  const inside = !!panel?.contains(document.activeElement)
+  const onTrigger = !inside && !!rootEl.value?.contains(document.activeElement)
+  if (!inside && !onTrigger) return
+  if (onTrigger && e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+  e.preventDefault()
+  const land = (pick: (list: HTMLElement[]) => HTMLElement | undefined) =>
+    nextTick(() => requestAnimationFrame(() => pick(rows())?.focus()))
+  if (onTrigger) {
+    if (!props.open) emit('update:open', true)
+    land((list) => list.find((r) => r.getAttribute('aria-checked') === 'true')
+      ?? (e.key === 'ArrowUp' ? list[list.length - 1] : list[0]))
+    return
+  }
+  const list = rows()
+  const at = list.indexOf(document.activeElement as HTMLElement)
+  const to = {
+    ArrowDown: (at + 1) % list.length,
+    ArrowUp: (at - 1 + list.length) % list.length,
+    Home: 0,
+    End: list.length - 1,
+  }[e.key]
+  if (to !== undefined) list[to]?.focus()
 }
 
 onMounted(() => {
