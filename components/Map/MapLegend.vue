@@ -212,11 +212,36 @@ watch(() => [props.legend, props.title, current.value, props.ticks, props.unit],
   fit()
 })
 
+/* ── Its panels: one open at a time ─────────────────────────────── */
+/*
+  Each chip's `Dropdown` is controlled (it emits `update:open`), so the legend
+  holds the state — one value for its three panels, which is also what keeps
+  one open at a time: opening « Symboles » closes the indicators' menu, and the
+  other way round. 0.116.0 bound it on the menu alone, and the two panels'
+  chips toggled nothing.
+*/
+type Panel = 'metrics' | 'more' | 'symbols'
+const openPanel = ref<Panel | null>(null)
+const isOpen = (panel: Panel) => openPanel.value === panel
+function setOpen(panel: Panel, value: boolean) {
+  if (value) openPanel.value = panel
+  else if (openPanel.value === panel) openPanel.value = null
+}
+/* Closed by a click on the map, the focus would fall to the page: it goes back
+   to the chip that opened the panel. A click on another control keeps its own. */
+watch(openPanel, (now, before) => {
+  if (now !== null || before === null) return
+  nextTick(() => {
+    const active = document.activeElement
+    if (active && active !== document.body) return
+    root.value?.querySelector<HTMLElement>(`.ds-map-legend__chip[data-panel="${before}"]`)?.focus()
+  })
+})
+
 /* ── Choosing ───────────────────────────────────────────────────── */
-const open = ref(false)
 function pick(m: MapLegendMetric) {
   if (m.disabled) return
-  open.value = false
+  openPanel.value = null
   if (m.value !== current.value?.value) {
     metric.value = m.value
     pending = true
@@ -250,13 +275,23 @@ onBeforeUnmount(() => clearTimeout(timer))
     <span class="ds-map-legend__said" role="status">{{ announced }}</span>
 
     <!-- The chip: MapTimeline's scale chip, menu and all. -->
-    <Dropdown v-if="choosing" v-model:open="open" class="ds-map-legend__menu" :label="metricsLabel" align="start" size="sm" width="max-content">
-      <template #trigger="{ open: isOpen, toggle }">
+    <Dropdown
+      v-if="choosing"
+      :open="isOpen('metrics')"
+      class="ds-map-legend__menu"
+      :label="metricsLabel"
+      align="start"
+      size="sm"
+      width="max-content"
+      @update:open="setOpen('metrics', $event)"
+    >
+      <template #trigger="{ open: opened, toggle }">
         <DropdownTrigger
           class="ds-map-legend__chip"
+          data-panel="metrics"
           chrome="chip"
           chevron
-          :open="isOpen"
+          :open="opened"
           :ariaLabel="`${metricsLabel} : ${name}`"
           @click="toggle"
         >{{ chipWord }}</DropdownTrigger>
@@ -284,9 +319,19 @@ onBeforeUnmount(() => clearTimeout(timer))
       </div>
       <template v-else>
         <ChartLegend :items="keys" shape="zone" class="ds-map-legend__keys" role="img" :aria-label="keySaid" />
-        <Dropdown v-if="rest.length" class="ds-map-legend__more" role="dialog" :label="moreLabel" align="start" size="sm" width="auto">
-          <template #trigger="{ open: isOpen, toggle }">
-            <DropdownTrigger class="ds-map-legend__chip" chrome="chip" chevron :open="isOpen" :ariaLabel="moreLabel" @click="toggle">+{{ rest.length }}</DropdownTrigger>
+        <Dropdown
+          v-if="rest.length"
+          :open="isOpen('more')"
+          class="ds-map-legend__more"
+          role="dialog"
+          :label="moreLabel"
+          align="start"
+          size="sm"
+          width="auto"
+          @update:open="setOpen('more', $event)"
+        >
+          <template #trigger="{ open: opened, toggle }">
+            <DropdownTrigger class="ds-map-legend__chip" data-panel="more" chrome="chip" chevron :open="opened" :ariaLabel="moreLabel" @click="toggle">+{{ rest.length }}</DropdownTrigger>
           </template>
           <ChartLegend :items="rest" shape="zone" orientation="vertical" class="ds-map-legend__panel-keys" />
         </Dropdown>
@@ -336,9 +381,18 @@ onBeforeUnmount(() => clearTimeout(timer))
       <!-- The symbols: their marks in a chip, their names in its panel. -->
       <template v-if="symbols">
         <Divider class="ds-map-legend__rule" orientation="vertical" />
-        <Dropdown class="ds-map-legend__more" role="dialog" :label="symbolsLabel" align="end" size="sm" width="auto">
-          <template #trigger="{ open: isOpen, toggle }">
-            <DropdownTrigger class="ds-map-legend__chip" chrome="chip" chevron :open="isOpen" :ariaLabel="symbolsLabel" @click="toggle">
+        <Dropdown
+          :open="isOpen('symbols')"
+          class="ds-map-legend__more"
+          role="dialog"
+          :label="symbolsLabel"
+          align="end"
+          size="sm"
+          width="auto"
+          @update:open="setOpen('symbols', $event)"
+        >
+          <template #trigger="{ open: opened, toggle }">
+            <DropdownTrigger class="ds-map-legend__chip" data-panel="symbols" chrome="chip" chevron :open="opened" :ariaLabel="symbolsLabel" @click="toggle">
               <span class="ds-map-legend__dots" aria-hidden="true">
                 <span v-for="s in legend" :key="s.key" class="ds-map-legend__dot" :style="{ background: s.color }" />
               </span>

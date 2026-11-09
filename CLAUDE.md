@@ -1365,6 +1365,8 @@ Before working on any component, read:
   is written after the rule only when it differs from the chip (Comparer). Nothing to choose = the word, no chip
   (ADR-0114). By category: at its size ≤ 480, overflow in « +N »; with symbols, a « Symboles » chip. Ramp cross-fades
   over `process`; announced once. `Dropdown role="menu"` gains arrow keys (↓/↑ from the trigger, Home/End).
+  **Amended (0.116.1)**: a controlled `Dropdown` needs its state — the « Symboles » / « +N » chips opened nothing; one
+  value now holds the three panels (one open at a time), ↓ opens a `dialog` dropdown, and `play` tests guard it.
 
 ## Architecture
 

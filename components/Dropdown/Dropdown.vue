@@ -160,6 +160,13 @@ function onRootKeyDown(e: KeyboardEvent) {
     arrows(e)
     return
   }
+  /* A panel that is not a menu has no rows to walk: ↓ on its trigger opens it. */
+  if (props.role === 'dialog' && e.key === 'ArrowDown' && !props.open
+    && !panelEl.value?.contains(document.activeElement)) {
+    e.preventDefault()
+    emit('update:open', true)
+    return
+  }
   if (e.key !== 'Escape' || !props.open) return
   e.stopPropagation()
   e.preventDefault()

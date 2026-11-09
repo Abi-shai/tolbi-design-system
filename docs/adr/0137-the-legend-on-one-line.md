@@ -47,3 +47,14 @@ the same map says the same kind of thing in 48px: a chip that chooses, a rule, t
   too. Tab still walks the rows.
 - **Not taken from the board**: its red → green ramp. A magnitude is sequential (ADR-0096); the product passes its own
   `colors` where it diverges (Comparer).
+
+## Amended (9 Nov., 0.116.1) — the panels opened nothing
+
+`Dropdown` is controlled (`open` + `update:open`), and 0.116.0 gave state to the indicators' menu alone: the
+« Symboles » and « +N » chips emitted their toggle into nothing — no click, no key opened them (the cockpit's symbols
+were unreadable). The legend now holds **one** value for its three panels, which is also what keeps **one open at a
+time** (opening « Symboles » closes the menu, and the other way round). Closed by a click on the map, the focus goes back
+to the chip that opened it (a click on another control keeps its own). `Dropdown role="dialog"` takes **↓ on its
+trigger** to open, as a menu does. Two stories carry **play functions** — click → panel shown, Escape → gone with the
+focus on the chip, ↓ → shown, one panel at a time — and the test bites: with the symbols' state removed, it fails
+(« expected false to be true »).

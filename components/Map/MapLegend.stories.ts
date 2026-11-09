@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { computed, ref } from 'vue'
+import { expect, userEvent, waitFor, within } from '@storybook/test'
 import MapLegend, { type MapLegendMetric } from './MapLegend.vue'
 import MapTimeline from './MapTimeline.vue'
 
@@ -208,3 +209,87 @@ export const WithTimeline: Story = {
   }),
 }
 
+
+/*
+  The panels open, and close back onto their chip (0.116.0 shipped with both
+  chips toggling nothing — their `Dropdown` is controlled and was given no
+  state). Each check runs as the story's `play`: click → the panel is shown,
+  Escape → it is gone and the focus is on the chip; ↓ opens it too; and one
+  panel at a time.
+*/
+const shownPanel = (label: string) =>
+  document.querySelector<HTMLElement>(`[role="dialog"][aria-label="${label}"]`)?.matches(':popover-open') ?? false
+
+async function opensAndCloses(canvasElement: HTMLElement, chipName: string, panelLabel: string) {
+  const canvas = within(canvasElement)
+  const chip = await canvas.findByRole('button', { name: chipName })
+  await userEvent.click(chip)
+  await waitFor(() => expect(shownPanel(panelLabel)).toBe(true))
+  await userEvent.keyboard('{Escape}')
+  await waitFor(() => expect(shownPanel(panelLabel)).toBe(false))
+  await expect(chip).toHaveFocus()
+  await userEvent.keyboard('{ArrowDown}')
+  await waitFor(() => expect(shownPanel(panelLabel)).toBe(true))
+  await userEvent.keyboard('{Escape}')
+  await waitFor(() => expect(shownPanel(panelLabel)).toBe(false))
+  await expect(chip).toHaveFocus()
+}
+
+/**
+ * **« Symboles » s’ouvre** — le cockpit ARR : un clic déplie le panneau des symboles (aligné à droite), Échap le referme
+ * et rend le focus à la puce ; ↓ l’ouvre aussi. Ouvrir le menu des indicateurs le referme : un panneau à la fois.
+ */
+export const SymbolsOpen: Story = {
+  name: 'Symboles, ouvert',
+  render: () => ({
+    components: { MapLegend },
+    setup: () => ({
+      metric: ref('stock'),
+      metrics: [
+        { value: 'stock', label: 'Indice de stock' },
+        { value: 'carbon', label: 'Carbone', unit: 'tCO2e/ha' },
+      ],
+      legend: [
+        { key: 'project', label: 'Point du projet', shape: 'square', color: 'var(--ds-text-strong)' },
+        { key: 'control', label: 'Point de contrôle', shape: 'circle', color: 'var(--ds-chart-sequential-4)' },
+        { key: 'reserve', label: 'Réserve', shape: 'point', color: 'var(--ds-chart-threshold)' },
+        { key: 'excluded', label: 'Zone exclue', shape: 'zone', color: 'var(--ds-chart-categorical-3)' },
+      ],
+    }),
+    template: ground(`<MapLegend v-model:metric="metric" :metrics="metrics" title="Indice de stock" :ticks="['0,30', '0,45', '0,60']" :legend="legend" />`),
+  }),
+  play: async ({ canvasElement }) => {
+    await opensAndCloses(canvasElement, 'Symboles', 'Symboles')
+    const canvas = within(canvasElement)
+    await userEvent.click(await canvas.findByRole('button', { name: 'Symboles' }))
+    await waitFor(() => expect(shownPanel('Symboles')).toBe(true))
+    await userEvent.click(await canvas.findByRole('button', { name: /Indicateur affiché/ }))
+    await waitFor(() => expect(shownPanel('Symboles')).toBe(false))
+    await userEvent.click(await canvas.findByRole('button', { name: 'Symboles' }))
+    await waitFor(() => expect(shownPanel('Symboles')).toBe(true))
+  },
+}
+
+/**
+ * **« +N » s’ouvre** — au-delà de 480, les dernières catégories passent dans la puce « +2 » ; un clic déplie leur
+ * panneau (aligné à gauche), Échap le referme et rend le focus à la puce ; ↓ l’ouvre aussi.
+ */
+export const MoreOpen: Story = {
+  name: '+N, ouvert',
+  render: () => ({
+    components: { MapLegend },
+    setup: () => ({
+      many: [
+        ...PARTS,
+        { key: 'water', label: 'Plan d’eau', color: 'var(--ds-chart-categorical-4)' },
+        { key: 'urban', label: 'Zone bâtie', color: 'var(--ds-chart-categorical-5)' },
+      ],
+    }),
+    template: ground(`<MapLegend title="Parcelles" :legend="many" />`),
+  }),
+  play: async ({ canvasElement }) => {
+    await opensAndCloses(canvasElement, 'Autres catégories', 'Autres catégories')
+    await userEvent.click(await within(canvasElement).findByRole('button', { name: 'Autres catégories' }))
+    await waitFor(() => expect(shownPanel('Autres catégories')).toBe(true))
+  },
+}
