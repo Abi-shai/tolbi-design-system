@@ -1391,8 +1391,8 @@ Before working on any component, read:
 - **ADR-0143**: **the alerts layer** (owner's recap `4037:5437`, decided) — **`PanelBlock`** = `SectionCard` at
   `density="compact"` (12 / 8) + `help` + `#aside`; **`OptionCard density="row"`** (40px: icon on a 28px tile, title cut,
   badge right after it, meta at the end, chevron); **`AlertsBlock`** — « Alertes » + count, rows (Bloque / À surveiller /
-  À revoir), **« Tout voir (n) » only past three** (`see-all`), a press on the block unfolds it (`v-model:expanded`,
-  « Réduire »), a blocking alert = its line + `followUps`, no alert = nothing rendered, rows emit `select`;
+  À revoir), **« Tout voir (n) » only past three**, one button that unfolds and turns to « Réduire » (no second button, no
+  `see-all`; a press on the block unfolds too, `v-model:expanded`), a blocking alert = its line + `followUps`, no alert = nothing rendered, rows emit `select`;
   **`--ds-chart-status-critical/-warning/-neutral`** (+ `chartStatus`) for map outlines — no step clears 3:1 on both
   basemap and imagery, so a casing on imagery.
 

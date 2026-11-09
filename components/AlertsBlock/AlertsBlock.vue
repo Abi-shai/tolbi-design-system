@@ -34,10 +34,11 @@ export interface AlertsBlockItem {
  * the kind's glyph, « code · objet », the severity's badge, the delay, a
  * chevron, because each line leads somewhere (`select`).
  *
- * - **Three lines at most.** Past three, « Tout voir (n) » (`see-all`) — the
- *   data window's alerts tab, the product's — and a press **anywhere else on
- *   the block** unfolds it in place to show them all; « Réduire » folds it.
- *   `v-model:expanded`. Three or fewer: no link, nothing to unfold.
+ * - **Three lines at most.** Past three, « Tout voir (n) » **unfolds the block
+ *   in place** and its words turn to « Réduire », which folds it — one button
+ *   (the owner, amending the first cut's second button). A press anywhere else
+ *   on the block unfolds it too. `v-model:expanded`. Three or fewer: no
+ *   button, nothing to unfold.
  * - **An alert that blocks** (`followUps`): its line alone at the head, then
  *   its next steps — one to three lines without gravity — and no « Tout
  *   voir »: what follows a blocking result is what to do, not more alerts.
@@ -68,7 +69,7 @@ const props = withDefaults(defineProps<Props>(), {
   severityLabels: () => ({ blocking: 'Bloque', watch: 'À surveiller', review: 'À revoir' }),
 })
 
-const emit = defineEmits<{ select: [item: AlertsBlockItem]; 'see-all': [] }>()
+const emit = defineEmits<{ select: [item: AlertsBlockItem] }>()
 const expanded = defineModel<boolean>('expanded', { default: false })
 
 const TONE: Record<AlertsBlockSeverity, BadgeTone> = { blocking: 'error', watch: 'warning', review: 'neutral' }
@@ -83,8 +84,8 @@ const open = computed(() => more.value && expanded.value)
 const count = computed(() => (blocking.value ? 1 : props.alerts.length))
 const restId = `ds-alerts-block-rest-${useId()}`
 
-/* A press on the block itself — not on a line, not on a link — unfolds it. The
-   keyboard has « Tout voir », which reaches every alert in the data window. */
+/* A press on the block itself — not on a line, not on the button — unfolds it.
+   The keyboard has the button. */
 function onBlock(e: MouseEvent) {
   if (!more.value || expanded.value) return
   if ((e.target as Element | null)?.closest('button, a, .ds-option-card')) return
@@ -140,16 +141,16 @@ function onBlock(e: MouseEvent) {
         </div>
       </div>
       <div v-if="more" class="ds-alerts-block__foot">
-        <Button variant="link" size="xs" icon-trailing="chevron-right" :label="`${seeAllLabel} (${alerts.length})`" @click="emit('see-all')" />
+        <!-- One button, its words turning (ADR-0143, amended): it unfolds the
+             block, then says « Réduire » — not a second button beside it. -->
         <Button
-          v-if="expanded"
           variant="link"
           size="xs"
-          :label="collapseLabel"
+          :icon-trailing="expanded ? 'chevron-up' : 'chevron-down'"
+          :label="expanded ? collapseLabel : `${seeAllLabel} (${alerts.length})`"
+          :aria-expanded="expanded ? 'true' : 'false'"
           :aria-controls="restId"
-          aria-expanded="true"
-          class="ds-alerts-block__collapse"
-          @click="expanded = false"
+          @click="expanded = !expanded"
         />
       </div>
     </PanelBlock>
@@ -203,7 +204,5 @@ function onBlock(e: MouseEvent) {
 .ds-alerts-block__foot {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-spacing-md);
 }
 </style>

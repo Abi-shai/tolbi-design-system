@@ -15,7 +15,8 @@ const meta: Meta<typeof AlertsBlock> = {
           'Les alertes d’un projet, dans son panneau (ADR-0143, « Couche Alertes » `4037:5437`, décidé) : un `PanelBlock` ' +
           '« Alertes » et son compte, puis les alertes **en lignes** — `OptionCard density="row"` : le type en glyphe, ' +
           '« code · objet », la gravité en badge, le délai, un chevron. **Trois lignes au plus** ; au-delà, « Tout voir (n) » ' +
-          '(`see-all`) et un clic ailleurs sur le bloc le déplie sur place (`v-model:expanded`), « Réduire » le replie. ' +
+          'déplie le bloc sur place et devient « Réduire » — **un seul bouton** ; un clic ailleurs sur le bloc le déplie aussi ' +
+          '(`v-model:expanded`). ' +
           '**Une alerte qui bloque** (`followUps`) : sa ligne seule, puis ses suites, sans « Tout voir ». **Sans alerte, pas ' +
           'de bloc.** Chaque ligne émet `select` avec son objet ; le produit décide (carte et fiche, ou fenêtre de données).',
       },
@@ -37,13 +38,13 @@ const FIVE: AlertsBlockItem[] = [
   { id: 'b3', label: 'B3 · FPH-SBR-008', icon: 'satellite', severity: 'review', meta: 'avant consolidation' },
 ]
 
-/** **Avec alertes** — cinq : les trois premières, « Tout voir (5) » ; un clic sur le bloc le déplie. */
+/** **Avec alertes** — cinq : les trois premières, « Tout voir (5) » déplie le bloc et devient « Réduire ». */
 export const WithAlerts: Story = {
   name: 'Avec alertes',
   render: () => ({
     components: { AlertsBlock },
     setup: () => ({ alerts: FIVE, expanded: ref(false), last: ref('') }),
-    template: ground(`<AlertsBlock v-model:expanded="expanded" :alerts="alerts" @select="last = $event.label" @see-all="last = 'Tout voir'" />
+    template: ground(`<AlertsBlock v-model:expanded="expanded" :alerts="alerts" @select="last = $event.label" />
       <p style="margin:12px 0 0;font:var(--ds-font-body-sm);color:var(--ds-text-subtle)">Dernier choix : {{ last || '—' }}</p>`),
   }),
 }
@@ -85,8 +86,9 @@ export const None: Story = {
 }
 
 /*
-  Guarded: a press on the block (not on a line, not on the link) unfolds it and
-  shows all five; « Réduire » folds it; a line emits `select` and does not unfold.
+  Guarded: a press on the block (not on a line) unfolds it and shows all five;
+  the one button then says « Réduire » and folds it; « Tout voir (5) » unfolds
+  it again; a line emits `select` and does not unfold.
 */
 export const Unfolds: Story = {
   name: 'Se déplie au clic',
@@ -100,6 +102,13 @@ export const Unfolds: Story = {
     const visible = () => [...canvasElement.querySelectorAll('.ds-option-card')].filter((c) => getComputedStyle(c.closest('.ds-alerts-block__rest') ?? c).visibility === 'visible').length
     await expect(visible()).toBe(3)
     await userEvent.click(canvasElement.querySelector('.ds-section-card__title')!)
+    await waitFor(() => expect(visible()).toBe(5))
+    await expect(canvas.queryByRole('button', { name: /Tout voir/ })).toBeNull()
+    await userEvent.click(await canvas.findByRole('button', { name: 'Réduire' }))
+    await waitFor(() => expect(visible()).toBe(3))
+    const seeAll = await canvas.findByRole('button', { name: 'Tout voir (5)' })
+    await expect(seeAll).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.click(seeAll)
     await waitFor(() => expect(visible()).toBe(5))
     await userEvent.click(await canvas.findByRole('button', { name: 'Réduire' }))
     await waitFor(() => expect(visible()).toBe(3))
