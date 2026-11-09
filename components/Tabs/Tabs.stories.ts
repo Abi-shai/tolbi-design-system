@@ -122,3 +122,28 @@ export const NoBadge: Story = {
     template: `<Tabs v-model="active" :tabs="tabs" />`,
   }),
 }
+
+/**
+ * ADR-0141 — **un onglet ne coupe jamais son contenu** : chacun part de la largeur de ce qu’il porte, la place qui
+ * reste est partagée ; si même ainsi ça ne tient pas, le libellé s’ellipse et le compte reste entier. Les cas réels :
+ * la tête d’un `MapPanel lg` (25rem moins le bouton replier), « Données · Parcelles 128 · Rapport » ; puis une bande
+ * plus étroite encore.
+ */
+export const ContentWidth: Story = {
+  name: 'À la largeur du contenu',
+  render: () => ({
+    components: { Tabs },
+    setup: () => ({
+      a: ref('data'), b: ref('parcels'), c: ref('data'),
+      dmrv: [{ value: 'data', label: 'Données' }, { value: 'parcels', label: 'Parcelles', badge: 28 }, { value: 'report', label: 'Rapport' }],
+      arr: [{ value: 'data', label: 'Données' }, { value: 'parcels', label: 'Parcelles', badge: 128 }, { value: 'report', label: 'Rapport' }],
+    }),
+    template: `
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div style="width:328px"><Tabs v-model="a" :tabs="dmrv" size="sm" /></div>
+        <div style="width:328px"><Tabs v-model="b" :tabs="arr" size="sm" /></div>
+        <div style="width:240px"><Tabs v-model="c" :tabs="arr" size="sm" /></div>
+      </div>
+    `,
+  }),
+}

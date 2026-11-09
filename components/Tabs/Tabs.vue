@@ -159,12 +159,15 @@ function onKeydown(e: KeyboardEvent, i: number) {
   position: relative;
   z-index: var(--ds-z-raised);
   display: flex;
-  flex: 1 0 0;
+  /* At least as wide as what it holds, then the room left shared out
+     (ADR-0141): equal widths (`1 0 0`) cut « Parcelles 128 » in a 25rem
+     panel while « Rapport » had room to spare. Past the strip's width the
+     tabs shrink together, and only the label gives. */
+  flex: 1 1 auto;
   align-items: center;
   justify-content: center;
   gap: var(--ds-spacing-md);
-  min-width: 1px;
-  overflow: hidden;
+  min-width: 0;
   padding: var(--ds-spacing-md) var(--ds-spacing-lg);
   background: transparent;
   border: none;
@@ -217,9 +220,17 @@ function onKeydown(e: KeyboardEvent, i: number) {
 
 /* ── Label ─────────────────────────────────────────────────────────── */
 .ds-tabs__label {
+  min-width: 0;
+  overflow: hidden;
   font-family: var(--ds-typography-font-family-poppins);
   font-weight: var(--ds-font-weight-label-lg-strong);
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* The count is never the part that gives: a cut « 12… » would be a wrong number. */
+.ds-tabs__tab > :deep(.ds-badge) {
+  flex: none;
 }
 
 .ds-tabs--md .ds-tabs__label {

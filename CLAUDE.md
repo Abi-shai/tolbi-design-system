@@ -1382,6 +1382,9 @@ Before working on any component, read:
   outline), `forest` (a crowned canopy, green outline) and `invalid` (the reading faded, the zone « Échec »'s red
   dashes): rasters made from the owner's « Suivie » drawing so each differs by one thing (board `3939:1427`, track A of
   each).
+- **ADR-0141**: **a tab never cuts its content** — `Tabs` tabs are `flex: 1 1 auto` (at least their content, the room left
+  shared; were equal widths that clipped « Parcelles 128 » in a `MapPanel lg` head); past the strip's width only the
+  label ellipsises and the badge stays whole (`flex: none`). The indicator follows the measured widths as before.
 
 ## Architecture
 
