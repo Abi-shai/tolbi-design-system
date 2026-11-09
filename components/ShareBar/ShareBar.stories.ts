@@ -65,3 +65,20 @@ export const Changing: Story = {
     `,
   }),
 }
+
+/**
+ * ADR-0139 — **une couleur par segment** : un statut garde sa couleur quel que soit son rang (« Éligibles » reste le
+ * même vert d’une zone à l’autre). Sans `color`, la couleur du rang dans la palette.
+ */
+export const OwnColours: Story = {
+  name: 'Une couleur par segment',
+  args: {
+    shown: 3,
+    items: [
+      { label: 'Forêt en 2016', share: 52, color: 'var(--ds-chart-categorical-2)' },
+      { label: 'Éligibles', share: 40, color: 'var(--ds-chart-sequential-4)' },
+      { label: 'Contour invalide', share: 8, color: 'var(--ds-text-error)' },
+    ],
+  },
+  render: (args) => ({ components: { ShareBar }, setup: () => ({ args }), template: `<div style="width:328px"><ShareBar v-bind="args" /></div>` }),
+}

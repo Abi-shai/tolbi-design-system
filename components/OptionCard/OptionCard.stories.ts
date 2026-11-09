@@ -153,3 +153,24 @@ export const OneLine: Story = {
     `,
   }),
 }
+
+/**
+ * ADR-0139 — **un statut** : `badge` + `badgeTone` sur la ligne du titre, avant le contrôle et après `meta` — la
+ * parcelle suivie, en alerte, à vérifier. Un `Badge sm` : le mot dit le statut, le ton le colore.
+ */
+export const WithStatus: Story = {
+  name: 'Avec un statut',
+  render: () => ({
+    components: { OptionCard, OptionList },
+    setup: () => ({ parcel: ref('P-0412') }),
+    template: `
+      <div style="width:23rem">
+        <OptionList v-model="parcel" layout="stack" aria-label="Parcelles">
+          <OptionCard value="P-0412" label="P-0412" description="Traoré Moussa · Djoutougbo 2" meta="17,5 ha" badge="Suivie" badge-tone="success" :description-lines="1" />
+          <OptionCard value="P-0413" label="P-0413" description="Koné Aminata · Djoutougbo 2" meta="4,2 ha" badge="En alerte" badge-tone="error" :description-lines="1" />
+          <OptionCard value="P-0415" label="P-0415" description="Diallo Ibrahima · Sokoura" badge="Qualité" badge-tone="warning" :description-lines="1" />
+        </OptionList>
+      </div>
+    `,
+  }),
+}

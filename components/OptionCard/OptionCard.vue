@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 import { Avatar } from '../Avatar'
+import { Badge, type BadgeTone } from '../Badge'
 import { Checkbox } from '../Checkbox'
 import { Flag } from '../Flag'
 import { Icon, type IconName } from '../Icon'
@@ -44,6 +45,13 @@ interface Props {
   description?: string
   /** A figure or a word just before the control — « 128 parcelles ». */
   meta?: string
+  /**
+   * A status on the title's line, at the end before the control (ADR-0139) —
+   * « Suivie », « En alerte ». A `Badge sm`: the word says it, the tone colours
+   * it. With `meta`, after it.
+   */
+  badge?: string
+  badgeTone?: BadgeTone
   /** In an `OptionList`, what this option stands for. */
   value?: OptionValue
   icon?: IconName
@@ -78,6 +86,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   description: undefined,
   meta: undefined,
+  badge: undefined,
+  badgeTone: 'neutral',
   value: undefined,
   icon: undefined,
   avatarSrc: undefined,
@@ -99,6 +109,10 @@ const list = inject(OPTION_LIST_KEY, null)
 const uid = useId()
 const titleId = `ds-option-card-title-${uid}`
 const descriptionId = `ds-option-card-description-${uid}`
+const badgeId = `ds-option-card-badge-${uid}`
+/* What the row is described by: its sentence, then its status. */
+const describedBy = computed(() =>
+  [props.description ? descriptionId : null, props.badge ? badgeId : null].filter(Boolean).join(' ') || undefined)
 
 /* A row that holds an action; else a choice inside a list; else a row that leads. */
 const holds = computed(() => Boolean(props.actionLabel))
@@ -111,7 +125,7 @@ const tag = computed(() => (holds.value ? 'div' : choosing.value ? 'label' : pro
 const rootAttrs = computed(() => {
   if (choosing.value || holds.value) return {}
   /* Named by its title, described by its sentence — not the whole row read as one name. */
-  const named = { 'aria-labelledby': titleId, 'aria-describedby': props.description ? descriptionId : undefined }
+  const named = { 'aria-labelledby': titleId, 'aria-describedby': describedBy.value }
   if (props.href) return { ...named, href: isDisabled.value ? undefined : props.href, 'aria-disabled': isDisabled.value || undefined }
   return { ...named, type: 'button', disabled: isDisabled.value }
 })
@@ -158,7 +172,7 @@ onBeforeUnmount(() => ro?.disconnect())
 
 /* The button is named by its word and described by the row: five « Télécharger »
    in a list each say which file. */
-const actionDescribedBy = computed(() => [titleId, props.description ? descriptionId : null].filter(Boolean).join(' '))
+const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boolean).join(' '))
 </script>
 
 <template>
@@ -184,7 +198,7 @@ const actionDescribedBy = computed(() => [titleId, props.description ? descripti
       :checked="checked"
       :disabled="isDisabled"
       :aria-labelledby="titleId"
-      :aria-describedby="description ? descriptionId : undefined"
+      :aria-describedby="describedBy"
       @change="onChange"
     />
 
@@ -218,6 +232,7 @@ const actionDescribedBy = computed(() => [titleId, props.description ? descripti
     </span>
 
     <span v-if="meta" class="ds-option-card__meta"><span class="ds-option-card__meta-text">{{ meta }}</span></span>
+    <span v-if="badge" :id="badgeId" class="ds-option-card__meta ds-option-card__badge"><Badge :label="badge" :tone="badgeTone" size="sm" /></span>
 
     <span v-if="holds" class="ds-option-card__action">
       <Tooltip :title="actionLabel!" placement="top">

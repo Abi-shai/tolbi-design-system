@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useId } from 'vue'
 import { Button } from '../Button'
+import { CloseButton } from '../CloseButton'
 import { IconButton } from '../IconButton'
 import { Skeleton } from '../Skeleton'
 import { SurfaceTransition } from '../SurfaceTransition'
@@ -56,6 +57,14 @@ interface Props {
    * block, the shape of a reading panel. The foot stays.
    */
   loading?: boolean
+  /**
+   * A close button at the end of the title's line, emitting `close` (ADR-0139)
+   * — a panel the reader opened and dismisses: a parcel's sheet beside the
+   * map. The product removes it.
+   */
+  closable?: boolean
+  /** The close's name — said with the title, « Fermer P-0412 ». */
+  closeLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -65,7 +74,11 @@ const props = withDefaults(defineProps<Props>(), {
   collapseLabel: 'Replier',
   expandLabel: 'Déplier',
   loading: false,
+  closable: false,
+  closeLabel: 'Fermer',
 })
+
+const emit = defineEmits<{ close: [] }>()
 
 const slots = defineSlots<{
   default?: () => unknown
@@ -75,6 +88,12 @@ const slots = defineSlots<{
   footer?: () => unknown
   /** What the body shows while `loading` — placeholders in the shape of the content. */
   loading?: () => unknown
+  /**
+   * Folded, beside the control the panel became (ADR-0139) — one action that
+   * stays within reach while the panel is away, « Toutes les données ». A
+   * `Button sm`, so the two stand on one line at one height.
+   */
+  folded?: () => unknown
 }>()
 
 const collapsed = defineModel<boolean>('collapsed', { default: false })
@@ -135,6 +154,7 @@ function focusArrived() {
         :aria-controls="panelId"
         @click="fold(false)"
       />
+      <slot name="folded" />
       </div>
       <!-- A small panel: a button bearing its title, in its place. -->
       <div v-else-if="collapsible && collapsed" key="open-title" class="ds-map-panel__unfold">
@@ -148,6 +168,7 @@ function focusArrived() {
         :aria-controls="panelId"
         @click="fold(false)"
       />
+      <slot name="folded" />
       </div>
       <section
         v-else
@@ -158,7 +179,11 @@ function focusArrived() {
         :aria-label="props.title"
         :aria-busy="loading || undefined"
       >
-        <div v-if="slotHead" class="ds-map-panel__head ds-map-panel__head--slot" :class="{ 'ds-map-panel__head--folds': collapsible }">
+        <div
+          v-if="slotHead"
+          class="ds-map-panel__head ds-map-panel__head--slot"
+          :class="{ 'ds-map-panel__head--folds': collapsible, 'ds-map-panel__head--closes': closable }"
+        >
           <IconButton
             v-if="collapsible"
             data-map-panel-fold
@@ -176,6 +201,7 @@ function focusArrived() {
               <Skeleton v-else-if="loading" width="40%" aria-hidden="true" />
             </slot>
           </div>
+          <CloseButton v-if="closable" class="ds-map-panel__close" size="sm" :ariaLabel="named(closeLabel)" @click="emit('close')" />
         </div>
         <div v-else-if="title" class="ds-map-panel__head">
           <span class="ds-map-panel__title">{{ title }}</span>
@@ -190,6 +216,7 @@ function focusArrived() {
             :aria-controls="panelId"
             @click="fold(true)"
           />
+          <CloseButton v-if="closable" class="ds-map-panel__close" size="xs" :ariaLabel="named(closeLabel)" @click="emit('close')" />
         </div>
         <div v-else-if="loading" class="ds-map-panel__head" aria-hidden="true">
           <Skeleton width="40%" />
@@ -269,9 +296,15 @@ function focusArrived() {
   white-space: nowrap;
 }
 
-.ds-map-panel__head:not(.ds-map-panel__head--slot) :deep(.ds-icon-button) {
+.ds-map-panel__head:not(.ds-map-panel__head--slot) :deep(.ds-icon-button),
+.ds-map-panel__head:not(.ds-map-panel__head--slot) > .ds-map-panel__close {
   margin-block: calc(-1 * var(--ds-spacing-md));
   margin-inline-end: calc(-1 * var(--ds-spacing-md));
+}
+
+/* A title, then — pushed to the end — the fold and the close, touching. */
+.ds-map-panel__head:not(.ds-map-panel__head--slot) > .ds-map-panel__title {
+  margin-inline-end: auto;
 }
 
 /* ── lg: the panel a screen is read from ──────────────────────────────── */
@@ -345,6 +378,21 @@ function focusArrived() {
   grid-template-columns: auto minmax(0, 1fr);
 }
 
+/* The close ends the first line (ADR-0139); what follows still takes the
+   head's whole width, under it too. */
+.ds-map-panel__head--closes {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.ds-map-panel__head--folds.ds-map-panel__head--closes {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.ds-map-panel__head--slot > .ds-map-panel__close {
+  grid-row: 1;
+  grid-column: -2;
+}
+
 .ds-map-panel__header {
   display: contents;
 }
@@ -394,6 +442,8 @@ function focusArrived() {
 
 .ds-map-panel__unfold {
   display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-md);
   transform-origin: top left;
 }
 </style>

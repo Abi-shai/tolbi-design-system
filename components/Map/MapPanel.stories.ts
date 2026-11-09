@@ -236,3 +236,37 @@ export const HeaderWithSearch: Story = {
     `,
   }),
 }
+
+/**
+ * ADR-0139 — **fermable** : `closable` met un bouton fermer au bout de la ligne du titre, qui émet `close` — la fiche
+ * d’une parcelle, ouverte par le lecteur, à droite de la carte. Le produit la retire. **Replié** (`#folded`) : une
+ * action reste à portée, à côté du bouton qui déplie, à la même hauteur.
+ */
+export const ClosableAndFolded: Story = {
+  name: 'Fermable, et une action repliée',
+  parameters: { layout: 'fullscreen' },
+  render: () => ({
+    components: { MapPanel, MapOverlay, ChartLegend, Button, Tabs },
+    setup: () => ({ SERIES, open: ref(true), folded: ref(true), tab: ref('a'), tabs: [{ value: 'a', label: 'Données' }, { value: 'b', label: 'Historique' }] }),
+    template: `
+      <div style="position:relative;height:520px;background:var(--ds-bg-neutral);border-radius:12px;overflow:hidden">
+        <MapOverlay position="top-start">
+          <MapPanel v-model:collapsed="folded" size="lg" title="Projet Soubré" collapsible collapse-label="Replier" expand-label="Déplier">
+            <template #header><Tabs v-model="tab" :tabs="tabs" size="sm" /></template>
+            <template #folded><Button variant="secondary-gray" size="sm" icon-leading="chart-column" label="Toutes les données" /></template>
+            <ChartLegend orientation="vertical" :items="SERIES" />
+          </MapPanel>
+        </MapOverlay>
+        <MapOverlay position="top-end">
+          <MapPanel v-if="open" title="Parcelle P-0412" closable @close="open = false">
+            <ChartLegend orientation="vertical" :items="SERIES" />
+          </MapPanel>
+          <Button v-else variant="secondary-gray" size="sm" label="Rouvrir la fiche" @click="open = true" />
+        </MapOverlay>
+        <MapOverlay position="bottom-end">
+          <MapPanel size="lg" title="Fiche lg" closable style="height:180px"><p style="margin:0;font:var(--ds-font-body-md)">Une fiche en grand format.</p></MapPanel>
+        </MapOverlay>
+      </div>
+    `,
+  }),
+}

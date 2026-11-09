@@ -12,6 +12,12 @@ export interface ShareBarItem {
   label: string
   share: number
   rest?: boolean
+  /**
+   * The segment's own colour (ADR-0139) — a status that keeps its colour
+   * wherever it ranks (« Éligibles » is always the same green). Any CSS
+   * colour; pass tokens. Absent, the palette's colour for its rank.
+   */
+  color?: string
 }
 
 /**
@@ -65,7 +71,8 @@ const CEILING = 5
 const named = computed(() => Math.min(props.shown, CEILING))
 function colour(i: number) {
   const item = ordered.value[i]
-  return !item?.rest && i < named.value ? `var(--ds-chart-categorical-${i + 1})` : 'var(--share-bar-rest)'
+  if (item?.rest || i >= named.value) return 'var(--share-bar-rest)'
+  return item?.color ?? `var(--ds-chart-categorical-${i + 1})`
 }
 </script>
 

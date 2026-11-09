@@ -108,6 +108,8 @@ export interface ProjectCardMetric {
 export interface ProjectCardShare {
   label: string
   share: number
+  /** Its own colour, kept whatever its rank (ADR-0139) — see `ShareBarItem.color`. */
+  color?: string
 }
 
 /** Yield's phenological spread. */

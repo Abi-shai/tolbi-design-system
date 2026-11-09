@@ -1373,6 +1373,11 @@ Before working on any component, read:
   disclosure (`DropdownTrigger popup: false` — `aria-expanded`, `aria-controls` a `role="region"`); Escape folds, a map
   click does not; `v-model:expanded`. Radius = half the line (24). Height `0fr → 1fr`: `enter`/`easing-out` in with the
   content in the second half, content then height out (`instant` + `exit`).
+- **ADR-0139**: **what the ARR prototype adds (lot 1)** — `OptionCard` `badge` + `badgeTone` (a `Badge sm` on the
+  title's line after `meta`, read after the sentence); `MapPanel` `closable` + `closeLabel` → `close` (a `CloseButton`
+  ending the title's line, `xs` in a small head, `sm` in `lg`) and `#folded` (an action beside the control the panel
+  became, same 38px line); `ShareBar` / `ProjectCard` share items take a `color` (kept whatever the rank; `+N` still
+  neutral).
 
 ## Architecture
 
