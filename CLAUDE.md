@@ -1378,6 +1378,10 @@ Before working on any component, read:
   ending the title's line, `xs` in a small head, `sm` in `lg`) and `#folded` (an action beside the control the panel
   became, same 38px line); `ShareBar` / `ProjectCard` share items take a `color` (kept whatever the rank; `+N` still
   neutral).
+- **ADR-0140**: **three parcel statuses** — `ProjectGlyph kind="parcel"` gains `quality` (clouds over the reading, amber
+  outline), `forest` (a crowned canopy, green outline) and `invalid` (the reading faded, the zone « Échec »'s red
+  dashes): rasters made from the owner's « Suivie » drawing so each differs by one thing (board `3939:1427`, track A of
+  each).
 
 ## Architecture
 

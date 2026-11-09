@@ -5,6 +5,9 @@ import zoneRunning from './art/zone-running.png'
 import zoneFailed from './art/zone-failed.png'
 import parcelMonitored from './art/parcel-monitored.png'
 import parcelAlert from './art/parcel-alert.png'
+import parcelQuality from './art/parcel-quality.png'
+import parcelForest from './art/parcel-forest.png'
+import parcelInvalid from './art/parcel-invalid.png'
 import baselineUpToDate from './art/baseline-up-to-date.png'
 import baselineOutdated from './art/baseline-outdated.png'
 import baselineComputing from './art/baseline-computing.png'
@@ -27,12 +30,13 @@ import baselineComputing from './art/baseline-computing.png'
 export type ProjectGlyphKind = 'zone' | 'parcel' | 'baseline'
 export type ProjectGlyphStatus =
   | 'done' | 'running' | 'failed'            // zone
-  | 'monitored' | 'alert'                    // parcel
+  | 'monitored' | 'alert' | 'quality'        // parcel — dMRV
+  | 'forest' | 'invalid'                     // parcel — ARR (ADR-0140)
   | 'up-to-date' | 'outdated' | 'computing'  // baseline
 
 const ART: Record<ProjectGlyphKind, Partial<Record<ProjectGlyphStatus, string>>> = {
   zone:     { done: zoneDone, running: zoneRunning, failed: zoneFailed },
-  parcel:   { monitored: parcelMonitored, alert: parcelAlert },
+  parcel:   { monitored: parcelMonitored, alert: parcelAlert, quality: parcelQuality, forest: parcelForest, invalid: parcelInvalid },
   baseline: { 'up-to-date': baselineUpToDate, outdated: baselineOutdated, computing: baselineComputing },
 }
 /* What a kind falls back to when it is given a status it does not draw. */
@@ -44,7 +48,7 @@ const VARIANTS = 8
 interface Props {
   /** The geographic object the project is about. */
   kind: ProjectGlyphKind
-  /** Its status — `done | running | failed` for a zone, `monitored | alert` for a parcel, `up-to-date | outdated | computing` for a baseline. */
+  /** Its status — `done | running | failed` for a zone, `monitored | alert | quality | forest | invalid` for a parcel, `up-to-date | outdated | computing` for a baseline. */
   status?: ProjectGlyphStatus
   /** What keeps the drawing stable for a project — its id. Two projects with two seeds rarely share a variant. */
   seed?: string | number

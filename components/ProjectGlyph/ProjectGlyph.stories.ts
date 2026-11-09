@@ -21,7 +21,7 @@ const meta: Meta<typeof ProjectGlyph> = {
   },
   argTypes: {
     kind: { control: 'inline-radio', options: ['zone', 'parcel', 'baseline'] },
-    status: { control: 'select', options: ['done', 'running', 'failed', 'monitored', 'alert', 'up-to-date', 'outdated', 'computing'] },
+    status: { control: 'select', options: ['done', 'running', 'failed', 'monitored', 'alert', 'quality', 'forest', 'invalid', 'up-to-date', 'outdated', 'computing'] },
     seed: { control: 'text' },
     variant: { control: { type: 'number', min: 0, max: 7 } },
     size: { control: 'number' },
@@ -43,7 +43,7 @@ export const Range: Story = {
     setup: () => ({
       rows: [
         ['zone', ['done', 'running', 'failed'], 'Zone — terminée, en cours, échec'],
-        ['parcel', ['monitored', 'alert'], 'Parcelle — suivie, en alerte'],
+        ['parcel', ['monitored', 'alert', 'quality', 'forest', 'invalid'], 'Parcelle — suivie, en alerte, qualité ; forêt en 2016, contour invalide (ARR)'],
         ['baseline', ['up-to-date', 'outdated', 'computing'], 'Baseline — à jour, à mettre à jour, en calcul'],
       ],
     }),
