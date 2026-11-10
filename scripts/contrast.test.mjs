@@ -121,3 +121,22 @@ test('DropdownTrigger surface: the open contour outranks the hover contour, both
     assert.ok(open > hover, `${mode}: border-brand (${open.toFixed(2)}:1) does not outrank border-default (${hover.toFixed(2)}:1) on the pill`)
   }
 })
+
+/**
+ * ADR-0147 — `Scrollbar`'s thumb is drawn by us, so WCAG 1.4.11 applies (the
+ * native bar is exempt): 3:1 against the surfaces it scrolls over — the page
+ * and a block — at rest, and the hover step further still. `bg-neutral-strong`
+ * had it at 1.47:1 and it read as a border.
+ */
+test('Scrollbar: the thumb clears 3:1 on bg-default and on a block, at rest and held, both modes', () => {
+  for (const [mode, tokens] of Object.entries(MODES)) {
+    const rest = hex(tokens.bg.scrollbar.$value)
+    const held = hex(tokens.bg['scrollbar-hover'].$value)
+    for (const ground of ['default', 'neutral-subtle']) {
+      const g = hex(tokens.bg[ground].$value)
+      const [r, h] = [ratio(rest, g), ratio(held, g)]
+      assert.ok(r >= UI, `${mode}: bg-scrollbar on bg-${ground} is ${r.toFixed(2)}:1, below ${UI}`)
+      assert.ok(h > r, `${mode}: bg-scrollbar-hover (${h.toFixed(2)}:1) is not a step past the resting thumb (${r.toFixed(2)}:1) on bg-${ground}`)
+    }
+  }
+})

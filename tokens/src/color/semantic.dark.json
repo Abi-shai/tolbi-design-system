@@ -170,12 +170,22 @@
     "neutral-strong": {
       "$value": "{color.gray-forest.600}",
       "$type": "color",
-      "$description": "ground — inert control channels: slider track, scrollbar thumb"
+      "$description": "ground — inert control channels: slider track"
     },
     "pending": {
       "$value": "{color.gray-forest.600}",
       "$type": "color",
       "$description": "decorative — the mark for what is not there yet: a skeleton bar, a snapshot still loading, a stage not yet reached. No text sits on it, so it takes no on-colour partner"
+    },
+    "scrollbar": {
+      "$value": "{color.gray-forest.400}",
+      "$type": "color",
+      "$description": "contract — a drawn scrollbar's thumb (ADR-0147). WCAG 1.4.11 applies to a bar the product draws (the native one is exempt): at least 3:1 on bg-default and on a block (bg-neutral-subtle), measured in contrast.test.mjs"
+    },
+    "scrollbar-hover": {
+      "$value": "{color.gray-forest.300}",
+      "$type": "color",
+      "$description": "state — the thumb pointed at or dragged: one step further from the ground (ADR-0147)"
     },
     "brand-subtle": {
       "$value": "{color.brand.dark-subtle}",

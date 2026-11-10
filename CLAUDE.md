@@ -1418,6 +1418,10 @@ Before working on any component, read:
   The thumb shows while scrolling, on the thumb or dragging, and fades **1 s** after the last movement; **pointing at
   the area shows nothing** (in a panel the pointer is always there); reduced motion without a fade. The 1 s is a
   constant, not a token — a delay, not a duration.
+- **ADR-0147**: **a thumb you can see** — WCAG 1.4.11 applies to a bar we draw: `Scrollbar`'s thumb takes its own role,
+  **`--ds-bg-scrollbar`** (gray-light/500, 4.97 / 4.76:1 on page and block; dark gray-forest/400, 5.15 / 4.18) and
+  **`--ds-bg-scrollbar-hover`** (600; dark 300 — further from the ground) when pointed at or held (`--held`: a captured
+  pointer drops `:hover`). `bg-neutral-strong` (1.47:1) stays the slider's channel. Measured in `contrast.test.mjs`.
 
 ## Architecture
 

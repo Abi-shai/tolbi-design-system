@@ -195,7 +195,7 @@ defineExpose({ viewport })
     <div
       v-if="scrollable"
       class="ds-scrollbar__thumb"
-      :class="{ 'ds-scrollbar__thumb--visible': visible }"
+      :class="{ 'ds-scrollbar__thumb--visible': visible, 'ds-scrollbar__thumb--held': dragging }"
       :style="
         horizontal
           ? { width: `${thumbSize}px`, transform: `translateX(${thumbOffset}px)` }
@@ -261,7 +261,9 @@ defineExpose({ viewport })
 .ds-scrollbar__thumb {
   position: absolute;
   border-radius: var(--ds-radius-pill);
-  background-color: var(--ds-bg-neutral-strong);
+  /* Its own role (ADR-0147): a bar the product draws owes WCAG 1.4.11's 3:1 —
+     `bg-neutral-strong` (1.47:1) is the slider's channel and read as a border. */
+  background-color: var(--ds-bg-scrollbar);
   opacity: 0;
   transition:
     opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-out),
@@ -294,9 +296,12 @@ defineExpose({ viewport })
   }
 }
 
+/* Pointed at or held — `--held` as well as `:active`, because a captured
+   pointer that leaves the thumb mid-drag drops `:hover`. */
 .ds-scrollbar__thumb:hover,
-.ds-scrollbar__thumb:active {
-  background-color: var(--ds-bg-neutral-strong);
+.ds-scrollbar__thumb:active,
+.ds-scrollbar__thumb--held {
+  background-color: var(--ds-bg-scrollbar-hover);
 }
 
 /* ── Edge fades ───────────────────────────────────────────────────── */
