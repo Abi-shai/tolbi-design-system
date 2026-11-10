@@ -26,15 +26,16 @@
       "$type": "dimension"
     },
     "body-sm": {
-      "$value": "{typography.font-size.13}",
-      "$type": "dimension"
+      "$value": "{typography.font-size.14}",
+      "$type": "dimension",
+      "$description": "The reading floor on mobile too — 14/20 since ADR-0144 (amended; was 13): the floor is an accessibility rule, not a desktop one"
     },
     "label-lg": {
       "$value": "{typography.font-size.16}",
       "$type": "dimension"
     },
     "label-md": {
-      "$value": "{typography.font-size.13}",
+      "$value": "{typography.font-size.14}",
       "$type": "dimension"
     },
     "metric-lg": {
@@ -42,7 +43,7 @@
       "$type": "dimension"
     },
     "code-md": {
-      "$value": "{typography.font-size.13}",
+      "$value": "{typography.font-size.14}",
       "$type": "dimension"
     },
     "metric-xl": {
@@ -58,7 +59,7 @@
       "$type": "dimension"
     },
     "body-sm-emphasis": {
-      "$value": "{typography.font-size.13}",
+      "$value": "{typography.font-size.14}",
       "$type": "dimension"
     },
     "label-xl": {
@@ -66,7 +67,7 @@
       "$type": "dimension"
     },
     "label-md-strong": {
-      "$value": "{typography.font-size.13}",
+      "$value": "{typography.font-size.14}",
       "$type": "dimension"
     },
     "label-lg-strong": {

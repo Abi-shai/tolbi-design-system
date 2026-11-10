@@ -111,11 +111,15 @@ its box horizontally, before and after; noise between two identical runs (a spin
 
 - The product's Tailwind and Nuxt UI sizes follow the roles: nothing to do there but the version.
 - A product layout that hard-codes a 280px card column should go to 320, or the card is squeezed back to 17.5em.
-- Mobile (`[data-typography="mobile"]`, opt-in) is **unchanged** and now sits **below** desktop at the floor
-  (`body-sm` 13 against 14). Not in scope — the request said desktop — but the floor is an accessibility rule, not a
-  desktop one.
+- Mobile (`[data-typography="mobile"]`, opt-in) was left unchanged and sat **below** the floor (`body-sm` 13) —
+  closed by the amendment below.
+
+## Amended — 10 Nov. 2026: the floor on mobile
+
+etolbi, after integrating 0.120.0: the mobile scale (`[data-typography="mobile"]`) still read `body-sm`, `label-md`
+(and their `-emphasis` / `-strong`) and `code-md` at **13**. They go to **14**, nothing else moves. Their line box was
+already 20, so no height changes — measured, a size inside the same box. The rest of the mobile scale stays as drawn
+(body 15, labels 16, headings 15/17/20/22).
 
 ## Still open
-
-- The mobile scale against the floor.
 - `Badge sm` and `md` are one type size now (14); they differ by 2px of inset. One size may be enough.

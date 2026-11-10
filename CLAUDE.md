@@ -1403,7 +1403,8 @@ Before working on any component, read:
   beside what did not grow, it takes the role a step down (`Badge md`, `Tabs`, `MetricValue`'s unit, Tolbi AI's title,
   `--reading-secondary-font` back to `body-sm`); where a width was drawn for 14px text it moves by 16/14
   (`ProjectCard` 20em, `ModuleCapsule` 296/344, `MapLegend`/`MapTimeline` on `--ds-width-md`, 560). 301 of 642 stories
-  change height, all in text. Mobile untouched — now under the floor.
+  change height, all in text. **Amended**: mobile's floor too — `body-sm`, `label-md`, `code-md` 13 → 14 (line box
+  already 20, no height moves).
 
 ## Architecture
 
