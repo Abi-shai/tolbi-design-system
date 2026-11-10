@@ -1436,6 +1436,10 @@ Before working on any component, read:
   « Éligibles · Non éligibles » said one colour of two). Short of room the line gives its **spacing** (8 / 4), then its
   **title and rule** (still in the key's name; a chip title stays), then the entries' **words**, never an entry. Past
   three, « +N » as before. The legend watches its container, so room coming back opens it again.
+- **ADR-0151**: **a masked row keeps its action** (the owner's `4104:2850`) — **`OptionCard muted`**: media at 0.4,
+  words in `text-disabled`, ground, edge and geometry unmoved, **the action live** (it unmasks). Not `hidden` (the HTML
+  attribute). The product turns the glyph and name (`eye` → `eye-off`, « Masquer… » → « Afficher… »); **no
+  `aria-pressed`** — a changing name *or* a pressed state, never both, or the reader hears the opposite of the map.
 
 ## Architecture
 

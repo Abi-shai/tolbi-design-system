@@ -6,6 +6,7 @@ import { OptionCard } from '../OptionCard'
 import { ProjectGlyph } from '../ProjectGlyph'
 import { StatusList, StatusRow } from '../StatusList'
 import { within, userEvent, expect, waitFor } from '@storybook/test'
+import { reactive } from 'vue'
 
 const meta: Meta<typeof PanelBlock> = {
   title: 'Structure/PanelBlock',
@@ -55,18 +56,34 @@ const MOTIFS = [
 /**
  * ADR-0148 — **le panneau d’une zone éligible** (Figma `4058:1446`) : les motifs d’exclusion, chacun sa pile de
  * glyphes (`ProjectGlyph count`) dans le `#media` d’une `OptionCard` qui porte une action (l’œil) ; puis les
- * critères, le mot seul (`StatusRow :glyph="false"`). Au-delà de deux motifs, la liste se replie (`limit`).
+ * critères, le mot seul (`StatusRow :glyph="false"`). Au-delà de deux motifs, la liste se replie (`limit`). L’œil
+ * masque les parcelles d’un motif : la ligne prend l’air désactivé (`OptionCard muted`), l’œil barré reste net et la
+ * réaffiche, son nom passe de « Masquer… » à « Afficher… » (ADR-0151).
  */
 export const EligibleZone: Story = {
   name: 'Zone éligible',
   render: () => ({
     components: { PanelBlock, Badge, OptionCard, ProjectGlyph, StatusList, StatusRow },
-    setup: () => ({ MOTIFS }),
+    setup: () => {
+      /* The eye masks a motif's parcels on the map (ADR-0151): the row is muted, the action stays live. */
+      const masked = reactive<Record<string, boolean>>({})
+      return { MOTIFS, masked }
+    },
     template: `
       <div style="width:25rem;display:flex;flex-direction:column;gap:16px;padding:16px;background:var(--ds-bg-default)">
         <PanelBlock title="Parcelles écartées" help="Les parcelles retirées de la zone, par motif." :limit="2">
           <template #aside><Badge label="24" tone="warning" size="sm" /></template>
-          <OptionCard v-for="m in MOTIFS" :key="m.id" :label="m.label" :description="m.count + (m.count > 1 ? ' parcelles' : ' parcelle')" :label-lines="1" action-icon="eye" :action-label="'Voir sur la carte — ' + m.label">
+          <OptionCard
+            v-for="m in MOTIFS"
+            :key="m.id"
+            :label="m.label"
+            :description="m.count + (m.count > 1 ? ' parcelles' : ' parcelle')"
+            :label-lines="1"
+            :muted="masked[m.id]"
+            :action-icon="masked[m.id] ? 'eye-off' : 'eye'"
+            :action-label="(masked[m.id] ? 'Afficher ' : 'Masquer ') + m.label"
+            @action="masked[m.id] = !masked[m.id]"
+          >
             <template #media><ProjectGlyph kind="parcel" :status="m.status" :seed="m.id" :count="m.count" /></template>
           </OptionCard>
         </PanelBlock>
@@ -93,5 +110,14 @@ export const EligibleZone: Story = {
     await waitFor(() => expect(shown()).toBe(4))
     await userEvent.click(await canvas.findByRole('button', { name: 'Réduire' }))
     await waitFor(() => expect(shown()).toBe(2))
+    /* The eye: masks the motif, the row mutes, the action turns and stays live, and brings it back. */
+    const hide = await canvas.findByRole('button', { name: 'Masquer Contour invalide' })
+    await userEvent.click(hide)
+    const show = await canvas.findByRole('button', { name: 'Afficher Contour invalide' })
+    await expect(show).toBeEnabled()
+    await expect(show.closest('.ds-option-card')).toHaveClass('ds-option-card--muted')
+    await userEvent.click(show)
+    await expect(await canvas.findByRole('button', { name: 'Masquer Contour invalide' })).toBeEnabled()
+    await expect(canvasElement.querySelector('.ds-option-card--muted')).toBeNull()
   },
 }

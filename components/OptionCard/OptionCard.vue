@@ -66,6 +66,15 @@ interface Props {
   /** An ISO 3166-1 code — the media is the country's flag (ADR-0085). */
   flag?: string
   disabled?: boolean
+  /**
+   * What the row stands for is **masked** — an exclusion reason whose parcels
+   * are hidden on the map (ADR-0151). The media, title, sentence and meta take
+   * the disabled look; the card's ground, edge and geometry do not move, and
+   * **the action stays live** — it is what brings the row back. The action's
+   * glyph and name are the product's to turn (`eye` → `eye-off`, « Masquer… »
+   * → « Afficher… »). Not `hidden`, which is the HTML attribute that removes it.
+   */
+  muted?: boolean
   /** A row that leads somewhere: a link. Without it and outside a list, a button. */
   href?: string
   /** The row's one action, its name and its tooltip — « Télécharger ». Emits `action`. */
@@ -101,6 +110,7 @@ const props = withDefaults(defineProps<Props>(), {
   avatarInitials: undefined,
   flag: undefined,
   disabled: false,
+  muted: false,
   href: undefined,
   actionLabel: undefined,
   actionIcon: undefined,
@@ -193,6 +203,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
     :class="{
       'ds-option-card--checked': checked,
       'ds-option-card--disabled': isDisabled,
+      'ds-option-card--muted': muted && !isDisabled,
       'ds-option-card--leads': !choosing && !holds,
       'ds-option-card--holds': holds,
       'ds-option-card--row': row,
@@ -448,6 +459,19 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
 
 .ds-option-card__chevron {
   color: var(--ds-text-subtle);
+}
+
+/* Masked (ADR-0151): the disabled look on what the row says, never on the
+   card or on its action — the owner's « le pâle du grisé ». The media is
+   decorative, so it may fade; the words take the disabled ink. */
+.ds-option-card--muted .ds-option-card__media {
+  opacity: 0.4;
+}
+
+.ds-option-card--muted .ds-option-card__title,
+.ds-option-card--muted .ds-option-card__description,
+.ds-option-card--muted .ds-option-card__meta-text {
+  color: var(--ds-text-disabled);
 }
 
 .ds-option-card--disabled .ds-option-card__title,
