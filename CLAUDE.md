@@ -1462,6 +1462,11 @@ Before working on any component, read:
   `cursor: pointer` on the box and the native control of `InputField` (so `PasswordField`, `PhoneField`),
   `TextareaInputField`, `DatePicker` (segments too); OTP cells already had it; disabled stays `not-allowed`. **A hand
   must not point at nothing**: a press on the box's padding focuses its control; a control of the box's own keeps its press.
+- **ADR-0156**: **the cursor says what the press does** — ADR-0155's hand reversed after the product measured 13
+  systems (none puts the hand on a typed field): **typed → text** (`InputField` incl. search, `PasswordField`,
+  `PhoneField`'s number, `TextareaInputField`, OTP cells, `DatePicker` box and segments even though a press opens the
+  calendar, a list's filter field, `readonly`); **chosen → hand** (calendar icon, `DatePicker multiple`, dropdown
+  triggers, `PhoneField`'s country); disabled `not-allowed`. ADR-0155's press on the padding stays.
 
 ## Architecture
 

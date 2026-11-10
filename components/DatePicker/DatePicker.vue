@@ -506,6 +506,10 @@ const calendarLabels = computed(() => ({
   min-width: 0;
 }
 
+/* The cursor says what the press does (ADR-0156): typed, the field's text
+   cursor (InputField's); several years are chosen, never typed — the hand. */
+.ds-date-picker--many:not(.ds-date-picker--disabled) :deep(.ds-input-field__wrapper) { cursor: pointer; }
+
 /* sm is the 14/20 type, as InputField's (ADR-0108). */
 .ds-date-picker--sm .ds-date-picker__value :deep(.ds-date-segments) {
   font: var(--ds-font-body-md);

@@ -193,7 +193,8 @@ const secondGroup = computed(() => props.digits === 6 ? [3, 4, 5] : [])
   color: var(--ds-text-strong);
   transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
   outline: none;
-  cursor: pointer;
+  /* A cell is typed into (ADR-0156). */
+  cursor: text;
   -moz-appearance: textfield;
 }
 

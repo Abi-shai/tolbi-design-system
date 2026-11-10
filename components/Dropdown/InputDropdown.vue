@@ -868,6 +868,8 @@ onUnmounted(() => {
   font: var(--ds-font-body-lg-emphasis);
   color: var(--ds-text-strong);
   padding: 0;
+  /* Typed to filter: the text cursor, not the trigger's hand it would inherit (ADR-0156). */
+  cursor: text;
 }
 
 .ds-input-dropdown__search-input::placeholder {
@@ -924,6 +926,7 @@ onUnmounted(() => {
   background: transparent;
   font: var(--ds-font-body-md);
   color: var(--ds-text-strong);
+  cursor: text;
 }
 
 .ds-input-dropdown__panel-search-input::placeholder {

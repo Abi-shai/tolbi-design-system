@@ -40,7 +40,7 @@ const isRequired  = computed(() => field?.required.value ?? props.required)
 const isDisabled  = computed(() => (field?.disabled.value ?? false) || props.disabled)
 
 /*
-  The box is the field (ADR-0155): it shows the hand, so a press on its
+  The box is the field (ADR-0155, amended by ADR-0156): a press on its
   padding lands in the control instead of on nothing. A control of its own in
   the box (a tag's close) keeps its press.
 */
@@ -177,8 +177,8 @@ function onKeydown(e: KeyboardEvent) {
   transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
   /* Default : px-14px py-12px */
   padding: var(--ds-spacing-lg) 14px;
-  /* The hand on the whole field, its control included (ADR-0155). */
-  cursor: pointer;
+  /* The cursor says what the press does: here, typing (ADR-0156). */
+  cursor: text;
 }
 
 /* Focused */
@@ -227,7 +227,7 @@ function onKeydown(e: KeyboardEvent) {
   font: var(--ds-font-body-lg);
   color: var(--ds-text-strong);
   box-sizing: border-box;
-  cursor: pointer;
+  cursor: text;
 }
 
 .ds-textarea__input::placeholder {

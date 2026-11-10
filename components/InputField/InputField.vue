@@ -92,9 +92,9 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
 const wrapperEl = ref<HTMLElement | null>(null)
 
 /*
-  The box is the field (ADR-0155): it shows the hand, so a press on its
-  padding or a glyph lands in the control instead of on nothing. A control of
-  its own in the box (a button, a list, a segment) keeps its press.
+  The box is the field (ADR-0155, amended by ADR-0156): a press on its padding
+  or a glyph lands in the control instead of on nothing. A control of its own
+  in the box (a button, a list, a segment) keeps its press.
 */
 function onBoxPress(e: MouseEvent) {
   const t = e.target as Element | null
@@ -229,8 +229,8 @@ provide(FORM_FIELD_KEY, null as unknown as FormFieldContext)
   box-sizing: border-box;
   transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
   padding: var(--ds-control-padding-md); /* md */
-  /* The hand on the whole field, its control included (ADR-0155). */
-  cursor: pointer;
+  /* The cursor says what the press does: here, typing (ADR-0156). */
+  cursor: text;
 }
 
 /* sm is 38px, as InputDropdown sm and ButtonGroup sm beside it in a bar
@@ -294,7 +294,7 @@ provide(FORM_FIELD_KEY, null as unknown as FormFieldContext)
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  cursor: pointer;
+  cursor: text;
 }
 
 /* The browser's own clear button is drawn in its own blue, off every ink of

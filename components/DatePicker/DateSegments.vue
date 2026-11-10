@@ -185,8 +185,8 @@ function onBlur(k: SegmentKind) {
   border-radius: var(--ds-radius-inner-sm);
   outline: none;
   caret-color: transparent;
-  /* The field's hand, as every input's (ADR-0155). */
-  cursor: pointer;
+  /* Typed into, even though a press also opens the calendar (ADR-0156). */
+  cursor: text;
 }
 
 .ds-date-segments__segment--empty {
