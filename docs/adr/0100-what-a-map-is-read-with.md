@@ -73,7 +73,10 @@ the bar `radius-surface-sm` (10, as drawn).
 neutral, **with a clock** (ADR-0006: a tone never speaks alone); what is known stays, what is computing is said
 **in words** — a metric `value: null` reads `pendingLabel` (« en calcul ») in the figure's line box — never a dash
 (« nothing ») nor a skeleton (« seconds », where this takes minutes). Nothing to open: the title is plain text, no
-menu, no lift (`--static`). **`#insight`** replaces the spread with what a module measures — ARR's « Indice de
+lift (`--static`). ~~No menu~~ — **amended (10 Nov. 2026, etolbi)**: the menu stays. It acts on the project, not on
+its figures, and a project being computed is renamed or abandoned like any other; « nothing to open » was read as
+« nothing to do ». The « ⋯ » is now rendered in every state but `loading` (the skeleton), and `#menu`'s presence
+decides what it opens (ADR-0053, ADR-0113). Guarded by a `play` test on « Menu d'actions », mutation-checked. **`#insight`** replaces the spread with what a module measures — ARR's « Indice de
 stock » and its curve (ADR-0038: the shell is shared, the insight is not).
 
 **`Sparkline`**. A trend where a chart would be too much: no axis, no grid, no point. `comparison` is a second

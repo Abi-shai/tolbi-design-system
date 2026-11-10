@@ -247,12 +247,16 @@ const isLoading = computed(() => props.state === 'loading')
  * grid stays on one height — and says what it knows; what it does not know is
  * said **in words**, « en calcul », never a dash (which reads « nothing ») nor
  * a skeleton (which promises seconds where this takes minutes). There is
- * nothing to open: no link, no menu, no lift.
+ * nothing to open: no link, no lift. **The menu stays** (ADR-0100, amended
+ * 10 Nov.): it acts on the project, not on its figures — a project being
+ * computed is renamed or abandoned like any other.
  */
 const isComputing = computed(() => props.state === 'computing')
 const slotsZone = useSlots() as Record<string, unknown>
 const hasZone = computed<boolean>(() => Boolean(props.zone || slotsZone.zone))
 const interactive = computed(() => !isLoading.value && !isComputing.value)
+/** Every state but the skeleton carries the « ⋯ »; the slot decides what it opens (ADR-0053). */
+const hasMenu = computed(() => !isLoading.value)
 
 /** The pill's tone is the state's, so the two can never disagree. */
 const STATUS = {
@@ -548,7 +552,7 @@ watch(() => [props.title, props.meta, props.state], async () => {
     -->
     <!-- Filled `#menu`: the « ⋯ » is the trigger of the package's menu (ADR-0113). -->
     <div
-      v-if="interactive && $slots.menu"
+      v-if="hasMenu && $slots.menu"
       ref="menuEl"
       class="ds-project-card__menu"
       @click="onMenuChoose"
@@ -571,7 +575,7 @@ watch(() => [props.title, props.meta, props.state], async () => {
       </Dropdown>
     </div>
     <IconButton
-      v-else-if="interactive"
+      v-else-if="hasMenu"
       class="ds-project-card__more"
       icon="ellipsis"
       size="xs"

@@ -1178,7 +1178,8 @@ Before working on any component, read:
   − **zoom gauge** (`v-model:zoom`) + ⊙, folded into a bar whose map button is **last** — in the corner the fold
   leaves, so open ↔ fold is one press in one place; two shapes swapped by `SurfaceTransition`.
   **`ProjectCard` `computing`**: same card, « En calcul » + clock, `value: null` said « en calcul » (**amended by
-  ADR-0105**: written « — », read « en calcul »), nothing to open; **`#insight`** slot. **`Sparkline`**: line + dashed comparison on one scale, `label` for a reader.
+  ADR-0105**: written « — », read « en calcul »), nothing to open — but **the menu stays** (amended 10 Nov.: the « ⋯ »
+  in every state but `loading`, a computing project is renamed or deleted like any other); **`#insight`** slot. **`Sparkline`**: line + dashed comparison on one scale, `label` for a reader.
 - **ADR-0101**: **a list is the size of what opens it** — `InputDropdown`'s list inherits the field's size (a row
   is the field's height: `md` 46/16 unchanged, `sm` **38/14** — it was 46/16 under a 38px field), the benchmark's
   unanimous rule; `Dropdown` takes its own **`size`** (`md` 40/14, `sm` 34/12 and a 160px panel), declared on the

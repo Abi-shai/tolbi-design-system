@@ -5,6 +5,7 @@ import { moduleNames } from '../ModuleIcon'
 import { Sparkline } from '../Sparkline'
 import { ProjectGlyph } from '../ProjectGlyph'
 import { DropdownItem, DropdownDivider } from '../Dropdown'
+import { within, userEvent, expect, waitFor } from '@storybook/test'
 
 const meta: Meta<typeof ProjectCard> = {
   title: 'Données/ProjectCard',
@@ -433,9 +434,28 @@ export const ActionMenu: Story = {
             </template>
           </ProjectCard>
         </div>
+        <!-- En calcul : rien à ouvrir, mais le projet se renomme et s'abandonne (ADR-0100, amendé le 10 nov.). -->
+        <div style="width: 320px; display: flex;">
+          <ProjectCard v-bind="d.card" title="FPH — Agroforesterie cacao 2026" state="computing" style="width:100%;">
+            <template #zone><ProjectGlyph kind="zone" status="planned" seed="fph-cacao-2026" /></template>
+            <template #menu>
+              <DropdownItem icon="pencil" label="Renommer" />
+              <DropdownDivider />
+              <DropdownItem icon="trash-2" label="Supprimer" tone="danger" />
+            </template>
+          </ProjectCard>
+        </div>
       </div>
     `,
   }),
+  /* Guarded: a project being computed still carries its « ⋯ », and it opens. */
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const more = await canvas.findByRole('button', { name: 'Actions — FPH — Agroforesterie cacao 2026' })
+    await userEvent.click(more)
+    const rename = await canvas.findByRole('menuitem', { name: /Renommer/ })
+    await waitFor(() => expect(rename).toBeVisible())
+  },
 }
 
 export const __namedExportsOrder = ['Yield', 'Scan', 'Baseline', 'Dmrv', 'Modules', 'States', 'ActionMenu', 'ModuleMark', 'CropOverflow']
