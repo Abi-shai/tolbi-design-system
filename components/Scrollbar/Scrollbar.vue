@@ -38,11 +38,19 @@ const thumbOffset = ref(0)
 const scrollable = ref(false)
 const visible = ref(false)
 const dragging = ref(false)
+const hovering = ref(false)
 const atStart = ref(true)
 const atEnd = ref(false)
 
 /** Below this the thumb becomes an untargetable sliver. */
 const MIN_THUMB = 24
+
+/**
+ * How long the thumb stays after the last movement — macOS's overlay bars
+ * (ADR-0146). A delay, so not a token: it is the time something is *left*
+ * on screen, not the length of a movement.
+ */
+const LINGER = 1000
 
 let hideTimer: ReturnType<typeof setTimeout> | undefined
 let observer: ResizeObserver | undefined
@@ -75,13 +83,31 @@ function measure() {
   thumbOffset.value = overflow > 0 ? (scrollPos / overflow) * travel : 0
 }
 
-/** Show the thumb, then fade it out once scrolling settles. */
+/**
+ * Show the thumb, then fade it out a second after the last movement — unless
+ * it is held or pointed at. **Pointing at the area shows nothing** (ADR-0146):
+ * in a panel the pointer is always there, so a thumb tied to the area's
+ * `:hover` never left; the edge fades already say there is more.
+ */
 function reveal() {
   visible.value = true
   if (hideTimer) clearTimeout(hideTimer)
   hideTimer = setTimeout(() => {
-    if (!dragging.value) visible.value = false
-  }, 700)
+    if (!dragging.value && !hovering.value) visible.value = false
+  }, LINGER)
+}
+
+/* The thumb itself, pointed at: shown while the pointer is on it, and
+   lingering a second after it leaves, as after a scroll. */
+function onThumbEnter() {
+  hovering.value = true
+  visible.value = true
+  if (hideTimer) clearTimeout(hideTimer)
+}
+
+function onThumbLeave() {
+  hovering.value = false
+  if (!dragging.value) reveal()
 }
 
 function onScroll() {
@@ -176,6 +202,8 @@ defineExpose({ viewport })
           : { height: `${thumbSize}px`, transform: `translateY(${thumbOffset}px)` }
       "
       aria-hidden="true"
+      @pointerenter="onThumbEnter"
+      @pointerleave="onThumbLeave"
       @pointerdown="onThumbDown"
       @pointermove="onThumbMove"
       @pointerup="onThumbUp"
@@ -254,9 +282,16 @@ defineExpose({ viewport })
   bottom: 4px;
 }
 
-.ds-scrollbar:hover .ds-scrollbar__thumb,
 .ds-scrollbar__thumb--visible {
   opacity: 1;
+}
+
+/* Reduced motion: it appears and goes without a fade — and so do the edges. */
+@media (prefers-reduced-motion: reduce) {
+  .ds-scrollbar__thumb,
+  .ds-scrollbar__fade {
+    transition: none;
+  }
 }
 
 .ds-scrollbar__thumb:hover,

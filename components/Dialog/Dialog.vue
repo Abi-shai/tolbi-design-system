@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, useId, watch } from 'vue'
 import { CloseButton } from '../CloseButton'
+import { Scrollbar } from '../Scrollbar'
 import { Icon, type IconName } from '../Icon'
 import { SurfaceTransition } from '../SurfaceTransition'
 import { pushModal, removeModal } from '../../composables/useModalStack'
@@ -154,6 +155,8 @@ const hasSummary = computed(() => Boolean(slots.summary || props.summary?.length
 const el = ref<HTMLDialogElement>()
 const surface = ref<HTMLElement>()
 const body = ref<HTMLElement>()
+/* The body scrolls in the package's `Scrollbar` (ADR-0146): its viewport is what moves. */
+const scroller = ref<InstanceType<typeof Scrollbar>>()
 const shown = ref(false)
 const id = useId()
 const titleId = `ds-dialog-title-${id}`
@@ -264,24 +267,33 @@ watch(open, (now) => (now ? void show() : (shown.value = false)), { immediate: t
 const below = ref(false)
 
 function measureScroll() {
-  const b = body.value
-  if (!b) return
-  below.value = Math.ceil(b.scrollTop + b.clientHeight) < b.scrollHeight
+  const v = scroller.value?.viewport
+  if (!v) return
+  below.value = Math.ceil(v.scrollTop + v.clientHeight) < v.scrollHeight
 }
 
 let bodyObserver: ResizeObserver | null = null
+let scrolled: HTMLElement | null = null
 
 watch(body, (b) => {
   bodyObserver?.disconnect()
   bodyObserver = null
+  scrolled?.removeEventListener('scroll', measureScroll)
+  scrolled = null
   if (!b) return
+  scrolled = scroller.value?.viewport ?? null
+  scrolled?.addEventListener('scroll', measureScroll, { passive: true })
   bodyObserver = new ResizeObserver(measureScroll)
+  if (scrolled) bodyObserver.observe(scrolled)
   bodyObserver.observe(b)
   for (const child of b.children) bodyObserver.observe(child)
   measureScroll()
 }, { flush: 'post' })
 
-onBeforeUnmount(() => bodyObserver?.disconnect())
+onBeforeUnmount(() => {
+  bodyObserver?.disconnect()
+  scrolled?.removeEventListener('scroll', measureScroll)
+})
 
 onBeforeUnmount(() => {
   follow(false)
@@ -431,12 +443,15 @@ function onClick(event: MouseEvent) {
             <CloseButton v-if="dismissible" size="sm" :ariaLabel="closeLabel" @click="dismiss" />
           </header>
           <div v-if="slots.nav" class="ds-dialog__nav"><slot name="nav" /></div>
-          <div v-if="slots.default || (description && !side) || slots.form" ref="body" class="ds-dialog__body" @scroll="measureScroll">
+          <!-- At the side the foot's 64px fade says what is left (ADR-0079); the centre takes the scroller's own fades. -->
+          <Scrollbar v-if="slots.default || (description && !side) || slots.form" ref="scroller" class="ds-dialog__scroll" :shadows="!side">
+          <div ref="body" class="ds-dialog__body">
             <!-- At the side, the slot is the panel's body — a form — and describes nothing. -->
             <div v-if="slots.default" :id="side ? undefined : descriptionId" :class="side ? 'ds-dialog__content' : 'ds-dialog__description'"><slot /></div>
             <p v-else-if="description && !side" :id="descriptionId" class="ds-dialog__description">{{ description }}</p>
             <slot name="form" />
           </div>
+          </Scrollbar>
           <footer v-if="slots.actions || hasSummary" class="ds-dialog__foot">
             <!-- A status: the figures move as the body is ticked, and say so once each time. -->
             <div v-if="hasSummary" class="ds-dialog__summary" role="status">
@@ -566,7 +581,7 @@ function onClick(event: MouseEvent) {
 
 /* The body takes what the head, the nav and the foot leave: a short tab does
    not shrink the window, a long one scrolls inside it. */
-.ds-dialog--centre.ds-dialog--2xl .ds-dialog__body {
+.ds-dialog--centre.ds-dialog--2xl .ds-dialog__scroll {
   flex: 1 1 auto;
 }
 
@@ -601,9 +616,12 @@ function onClick(event: MouseEvent) {
   border: 0;
 }
 
+.ds-dialog--untitled .ds-dialog__scroll {
+  border-top: 0;
+}
+
 .ds-dialog--untitled .ds-dialog__body {
   padding-top: var(--ds-spacing-md);
-  border-top: 0;
 }
 
 /*
@@ -631,14 +649,19 @@ function onClick(event: MouseEvent) {
   color: var(--ds-text-subtle);
 }
 
+/* What scrolls is `Scrollbar`'s viewport (ADR-0146): the rule stays on its
+   frame, the body's padding scrolls with what it holds. */
+.ds-dialog__scroll {
+  flex: 0 1 auto;
+  min-height: 0;
+  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+}
+
 .ds-dialog__body {
   display: flex;
   flex-direction: column;
   gap: var(--ds-spacing-xl);
-  min-height: 0;
-  overflow-y: auto;
   padding: var(--ds-spacing-3xl) var(--ds-spacing-2xl);
-  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
 }
 
 .ds-dialog__nav {
@@ -648,9 +671,12 @@ function onClick(event: MouseEvent) {
 }
 
 /* The rule is the nav's now: the body follows it without a second one. */
-.ds-dialog__nav + .ds-dialog__body {
-  padding-top: var(--ds-spacing-xl);
+.ds-dialog__nav + .ds-dialog__scroll {
   border-top: 0;
+}
+
+.ds-dialog__nav + .ds-dialog__scroll .ds-dialog__body {
+  padding-top: var(--ds-spacing-xl);
 }
 
 .ds-dialog__foot {
@@ -838,12 +864,15 @@ function onClick(event: MouseEvent) {
 
 /* 20px in, 20px between its blocks. The 4px of padding above and below, taken
    back by the margin, is room for a field's focus ring — the body clips. */
-.ds-dialog--side .ds-dialog__body {
+.ds-dialog--side .ds-dialog__scroll {
   flex: 1 1 auto;
-  gap: var(--ds-spacing-2xl);
   margin-block: calc(-1 * var(--ds-spacing-xs));
-  padding: var(--ds-spacing-xs) var(--ds-spacing-2xl);
   border-top: 0;
+}
+
+.ds-dialog--side .ds-dialog__body {
+  gap: var(--ds-spacing-2xl);
+  padding: var(--ds-spacing-xs) var(--ds-spacing-2xl);
 }
 
 .ds-dialog--side .ds-dialog__foot {

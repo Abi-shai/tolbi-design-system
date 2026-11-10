@@ -14,6 +14,9 @@ const meta: Meta<typeof Scrollbar> = {
           'absolue au-dessus du contenu : il ne prend aucune place dans la mise en page, ' +
           'contrairement à une barre native stylée qui ampute définitivement la boîte de contenu. ' +
           'Le scroll lui-même reste natif (molette, trackpad, tactile, clavier). ' +
+          'Comme les barres superposées de macOS (ADR-0146), le thumb **paraît pendant le défilement**, quand on ' +
+          'le survole ou qu’on le fait glisser, et **s’efface une seconde après le dernier mouvement** ; survoler ' +
+          'la zone ne l’affiche pas — les fondus disent déjà qu’il reste du contenu. Mouvement réduit : sans fondu. ' +
           'Dimensionner avec `height` ou `max-height`, et ne pas surcharger son `display`.',
       },
     },

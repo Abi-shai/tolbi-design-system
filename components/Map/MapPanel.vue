@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useId } from 'vue'
+import { computed, nextTick, ref, useId, type FunctionalComponent } from 'vue'
 import { Button } from '../Button'
 import { CloseButton } from '../CloseButton'
 import { IconButton } from '../IconButton'
+import { Scrollbar } from '../Scrollbar'
 import { Skeleton } from '../Skeleton'
 import { SurfaceTransition } from '../SurfaceTransition'
 
@@ -105,6 +106,10 @@ const named = (verb: string) => (props.title ? `${verb} ${props.title}` : verb)
    square at the start of its head into a control at the corner, tabs or no
    tabs; the title + chevron and the titled button are `sm`'s. */
 const iconFold = computed(() => props.size === 'lg' || !!slots.header)
+/* A reading panel's body scrolls in the package's `Scrollbar` — an overlay
+   thumb and the edge fades — not the browser's bar (ADR-0146). A small panel
+   does not scroll: its body is rendered as it is. */
+const AsIs: FunctionalComponent = (_, { slots: s }) => s.default?.()
 /* A `lg` head without `#header` carries the title after the fold. */
 const slotHead = computed(() => !!slots.header || (props.size === 'lg' && (!!props.title || props.collapsible || props.loading)))
 /* A panel the reader opened and closes — a parcel's sheet — is about one thing,
@@ -227,6 +232,7 @@ function focusArrived() {
         <div v-else-if="loading" class="ds-map-panel__head" aria-hidden="true">
           <Skeleton width="40%" />
         </div>
+        <component :is="size === 'lg' ? Scrollbar : AsIs" :shadows="size === 'lg' || undefined" class="ds-map-panel__scroll">
         <div class="ds-map-panel__body">
           <slot v-if="!loading" />
           <slot v-else name="loading">
@@ -238,6 +244,7 @@ function focusArrived() {
             </div>
           </slot>
         </div>
+        </component>
         <div v-if="slots.footer" class="ds-map-panel__foot"><slot name="footer" /></div>
       </section>
     </SurfaceTransition>
@@ -357,13 +364,16 @@ function focusArrived() {
   gap: var(--ds-spacing-xl);
 }
 
-.ds-map-panel--lg .ds-map-panel__body {
+/* The scroller takes what the head and the foot leave (ADR-0146): `Scrollbar`'s
+   viewport scrolls on y only — never across, a sideways overflow would put a
+   bar under a panel that looks whole — and its thumb shows only while the body
+   moves. */
+.ds-map-panel--lg .ds-map-panel__scroll {
   flex: 1 1 auto;
   min-height: 0;
-  /* A bar only when the content runs past the foot — and never across: a
-     sideways overflow would put a bar under a panel that looks whole. */
-  overflow-x: hidden;
-  overflow-y: auto;
+}
+
+.ds-map-panel--lg .ds-map-panel__body {
   gap: var(--ds-spacing-xl);
   padding: 0 var(--ds-spacing-xl) var(--ds-spacing-xl);
 }

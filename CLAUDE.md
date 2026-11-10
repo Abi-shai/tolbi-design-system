@@ -1413,6 +1413,11 @@ Before working on any component, read:
   and 320px: `Dialog side`, `MapPanel lg`, `Table stickyHeader` hold; `Toast` ran off at 320 — `max-width: min(27.5rem,
   100%)`; **still breaking**: the GIS screen at 200 % (legend and navigator over the panel), `AlertsBlock`'s row title
   at 320 (gives to nothing), `Tabs sm` labels at 320 — three drawings.
+- **ADR-0146**: **the bar shows when it moves** — `MapPanel lg` and `Dialog` scroll in `Scrollbar` (no native bar left;
+  `MapPanel` with its fades, `Dialog` centred with its fades, at the side the owner's 64px foot fade on the viewport).
+  The thumb shows while scrolling, on the thumb or dragging, and fades **1 s** after the last movement; **pointing at
+  the area shows nothing** (in a panel the pointer is always there); reduced motion without a fade. The 1 s is a
+  constant, not a token — a delay, not a duration.
 
 ## Architecture
 
