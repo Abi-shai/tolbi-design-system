@@ -238,21 +238,36 @@ function evaluate() {
   commit({ start: valueOf(a), end: valueOf(b) })
 }
 
+/* Which end is being typed, so the open grid follows that one (ADR-0154). */
+const typing = ref<'start' | 'end'>('start')
+
 function onStart(p: DateParts) {
   draftStart.value = p
+  typing.value = 'start'
   evaluate()
 }
 
 function onEnd(p: DateParts) {
   draftEnd.value = p
+  typing.value = 'end'
   evaluate()
 }
+
+/* A year once it has four digits; a day once its month is typed (its day, or the 1st). */
+const followKey = computed<number | null>(() => {
+  const p = typing.value === 'end' ? draftEnd.value : draftStart.value
+  if (p.y === null || p.y < 1000) return null
+  if (props.granularity === 'year') return p.y
+  if (p.m === null) return null
+  return dayKey(p.y, p.m, Math.min(p.d ?? 1, daysIn(p.y, p.m)))
+})
 
 /* ── The calendar ───────────────────────────────────────────────────── */
 const open = ref(false)
 const root = ref<HTMLElement | null>(null)
 const panel = ref<HTMLElement | null>(null)
 const button = ref<HTMLButtonElement | null>(null)
+const calendar = ref<InstanceType<typeof DateCalendar> | null>(null)
 const startSegments = ref<InstanceType<typeof DateSegments> | null>(null)
 const endSegments = ref<InstanceType<typeof DateSegments> | null>(null)
 
@@ -261,14 +276,72 @@ const anchor = ref<HTMLElement | null>(null)
 onMounted(() => { anchor.value = root.value?.querySelector<HTMLElement>('.ds-input-field__wrapper') ?? null })
 useAnchoredSurface(anchor, panel, { align: () => 'start' })
 
-function toggle() {
+/* Where the focus goes back to on closing: the segment the panel was opened
+   from, or the calendar button (ADR-0154). */
+let returnTo: HTMLElement | null = null
+/* Whether the grid takes the focus: from the keyboard and the button, yes;
+   from a press in the field, no — the segment keeps it and typing goes on. */
+const takeFocus = ref(true)
+
+function openPanel(focusGrid: boolean) {
   if (isDisabled.value) return
-  open.value = !open.value
+  if (open.value) {
+    if (focusGrid) calendar.value?.focus()
+    return
+  }
+  const active = document.activeElement as HTMLElement | null
+  returnTo = active && root.value?.contains(active) ? active : null
+  takeFocus.value = focusGrid
+  open.value = true
+}
+
+/* The calendar button: it opens and closes, the grid taking the focus. */
+function toggle() {
+  if (open.value) close()
+  else openPanel(true)
 }
 
 function close(refocus = true) {
   open.value = false
-  if (refocus) nextTick(() => button.value?.focus())
+  if (!refocus) return
+  const to = returnTo?.isConnected ? returnTo : button.value
+  nextTick(() => to?.focus())
+}
+
+/*
+  A press anywhere in the box opens the panel (ADR-0154) — the button keeps
+  its own toggle. On a segment the press focuses it too, and the grid leaves
+  the focus there; elsewhere in the box the first segment takes it. Several
+  years have no typing: the whole box is the trigger, and the grid takes the
+  focus as the button gives it.
+*/
+function onBoxClick(e: MouseEvent) {
+  const t = e.target as Element | null
+  if (!t || isDisabled.value || !anchor.value?.contains(t) || button.value?.contains(t)) return
+  if (many.value) {
+    openPanel(true)
+    return
+  }
+  if (!t.closest('[role="spinbutton"]')) {
+    const inEnd = endSegments.value && (t.closest('.ds-date-picker__end') !== null)
+    ;(inEnd ? endSegments.value : startSegments.value)?.focus('start')
+  }
+  openPanel(false)
+}
+
+/* From a segment: Alt+↓ or Enter opens, the grid taking the focus; Escape
+   closes and the focus stays in the field. */
+function onBoxKeydown(e: KeyboardEvent) {
+  const t = e.target as Element | null
+  if (!t?.closest('[role="spinbutton"]')) return
+  if ((e.altKey && e.key === 'ArrowDown') || e.key === 'Enter') {
+    e.preventDefault()
+    openPanel(true)
+  } else if (e.key === 'Escape' && open.value) {
+    e.preventDefault()
+    e.stopPropagation()
+    close()
+  }
 }
 
 function onPick(k: number) {
@@ -309,7 +382,13 @@ const calendarLabels = computed(() => ({
 </script>
 
 <template>
-  <div ref="root" class="ds-date-picker" :class="`ds-date-picker--${size}`">
+  <div
+    ref="root"
+    class="ds-date-picker"
+    :class="[`ds-date-picker--${size}`, { 'ds-date-picker--many': many, 'ds-date-picker--disabled': isDisabled }]"
+    @click="onBoxClick"
+    @keydown="onBoxKeydown"
+  >
     <InputField :size="size" :disabled="isDisabled" :destructive="destructive || (!field && !!message)">
       <template #control>
         <div
@@ -328,7 +407,6 @@ const calendarLabels = computed(() => ({
             :class="{ 'ds-date-picker__list--empty': !manyValue.length }"
             :disabled="isDisabled"
             tabindex="-1"
-            @click="toggle"
           >{{ manyValue.length ? manyText : multiplePlaceholder }}</button>
           <DateSegments
             v-else
@@ -347,6 +425,7 @@ const calendarLabels = computed(() => ({
             <span class="ds-date-picker__arrow" aria-hidden="true">→</span>
             <DateSegments
               ref="endSegments"
+              class="ds-date-picker__end"
               :parts="draftEnd"
               :kinds="kinds"
               :separator="separator"
@@ -388,6 +467,9 @@ const calendarLabels = computed(() => ({
         :aria-label="calendarLabel"
       >
         <DateCalendar
+          ref="calendar"
+          :take-focus="takeFocus"
+          :follow="followKey"
           :granularity="granularity"
           :size="size"
           :range="range && !many"
@@ -423,6 +505,11 @@ const calendarLabels = computed(() => ({
   gap: var(--ds-spacing-md);
   min-width: 0;
 }
+
+/* The whole box opens the panel (ADR-0154): a text cursor where it is typed,
+   the hand where it only opens. */
+.ds-date-picker:not(.ds-date-picker--disabled) :deep(.ds-input-field__wrapper) { cursor: text; }
+.ds-date-picker--many:not(.ds-date-picker--disabled) :deep(.ds-input-field__wrapper) { cursor: pointer; }
 
 /* sm is the 14/20 type, as InputField's (ADR-0108). */
 .ds-date-picker--sm .ds-date-picker__value :deep(.ds-date-segments) {

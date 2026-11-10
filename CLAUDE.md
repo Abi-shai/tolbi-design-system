@@ -1453,6 +1453,11 @@ Before working on any component, read:
   **Amended**: the panel **follows its field** — `max(300px, var(--anchor-width))`, a day a square centred in its
   column (`min(40px, 100%)`, so 300px does not spill); the grid takes the field's `size` like `DropdownItem` — `md`
   `label-lg` / `-strong` on 40px cells, `sm` 14 on 36 as before.
+- **ADR-0154**: **the field opens the calendar** (etolbi; Ant, Atlassian, Carbon) — a press **anywhere in the box**
+  opens the panel; on a segment it focuses it and the grid **leaves the focus there**, so typing goes on with the panel
+  open; elsewhere the first segment takes it; `multiple` = the whole box is the trigger. **The grid follows the typing**
+  (`follow`: a 4-digit year's page, a typed month). Tab opens nothing; **Alt+↓ / Enter** open with the focus in the
+  grid; **Escape** closes and gives the focus back to the segment it came from. The icon stays, with its own toggle.
 
 ## Architecture
 

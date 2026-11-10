@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { Button } from '../Button'
 import { IconButton } from '../IconButton'
 import { DropdownTrigger } from '../Dropdown'
@@ -42,6 +42,10 @@ export interface DateCalendarProps {
   many?: number[]
   /** The confirm button's word, and the count's words. */
   confirmLabel?: string
+  /** Take the focus on opening — false when a press in the field opened it, so typing goes on (ADR-0154). */
+  takeFocus?: boolean
+  /** What the field is being typed towards: the grid shows its page or month, without the focus (ADR-0154). */
+  follow?: number | null
   /** The chosen key, or the range's two (either may be null). */
   start: number | null
   end?: number | null
@@ -299,8 +303,27 @@ function onEscape(e: KeyboardEvent) {
 function focusActive() {
   nextTick(() => requestAnimationFrame(() => grid.value?.querySelector<HTMLElement>('[tabindex="0"]')?.focus()))
 }
-onMounted(focusActive)
+onMounted(() => { if (props.takeFocus !== false) focusActive() })
 defineExpose({ focus: focusActive })
+
+/* Typing in the field: the grid goes where the value is going — its page of
+   years, or its month — and moves nothing else; the focus stays in the field. */
+watch(() => props.follow, (k) => {
+  if (k === null || k === undefined) return
+  if (props.granularity === 'year') {
+    const y = clampYear(k)
+    activeYear.value = y
+    active.value = y
+    pageStart.value = pageStartOf(y, minYear.value ?? 0)
+    return
+  }
+  const d = clamp(k)
+  const p = fromDayKey(d)
+  active.value = d
+  month.value = { y: p.y, m: p.m }
+  activeYear.value = p.y
+  pageStart.value = pageStartOf(p.y, minYear.value ?? 0)
+})
 
 const isActiveYear = (y: number) => y === activeYear.value
 const isActiveDay = (k: number) => k === active.value

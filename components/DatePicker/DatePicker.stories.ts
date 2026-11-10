@@ -17,7 +17,8 @@ const meta: Meta<typeof DatePicker> = {
         component:
           'Un composant, quatre modes (ADR-0152, Figma `4116:3094`) : `granularity` = `day` | `year`, et `range`. ' +
           '**Le champ se tape** par segments — AAAA ; JJ/MM/AAAA dans l’ordre de la langue — ↑ ↓ font ± 1 sur le ' +
-          'segment actif, ← → passent d’un segment à l’autre. **Le panneau s’ouvre sous le champ** : une grille de ' +
+          'segment actif, ← → passent d’un segment à l’autre. **Un clic dans la boîte ouvre le panneau** sous le champ ' +
+          '(ADR-0154) — sur un segment, on tape sans le fermer et la grille suit ; Alt+↓ ou Entrée l’ouvrent au clavier. Une grille de ' +
           '16 années (4 × 4) calée sur `min`, ou le mois, dont l’en-tête mène à la même grille. **Une plage** se ' +
           'choisit en deux clics, l’intervalle teinté, le survol en aperçu. **Hors bornes, refusé** : la valeur ' +
           'n’est pas prise et `invalid` dit pourquoi (« Entre 2011 et 2031 »), pour le `FormField` autour. ' +
@@ -87,17 +88,22 @@ export const Day: Story = {
       </div>
     `,
   }),
-  /* Guarded: ↑ on the day segment steps it; a day picked in the grid becomes the value. */
+  /* Guarded (ADR-0154): a press on the day opens the month and keeps the focus there; ↑ steps it, a month
+     typed moves the grid; a day picked in the grid becomes the value. */
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const body = within(canvasElement.ownerDocument.body)
-    await userEvent.click(canvas.getByRole('spinbutton', { name: 'jour' }))
+    const day = canvas.getByRole('spinbutton', { name: 'jour' })
+    await userEvent.click(day)
+    await body.findByRole('grid', { name: 'Mars 2026' })
+    await waitFor(() => expect(day).toHaveFocus())
     await userEvent.keyboard('{ArrowUp}')
     await waitFor(() => expect(canvas.getByTestId('value')).toHaveTextContent('2026-03-13'))
-    await userEvent.click(canvas.getByRole('button', { name: 'Ouvrir le calendrier' }))
-    const grid = await body.findByRole('grid', { name: 'Mars 2026' })
-    await userEvent.click(within(grid).getByRole('gridcell', { name: /20 mars 2026/ }))
-    await waitFor(() => expect(canvas.getByTestId('value')).toHaveTextContent('2026-03-20'))
+    await userEvent.keyboard('{ArrowRight}05')
+    await waitFor(() => expect(canvas.getByTestId('value')).toHaveTextContent('2026-05-13'))
+    const grid = await body.findByRole('grid', { name: 'Mai 2026' })
+    await userEvent.click(within(grid).getByRole('gridcell', { name: /20 mai 2026/ }))
+    await waitFor(() => expect(canvas.getByTestId('value')).toHaveTextContent('2026-05-20'))
   },
 }
 
@@ -167,6 +173,54 @@ export const ManyYears: Story = {
     await userEvent.keyboard('{Escape}')
     await waitFor(() => expect(body.queryByRole('grid')).toBeNull())
     await expect(canvas.getByTestId('value')).toHaveTextContent('[2021,2023,2026]')
+    /* The whole box is the trigger (ADR-0154). */
+    await userEvent.click(canvas.getByText('2021, 2023, 2026'))
+    await body.findByRole('grid', { name: '2016 – 2031' })
+  },
+}
+
+/**
+ * ADR-0154 — **le champ ouvre le calendrier** : un clic n’importe où dans la boîte l’ouvre ; sur un segment, il le
+ * focalise aussi, et l’on tape sans fermer — la grille suit (page, cellule choisie). Au clavier, Tab n’ouvre rien ;
+ * Alt+↓ ou Entrée ouvre et met le focus dans la grille ; Échap ferme et rend le focus au champ.
+ */
+export const FieldOpens: Story = {
+  name: 'Le champ ouvre le calendrier',
+  render: () => ({
+    components: { DatePicker, FormField },
+    setup: () => ({ value: ref<DatePickerValue | null>(null), shown }),
+    template: `
+      <div style="width:300px;display:flex;flex-direction:column;gap:12px">
+        <FormField label="Année de plantation">
+          <DatePicker v-model="value" granularity="year" :min="2000" :max="2031" />
+        </FormField>
+        <span data-testid="value" style="font:var(--ds-font-body-sm);color:var(--ds-text-subtle)">Valeur : {{ shown(value) }}</span>
+      </div>
+    `,
+  }),
+  /* Guarded: a press in the box's empty part opens on today's page, the segment focused; 2008 typed turns the page and is chosen;
+     Escape closes with the focus kept; Alt+↓ opens with the focus in the grid; Escape gives it back. */
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const body = within(canvasElement.ownerDocument.body)
+    const year = canvas.getByRole('spinbutton', { name: 'année' })
+    await userEvent.click(canvas.getByRole('group'))
+    await body.findByRole('grid', { name: '2016 – 2031' })
+    await waitFor(() => expect(year).toHaveFocus())
+    await userEvent.keyboard('2008')
+    await waitFor(() => expect(canvas.getByTestId('value')).toHaveTextContent('2008'))
+    const grid = await body.findByRole('grid', { name: '2000 – 2015' })
+    await expect(within(grid).getByRole('gridcell', { name: '2008' })).toHaveAttribute('aria-selected', 'true')
+    await expect(year).toHaveFocus()
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(body.queryByRole('grid')).toBeNull())
+    await expect(year).toHaveFocus()
+    await userEvent.keyboard('{Alt>}{ArrowDown}{/Alt}')
+    const again = await body.findByRole('grid', { name: '2000 – 2015' })
+    await waitFor(() => expect(within(again).getByRole('gridcell', { name: '2008' })).toHaveFocus())
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(body.queryByRole('grid')).toBeNull())
+    await waitFor(() => expect(year).toHaveFocus())
   },
 }
 

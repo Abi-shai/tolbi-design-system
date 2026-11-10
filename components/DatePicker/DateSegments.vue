@@ -95,7 +95,8 @@ function step(k: SegmentKind, dir: 1 | -1) {
 }
 
 function onKeydown(e: KeyboardEvent, i: number, k: SegmentKind) {
-  if (props.disabled) return
+  /* Alt+↓ is the field's (it opens the calendar), not a step. */
+  if (props.disabled || e.altKey) return
   if (/^[0-9]$/.test(e.key)) {
     e.preventDefault()
     typeDigit(i, k, e.key)
