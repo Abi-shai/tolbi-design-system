@@ -95,6 +95,15 @@ provide(OPTION_LIST_KEY, {
 }
 
 /*
+  A stack is a list read in bulk — a MapPanel's parcels — so its titles sit at
+  the floor, 14, as before ADR-0144; the description already does (ADR-0145).
+  A variant switch read by OptionCard's title and its line (ADR-0010).
+*/
+.ds-option-list--stack {
+  --option-card-title-font: var(--ds-font-label-md-strong);
+}
+
+/*
   At most `columns` side by side, never under 14rem each: the max() picks the
   wider of the two, so a narrow container drops a column before it squeezes
   one — down to a pile. Cards on a row share its height (grid's own stretch).

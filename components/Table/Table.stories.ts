@@ -536,3 +536,34 @@ export const TwoLines: Story = {
     `,
   }),
 }
+
+/**
+ * ADR-0145 — **`density`** : `default` lit les cellules au corps (16 px), `compact` au plancher (14 px), pour un
+ * tableau lu en masse — beaucoup de colonnes, un panneau. Seule la taille change ; l’en-tête est à 14 dans les deux.
+ */
+export const Density: Story = {
+  name: 'Densité',
+  render: () => ({
+    components: { Table },
+    setup: () => {
+      const columns: TableColumn[] = [
+        { key: 'code', label: 'Parcelle', primary: true, secondary: 'producer', width: '14rem' },
+        { key: 'village', label: 'Village' },
+        { key: 'crop', label: 'Culture' },
+        { key: 'area', label: 'Surface', numeric: true },
+      ]
+      const rows: TableRow[] = [
+        { id: 1, code: 'P-0412', producer: 'Traoré Moussa', village: 'Djoutougbo 2', crop: 'Cacao', area: '17,5 ha' },
+        { id: 2, code: 'P-0413', producer: 'Koné Aminata', village: 'Djoutougbo 2', crop: 'Hévéa', area: '4,2 ha' },
+        { id: 3, code: 'P-0415', producer: 'Diallo Ibrahima', village: 'Sokoura', crop: 'Cacao', area: '9,8 ha' },
+      ]
+      return { columns, rows }
+    },
+    template: `
+      <div style="max-width:720px;display:flex;flex-direction:column;gap:24px">
+        <Table :columns="columns" :rows="rows" :page-sizes="[]" />
+        <Table :columns="columns" :rows="rows" :page-sizes="[]" density="compact" />
+      </div>
+    `,
+  }),
+}

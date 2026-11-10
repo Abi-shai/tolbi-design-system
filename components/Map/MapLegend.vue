@@ -519,7 +519,7 @@ onBeforeUnmount(() => clearTimeout(timer))
    the timeline's lone scale word (ADR-0114). */
 .ds-map-legend__word {
   flex: none;
-  font: var(--ds-font-label-lg-strong);
+  font: var(--ds-font-label-md-strong);
   color: var(--ds-text-subtle);
   white-space: nowrap;
 }
@@ -534,7 +534,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 /* ── The scale ────────────────────────────────────────────────────── */
 .ds-map-legend__aside {
   flex: none;
-  font: var(--ds-font-label-lg-strong);
+  font: var(--ds-font-label-md-strong);
   color: var(--ds-text-default);
   white-space: nowrap;
 }
@@ -543,7 +543,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 .ds-map-legend__unit {
   display: inline-grid;
   flex: none;
-  font: var(--ds-font-label-lg);
+  font: var(--ds-font-label-md);
   font-variant-numeric: tabular-nums;
   color: var(--ds-text-default);
   white-space: nowrap;
@@ -630,7 +630,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 }
 
 .ds-map-legend__chip-word {
-  font: var(--ds-font-label-lg-strong);
+  font: var(--ds-font-label-md-strong);
 }
 
 /* ── The symbols' marks, overlapping ──────────────────────────────── */

@@ -190,7 +190,7 @@ export type { AlertsBlockItem, AlertsBlockSeverity } from './AlertsBlock'
 export { ShareBar } from './ShareBar'
 export type { ShareBarItem } from './ShareBar'
 export { Table, TableColumnMenu } from './Table'
-export type { TableColumn, TableRow, TableSort, TableSortDirection } from './Table'
+export type { TableColumn, TableDensity, TableRow, TableSort, TableSortDirection } from './Table'
 
 export { Breadcrumbs } from './Breadcrumbs'
 export type { BreadcrumbsItem } from './Breadcrumbs'

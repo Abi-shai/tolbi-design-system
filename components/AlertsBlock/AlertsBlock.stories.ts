@@ -28,7 +28,7 @@ export default meta
 type Story = StoryObj<typeof AlertsBlock>
 
 const ground = (inner: string) =>
-  `<div style="width:25rem;background:var(--ds-bg-default);padding:16px;border:1px solid var(--ds-border-subtle);border-radius:16px">${inner}</div>`
+  `<div style="box-sizing:border-box;width:100%;max-width:25rem;background:var(--ds-bg-default);padding:16px;border:1px solid var(--ds-border-subtle);border-radius:16px">${inner}</div>`
 
 const FIVE: AlertsBlockItem[] = [
   { id: 'k2', label: 'K2 · Projet', icon: 'sprout', severity: 'blocking', meta: 'immédiat' },

@@ -51,6 +51,9 @@ export type TableRow = { id: string | number } & Record<string, unknown>
 
 export type TableSortDirection = 'ascending' | 'descending'
 
+/** `default` reads at the body (16); `compact` at the floor (14) — a dense table (ADR-0145). */
+export type TableDensity = 'default' | 'compact'
+
 export interface TableSort {
   key: string
   direction: TableSortDirection
@@ -100,6 +103,11 @@ interface Props {
   stickyHeader?: boolean
   /** `false` in a surface that draws its own frame — a `Card`, a `SectionCard` (ADR-0098). */
   framed?: boolean
+  /**
+   * `compact`: the cells at the floor, `body-sm` (14) — a table read in bulk,
+   * many columns, a panel. `default` keeps the body's 16 (ADR-0145).
+   */
+  density?: TableDensity
   /** Where a row leads. Given, the row opens as a link. */
   rowLink?: (row: TableRow) => string | undefined
   /** Declared as a prop so the table knows a row can be opened (`@row-click`). */
@@ -138,6 +146,7 @@ const props = withDefaults(defineProps<Props>(), {
   visibleColumns: undefined,
   stickyHeader: false,
   framed: true,
+  density: 'default',
   rowLink: undefined,
   onRowClick: undefined,
   total: undefined,
@@ -444,7 +453,7 @@ const showPagination = computed(() =>
   <div class="ds-table-container" :class="{ 'ds-table-container--bare': !framed }">
     <div class="ds-table__frame">
     <Scrollbar ref="scrollbarRef" :horizontal="true">
-      <table ref="tableEl" class="ds-table">
+      <table ref="tableEl" class="ds-table" :class="{ 'ds-table--compact': density === 'compact' }">
         <thead>
           <TableHeaderRow
             :cells="headerCells(false)"
@@ -843,6 +852,14 @@ const showPagination = computed(() =>
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Compact (ADR-0145): the cells at the floor. The inset does not move, so the
+   row is what it was before ADR-0144 — 16 + 20 + 16. The header is `label-md`
+   (14) in both. */
+.ds-table--compact .ds-table__td,
+.ds-table--compact .ds-table__cell-text {
+  font: var(--ds-font-body-sm);
 }
 
 /* The second line (ADR-0136): Figma's `Lignes=Deux`, 16px under a 20px line,

@@ -1405,6 +1405,13 @@ Before working on any component, read:
   (`ProjectCard` 20em, `ModuleCapsule` 296/344, `MapLegend`/`MapTimeline` on `--ds-width-md`, 560). 301 of 642 stories
   change height, all in text. **Amended**: mobile's floor too — `body-sm`, `label-md`, `code-md` 13 → 14 (line box
   already 20, no height moves).
+- **ADR-0145**: **sixteen to read, fourteen where it is dense** (etolbi: WCAG sets no size; Atlassian, Carbon) — the
+  scale does not move, a dense place takes the floor locally: **`Table density`** (`default` 16 · `compact` 14,
+  `TableDensity`), **`OptionList layout="stack"`** titles at `label-md-strong` (`--option-card-title-font`), **`MapLegend`**
+  at 14 (`ChartLegend`/`ChartTooltip`/`MapTooltip` already were; the columns' figure back to 16). Checked at 200 % (640)
+  and 320px: `Dialog side`, `MapPanel lg`, `Table stickyHeader` hold; `Toast` ran off at 320 — `max-width: min(27.5rem,
+  100%)`; **still breaking**: the GIS screen at 200 % (legend and navigator over the panel), `AlertsBlock`'s row title
+  at 320 (gives to nothing), `Tabs sm` labels at 320 — three drawings.
 
 ## Architecture
 

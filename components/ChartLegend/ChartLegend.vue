@@ -31,7 +31,7 @@ export type ChartLegendShape = 'dot' | 'line' | 'dashed' | 'square' | 'circle' |
 /**
  * `columns` — a key that is read, not scanned (ADR-0138): each entry a column
  * of its own, four to a row, equal widths, centred — its mark in a 16px box,
- * its figure (`value`) in `label-xl-strong`, its name under it in `label-md`.
+ * its figure (`value`) in `label-lg-strong` (16), its name under it in `label-md` (14).
  * A map legend's unfolded symbols: « 40 / Point du projet ».
  */
 export type ChartLegendOrientation = 'horizontal' | 'vertical' | 'columns'
@@ -245,7 +245,9 @@ button.ds-chart-legend__entry:focus-visible {
 
 .ds-chart-legend--columns .ds-chart-legend__value {
   order: 1;
-  font: var(--ds-font-label-xl-strong);
+  /* A figure, and figures did not grow (ADR-0144): its 16px, by the role a step
+     down — `label-xl` went to 18 (ADR-0145). */
+  font: var(--ds-font-label-lg-strong);
   font-variant-numeric: tabular-nums;
   color: var(--ds-text-strong);
 }

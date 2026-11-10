@@ -193,9 +193,11 @@ const liveRole = computed(() => (props.tone === 'error' ? 'alert' : 'status'))
   align-items: flex-start;
   gap: var(--ds-spacing-lg);
   box-sizing: border-box;
-  /* The width is the sentence's, up to the frame's 440. */
+  /* The width is the sentence's, up to the frame's 440 — and never past what it
+     stands in: at 320px (WCAG 1.4.10, ADR-0145) a 440 toast ran 136px off the
+     screen's left edge. */
   width: max-content;
-  max-width: 27.5rem;
+  max-width: min(27.5rem, 100%);
   padding: var(--ds-spacing-lg) var(--ds-spacing-lg) var(--ds-spacing-lg) var(--ds-spacing-xl);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);

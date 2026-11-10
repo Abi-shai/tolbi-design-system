@@ -378,13 +378,13 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
 }
 
 .ds-option-card__title {
-  font: var(--ds-font-label-lg-strong);
+  font: var(--option-card-title-font, var(--ds-font-label-lg-strong));
   color: var(--ds-text-strong);
   overflow-wrap: anywhere;
 }
 
 .ds-option-card__description {
-  /* 12px, 14 in a reading panel (ADR-0132). */
+  /* The floor, 14 — `body-sm`, or the reading panel's (ADR-0132, ADR-0144). */
   font: var(--reading-secondary-font, var(--ds-font-body-sm));
   color: var(--ds-text-subtle);
   overflow-wrap: anywhere;
@@ -430,7 +430,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
   flex: none;
   align-items: center;
   height: 1lh;
-  font: var(--ds-font-label-lg-strong);
+  font: var(--option-card-title-font, var(--ds-font-label-lg-strong));
 }
 
 /* The action on the title's line, at the end: its top on the content's top. */
