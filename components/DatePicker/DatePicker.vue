@@ -506,11 +506,6 @@ const calendarLabels = computed(() => ({
   min-width: 0;
 }
 
-/* The whole box opens the panel (ADR-0154): a text cursor where it is typed,
-   the hand where it only opens. */
-.ds-date-picker:not(.ds-date-picker--disabled) :deep(.ds-input-field__wrapper) { cursor: text; }
-.ds-date-picker--many:not(.ds-date-picker--disabled) :deep(.ds-input-field__wrapper) { cursor: pointer; }
-
 /* sm is the 14/20 type, as InputField's (ADR-0108). */
 .ds-date-picker--sm .ds-date-picker__value :deep(.ds-date-segments) {
   font: var(--ds-font-body-md);

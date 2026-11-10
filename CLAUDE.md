@@ -1458,6 +1458,10 @@ Before working on any component, read:
   open; elsewhere the first segment takes it; `multiple` = the whole box is the trigger. **The grid follows the typing**
   (`follow`: a 4-digit year's page, a typed month). Tab opens nothing; **Alt+↓ / Enter** open with the focus in the
   grid; **Escape** closes and gives the focus back to the segment it came from. The icon stays, with its own toggle.
+- **ADR-0155**: **the hand on every field** (etolbi, a product decision against the text-cursor convention) —
+  `cursor: pointer` on the box and the native control of `InputField` (so `PasswordField`, `PhoneField`),
+  `TextareaInputField`, `DatePicker` (segments too); OTP cells already had it; disabled stays `not-allowed`. **A hand
+  must not point at nothing**: a press on the box's padding focuses its control; a control of the box's own keeps its press.
 
 ## Architecture
 

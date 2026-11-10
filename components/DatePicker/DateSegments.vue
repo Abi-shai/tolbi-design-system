@@ -185,7 +185,8 @@ function onBlur(k: SegmentKind) {
   border-radius: var(--ds-radius-inner-sm);
   outline: none;
   caret-color: transparent;
-  cursor: text;
+  /* The field's hand, as every input's (ADR-0155). */
+  cursor: pointer;
 }
 
 .ds-date-segments__segment--empty {

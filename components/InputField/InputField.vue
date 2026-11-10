@@ -91,6 +91,20 @@ const iconSize = computed(() => props.size === 'sm' ? 16 : 20)
 /* The list at the end hangs from the box, not from its word. */
 const wrapperEl = ref<HTMLElement | null>(null)
 
+/*
+  The box is the field (ADR-0155): it shows the hand, so a press on its
+  padding or a glyph lands in the control instead of on nothing. A control of
+  its own in the box (a button, a list, a segment) keeps its press.
+*/
+function onBoxPress(e: MouseEvent) {
+  const t = e.target as Element | null
+  if (!t || isDisabled.value || t.closest('input, textarea, select, button, a, [tabindex], [contenteditable]')) return
+  const control = (e.currentTarget as HTMLElement).querySelector<HTMLElement>('.ds-input-field__input')
+  if (!control) return
+  e.preventDefault()
+  control.focus()
+}
+
 /* What rides inside the box is the box's, not the FormField's: the field's id,
    message and state belong to the input, and a list at its end taking them
    too would put one id on two controls. */
@@ -104,6 +118,7 @@ provide(FORM_FIELD_KEY, null as unknown as FormFieldContext)
     <div
       ref="wrapperEl"
       class="ds-input-field__wrapper"
+      @mousedown="onBoxPress"
       :class="{
         'ds-input-field__wrapper--destructive': isInvalid,
         'ds-input-field__wrapper--disabled':    isDisabled,
@@ -214,6 +229,8 @@ provide(FORM_FIELD_KEY, null as unknown as FormFieldContext)
   box-sizing: border-box;
   transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
   padding: var(--ds-control-padding-md); /* md */
+  /* The hand on the whole field, its control included (ADR-0155). */
+  cursor: pointer;
 }
 
 /* sm is 38px, as InputDropdown sm and ButtonGroup sm beside it in a bar
@@ -277,6 +294,7 @@ provide(FORM_FIELD_KEY, null as unknown as FormFieldContext)
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 /* The browser's own clear button is drawn in its own blue, off every ink of
