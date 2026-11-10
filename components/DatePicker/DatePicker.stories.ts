@@ -225,3 +225,21 @@ export const Sizes: Story = {
     `,
   }),
 }
+
+/**
+ * ADR-0153, amendé — **le panneau suit le champ** : sa largeur (jamais sous 300 px), et sa taille de texte
+ * comme `DropdownItem` — `md` en `label-lg` sur des cellules de 40, `sm` au plancher de 14 sur 36.
+ */
+export const FieldWidth: Story = {
+  name: 'À la largeur du champ',
+  render: () => ({
+    components: { DatePicker, FormField },
+    setup: () => ({ a: ref<DatePickerValue | null>('2026-03-12'), b: ref<DatePickerValue | null>(2026) }),
+    template: `
+      <div style="width:470px;display:flex;flex-direction:column;gap:16px">
+        <FormField label="Date de démarrage (md)"><DatePicker v-model="a" /></FormField>
+        <FormField label="Année de plantation (sm)"><DatePicker v-model="b" granularity="year" size="sm" :min="2011" /></FormField>
+      </div>
+    `,
+  }),
+}

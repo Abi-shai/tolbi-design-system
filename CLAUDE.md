@@ -1450,6 +1450,9 @@ Before working on any component, read:
 - **ADR-0153**: **several years, confirmed** — `DatePicker multiple` (`granularity="year"`; `v-model` a sorted
   `number[]`): years **toggled one by one** in the grid, then **« Valider »** in a foot with the count; closing without it
   keeps the value (a set is built in several gestures). The field **lists** them (« 2021, 2023, 2026 »), not typed.
+  **Amended**: the panel **follows its field** — `max(300px, var(--anchor-width))`, a day a square centred in its
+  column (`min(40px, 100%)`, so 300px does not spill); the grid takes the field's `size` like `DropdownItem` — `md`
+  `label-lg` / `-strong` on 40px cells, `sm` 14 on 36 as before.
 
 ## Architecture
 

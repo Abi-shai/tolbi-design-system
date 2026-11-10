@@ -34,6 +34,8 @@ import {
 export interface DateCalendarProps {
   granularity: DateGranularity
   range: boolean
+  /** The field's size: `md` reads at `label-lg` on taller cells, `sm` at the floor (ADR-0153, amended). */
+  size?: 'sm' | 'md'
   /** Several years, toggled one by one and confirmed (ADR-0153). */
   multiple?: boolean
   /** The years chosen, in `multiple`. */
@@ -305,7 +307,7 @@ const isActiveDay = (k: number) => k === active.value
 </script>
 
 <template>
-  <div class="ds-date-calendar" @keydown="onEscape">
+  <div class="ds-date-calendar" :class="`ds-date-calendar--${size ?? 'md'}`" @keydown="onEscape">
     <!-- A range made: its ends and its span, over the grid (the owner's « 2016 → 2026 · 11 années »). -->
     <p v-if="summary" class="ds-date-calendar__summary">
       <span class="ds-date-calendar__summary-ends">{{ summary.ends }}</span>
@@ -488,7 +490,7 @@ const isActiveDay = (k: number) => k === active.value
 .ds-date-calendar__cell {
   display: grid;
   place-items: center;
-  height: 36px;
+  height: var(--date-calendar-cell, 36px);
   padding: 0;
   border: 0;
   background: transparent;
@@ -504,7 +506,48 @@ const isActiveDay = (k: number) => k === active.value
 }
 
 .ds-date-calendar__cell--year { border-radius: var(--ds-radius-control); }
-.ds-date-calendar__cell--day { border-radius: var(--ds-radius-pill); }
+
+/* A day stays round whatever the panel's width: a square, centred in its
+   column — and in a 300px panel at md, where seven 40s and their gaps do not
+   fit (304 > 276), the square gives to the column rather than spilling. */
+.ds-date-calendar__cell--day {
+  justify-self: center;
+  width: min(var(--date-calendar-cell, 36px), 100%);
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: var(--ds-radius-pill);
+}
+
+/*
+  md follows its field as `DropdownItem` does (ADR-0153, amended): the field
+  writes at `body-lg`, so the grid reads at `label-lg` on cells 40 high — the
+  36 of `sm` × the 24 / 20 of the two line boxes, on the 4px grid. sm keeps
+  the floor's 14 on 36 (ADR-0145).
+*/
+.ds-date-calendar--md {
+  --date-calendar-cell: 40px;
+}
+
+.ds-date-calendar--md .ds-date-calendar__cell {
+  font: var(--ds-font-label-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-date-calendar--md .ds-date-calendar__cell--chosen {
+  font: var(--ds-font-label-lg-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-date-calendar--md .ds-date-calendar__title,
+.ds-date-calendar--md .ds-date-calendar__month,
+.ds-date-calendar--md .ds-date-calendar__summary-ends {
+  font: var(--ds-font-label-lg-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-date-calendar--md .ds-date-calendar__weekday {
+  font: var(--ds-font-label-lg);
+}
 
 .ds-date-calendar__cell:hover:not([aria-disabled='true']):not(.ds-date-calendar__cell--chosen) {
   background-color: var(--ds-bg-hover);

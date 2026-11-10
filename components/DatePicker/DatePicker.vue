@@ -389,6 +389,7 @@ const calendarLabels = computed(() => ({
       >
         <DateCalendar
           :granularity="granularity"
+          :size="size"
           :range="range && !many"
           :multiple="many"
           :many="manyValue"
@@ -490,7 +491,9 @@ const calendarLabels = computed(() => ({
   color: inherit;
   z-index: var(--ds-z-popover);
   box-sizing: border-box;
-  width: 300px;
+  /* The field's width, as a select's list has (ADR-0153, amended), never under
+     the 300 of the owner's frame — the grid's own floor. */
+  width: max(300px, var(--anchor-width, 300px));
   max-width: calc(100vw - 2 * var(--ds-spacing-md));
   max-height: var(--anchor-room, none);
   overflow: auto;
