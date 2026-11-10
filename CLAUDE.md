@@ -1432,6 +1432,10 @@ Before working on any component, read:
   exact ink, 8.83 / 6.70:1), legitimate under ADR-0009 on ADR-0014's ground: it counts what a **control** leads to, so
   it sits inside one, never on a statement. **`TabsItem.badgeTone`** picks a tab's badge tone (default `neutral`): a
   count of objects is `brand`, a problem keeps its tone.
+- **ADR-0150**: **a short key never folds** — `MapLegend` by category, up to **three** entries: no « +N » (« +1 » on
+  « Éligibles · Non éligibles » said one colour of two). Short of room the line gives its **spacing** (8 / 4), then its
+  **title and rule** (still in the key's name; a chip title stays), then the entries' **words**, never an entry. Past
+  three, « +N » as before. The legend watches its container, so room coming back opens it again.
 
 ## Architecture
 

@@ -149,6 +149,37 @@ export const Categorical: Story = {
 }
 
 /**
+ * ADR-0150 — **une légende courte ne se replie jamais** : jusqu’à trois entrées, aucune ne part dans « +N » — « +1 »
+ * sur « Éligibles · Non éligibles » ne disait qu’une couleur sur deux. Si la place manque, la ligne cède dans cet
+ * ordre : ses espacements (8 entre les entrées, 4 entre ses parties), puis le titre et son trait — encore lus dans le
+ * nom de la légende — puis les mots des entrées sont coupés. Le « +N » reste aux légendes longues.
+ */
+export const ShortKey: Story = {
+  name: 'Légende courte',
+  render: () => ({
+    components: { MapLegend },
+    setup: () => ({
+      two: [
+        { key: 'ok', label: 'Éligibles', color: 'var(--ds-chart-status-neutral)', value: '219' },
+        { key: 'no', label: 'Non éligibles', color: 'var(--ds-chart-status-critical)', value: '21' },
+      ],
+    }),
+    template: ground(`
+      <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+        <div v-for="w in [560, 330, 290, 230, 180]" :key="w" :style="{ width: w + 'px', display: 'flex', justifyContent: 'center' }">
+          <MapLegend title="Parcelles" :legend="two" />
+        </div>
+      </div>`),
+  }),  /* Guarded: at no width does a two-entry key fold into « +N »; the widest keeps its title, the narrowest drops it. */
+  play: async ({ canvasElement }) => {
+    const legends = [...canvasElement.querySelectorAll('.ds-map-legend')]
+    await waitFor(() => expect(legends.every((l) => !l.querySelector('.ds-map-legend__unfold'))).toBe(true))
+    await waitFor(() => expect(legends[legends.length - 1]?.classList.contains('ds-map-legend--bare')).toBe(true))
+    await expect(legends[0]?.classList.contains('ds-map-legend--bare')).toBe(false)
+  },
+}
+
+/**
  * **Symboles, replié** — le cockpit ARR : les quatre symboles ne tiennent pas dans 560 avec leurs noms (747) ; leurs
  * pastilles restent visibles dans la puce « Symboles », qui déplie le bloc sous la ligne (ADR-0138).
  */

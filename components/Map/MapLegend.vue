@@ -163,6 +163,20 @@ const chipWord = computed(() => (short.value && current.value?.shortLabel ? curr
 const sizer = ref<HTMLElement | null>(null)
 const shown = ref(Number.POSITIVE_INFINITY)
 const KEY_GAP = 12 // token-lint-disable no-literal-dimension-js — spacing-lg, ChartLegend's own gap between entries
+/*
+  A short key never folds (ADR-0150): « Éligibles · Non éligibles » with one of
+  the two in « +1 » says one colour of two, and reads as another version of the
+  map. Up to `SHORT_KEY` entries, the line gives way in this order — its
+  spacing (`tight`), then the title and its rule (`bare`, still read in the
+  key's name) — and never an entry; past that, the long key folds into « +N »
+  as before.
+*/
+const SHORT_KEY = 3
+const TIGHT_KEY_GAP = 8 // token-lint-disable no-literal-dimension-js — spacing-md, the tight key's gap
+const TIGHT_LINE_GAP = 4 // token-lint-disable no-literal-dimension-js — spacing-xs, the tight line's gap
+const tight = ref(false)
+const bare = ref(false)
+let fixedFull = 0
 function fitKeys() {
   if (!categorical.value || !root.value || !sizer.value) return
   const items = [...sizer.value.querySelectorAll<HTMLElement>('.ds-chart-legend__item')]
@@ -173,15 +187,34 @@ function fitKeys() {
   /* At its size, `--ds-width-sm` at most — and never past its container. */
   const cap = sizer.value.querySelector<HTMLElement>('.ds-map-legend__cap')?.getBoundingClientRect().width || Number.POSITIVE_INFINITY
   const max = Math.min(cap, root.value.parentElement?.clientWidth ?? cap)
-  const fixed = [...line.querySelectorAll<HTMLElement>(':scope > .ds-map-legend__word, :scope > .ds-map-legend__rule')]
-    .reduce((sum, el) => sum + el.getBoundingClientRect().width, 0)
-  const gap = parseFloat(style.columnGap) || 0
+  /* The title and its rule, measured while they show — a bare line hides them. */
+  if (!bare.value) {
+    fixedFull = [...line.querySelectorAll<HTMLElement>(':scope > .ds-map-legend__word, :scope > .ds-map-legend__rule')]
+      .reduce((sum, el) => sum + el.getBoundingClientRect().width, 0)
+  }
+  const fixed = fixedFull
+  /* The line's own gap, at rest — a tight line has a smaller one. */
+  const gap = tight.value ? 6 : parseFloat(style.columnGap) || 0 // token-lint-disable no-literal-dimension-js — spacing-sm, the line's gap at rest
   const frame = getComputedStyle(root.value)
-  const room = max - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
-    - parseFloat(frame.borderLeftWidth) - parseFloat(frame.borderRightWidth) - fixed - 2 * gap
+  const inner = max - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
+    - parseFloat(frame.borderLeftWidth) - parseFloat(frame.borderRightWidth)
+  const room = inner - fixed - 2 * gap
   const widths = items.map((el) => el.getBoundingClientRect().width)
-  const all = widths.reduce((s, w, i) => s + w + (i ? KEY_GAP : 0), 0)
-  if (all <= room) { shown.value = items.length; return }
+  const span = (keyGap: number) => widths.reduce((s, w, i) => s + w + (i ? keyGap : 0), 0)
+  const all = span(KEY_GAP)
+  /* 1px of slack: measured widths are fractional, and a line that fits to the pixel fits. */
+  if (all <= room + 1) { tight.value = false; bare.value = false; shown.value = items.length; return }
+  /* Short: the spacing gives, then the title — never an entry. A title that is
+     a chip (a choice of indicators) is a control and stays. */
+  if (items.length <= SHORT_KEY) {
+    shown.value = items.length
+    tight.value = true
+    const canBare = !choosing.value
+    bare.value = canBare && span(TIGHT_KEY_GAP) > inner - fixed - 2 * TIGHT_LINE_GAP + 1
+    return
+  }
+  tight.value = false
+  bare.value = false
   const moreW = (more?.getBoundingClientRect().width ?? 40) + gap
   let used = 0
   let n = 0
@@ -206,11 +239,16 @@ onMounted(() => {
   ro = new ResizeObserver(() => fit())
   if (root.value) ro.observe(root.value)
   if (bar.value) ro.observe(bar.value)
+  /* Its container too: a key that hugs does not grow when room comes back, so
+     only the container says a folded or bare line may open again. */
+  if (root.value?.parentElement) ro.observe(root.value.parentElement)
   document.fonts?.ready.then(fit)
 })
 onBeforeUnmount(() => ro?.disconnect())
 watch(() => [props.legend, props.title, current.value, props.ticks, props.unit], async () => {
   short.value = false
+  tight.value = false
+  bare.value = false
   await nextTick()
   fit()
 })
@@ -273,7 +311,7 @@ onBeforeUnmount(() => clearTimeout(timer))
   <div
     ref="root"
     class="ds-map-legend"
-    :class="{ 'ds-map-legend--categorical': categorical, 'ds-map-legend--open': open }"
+    :class="{ 'ds-map-legend--categorical': categorical, 'ds-map-legend--open': open, 'ds-map-legend--tight': tight, 'ds-map-legend--bare': bare }"
     :aria-busy="loading || undefined"
     @keydown="onKeydown"
   >
@@ -599,6 +637,40 @@ onBeforeUnmount(() => clearTimeout(timer))
   align-items: center;
   gap: var(--ds-spacing-lg);
   white-space: nowrap;
+}
+
+/*
+  A short key that lacks room (ADR-0150): first its spacing — the entries 8
+  apart, the line's parts 4 — then its title and rule. Past even that, the
+  entries' words are cut, never an entry dropped; the key's name keeps the
+  whole sentence.
+*/
+.ds-map-legend--tight .ds-map-legend__line {
+  gap: var(--ds-spacing-xs);
+}
+
+.ds-map-legend--tight .ds-map-legend__keys {
+  gap: var(--ds-spacing-md);
+}
+
+.ds-map-legend--bare .ds-map-legend__line > .ds-map-legend__word,
+.ds-map-legend--bare .ds-map-legend__line > .ds-map-legend__rule {
+  display: none;
+}
+
+.ds-map-legend--bare .ds-map-legend__keys {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.ds-map-legend--bare .ds-map-legend__keys :deep(.ds-chart-legend__item),
+.ds-map-legend--bare .ds-map-legend__keys :deep(.ds-chart-legend__entry) {
+  min-width: 0;
+}
+
+.ds-map-legend--bare .ds-map-legend__keys :deep(.ds-chart-legend__label) {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Out of sight and out of the scroll: a box of nothing that clips what it holds. */
