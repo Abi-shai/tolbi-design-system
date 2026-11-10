@@ -34,6 +34,8 @@ export interface DatePickerRange {
   end: DatePickerValue | null
 }
 export type DatePickerGranularity = DateGranularity
+/** Every value `v-model` can carry: a year, a day, a range, several years. */
+export type DatePickerModel = DatePickerValue | DatePickerRange | number[] | null
 
 /**
  * One component, four modes (ADR-0152, the owner's frame `4116:3094`):
@@ -52,9 +54,19 @@ export type DatePickerGranularity = DateGranularity
  */
 export interface DatePickerProps {
   /** A year (`number`), an ISO day (`string`), a `{ start, end }` range, or null. */
-  modelValue?: DatePickerValue | DatePickerRange | null
+  modelValue?: DatePickerModel
   granularity?: DatePickerGranularity
   range?: boolean
+  /**
+   * Several years, not contiguous — 2021, 2023, 2026 (ADR-0153). `granularity="year"`
+   * only; `v-model` is a `number[]`, sorted. Picked one by one in the grid and
+   * confirmed by « Valider »; the field then lists them and is not typed.
+   */
+  multiple?: boolean
+  /** The field's words while nothing is chosen, in `multiple`. */
+  multiplePlaceholder?: string
+  /** The confirm button's word, in `multiple`. */
+  confirmLabel?: string
   /** The first choosable — a year, or an ISO day. */
   min?: DatePickerValue
   /** The last choosable — a year, or an ISO day. */
@@ -81,6 +93,9 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
   modelValue: null,
   granularity: 'day',
   range: false,
+  multiple: false,
+  multiplePlaceholder: 'Choisir des années',
+  confirmLabel: 'Valider',
   min: undefined,
   max: undefined,
   locale: 'fr-FR',
@@ -98,7 +113,7 @@ const props = withDefaults(defineProps<DatePickerProps>(), {
 })
 
 const emit = defineEmits<{
-  'update:modelValue': [value: DatePickerValue | DatePickerRange | null]
+  'update:modelValue': [value: DatePickerModel]
   /** Why what is typed was refused — « Entre 2011 et 2031 » — or null once it is accepted. */
   invalid: [message: string | null]
 }>()
@@ -150,6 +165,7 @@ watch(
   () => [props.modelValue, props.granularity, props.range],
   () => {
     const v = props.modelValue
+    if (Array.isArray(v)) return
     if (props.range) {
       const r = (v && typeof v === 'object' ? v : { start: null, end: null }) as DatePickerRange
       draftStart.value = partsOf(r.start)
@@ -187,7 +203,17 @@ function same(a: unknown, b: unknown) {
   return JSON.stringify(a ?? null) === JSON.stringify(b ?? null)
 }
 
-function commit(value: DatePickerValue | DatePickerRange | null) {
+/* Several years: `multiple` takes only years (ADR-0153). */
+const many = computed(() => props.multiple && props.granularity === 'year')
+const manyValue = computed<number[]>(() => (Array.isArray(props.modelValue) ? [...props.modelValue].sort((a, b) => a - b) : []))
+const manyText = computed(() => manyValue.value.join(', '))
+
+function onPickMany(years: number[]) {
+  commit([...years].sort((a, b) => a - b))
+  close()
+}
+
+function commit(value: DatePickerModel) {
   if (!same(value, props.modelValue)) emit('update:modelValue', value)
 }
 
@@ -294,7 +320,18 @@ const calendarLabels = computed(() => ({
           :aria-describedby="field?.describedBy.value"
           :aria-invalid="field?.invalid.value || (!field && !!message) || undefined"
         >
+          <!-- Several years are listed, not typed: the grid is where they are chosen. -->
+          <button
+            v-if="many"
+            type="button"
+            class="ds-date-picker__list"
+            :class="{ 'ds-date-picker__list--empty': !manyValue.length }"
+            :disabled="isDisabled"
+            tabindex="-1"
+            @click="toggle"
+          >{{ manyValue.length ? manyText : multiplePlaceholder }}</button>
           <DateSegments
+            v-else
             ref="startSegments"
             :parts="draftStart"
             :kinds="kinds"
@@ -306,7 +343,7 @@ const calendarLabels = computed(() => ({
             @update:parts="onStart"
             @leave-end="range ? endSegments?.focus('start') : button?.focus()"
           />
-          <template v-if="range">
+          <template v-if="range && !many">
             <span class="ds-date-picker__arrow" aria-hidden="true">→</span>
             <DateSegments
               ref="endSegments"
@@ -352,7 +389,10 @@ const calendarLabels = computed(() => ({
       >
         <DateCalendar
           :granularity="granularity"
-          :range="range"
+          :range="range && !many"
+          :multiple="many"
+          :many="manyValue"
+          :confirm-label="confirmLabel"
           :start="startKey"
           :end="endKey"
           :min="minKey"
@@ -361,6 +401,7 @@ const calendarLabels = computed(() => ({
           :labels="calendarLabels"
           @pick="onPick"
           @pick-range="onPickRange"
+          @pick-many="onPickMany"
           @close="close()"
         />
       </div>
@@ -384,6 +425,30 @@ const calendarLabels = computed(() => ({
 
 /* sm is the 14/20 type, as InputField's (ADR-0108). */
 .ds-date-picker--sm .ds-date-picker__value :deep(.ds-date-segments) {
+  font: var(--ds-font-body-md);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The list of several years: the field's own type, cut at its edge. */
+.ds-date-picker__list {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: var(--ds-font-body-lg);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-strong);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.ds-date-picker__list--empty { color: var(--ds-text-placeholder); }
+
+.ds-date-picker--sm .ds-date-picker__list {
   font: var(--ds-font-body-md);
   font-variant-numeric: tabular-nums;
 }

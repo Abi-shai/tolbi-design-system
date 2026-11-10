@@ -1447,6 +1447,9 @@ Before working on any component, read:
   contour, a range = two picks with a hover preview and `bg-brand-subtle` between. Out of bounds is **refused** (model
   kept) and **`invalid`** emits the message for the `FormField` (ADR-0008). Values: year `number`, day ISO `string`,
   range `{ start, end }`.
+- **ADR-0153**: **several years, confirmed** — `DatePicker multiple` (`granularity="year"`; `v-model` a sorted
+  `number[]`): years **toggled one by one** in the grid, then **« Valider »** in a foot with the count; closing without it
+  keeps the value (a set is built in several gestures). The field **lists** them (« 2021, 2023, 2026 »), not typed.
 
 ## Architecture
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref } from 'vue'
+import { Button } from '../Button'
 import { IconButton } from '../IconButton'
 import { DropdownTrigger } from '../Dropdown'
 import {
@@ -16,6 +17,7 @@ import {
   shiftMonths,
   spanText,
   today,
+  wordsFor,
   weekdayNames,
   yearOf,
   type DateGranularity,
@@ -32,6 +34,12 @@ import {
 export interface DateCalendarProps {
   granularity: DateGranularity
   range: boolean
+  /** Several years, toggled one by one and confirmed (ADR-0153). */
+  multiple?: boolean
+  /** The years chosen, in `multiple`. */
+  many?: number[]
+  /** The confirm button's word, and the count's words. */
+  confirmLabel?: string
   /** The chosen key, or the range's two (either may be null). */
   start: number | null
   end?: number | null
@@ -51,6 +59,7 @@ const props = defineProps<DateCalendarProps>()
 const emit = defineEmits<{
   pick: [key: number]
   'pick-range': [start: number, end: number]
+  'pick-many': [years: number[]]
   close: []
 }>()
 
@@ -66,8 +75,15 @@ function clamp(k: number): number {
   return k
 }
 
-/* Where the panel opens: the value, else today, held inside the bounds. */
-const initial = clamp(props.start ?? todayKey)
+/* Where the panel opens: the value (the first of several), else today, held inside the bounds. */
+const initial = clamp(props.start ?? (props.multiple && props.many?.length ? Math.min(...props.many) : todayKey))
+
+/* Several years: a draft, confirmed by « Valider » — closing without it keeps the value (ADR-0153). */
+const draft = ref<number[]>([...(props.many ?? [])].sort((a, b) => a - b))
+function toggleMany(y: number) {
+  draft.value = draft.value.includes(y) ? draft.value.filter((v) => v !== y) : [...draft.value, y].sort((a, b) => a - b)
+}
+const draftCount = computed(() => wordsFor(props.locale).years(draft.value.length))
 
 /* ── State ──────────────────────────────────────────────────────────── */
 const view = ref<'years' | 'days'>(props.granularity === 'year' ? 'years' : 'days')
@@ -144,6 +160,7 @@ function isBetween(k: number): boolean {
 
 /* The day picker's year grid marks the month's year as chosen, nothing else. */
 function yearChosen(y: number): boolean {
+  if (props.multiple) return draft.value.includes(y)
   if (props.granularity === 'day') return y === month.value.y
   return isChosen(y)
 }
@@ -177,6 +194,10 @@ function pick(k: number) {
 
 function pickYear(y: number) {
   if (yearOut(y)) return
+  if (props.multiple) {
+    toggleMany(y)
+    return
+  }
   if (props.granularity === 'year') {
     pick(y)
     return
@@ -298,7 +319,7 @@ const isActiveDay = (k: number) => k === active.value
         <span class="ds-date-calendar__title" aria-live="polite">{{ yearsTitle }}</span>
         <IconButton size="xs" variant="subtle" icon="chevron-right" :ariaLabel="labels.nextYears" :disabled="!canNextYears" @click="pageYears(1)" />
       </div>
-      <div ref="grid" class="ds-date-calendar__years" role="grid" :aria-label="yearsTitle" @keydown="onKeydown" @mouseleave="hover = null">
+      <div ref="grid" class="ds-date-calendar__years" role="grid" :aria-label="yearsTitle" :aria-multiselectable="multiple || undefined" @keydown="onKeydown" @mouseleave="hover = null">
         <div v-for="row in 4" :key="row" class="ds-date-calendar__row" role="row">
           <button
             v-for="y in years.slice((row - 1) * 4, row * 4)"
@@ -366,6 +387,12 @@ const isActiveDay = (k: number) => k === active.value
         </div>
       </div>
     </template>
+
+    <!-- Several years: the count, and the choice confirmed — not taken on every press (ADR-0153). -->
+    <div v-if="multiple" class="ds-date-calendar__foot">
+      <span class="ds-date-calendar__count" role="status">{{ draftCount }}</span>
+      <Button variant="primary" size="sm" :label="confirmLabel ?? 'Valider'" @click="emit('pick-many', draft)" />
+    </div>
   </div>
 </template>
 
@@ -381,6 +408,20 @@ const isActiveDay = (k: number) => k === active.value
   gap: var(--ds-spacing-lg);
   padding: var(--ds-spacing-lg);
   font-family: var(--ds-typography-font-family-poppins);
+}
+
+.ds-date-calendar__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-spacing-md);
+  padding-top: var(--ds-spacing-lg);
+  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+}
+
+.ds-date-calendar__count {
+  font: var(--ds-font-body-sm);
+  color: var(--ds-text-subtle);
 }
 
 .ds-date-calendar__summary {

@@ -219,7 +219,7 @@ export type { EmptyStateSize } from './EmptyState'
 
 export { Toast, ToastRegion } from './Toast'
 export { DatePicker } from './DatePicker'
-export type { DatePickerValue, DatePickerRange, DatePickerGranularity } from './DatePicker'
+export type { DatePickerModel, DatePickerProps, DatePickerValue, DatePickerRange, DatePickerGranularity } from './DatePicker'
 export { Dialog, ConfirmDialog } from './Dialog'
 export type { ConfirmDialogConsequence, DialogPlacement, DialogSize, DialogSummaryItem } from './Dialog'
 export type { ToastTone, ToastRegionPlacement } from './Toast'

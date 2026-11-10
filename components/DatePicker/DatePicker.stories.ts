@@ -129,6 +129,47 @@ export const YearRange: Story = {
   },
 }
 
+/**
+ * ADR-0153 — **plusieurs années**, non contiguës (la création d’un projet Yield) : `multiple`, `v-model` en
+ * `number[]`. Les cellules se choisissent une à une et le choix se **valide** ; fermer sans valider garde la valeur.
+ * Le champ les liste, il ne se tape pas.
+ */
+export const ManyYears: Story = {
+  name: 'Plusieurs années',
+  render: () => ({
+    components: { DatePicker, FormField },
+    setup: () => ({ value: ref<number[]>([]), shown }),
+    template: `
+      <div style="width:300px;display:flex;flex-direction:column;gap:12px">
+        <FormField label="Années de la campagne">
+          <DatePicker v-model="value" granularity="year" multiple :min="2016" :max="2026" />
+        </FormField>
+        <span data-testid="value" style="font:var(--ds-font-body-sm);color:var(--ds-text-subtle)">Valeur : {{ shown(value) }}</span>
+      </div>
+    `,
+  }),
+  /* Guarded: three years toggled, one untoggled, confirmed; then a change closed by Escape is not kept. */
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const body = within(canvasElement.ownerDocument.body)
+    await userEvent.click(canvas.getByRole('button', { name: 'Ouvrir le calendrier' }))
+    const grid = await body.findByRole('grid', { name: '2016 – 2031' })
+    for (const y of ['2021', '2023', '2024', '2026', '2024']) await userEvent.click(within(grid).getByRole('gridcell', { name: y }))
+    await expect(body.getByRole('status')).toHaveTextContent('3 années')
+    await expect(canvas.getByTestId('value')).toHaveTextContent('[]')
+    await userEvent.click(body.getByRole('button', { name: 'Valider' }))
+    await waitFor(() => expect(canvas.getByTestId('value')).toHaveTextContent('[2021,2023,2026]'))
+    await waitFor(() => expect(body.queryByRole('grid')).toBeNull())
+    await expect(canvas.getByText('2021, 2023, 2026')).toBeVisible()
+    await userEvent.click(canvas.getByRole('button', { name: 'Ouvrir le calendrier' }))
+    const again = await body.findByRole('grid', { name: '2016 – 2031' })
+    await userEvent.click(within(again).getByRole('gridcell', { name: '2018' }))
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(body.queryByRole('grid')).toBeNull())
+    await expect(canvas.getByTestId('value')).toHaveTextContent('[2021,2023,2026]')
+  },
+}
+
 /** Une plage de jours — la même règle sur le mois : début, fin, l’intervalle teinté. */
 export const DayRange: Story = {
   name: 'Plage de jours',
