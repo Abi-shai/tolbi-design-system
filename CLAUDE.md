@@ -1440,6 +1440,13 @@ Before working on any component, read:
   words in `text-disabled`, ground, edge and geometry unmoved, **the action live** (it unmasks). Not `hidden` (the HTML
   attribute). The product turns the glyph and name (`eye` → `eye-off`, « Masquer… » → « Afficher… »); **no
   `aria-pressed`** — a changing name *or* a pressed state, never both, or the reader hears the opposite of the map.
+- **ADR-0152**: **a date picker** (the owner's `4116:3094`) — **`DatePicker`**, `granularity` (`day` | `year`) × `range`.
+  The field is **typed by segments** (`spinbutton`s, the locale's order; ↑ ↓ step, ← → cross), in **`InputField`'s box**
+  through its new **`#control` slot**; a bare 20px calendar glyph opens a **300px popover**: years **4 × 4 paged on
+  `min`**, or a six-week month whose title chip opens the same years. Chosen = brand fill, today = `border-brand`
+  contour, a range = two picks with a hover preview and `bg-brand-subtle` between. Out of bounds is **refused** (model
+  kept) and **`invalid`** emits the message for the `FormField` (ADR-0008). Values: year `number`, day ISO `string`,
+  range `{ start, end }`.
 
 ## Architecture
 

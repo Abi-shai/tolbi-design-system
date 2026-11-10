@@ -130,8 +130,15 @@ provide(FORM_FIELD_KEY, null as unknown as FormFieldContext)
           <slot name="leading-text" />
         </span>
 
+        <!--
+          A control that is not one `<input>` — `DatePicker`'s segments
+          (ADR-0152): the box, its ring, its error and its trailing slot stay
+          this component's; what is typed is the slot's, ids and all.
+        -->
+        <slot v-if="$slots.control" name="control" />
         <!-- Native input -->
         <input
+          v-else
           v-bind="$attrs"
           :id="inputId"
           class="ds-input-field__input"
