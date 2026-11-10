@@ -56,6 +56,15 @@ interface Props {
   variant?: number
   /** The box, in px. 40 in `ProjectCard`; the range is drawn at 32 and 40. */
   size?: number
+  /**
+   * How many objects the drawing stands for — a reason that set aside several
+   * parcels (ADR-0148, the owner's « Zone/Pile de parcelles »). Given, the
+   * drawing is **stacked**: one for 1, two for 2, three past that, those behind
+   * paler (0.6, 0.35) and stepped up and to the right, in a box 30 % larger so
+   * a list of piles keeps one geometry; 1 and 2 are centred in it. Absent, the
+   * single drawing in its own box, as before.
+   */
+  count?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -63,6 +72,7 @@ const props = withDefaults(defineProps<Props>(), {
   seed: undefined,
   variant: undefined,
   size: 40,
+  count: undefined,
 })
 
 /* FNV-1a: small, stable across sessions, spreads short ids well. */
@@ -86,6 +96,24 @@ const index = computed(() => {
   return 0
 })
 
+/*
+  The pile, back to front: the step is 15 % of the drawing (6px at 40), the box
+  the drawing plus two steps (52). Offsets in steps from the box's top left,
+  as drawn: one centred; two centred on the diagonal; three from corner to
+  corner.
+*/
+const LAYERS: Record<1 | 2 | 3, { x: number; y: number; opacity: number }[]> = {
+  1: [{ x: 1, y: 1, opacity: 1 }],
+  2: [{ x: 1.5, y: 0.5, opacity: 0.6 }, { x: 0.5, y: 1.5, opacity: 1 }],
+  3: [{ x: 2, y: 0, opacity: 0.35 }, { x: 1, y: 1, opacity: 0.6 }, { x: 0, y: 2, opacity: 1 }],
+}
+const step = computed(() => props.size * 0.15)
+const layers = computed(() => {
+  if (props.count === undefined) return []
+  const n = Math.min(Math.max(Math.round(props.count), 1), 3) as 1 | 2 | 3
+  return LAYERS[n]
+})
+
 const transform = computed(() => {
   const turn = (index.value % 4) * 90
   const mirror = index.value >= 4 ? ' scaleX(-1)' : ''
@@ -94,7 +122,25 @@ const transform = computed(() => {
 </script>
 
 <template>
+  <span
+    v-if="count !== undefined"
+    class="ds-project-glyph-stack"
+    aria-hidden="true"
+    :style="{ width: `${size + 2 * step}px`, height: `${size + 2 * step}px` }"
+  >
+    <img
+      v-for="(layer, i) in layers"
+      :key="i"
+      class="ds-project-glyph ds-project-glyph-stack__layer"
+      :src="src"
+      alt=""
+      :width="size"
+      :height="size"
+      :style="{ left: `${layer.x * step}px`, top: `${layer.y * step}px`, opacity: layer.opacity === 1 ? undefined : layer.opacity, transform }"
+    />
+  </span>
   <img
+    v-else
     class="ds-project-glyph"
     :src="src"
     alt=""
@@ -110,5 +156,15 @@ const transform = computed(() => {
   display: block;
   flex: none;
   object-fit: contain;
+}
+
+.ds-project-glyph-stack {
+  position: relative;
+  display: block;
+  flex: none;
+}
+
+.ds-project-glyph-stack__layer {
+  position: absolute;
 }
 </style>

@@ -99,7 +99,7 @@ export const Unfolds: Story = {
   }),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    const visible = () => [...canvasElement.querySelectorAll('.ds-option-card')].filter((c) => getComputedStyle(c.closest('.ds-alerts-block__rest') ?? c).visibility === 'visible').length
+    const visible = () => [...canvasElement.querySelectorAll('.ds-option-card')].filter((c) => getComputedStyle(c.closest('.ds-panel-block__rest') ?? c).visibility === 'visible').length
     await expect(visible()).toBe(3)
     await userEvent.click(canvasElement.querySelector('.ds-section-card__title')!)
     await waitFor(() => expect(visible()).toBe(5))

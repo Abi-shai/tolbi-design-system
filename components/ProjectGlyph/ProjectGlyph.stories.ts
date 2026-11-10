@@ -25,6 +25,7 @@ const meta: Meta<typeof ProjectGlyph> = {
     seed: { control: 'text' },
     variant: { control: { type: 'number', min: 0, max: 7 } },
     size: { control: 'number' },
+    count: { control: { type: 'number', min: 0, max: 99 } },
   },
   args: { kind: 'zone', status: 'done', size: 40 },
 }
@@ -103,6 +104,29 @@ export const InAList: Story = {
           freshness="Créé le 4 mars 2021">
           <template #zone><ProjectGlyph kind="zone" status="done" :seed="p.id" /></template>
         </ProjectCard>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * ADR-0148 — **la pile** : `count` dit combien d’objets le dessin représente — un motif qui a écarté plusieurs
+ * parcelles. Un glyphe pour 1, deux pour 2, trois au-delà ; ceux de derrière plus pâles (0,6 / 0,35), décalés en
+ * diagonale, dans une case 30 % plus grande (52 à 40) pour qu’une liste de piles garde une géométrie ; 1 et 2 y sont
+ * centrés. Le dessin du propriétaire, « Zone/Pile de parcelles ».
+ */
+export const Stack: Story = {
+  name: 'En pile',
+  render: () => ({
+    components: { ProjectGlyph },
+    template: `
+      <div style="display:grid;grid-template-columns:repeat(3,auto);gap:24px;align-items:center">
+        <ProjectGlyph kind="parcel" status="forest" :count="1" />
+        <ProjectGlyph kind="parcel" status="forest" :count="2" />
+        <ProjectGlyph kind="parcel" status="forest" :count="15" />
+        <ProjectGlyph kind="parcel" status="invalid" :count="1" />
+        <ProjectGlyph kind="parcel" status="invalid" :count="2" />
+        <ProjectGlyph kind="parcel" status="invalid" :count="6" />
       </div>
     `,
   }),

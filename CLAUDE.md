@@ -1422,6 +1422,12 @@ Before working on any component, read:
   **`--ds-bg-scrollbar`** (gray-light/500, 4.97 / 4.76:1 on page and block; dark gray-forest/400, 5.15 / 4.18) and
   **`--ds-bg-scrollbar-hover`** (600; dark 300 — further from the ground) when pointed at or held (`--held`: a captured
   pointer drops `:hover`). `bg-neutral-strong` (1.47:1) stays the slider's channel. Measured in `contrast.test.mjs`.
+- **ADR-0148**: **an eligible zone's panel** (the owner's `4058:1446`) — **`PanelBlock`** carries a hairline, always:
+  `border-subtle`, not the frame's `border-subtlest`, which *is* the block's ground in dark (1.000:1). **`ProjectGlyph
+  count`**: a pile — 1 centred, 2 on the diagonal, 3 corner to corner, behind at 0.6 / 0.35, in a box 30 % larger
+  (52 at 40). **`StatusRow :glyph="false"`**: the word alone in its tone's on-tint ink. **`PanelBlock limit`** (+
+  `seeAllLabel`, `collapseLabel`, `v-model:expanded`) owns the list that unfolds — « Tout voir (n) » → « Réduire » —
+  and `AlertsBlock` renders it (ADR-0001), 6px rows through `--panel-block-list-gap`.
 
 ## Architecture
 

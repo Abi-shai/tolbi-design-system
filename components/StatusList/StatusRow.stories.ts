@@ -58,6 +58,28 @@ export const Tones: Story = {
   }),
 }
 
+/**
+ * ADR-0148 — **sans glyphe** (`:glyph="false"`) : le mot porte seul le ton — « Oui », « Non », « À prouver ». Pour un
+ * verdict dont le mot est déjà sans ambiguïté, où une colonne de marques dirait chaque réponse deux fois : les
+ * critères d’éligibilité d’une zone.
+ */
+export const WithoutGlyph: Story = {
+  name: 'Sans glyphe',
+  render: () => ({
+    components: { StatusRow, StatusList },
+    template: `
+      <div style="width:342px">
+        <StatusList>
+          <StatusRow :glyph="false" label="Terre agricole" tone="success" status="Oui" />
+          <StatusRow :glyph="false" label="Pas une forêt il y a moins de 10 ans" tone="error" status="Non" />
+          <StatusRow :glyph="false" label="Contour valide" tone="error" status="Non" />
+          <StatusRow :glyph="false" label="Droits fonciers sur les parcelles" tone="neutral" status="À prouver" />
+        </StatusList>
+      </div>
+    `,
+  }),
+}
+
 /** Un nom long se replie ; le mot, lui, ne se coupe jamais, et le glyphe tient la première ligne. */
 export const LongLabel: Story = {
   name: 'Nom long',

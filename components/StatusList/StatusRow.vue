@@ -16,9 +16,16 @@ interface Props {
    * are two facts under one tone, so the component never writes it.
    */
   status: string
+  /**
+   * `false`: the word alone, in its tone's ink — « Oui », « Non », « À prouver »
+   * (ADR-0148). For a verdict whose word is already unambiguous, where a column
+   * of marks would say each answer twice. ADR-0006 holds: the tone still never
+   * speaks alone, the word does.
+   */
+  glyph?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), { glyph: true })
 
 /*
   The tone picks the glyph as it picks the ink — a tone never carries the
@@ -32,7 +39,7 @@ const GLYPH: Record<StatusTone, IconName> = {
   neutral: 'circle',
 }
 
-const glyph = computed(() => GLYPH[props.tone])
+const mark = computed(() => GLYPH[props.tone])
 </script>
 
 <template>
@@ -40,8 +47,8 @@ const glyph = computed(() => GLYPH[props.tone])
     <dt class="ds-status-row__label">
       <!-- In a box one line tall, so the glyph sits on the first line whether
            the name wraps or not (ADR-0065's own measure). -->
-      <span class="ds-status-row__mark" aria-hidden="true">
-        <Icon :name="glyph" :size="16" />
+      <span v-if="props.glyph" class="ds-status-row__mark" aria-hidden="true">
+        <Icon :name="mark" :size="16" />
       </span>
       <span class="ds-status-row__name">{{ label }}</span>
     </dt>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
+import { computed } from 'vue'
 import { Badge, type BadgeTone } from '../Badge'
-import { Button } from '../Button'
 import type { IconName } from '../Icon'
 import { OptionCard } from '../OptionCard'
 import { PanelBlock } from '../PanelBlock'
@@ -77,12 +76,11 @@ const TONE: Record<AlertsBlockSeverity, BadgeTone> = { blocking: 'error', watch:
 const blocking = computed(() => props.followUps.length > 0 && props.alerts.length > 0)
 /* More than the limit: the only case with something to see all of, or to unfold. */
 const more = computed(() => !blocking.value && props.alerts.length > props.limit)
-const head = computed(() => (blocking.value ? props.alerts.slice(0, 1) : props.alerts.slice(0, props.limit)))
-const rest = computed(() => (more.value ? props.alerts.slice(props.limit) : []))
+/* Blocking, its line alone; otherwise every alert — `PanelBlock`'s `limit` holds
+   the first ones and unfolds the rest (ADR-0148: the behaviour is the block's). */
+const shown = computed(() => (blocking.value ? props.alerts.slice(0, 1) : props.alerts))
 const steps = computed(() => (blocking.value ? props.followUps.slice(0, 3) : []))
-const open = computed(() => more.value && expanded.value)
 const count = computed(() => (blocking.value ? 1 : props.alerts.length))
-const restId = `ds-alerts-block-rest-${useId()}`
 
 /* A press on the block itself — not on a line, not on the button — unfolds it.
    The keyboard has the button. */
@@ -97,62 +95,38 @@ function onBlock(e: MouseEvent) {
   <div
     v-if="alerts.length"
     class="ds-alerts-block"
-    :class="{ 'ds-alerts-block--unfolds': more && !expanded, 'ds-alerts-block--open': open }"
+    :class="{ 'ds-alerts-block--unfolds': more && !expanded }"
     @click="onBlock"
   >
-    <PanelBlock :title="title" :help="help">
+    <PanelBlock
+      v-model:expanded="expanded"
+      :title="title"
+      :help="help"
+      :limit="blocking ? undefined : limit"
+      :see-all-label="seeAllLabel"
+      :collapse-label="collapseLabel"
+    >
       <template #aside><Badge :label="String(count)" tone="error" size="sm" /></template>
-      <div class="ds-alerts-block__rows">
-        <OptionCard
-          v-for="a in head"
-          :key="a.id"
-          density="row"
-          :icon="a.icon"
-          :label="a.label"
-          :meta="a.meta"
-          :badge="a.severity ? severityLabels[a.severity] : undefined"
-          :badge-tone="a.severity ? TONE[a.severity] : undefined"
-          @click="emit('select', a)"
-        />
-        <OptionCard
-          v-for="s in steps"
-          :key="`step-${s.id}`"
-          density="row"
-          :icon="s.icon"
-          :label="s.label"
-          :meta="s.meta"
-          @click="emit('select', s)"
-        />
-        <!-- The rest opens its own space (ADR-0025), and leaves the reader's way once closed. -->
-        <div v-if="rest.length" :id="restId" class="ds-alerts-block__rest">
-          <div class="ds-alerts-block__rest-inner">
-            <OptionCard
-              v-for="a in rest"
-              :key="a.id"
-              density="row"
-              :icon="a.icon"
-              :label="a.label"
-              :meta="a.meta"
-              :badge="a.severity ? severityLabels[a.severity] : undefined"
-              :badge-tone="a.severity ? TONE[a.severity] : undefined"
-              @click="emit('select', a)"
-            />
-          </div>
-        </div>
-      </div>
-      <div v-if="more" class="ds-alerts-block__foot">
-        <!-- One button, its words turning (ADR-0143, amended): it unfolds the
-             block, then says « Réduire » — not a second button beside it. -->
-        <Button
-          variant="link"
-          size="xs"
-          :icon-trailing="expanded ? 'chevron-up' : 'chevron-down'"
-          :label="expanded ? collapseLabel : `${seeAllLabel} (${alerts.length})`"
-          :aria-expanded="expanded ? 'true' : 'false'"
-          :aria-controls="restId"
-          @click="expanded = !expanded"
-        />
-      </div>
+      <OptionCard
+        v-for="a in shown"
+        :key="a.id"
+        density="row"
+        :icon="a.icon"
+        :label="a.label"
+        :meta="a.meta"
+        :badge="a.severity ? severityLabels[a.severity] : undefined"
+        :badge-tone="a.severity ? TONE[a.severity] : undefined"
+        @click="emit('select', a)"
+      />
+      <OptionCard
+        v-for="s in steps"
+        :key="`step-${s.id}`"
+        density="row"
+        :icon="s.icon"
+        :label="s.label"
+        :meta="s.meta"
+        @click="emit('select', s)"
+      />
     </PanelBlock>
   </div>
 </template>
@@ -162,47 +136,8 @@ function onBlock(e: MouseEvent) {
   cursor: pointer;
 }
 
-.ds-alerts-block__rows {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-sm);
-}
-
-/*
-  The rows past the limit: ADR-0025's `0fr → 1fr` on the element that
-  transitions. In over `enter`, the block making room; out over `exit`. Hidden
-  from a reader once closed. The 6px between rows is the rows' own gap, carried
-  inside, so a closed rest leaves none.
-*/
-.ds-alerts-block__rest {
-  display: grid;
-  grid-template-rows: 0fr;
-  margin-top: calc(-1 * var(--ds-spacing-sm));
-  visibility: hidden;
-  transition:
-    grid-template-rows var(--ds-motion-duration-exit) var(--ds-motion-easing-in),
-    visibility 0s linear var(--ds-motion-duration-exit);
-}
-
-.ds-alerts-block--open .ds-alerts-block__rest {
-  grid-template-rows: 1fr;
-  visibility: visible;
-  transition:
-    grid-template-rows var(--ds-motion-duration-enter) var(--ds-motion-easing-out),
-    visibility 0s;
-}
-
-.ds-alerts-block__rest-inner {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-sm);
-  min-height: 0;
-  padding-top: var(--ds-spacing-sm);
-  overflow: hidden;
-}
-
-.ds-alerts-block__foot {
-  display: flex;
-  align-items: center;
+/* Its 40px rows sit 6 apart (ADR-0143) — `PanelBlock`'s list gap, switched. */
+.ds-alerts-block {
+  --panel-block-list-gap: var(--ds-spacing-sm);
 }
 </style>
