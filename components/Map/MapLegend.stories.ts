@@ -15,13 +15,13 @@ const meta: Meta<typeof MapLegend> = {
         component:
           'La **légende d’une carte** en mode SIG, **sur une ligne, dans la grammaire de la frise** (ADR-0137, piste A ' +
           'de `3919:1427`) : une puce qui choisit, un trait, les valeurs. La même pilule que `MapTimeline` — même puce, ' +
-          'même trait, même hauteur, **480 px** — : en haut de la carte ce qu’elle montre, en bas quand.\n\n' +
+          'même trait, même hauteur, **560 px** — : en haut de la carte ce qu’elle montre, en bas quand.\n\n' +
           '- **La puce nomme l’indicateur** et, avec deux `metrics` ou plus, le choisit (`v-model:metric`) ; son menu ' +
           'montre pour chacun le nom, l’unité et un aperçu de sa rampe. Le titre n’est plus répété.\n' +
           '- **L’échelle sur une ligne** : borne basse, rampe, borne haute, unité. Les crans du milieu ne sont plus écrits, ' +
-          'ils sont lus (`summary`). **La ligne fait toujours 480 et la rampe est sa seule part élastique** ; sous 120 px ' +
+          'ils sont lus (`summary`). **La ligne fait toujours 560 et la rampe est sa seule part élastique** ; sous 120 px ' +
           'de rampe, la puce prend le nom court (`shortLabel`).\n' +
-          '- **Par catégories** : les clés après le trait, à leur taille jusqu’à 480 ; au-delà, « +N ».\n' +
+          '- **Par catégories** : les clés après le trait, à leur taille jusqu’à 560 ; au-delà, « +N ».\n' +
           '- **Rampe et symboles** : une puce « Symboles » en fin de ligne, leurs noms dans son panneau.',
       },
     },
@@ -47,7 +47,7 @@ const SCALES: Record<string, { title: string; unit: string; ticks: string[] }> =
   height: { title: 'Hauteur de canopée', unit: 'm', ticks: ['0', '15', '30'] },
 }
 
-/** Au repos : la puce nomme l’indicateur choisi, puis la rampe entre ses deux bornes et son unité. 480 × 48. */
+/** Au repos : la puce nomme l’indicateur choisi, puis la rampe entre ses deux bornes et son unité. 560 × 48. */
 export const Rest: Story = {
   name: 'Au repos',
   render: () => ({
@@ -84,7 +84,7 @@ export const MenuOpen: Story = {
 }
 
 /**
- * **En attente, puis sans mesure** : la pilule est à 480 dès le clic, la puce lisible, la rampe aux couleurs de
+ * **En attente, puis sans mesure** : la pilule est à 560 dès le clic, la puce lisible, la rampe aux couleurs de
  * l’indicateur ; bornes et unité en squelettes (ADR-0122). Sans mesure, les bornes sont « — » et l’unité tombe
  * (ADR-0105).
  */
@@ -126,7 +126,7 @@ const PARTS = [
 
 /**
  * **Par catégories** (ADR-0129) : rien à choisir, le mot nomme ce qui est coloré, les clés suivent le trait. À sa
- * taille, 480 au plus ; au-delà, les dernières clés passent dans une puce « +N » dont le panneau les liste.
+ * taille, 560 au plus ; au-delà, les dernières clés passent dans une puce « +N » dont le panneau les liste.
  */
 export const Categorical: Story = {
   name: 'Par catégories',
@@ -149,7 +149,7 @@ export const Categorical: Story = {
 }
 
 /**
- * **Symboles, replié** — le cockpit ARR : les quatre symboles ne tiennent pas dans 480 avec leurs noms (747) ; leurs
+ * **Symboles, replié** — le cockpit ARR : les quatre symboles ne tiennent pas dans 560 avec leurs noms (747) ; leurs
  * pastilles restent visibles dans la puce « Symboles », qui déplie le bloc sous la ligne (ADR-0138).
  */
 export const Symbols: Story = {
@@ -170,7 +170,7 @@ export const Symbols: Story = {
 
 /**
  * **Le pire cas, et le nom court** : « Couverture forestière » avec « 1 250 ha » laisse encore ~200 px de rampe dans
- * 480. Plus étroite (ici 360), la rampe passerait sous 120 px : la puce prend le nom court, « Couvert ».
+ * 560. Plus étroite (ici 360), la rampe passerait sous 120 px : la puce prend le nom court, « Couvert ».
  */
 export const WorstCase: Story = {
   name: 'Pire cas et nom court',

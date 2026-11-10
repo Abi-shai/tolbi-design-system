@@ -125,7 +125,7 @@ export const OnAMap: Story = {
 /**
  * L’écran SIG, placé comme les cadres retenus de l’ARR (Figma section 15, carte de 1424 × 828) — ADR-0103 :
  * le panneau de lecture sur **tout le bord gauche** (`MapOverlay position="start"`, 400 px, 16 px du haut et du
- * bas), la **légende en haut** et la **frise en bas**, centrées sur un même axe de 480 px, le **navigateur en haut à
+ * bas), la **légende en haut** et la **frise en bas**, centrées sur un même axe de 560 px, le **navigateur en haut à
  * droite**. Un point ouvre sa bulle. Chaque pièce est vivante ; le fond tient lieu d’imagerie.
  */
 export const GisScreen: Story = {

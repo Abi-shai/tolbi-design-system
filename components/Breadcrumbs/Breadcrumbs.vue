@@ -275,7 +275,7 @@ function leave(): void {
   /* The glyph and its word are one unit; the padding is a crumb's, so the row
      is even from the first node to the last. */
   gap: var(--ds-spacing-xs, 4px);
-  padding: var(--ds-spacing-xs, 4px) var(--ds-spacing-md, 8px);
+  padding: var(--ds-spacing-xxs, 2px) var(--ds-spacing-md, 8px);
   font: var(--ds-font-label-lg);
   white-space: nowrap;
   background: transparent;
@@ -317,7 +317,7 @@ function leave(): void {
   /* `block`, not `flex`: text-overflow has no effect on a flex container. */
   display: block;
   max-width: var(--breadcrumb-label-max);
-  padding: var(--ds-spacing-xs, 4px) var(--ds-spacing-md, 8px);
+  padding: var(--ds-spacing-xxs, 2px) var(--ds-spacing-md, 8px);
   border-radius: var(--ds-radius-inner);
   font: var(--ds-font-label-lg);
   color: var(--ds-text-subtle);

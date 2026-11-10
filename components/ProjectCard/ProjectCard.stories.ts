@@ -140,7 +140,7 @@ const DMRV = {
 }
 
 const frame = (inner: string) =>
-  `<div style="width: 280px; display: flex;">${inner}</div>`
+  `<div style="width: 320px; display: flex;">${inner}</div>`
 
 /** Yield : le bloc du bas est une progression — 2 stades sur 4, de gauche à droite. */
 export const Yield: Story = {
@@ -204,7 +204,7 @@ export const States: Story = {
     components: { ProjectCard },
     setup: () => ({ args: YIELD }),
     template: `
-      <div style="display: grid; grid-template-columns: repeat(4, 280px); gap: var(--ds-spacing-xl);">
+      <div style="display: grid; grid-template-columns: repeat(4, 320px); gap: var(--ds-spacing-xl);">
         <ProjectCard v-bind="args" state="planned"
           :metrics="[{ label: 'Rendement', value: '—' }, { label: 'Production', value: '—' }]"
           stageLabel="Démarre le 15 juin 2026" :stage="[]" />
@@ -229,7 +229,7 @@ export const Modules: Story = {
     components: { ProjectCard, Sparkline, ProjectGlyph },
     setup: () => ({ y: YIELD, s: SCAN, d: DMRV, INSIGHT_HEAD, up: [0.31, 0.32, 0.34, 0.33, 0.36, 0.38, 0.39, 0.41, 0.42, 0.44], ref: [0.31, 0.31, 0.32, 0.32, 0.32, 0.33, 0.33, 0.33, 0.34, 0.34] }),
     template: `
-      <div style="display: grid; grid-template-columns: repeat(4, 280px); gap: var(--ds-spacing-xl); align-items: stretch;">
+      <div style="display: grid; grid-template-columns: repeat(4, 320px); gap: var(--ds-spacing-xl); align-items: stretch;">
         <ProjectCard v-bind="y" />
         <ProjectCard v-bind="s" />
         <ProjectCard state="done" status="À jour" title="Soubré — cacao agroforestier"
@@ -279,7 +279,7 @@ export const ModuleMark: Story = {
     components: { ProjectCard },
     setup: () => ({ y: YIELD, s: SCAN }),
     template: `
-      <div style="display: grid; grid-template-columns: repeat(3, 280px); gap: var(--ds-spacing-xl);">
+      <div style="display: grid; grid-template-columns: repeat(3, 320px); gap: var(--ds-spacing-xl);">
         <ProjectCard v-bind="y" />
         <ProjectCard v-bind="s" />
         <ProjectCard v-bind="y" :module="undefined" title="Rendement Arachide Nord" />
@@ -307,7 +307,7 @@ export const Baseline: Story = {
       ref: [0.31, 0.31, 0.32, 0.32, 0.32, 0.33, 0.33, 0.33, 0.34, 0.34],
     }),
     template: `
-      <div style="display: grid; grid-template-columns: repeat(3, 280px); gap: var(--ds-spacing-xl); align-items: stretch;">
+      <div style="display: grid; grid-template-columns: repeat(3, 320px); gap: var(--ds-spacing-xl); align-items: stretch;">
         <ProjectCard state="done" status="À jour" title="Soubré — cacao agroforestier"
           :meta="[{ icon: 'map-pin', label: 'Soubré · référence 2026' }]"
           :metrics="[{ label: 'Part créditable', value: '86', unit: '%' }, { label: 'Crédits estimés', value: '65 762', unit: 'tCO2e' }]"
@@ -365,7 +365,7 @@ export const Dmrv: Story = {
     components: { ProjectCard, Sparkline, ProjectGlyph },
     setup: () => ({ d: DMRV, INSIGHT_HEAD }),
     template: `
-      <div style="display: grid; grid-template-columns: repeat(4, 280px); gap: var(--ds-spacing-xl); align-items: stretch;">
+      <div style="display: grid; grid-template-columns: repeat(4, 320px); gap: var(--ds-spacing-xl); align-items: stretch;">
         <ProjectCard v-bind="d.card" state="done" status="Suivi à jour">
           <template #zone><ProjectGlyph kind="zone" status="done" seed="fph-cacao" /></template>
           <template #insight>
@@ -417,7 +417,7 @@ export const ActionMenu: Story = {
     setup: () => ({ d: DMRV, INSIGHT_HEAD, chosen: { value: '—' } }),
     template: `
       <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-xl); padding-bottom:160px;">
-        <div style="width: 280px; display: flex;">
+        <div style="width: 320px; display: flex;">
           <ProjectCard v-bind="d.card" state="done" status="Suivi à jour" href="#" style="width:100%;">
             <template #zone><ProjectGlyph kind="zone" status="done" seed="fph-cacao" /></template>
             <template #insight>

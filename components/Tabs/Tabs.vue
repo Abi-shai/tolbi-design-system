@@ -233,12 +233,16 @@ function onKeydown(e: KeyboardEvent, i: number) {
   flex: none;
 }
 
+/* One role down from where they were, so the type stays put while the roles
+   grow (ADR-0144): md is 16 — a tab is a button's size, `heading-md` went to
+   18 — and sm is the floor, 14, or a `MapPanel lg`'s head (328px) cuts
+   « Données · Parcelles 128 · Rapport » it held whole at 14. */
 .ds-tabs--md .ds-tabs__label {
-  font: var(--ds-font-heading-md);
+  font: var(--ds-font-heading-sm);
 }
 
 .ds-tabs--sm .ds-tabs__label {
-  font: var(--ds-font-heading-sm);
+  font: var(--ds-font-label-md-strong);
 }
 
 .ds-tabs--xs .ds-tabs__label {

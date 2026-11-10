@@ -131,7 +131,12 @@ const emit = defineEmits<{
   gap: var(--ds-spacing-md);
   flex: 1;
   min-width: 0;
-  padding: 10px 10px 10px var(--ds-spacing-md);
+  /* 46px a row, the md field's height (ADR-0101): `body-lg`'s 28px line where a
+     supporting text sits beside the label, 8px above and below, the 1px gaps.
+     A label alone has a 24px line, so the floor holds it (ADR-0144). */
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: var(--ds-spacing-md) 10px var(--ds-spacing-md) var(--ds-spacing-md);
   border-radius: var(--ds-radius-inner);
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
@@ -241,11 +246,12 @@ const emit = defineEmits<{
   min-width: 0;
 }
 
-/* sm (ADR-0101): the row is the `sm` field's height — 38px: `label-lg`'s 20px
-   line, 8px above and below, and the row's 1px gap. One step down in type,
-   as the field is. */
+/* sm (ADR-0101): the row is the `sm` field's height — 38px: `label-lg`'s 24px
+   line, 6px above and below, and the row's 1px gap. One step down in type,
+   as the field is (ADR-0144: the line grew from 20, the inset gave). */
 .ds-dropdown-select-item--sm .ds-dropdown-select-item__content {
-  padding: var(--ds-spacing-md) 10px var(--ds-spacing-md) var(--ds-spacing-md);
+  min-height: 0;
+  padding: var(--ds-spacing-sm) 10px var(--ds-spacing-sm) var(--ds-spacing-md);
 }
 
 .ds-dropdown-select-item--sm .ds-dropdown-select-item__label {

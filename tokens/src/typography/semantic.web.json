@@ -11,44 +11,39 @@
       "$description": "Page title (PageHeader, ADR-0051), section heading, modal/drawer title"
     },
     "heading-md": {
-      "$value": "{typography.font-size.16}",
+      "$value": "{typography.font-size.18}",
       "$type": "dimension",
-      "$description": "Card title, list-group header"
+      "$description": "Card title, list-group header. 18/24 since ADR-0144 (+2 to stay above the 16px body)"
     },
     "heading-sm": {
-      "$value": "{typography.font-size.14}",
-      "$type": "dimension",
-      "$description": "Dense sub-headers, table column headers"
-    },
-    "body-lg": {
       "$value": "{typography.font-size.16}",
       "$type": "dimension",
-      "$description": "Long-form on web"
+      "$description": "Dense sub-headers, table column headers. 16/24 since ADR-0144"
+    },
+    "body-lg": {
+      "$value": "{typography.font-size.18}",
+      "$type": "dimension",
+      "$description": "Long-form on web; a form field's value at md. 18/28 since ADR-0144"
     },
     "body-md": {
-      "$value": "{typography.font-size.14}",
+      "$value": "{typography.font-size.16}",
       "$type": "dimension",
-      "$description": "Default body on web. Table cells, form values"
+      "$description": "Default body on web — 16/24 since ADR-0144 (was 14/20). Table cells, form values"
     },
     "body-sm": {
-      "$value": "{typography.font-size.12}",
-      "$type": "dimension",
-      "$description": "Helper text, timestamps, tooltips"
-    },
-    "label-lg": {
       "$value": "{typography.font-size.14}",
       "$type": "dimension",
-      "$description": "Buttons, tabs, nav items"
+      "$description": "The reading floor — 14/20 since ADR-0144 (was 12/16): no read text under 14px. Helper text, timestamps, tooltips"
+    },
+    "label-lg": {
+      "$value": "{typography.font-size.16}",
+      "$type": "dimension",
+      "$description": "Buttons, tabs, nav items. 16/24 since ADR-0144"
     },
     "label-md": {
-      "$value": "{typography.font-size.12}",
+      "$value": "{typography.font-size.14}",
       "$type": "dimension",
-      "$description": "Field labels, chips, badges"
-    },
-    "label-xs": {
-      "$value": "{typography.font-size.11}",
-      "$type": "dimension",
-      "$description": "Deprecated (ADR-0132): no read text under 12px — use body-sm. Kept for products that still name it. Tab-bar labels, chart axes. Floor — never content"
+      "$description": "Field labels, chips, badges, table headers. 14/20 since ADR-0144 — the floor"
     },
     "metric-lg": {
       "$value": "{typography.font-size.32}",
@@ -56,9 +51,9 @@
       "$description": "Dashboard KPI values. Needs tabular-nums"
     },
     "code-md": {
-      "$value": "{typography.font-size.13}",
+      "$value": "{typography.font-size.14}",
       "$type": "dimension",
-      "$description": "IDs, API keys, snippets"
+      "$description": "IDs, API keys, snippets. 14/20 since ADR-0144 — the reading floor applies to code too"
     },
     "metric-xl": {
       "$value": "{typography.font-size.40}",
@@ -66,37 +61,37 @@
       "$description": "Dashboard hero KPI. Needs tabular-nums"
     },
     "body-lg-emphasis": {
-      "$value": "{typography.font-size.16}",
+      "$value": "{typography.font-size.18}",
       "$type": "dimension",
       "$description": "body-lg raised to medium — ADR-0011"
     },
     "body-md-emphasis": {
-      "$value": "{typography.font-size.14}",
+      "$value": "{typography.font-size.16}",
       "$type": "dimension",
       "$description": "body-md raised to medium — ADR-0011"
     },
     "body-sm-emphasis": {
-      "$value": "{typography.font-size.12}",
+      "$value": "{typography.font-size.14}",
       "$type": "dimension",
       "$description": "body-sm raised to medium — ADR-0011"
     },
     "label-xl": {
-      "$value": "{typography.font-size.16}",
+      "$value": "{typography.font-size.18}",
       "$type": "dimension",
-      "$description": "Large control labels — Button lg/xl, 16px form labels. Added by ADR-0011"
+      "$description": "Large control labels — Button lg/xl. 18/24 since ADR-0144: +2 so it stays above label-lg (16)"
     },
     "label-md-strong": {
-      "$value": "{typography.font-size.12}",
+      "$value": "{typography.font-size.14}",
       "$type": "dimension",
       "$description": "label-md raised to semibold — buttons, triggers, tooltip titles"
     },
     "label-lg-strong": {
-      "$value": "{typography.font-size.14}",
+      "$value": "{typography.font-size.16}",
       "$type": "dimension",
       "$description": "label-lg raised to semibold — buttons, triggers, tooltip titles"
     },
     "label-xl-strong": {
-      "$value": "{typography.font-size.16}",
+      "$value": "{typography.font-size.18}",
       "$type": "dimension",
       "$description": "label-xl raised to semibold — buttons, triggers, tooltip titles"
     }
@@ -115,31 +110,27 @@
       "$type": "dimension"
     },
     "heading-sm": {
-      "$value": "{typography.line-height.20}",
-      "$type": "dimension"
-    },
-    "body-lg": {
       "$value": "{typography.line-height.24}",
       "$type": "dimension"
     },
+    "body-lg": {
+      "$value": "{typography.line-height.28}",
+      "$type": "dimension"
+    },
     "body-md": {
-      "$value": "{typography.line-height.20}",
+      "$value": "{typography.line-height.24}",
       "$type": "dimension"
     },
     "body-sm": {
-      "$value": "{typography.line-height.16}",
-      "$type": "dimension"
-    },
-    "label-lg": {
       "$value": "{typography.line-height.20}",
       "$type": "dimension"
     },
-    "label-md": {
-      "$value": "{typography.line-height.16}",
+    "label-lg": {
+      "$value": "{typography.line-height.24}",
       "$type": "dimension"
     },
-    "label-xs": {
-      "$value": "{typography.line-height.16}",
+    "label-md": {
+      "$value": "{typography.line-height.20}",
       "$type": "dimension"
     },
     "metric-lg": {
@@ -155,15 +146,15 @@
       "$type": "dimension"
     },
     "body-lg-emphasis": {
-      "$value": "{typography.line-height.24}",
+      "$value": "{typography.line-height.28}",
       "$type": "dimension"
     },
     "body-md-emphasis": {
-      "$value": "{typography.line-height.20}",
+      "$value": "{typography.line-height.24}",
       "$type": "dimension"
     },
     "body-sm-emphasis": {
-      "$value": "{typography.line-height.16}",
+      "$value": "{typography.line-height.20}",
       "$type": "dimension"
     },
     "label-xl": {
@@ -171,11 +162,11 @@
       "$type": "dimension"
     },
     "label-md-strong": {
-      "$value": "{typography.line-height.16}",
+      "$value": "{typography.line-height.20}",
       "$type": "dimension"
     },
     "label-lg-strong": {
-      "$value": "{typography.line-height.20}",
+      "$value": "{typography.line-height.24}",
       "$type": "dimension"
     },
     "label-xl-strong": {
@@ -218,10 +209,6 @@
       "$type": "dimension"
     },
     "label-md": {
-      "$value": "{typography.letter-spacing.none}",
-      "$type": "dimension"
-    },
-    "label-xs": {
       "$value": "{typography.letter-spacing.none}",
       "$type": "dimension"
     },
@@ -304,10 +291,6 @@
       "$description": "Label/lg strong raises this to semibold"
     },
     "label-md": {
-      "$value": "{typography.font-weight.medium}",
-      "$type": "fontWeight"
-    },
-    "label-xs": {
       "$value": "{typography.font-weight.medium}",
       "$type": "fontWeight"
     },

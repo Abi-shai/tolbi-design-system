@@ -89,9 +89,12 @@ const arrow = computed(() =>
   white-space: nowrap;
 }
 
+/* The unit is set by its figure, and the figures did not grow (ADR-0144): so
+   it holds its 14px by taking the role a step down — at 16 « 28 940 tCO2e »
+   ran 2px out of a 2 × 2 tile in a reading panel. */
 .ds-metric__unit {
   margin-left: 0.25em;
-  font: var(--ds-font-body-md);
+  font: var(--ds-font-body-sm);
   line-height: 1;
   color: var(--ds-text-subtle);
 }
@@ -113,8 +116,9 @@ const arrow = computed(() =>
   font: var(--ds-font-heading-lg);
 }
 .ds-metric--lg .ds-metric__value { font: var(--ds-font-metric-xl); letter-spacing: var(--ds-letter-spacing-metric-xl); }
-/* The unit grows with its figure (ADR-0132): 14px beside 40 read as a footnote. */
-.ds-metric--lg .ds-metric__unit { font: var(--ds-font-body-lg); line-height: 1; }
+/* The unit grows with its figure (ADR-0132): 14px beside 40 read as a footnote.
+   16px, held by a role a step down since ADR-0144 (body-lg went to 18). */
+.ds-metric--lg .ds-metric__unit { font: var(--ds-font-body-md); line-height: 1; }
 
 /*
  * Deliberately no brand-surface variant. The metric is only supported on the

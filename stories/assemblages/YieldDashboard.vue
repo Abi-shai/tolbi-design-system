@@ -300,9 +300,9 @@ const forecast = [
   background-color: var(--ds-bg-brand-solid);
   color: var(--ds-text-on-brand-solid);
   font-family: var(--ds-typography-font-family-mono);
-  font-size: var(--ds-font-size-label-xs);
+  font-size: var(--ds-font-size-body-sm);
   line-height: 1;
-  font-weight: var(--ds-font-weight-label-xs);
+  font-weight: var(--ds-font-weight-body-sm);
   pointer-events: none;
 }
 
@@ -331,7 +331,7 @@ const forecast = [
   background-color: var(--ds-bg-brand-solid);
   color: var(--ds-text-on-brand-solid);
   font-family: var(--ds-typography-font-family-mono);
-  font-size: var(--ds-font-size-label-xs);
+  font-size: var(--ds-font-size-body-sm);
   line-height: 1;
 }
 

@@ -1395,6 +1395,15 @@ Before working on any component, read:
   `see-all`; a press on the block unfolds too, `v-model:expanded`), a blocking alert = its line + `followUps`, no alert = nothing rendered, rows emit `select`;
   **`--ds-chart-status-critical/-warning/-neutral`** (+ `chartStatus`) for map outlines — no step clears 3:1 on both
   basemap and imagery, so a casing on imagery.
+- **ADR-0144**: **a reading floor of 14, a body of 16** (etolbi, accessibility) — desktop roles `body-sm`/`label-md`
+  12/16 → **14/20**, `body-md`/`label-lg` 14/20 → **16/24**, `body-lg` 18/28, `label-xl` 18/24, `heading-sm` 16/24,
+  `heading-md` 18/24, `code-md` 14/20; headings lg/xl and metrics unchanged; **`label-xs` deleted**. **A control holds
+  its height, the padding gives**: `control-padding` xs 2/10, sm 6/12, md 8/14, and the components' own insets — every
+  Button, field, trigger, segment, tab, menu row, nav row, crumb, Tag measured unchanged. Where a component sets text
+  beside what did not grow, it takes the role a step down (`Badge md`, `Tabs`, `MetricValue`'s unit, Tolbi AI's title,
+  `--reading-secondary-font` back to `body-sm`); where a width was drawn for 14px text it moves by 16/14
+  (`ProjectCard` 20em, `ModuleCapsule` 296/344, `MapLegend`/`MapTimeline` on `--ds-width-md`, 560). 301 of 642 stories
+  change height, all in text. Mobile untouched — now under the floor.
 
 ## Architecture
 

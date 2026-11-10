@@ -134,7 +134,9 @@ function onTagClick() {
   display: inline-flex;
   align-items: center;
   gap: var(--ds-spacing-xs);
-  padding: 3px var(--ds-spacing-md);
+  /* 24px with the border: `label-md`'s 20px line and 1px above and below —
+     the type grew to 14/20 and the tag held its height (ADR-0144). */
+  padding: 1px var(--ds-spacing-md);
   background-color: var(--ds-bg-default);
   border: var(--ds-border-width-default) solid var(--ds-border-default);
   border-radius: var(--ds-radius-inner);
@@ -147,10 +149,10 @@ function onTagClick() {
 
 /* ── Sizes ────────────────────────────────────────────────────────── */
 .ds-tag--md {
-  padding: 3px 10px;
+  padding: 1px 10px;
 }
 .ds-tag--lg {
-  padding: var(--ds-spacing-xs) 10px;
+  padding: var(--ds-spacing-xxs) 10px;
   font: var(--ds-font-label-lg);
 }
 

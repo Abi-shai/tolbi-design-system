@@ -1031,7 +1031,15 @@ onUnmounted(() => {
    what does not fit is « +N ». The box takes its ring from what it holds. */
 .ds-input-dropdown__trigger--multiple {
   position: relative;
+  /* The field's height, declared: its tags (24px) are lower than the
+     placeholder's `body-lg` line (28px since ADR-0144), and a field that
+     shrank as the first choice arrived would move the form under it. */
+  min-height: 46px;
   cursor: pointer;
+}
+
+.ds-input-dropdown--sm .ds-input-dropdown__trigger--multiple {
+  min-height: 38px;
 }
 
 .ds-input-dropdown__trigger--multiple:focus-within {

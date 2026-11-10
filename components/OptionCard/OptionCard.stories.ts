@@ -145,7 +145,7 @@ export const OneLine: Story = {
       ],
     }),
     template: `
-      <div style="width:23rem;--reading-secondary-font:var(--ds-font-body-md)">
+      <div style="width:23rem">
         <OptionList v-model="parcel" layout="stack" aria-label="Parcelles">
           <OptionCard v-for="p in parcels" :key="p.code" :value="p.code" :label="p.code" :description="p.who" :meta="p.ha" :description-lines="1" />
         </OptionList>

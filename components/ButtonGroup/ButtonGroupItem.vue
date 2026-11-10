@@ -89,7 +89,9 @@ function handleClick(event: MouseEvent) {
   justify-content: center;
   gap: 0;
   min-height: 32px;
-  padding: var(--ds-spacing-sm) var(--ds-spacing-lg);
+  /* 4 + the 24px line of `label-lg-strong` = 32: the type grew, the inset gave
+     (ADR-0144). */
+  padding: var(--ds-spacing-xs) var(--ds-spacing-lg);
   border: none;
   border-radius: var(--ds-radius-inner);
   background-color: transparent;
@@ -111,15 +113,16 @@ function handleClick(event: MouseEvent) {
 
 .ds-button-group-item--leading-icon {
   gap: var(--ds-spacing-md);
-  padding: var(--ds-spacing-sm) var(--ds-spacing-lg) var(--ds-spacing-sm) var(--ds-spacing-md);
+  padding: var(--ds-spacing-xs) var(--ds-spacing-lg) var(--ds-spacing-xs) var(--ds-spacing-md);
 }
 
 /* ── sm ────────────────────────────────────────────────────────────── */
 /* 28px, so the rail is 38 — an sm field's height. The type does not shrink
-   (it is the field's 14px); the inset does, and the glyph goes 20 → 16. */
+   (it is the field's 16px since ADR-0144); the inset does, and the glyph goes
+   20 → 16. */
 .ds-button-group-item--sm {
   min-height: 28px;
-  padding: var(--ds-spacing-xs) var(--ds-spacing-md);
+  padding: var(--ds-spacing-xxs) var(--ds-spacing-md);
   border-radius: var(--ds-radius-inner-sm);
 }
 
@@ -129,7 +132,7 @@ function handleClick(event: MouseEvent) {
 
 .ds-button-group-item--sm.ds-button-group-item--leading-icon {
   gap: var(--ds-spacing-sm);
-  padding: var(--ds-spacing-xs) var(--ds-spacing-md) var(--ds-spacing-xs) var(--ds-spacing-sm);
+  padding: var(--ds-spacing-xxs) var(--ds-spacing-md) var(--ds-spacing-xxs) var(--ds-spacing-sm);
 }
 
 /* ── States ───────────────────────────────────────────────────────── */

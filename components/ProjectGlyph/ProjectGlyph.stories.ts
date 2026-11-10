@@ -96,7 +96,7 @@ export const InAList: Story = {
       ],
     }),
     template: `
-      <div style="display:grid;grid-template-columns:repeat(3, 280px);gap:var(--ds-spacing-xl);">
+      <div style="display:grid;grid-template-columns:repeat(3, 320px);gap:var(--ds-spacing-xl);">
         <ProjectCard v-for="p in projects" :key="p.id" state="done" status="Suivi à jour" :title="p.title"
           :meta="[{ icon: 'map-pin', label: p.place }]"
           :metrics="[{ label: 'Gain carbone', value: '3 120', unit: 'tCO2e' }, { label: 'Surface suivie', value: '236', unit: 'ha' }]"

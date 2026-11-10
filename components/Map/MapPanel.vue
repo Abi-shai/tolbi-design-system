@@ -323,10 +323,12 @@ function focusArrived() {
 */
 .ds-map-panel--lg {
   /* A reading panel (ADR-0132): the text that explains a figure is read here,
-     beside figures of 32–40px, and there is room — 14px instead of 12. Read by
+     beside figures of 32–40px, at 14px — which since ADR-0144 is the floor,
+     `body-sm`, everywhere: the raise this context existed for is the scale's
+     own now, and `body-md` (16) would set a caption at the body's size. Read by
      ShareBar, StatTile, OptionCard and ChartLegend; a ProjectCard resets it. */
-  --reading-secondary-font: var(--ds-font-body-md);
-  --reading-secondary-font-emphasis: var(--ds-font-body-md-emphasis);
+  --reading-secondary-font: var(--ds-font-body-sm);
+  --reading-secondary-font-emphasis: var(--ds-font-body-sm-emphasis);
   --reading-legend-wrap: wrap;
   --reading-legend-fade: none;
   width: 25rem;

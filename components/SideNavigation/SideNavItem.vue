@@ -169,11 +169,12 @@ function handleClick(event: MouseEvent) {
    width *is* that row, which is how the token derives the rail in the first
    place. What changes here is what a transition can follow — the padding
    tightening to `spacing-md` and the gap closing, which is what walks the glyph
-   to the middle. Height never moves: 8 + 20 + 8 in both forms. */
+   to the middle. Height never moves: 6 + 24 + 6 in both forms — the label's
+   line box still stands at zero width (ADR-0144: 16/24, was 8 + 20 + 8). */
 .ds-side-nav-item--collapsed .ds-side-nav-item__control {
   justify-content: center;
   gap: 0;
-  padding: var(--ds-spacing-md);
+  padding: var(--ds-spacing-sm) var(--ds-spacing-md);
 }
 
 .ds-side-nav-item__icon {

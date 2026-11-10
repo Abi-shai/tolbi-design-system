@@ -1,16 +1,16 @@
 {
   "control-padding": {
     "xs": {
-      "$value": "{space.1} {space.2-5}",
-      "$description": "4px 10px — 24px control. The smallest text control, riding inside a composite rather than in a bar of its own — the Tolbi AI composer's « Arrêter » (ADR-0059). Label-md-strong's 16px line box; 26px rendered with its border (ADR-0033)"
+      "$value": "{space.0-5} {space.2-5}",
+      "$description": "2px 10px — 24px control. The smallest text control, riding inside a composite rather than in a bar of its own — the Tolbi AI composer's « Arrêter » (ADR-0059). Label-md-strong's 20px line box since ADR-0144 (was 4px around 16); 26px rendered with its border (ADR-0033)"
     },
     "sm": {
-      "$value": "{space.2} {space.3}",
-      "$description": "8px 12px — 36px control"
+      "$value": "{space.1-5} {space.3}",
+      "$description": "6px 12px — 36px control. ADR-0144: the type grew (label-lg / body-md 16/24) and the height held — the padding gives (was 8px around a 20px line box)"
     },
     "md": {
-      "$value": "{space.2-5} {space.3-5}",
-      "$description": "10px 14px — 40px control. Button, InputField, Dropdown and InputDropdown all landed here independently"
+      "$value": "{space.2} {space.3-5}",
+      "$description": "8px 14px — 40px control. Button, InputField, Dropdown and InputDropdown all landed here independently. ADR-0144: the type grew (16/24) and the height held — the padding gives (was 10px around 20)"
     },
     "lg": {
       "$value": "{space.2-5} {space.4}",

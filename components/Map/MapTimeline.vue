@@ -485,7 +485,7 @@ function exitCompare() {
   screen's instrument, so it is read at 14px and touched on 32px targets. The
   drawing's 42px and 12px type gave 20px targets, under WCAG 2.5.8's 24.
 
-  **48px tall, `--ds-width-sm` (480px) wide** (ADR-0116) — the legend's width
+  **48px tall, `--ds-width-md` (560px — 480 until ADR-0144) wide** (ADR-0116) — the legend's width
   and the same token, so the two are one width on the map's axis, edge over
   edge. Past it, the periods scroll; a fade at the edge says there are more. The border is `border-subtle` (ADR-0030): in dark
   the shadow cannot separate a surface from the map, the edge does.
@@ -495,7 +495,7 @@ function exitCompare() {
   align-items: center;
   gap: var(--ds-spacing-sm);
   box-sizing: border-box;
-  width: var(--ds-width-sm);
+  width: var(--ds-width-md);
   max-width: 100%;
   height: 48px;
   padding: 0 var(--ds-spacing-lg) 0 var(--ds-spacing-md);
@@ -508,7 +508,8 @@ function exitCompare() {
 /*
   One period can be chosen: a statement, not an instrument (ADR-0118,
   amended) — the bar hugs the word and the period(s), and keeps its place on
-  the map's axis. The 480 of ADR-0116 is for a bar that has a row to show.
+  the map's axis. The 560 of ADR-0116 (480 before ADR-0144) is for a bar that
+  has a row to show.
 */
 .ds-map-timeline--lone {
   width: fit-content;
@@ -653,12 +654,13 @@ function exitCompare() {
   flex-direction: column;
   align-items: center;
   gap: var(--ds-spacing-xxs);
-  /* A 32px target: `label-lg`'s 20px line + 6 above and below, and at least
-     32px wide, so a one-digit day is still a square. 6px aside: the pill is
-     the target, and five years with « Comparer » fit the 480 (ADR-0116). */
+  /* A 32px target: `label-lg`'s 24px line + 4 above and below (16/24 since
+     ADR-0144 — the line grew, the target held), and at least 32px wide, so a
+     one-digit day is still a square. 6px aside: the pill is the target, and
+     five years with « Comparer » fit the bar — 560 since ADR-0144 (ADR-0116). */
   box-sizing: border-box;
   min-width: 32px;
-  padding: var(--ds-spacing-sm);
+  padding: var(--ds-spacing-xs) var(--ds-spacing-sm);
   border: none;
   border-radius: var(--ds-radius-pill);
   background: transparent;

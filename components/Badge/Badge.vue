@@ -289,13 +289,17 @@ const dotSize = computed(() => {
   font: var(--ds-font-label-md);
   line-height: 1;
 }
+/* `label-md`, not `label-lg`: a status is read at the floor (14px), not at
+   the body's 16 — which is what md carried before ADR-0144 raised both. So md
+   keeps its 20px and its 14px; sm and md now differ by their inset. */
 .ds-badge--md {
   padding: var(--ds-spacing-xxs) 10px;
-  font: var(--ds-font-label-lg);
+  font: var(--ds-font-label-md);
   line-height: 1;
 }
 .ds-badge--lg {
-  padding: var(--ds-spacing-xs) var(--ds-spacing-lg);
+  /* 24px: `label-lg` grew to 16 (ADR-0144) and the inset gave 1px. */
+  padding: 3px var(--ds-spacing-lg);
   font: var(--ds-font-label-lg);
   line-height: 1;
 }

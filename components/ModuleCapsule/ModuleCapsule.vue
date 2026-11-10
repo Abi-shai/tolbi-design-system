@@ -302,10 +302,11 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
    ground in the row — 93px of it in one capsule, whose title is "Périmètre de
    Podor" and needs 167. The cap still has to hold: "Recensement ménages —
    Kaolack" wants 282 and truncates at 260, which is what Figma shows too. So the
-   column hugs its content and stops at the width the design drew. */
+   column hugs its content and stops at the width the design drew — scaled by
+   16/14 since ADR-0144 (260 → 296), as the type it holds was. */
 .ds-module-capsule__identity {
   flex: none;
-  max-width: 260px;
+  max-width: 296px;
   height: var(--capsule-band);
   display: flex;
   flex-direction: column;
@@ -431,8 +432,9 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
    capsule — which is also why the figure's badge goes to the far edge. */
 /* Same rule as the identity column: a ceiling, not a size. The delta's
    comparison still ellipsizes against it rather than widening the capsule. */
+/* 300 × 16/14 since ADR-0144. */
 .ds-module-capsule__hero--wide {
-  max-width: 300px;
+  max-width: 344px;
 }
 
 .ds-module-capsule__hero--wide .ds-module-capsule__hero-row {
@@ -467,10 +469,11 @@ const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${to
 /* ── Progress ─────────────────────────────────────────────────────── */
 /* The one column that does NOT hug. A bar is a scale, and its length is part of
    how it is read: let it follow its label and two capsules side by side would
-   measure the same percentage against different rulers. It keeps Figma's 300. */
+   measure the same percentage against different rulers. Figma's 300, scaled by
+   16/14 with its type since ADR-0144. */
 .ds-module-capsule__progress {
   flex: none;
-  width: 300px;
+  width: 344px;
   height: var(--capsule-band);
   display: flex;
   flex-direction: column;

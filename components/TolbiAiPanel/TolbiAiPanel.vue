@@ -597,19 +597,25 @@ defineExpose({ scrollToEnd })
   title truncates — and stands `spacing-md` out into the head's padding, so its
   hover lands 8px from the panel's edge as the close button's does on the other
   side, and the title's first letter on the content's 20px. The badge follows
-  the chevron at 16px rather than 20: the 4px are what keep « Nouvelle
-  conversation » whole at 400.
+  the chevron at 14px rather than 20 (16 until ADR-0144): those pixels are what
+  keep « Nouvelle conversation » whole at 400.
 */
 .ds-tolbi-ai-panel__switcher {
   flex: 0 1 auto;
   min-width: 0;
   margin-left: calc(-1 * var(--ds-spacing-md));
-  margin-right: calc(-1 * var(--ds-spacing-xs));
+  /* 14px to the badge since ADR-0144 (was 16): « ALPHA » grew with the floor
+     (12 → 14px) and took 2 of the title's pixels back. */
+  margin-right: calc(-1 * var(--ds-spacing-sm));
 }
 
+/* The head's title is a label at the floor, not at the body's 16: in a 400px
+   head beside four actions, « Nouvelle conversation » needs 182px at 16 and is
+   given 158 — ADR-0069 held it whole at 14, and so does ADR-0144. */
 .ds-tolbi-ai-panel__switch {
   max-width: 100%;
   min-width: 0;
+  font: var(--ds-font-label-md-strong);
 }
 
 .ds-tolbi-ai-panel__title {

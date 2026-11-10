@@ -223,6 +223,10 @@ function releaseWidth() {
   display: inline-flex;
   align-items: center;
   gap: var(--ds-spacing-sm);
+  /* The coin's 24px. The count (18/24) and its unit (16/24) share a baseline,
+     and two sizes on one baseline make a 25px line — the chip grew 1px when
+     ADR-0144 raised them both. */
+  height: 24px;
   color: var(--chip-text);
   transition: color var(--ds-motion-duration-enter) var(--ds-motion-easing-default);
 }
@@ -328,7 +332,9 @@ function releaseWidth() {
   gap: var(--ds-spacing-xs);
   padding: var(--ds-spacing-xxs) var(--ds-spacing-md);
   border-radius: var(--ds-radius-pill);
-  font: var(--ds-font-label-lg);
+  /* A badge's role — the floor, 14px (ADR-0144, `Badge md`'s call): at the
+     body's 16 the reminder made the chip 4px taller than the balance alone. */
+  font: var(--ds-font-label-md);
 }
 
 .ds-credits-chip__reminder--soon {

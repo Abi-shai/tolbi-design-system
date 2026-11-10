@@ -27,7 +27,7 @@ export interface MapLegendMetric {
  * The legend of a map in full GIS mode — **on one line, in the timeline's
  * grammar** (ADR-0137, track A of `3919:1427`): a chip that chooses, a rule,
  * the values. The same raised pill as `MapTimeline`, the same chip, the same
- * rule, the same height, the same 480px: on the GIS screen the two are one
+ * rule, the same height, the same 560px (480 until ADR-0144): on the GIS screen the two are one
  * family, the legend at the top (what the map shows), the timeline at the
  * bottom (when).
  *
@@ -39,11 +39,11 @@ export interface MapLegendMetric {
  *   without, it is the chip's word.
  * - **The scale on one line**: the low bound, the ramp, the high bound, the
  *   unit. The middle ticks are no longer written — they are said, in
- *   `summary`. **The line is always 480 and the ramp is its only elastic
+ *   `summary`. **The line is always 560 and the ramp is its only elastic
  *   part**: the legend never changes width from one indicator or one year to
  *   the next. Under 120px of ramp, the chip says the indicator's `shortLabel`.
  * - **By category** (`legend` without `ticks`, ADR-0129): the word, then the
- *   keys, at their size up to 480; past it, the last keys go into a « +N »
+ *   keys, at their size up to 560; past it, the last keys go into a « +N »
  *   chip whose panel lists them.
  * - **A ramp and symbols** (`legend` with `ticks`): after the unit, a rule and
  *   a « Symboles » chip carrying the symbols' marks, their names in its panel.
@@ -217,7 +217,7 @@ watch(() => [props.legend, props.title, current.value, props.ticks, props.unit],
 
 /* ── Unfolding in place (ADR-0138) ──────────────────────────────── */
 /*
-  What does not fit on the line — the symbols, the categories past 480 — is not
+  What does not fit on the line — the symbols, the categories past 560 — is not
   a menu: a menu closes at the first click on the map, and a legend is read
   while looking at the map. The legend grows downward instead, the line not
   moving a pixel, and stays open until its chip is pressed again or Escape.
@@ -340,7 +340,7 @@ onBeforeUnmount(() => clearTimeout(timer))
           <div ref="sizer" class="ds-map-legend__sizer-row">
             <ChartLegend :items="legend" shape="zone" />
             <DropdownTrigger class="ds-map-legend__more-sizer" chrome="chip" chevron tabindex="-1">+{{ legend.length }}</DropdownTrigger>
-            <!-- The token's length, resolved: `--ds-width-sm` is written in rem. -->
+            <!-- The token's length, resolved: `--ds-width-md` is written in rem. -->
             <span class="ds-map-legend__cap" />
           </div>
         </div>
@@ -413,8 +413,8 @@ onBeforeUnmount(() => clearTimeout(timer))
 /*
   `MapTimeline`'s pill, to the pixel (ADR-0137): a 48px line, 8 in at the start
   and 12 at the end, 6 between its parts, `bg-default` + `border-subtle` +
-  `elevation-raised`. **`--ds-width-sm` (480px), declared** for a scale
-  (ADR-0116); a key by category hugs, up to the same 480.
+  `elevation-raised`. **`--ds-width-md` (560px — 480 until ADR-0144), declared** for a scale
+  (ADR-0116); a key by category hugs, up to the same 560.
 
   The surface is the legend, not the line (ADR-0138): unfolded, it grows
   downward under the line, which does not move. So the radius is the line's —
@@ -428,7 +428,7 @@ onBeforeUnmount(() => clearTimeout(timer))
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  width: var(--ds-width-sm);
+  width: var(--ds-width-md);
   max-width: 100%;
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: calc(var(--map-legend-row) / 2);
@@ -439,7 +439,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .ds-map-legend--categorical {
   width: fit-content;
-  max-width: min(100%, var(--ds-width-sm));
+  max-width: min(100%, var(--ds-width-md));
 }
 
 .ds-map-legend__line {
@@ -622,7 +622,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .ds-map-legend__cap {
   position: absolute;
-  width: var(--ds-width-sm);
+  width: var(--ds-width-md);
 }
 
 .ds-map-legend__sizer :deep(.ds-chart-legend) {

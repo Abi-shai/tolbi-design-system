@@ -188,7 +188,9 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
   gap: var(--ds-spacing-lg);
   flex: 1;
   min-width: 0;
-  padding: 9px 10px;
+  /* 40px a row with its 1px gaps: `label-lg`'s 24px line and 7px above and
+     below — the type grew to 16/24 and the row held (ADR-0144). */
+  padding: 7px 10px;
   border-radius: var(--ds-radius-inner);
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
@@ -302,10 +304,11 @@ const hasAvatar = computed(() => !!(props.avatarSrc || props.avatarInitials))
   flex-shrink: 0;
 }
 
-/* sm (ADR-0101): 34px a row — `label-md`'s 16px line and 8px above and below,
-   plus the row's 1px gap — the size of the small control that opens it. */
+/* sm (ADR-0101): 34px a row — `label-md`'s 20px line and 6px above and below,
+   plus the row's 1px gap — the size of the small control that opens it
+   (ADR-0144: the line grew from 16, the inset gave). */
 .ds-dropdown-item--sm .ds-dropdown-item__content {
-  padding: var(--ds-spacing-md) 10px;
+  padding: var(--ds-spacing-sm) 10px;
 }
 
 .ds-dropdown-item--sm .ds-dropdown-item__label {

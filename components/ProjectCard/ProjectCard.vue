@@ -606,9 +606,13 @@ watch(() => [props.title, props.meta, props.state], async () => {
   consumer's. That is the point, but it also means the ceiling is not a constant;
   `17.5rem` is the version that is (and is what `EmptyState` and `ChartTooltip`
   use for their own caps).
+
+  **`20em` since ADR-0144** — 17.5 × 16/14: the body went 14 → 16 and the
+  inherited `em` did not, so the shell is moved by the same ratio as its text.
+  At 17.5em the dMRV card's two figures spilled 33px past its edge.
 */
 .ds-project-card {
-  /* A card is its own context, wherever it is shown: 280px holds 12px legends (ADR-0132). */
+  /* A card is its own context, wherever it is shown: its width holds the floor's legends (ADR-0132, ADR-0144). */
   --reading-secondary-font: var(--ds-font-body-sm);
   --reading-secondary-font-emphasis: var(--ds-font-body-sm-emphasis);
   --reading-legend-wrap: nowrap;
@@ -626,7 +630,7 @@ watch(() => [props.title, props.meta, props.state], async () => {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  max-width: 17.5em;
+  max-width: 20em;
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
   background-color: var(--ds-bg-default);
