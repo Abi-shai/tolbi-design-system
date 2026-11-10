@@ -5,7 +5,7 @@ import StoryGrid from '../../stories/StoryGrid.vue'
 // ADR-0010: two axes, because they route differently. A tone states a role and
 // resolves through the semantic layer; a colour states an identity and resolves
 // straight to the display palette.
-const ALL_TONES  = ['neutral', 'error', 'warning', 'success'] as const
+const ALL_TONES  = ['neutral', 'error', 'warning', 'success', 'brand'] as const
 const ALL_COLORS = [
   'blue', 'blue-light', 'blue-gray',
   'indigo', 'orange', 'pink', 'purple',

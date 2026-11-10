@@ -1428,6 +1428,10 @@ Before working on any component, read:
   (52 at 40). **`StatusRow :glyph="false"`**: the word alone in its tone's on-tint ink. **`PanelBlock limit`** (+
   `seeAllLabel`, `collapseLabel`, `v-model:expanded`) owns the list that unfolds — « Tout voir (n) » → « Réduire » —
   and `AlertsBlock` renders it (ADR-0001), 6px rows through `--panel-block-list-gap`.
+- **ADR-0149**: **a tab's count in the brand** (the owner's decision) — `Badge` gains **`tone="brand"`** (brand tint +
+  exact ink, 8.83 / 6.70:1), legitimate under ADR-0009 on ADR-0014's ground: it counts what a **control** leads to, so
+  it sits inside one, never on a statement. **`TabsItem.badgeTone`** picks a tab's badge tone (default `neutral`): a
+  count of objects is `brand`, a problem keeps its tone.
 
 ## Architecture
 

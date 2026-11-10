@@ -9,7 +9,13 @@ import type { IconName } from '../Icon'
  * a colour is categorical — the only sentence you can write about it is "this
  * one is blue" — and resolves straight to the display palette.
  */
-export type BadgeTone  = 'neutral' | 'error' | 'warning' | 'success'
+/**
+ * `brand` (ADR-0149) is not a status: it is the count of what a **control** leads
+ * to — « Parcelles 240 » on a tab. Brand stays interactive-only (ADR-0009), so
+ * it belongs on a badge that sits inside a control, never on a statement; a
+ * badge that signals a problem keeps its tone.
+ */
+export type BadgeTone  = 'neutral' | 'error' | 'warning' | 'success' | 'brand'
 export type BadgeColor =
   | 'blue' | 'blue-light' | 'blue-gray'
   | 'indigo' | 'orange' | 'pink' | 'purple'
@@ -148,6 +154,15 @@ const dotSize = computed(() => {
   --badge-text:           var(--ds-text-on-success-subtle);
   --badge-dot:            var(--ds-bg-success-solid);
   --badge-outline-border: var(--ds-border-success-solid);
+}
+/* The brand tint and its exact ink (ADR-0149): 8.83:1 in light, 6.70:1 in dark —
+   measured in contrast.test.mjs's pairing loop like every tint. */
+.ds-badge--brand {
+  --badge-bg:             var(--ds-bg-brand-subtle);
+  --badge-border:         var(--ds-border-on-brand-subtle);
+  --badge-text:           var(--ds-text-on-brand-subtle);
+  --badge-dot:            var(--ds-bg-brand-solid);
+  --badge-outline-border: var(--ds-border-brand);
 }
 /* ADR-0009: categorical label palette — component tier, not semantic tones.
    These eight hues have no primitive ramp. Pending a categorical-palette ADR. */

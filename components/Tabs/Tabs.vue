@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, watch, nextTick } from 'vue'
 import { useSlidingIndicator } from '../../composables/useSlidingIndicator'
-import { Badge } from '../Badge'
+import { Badge, type BadgeTone } from '../Badge'
 
 /**
  * `md` and `sm` head a page or a panel. `xs` switches what an instrument shows —
@@ -15,6 +15,12 @@ export interface TabsItem {
   value: string
   label: string
   badge?: string | number
+  /**
+   * The badge's tone (ADR-0149). A count of what the tab leads to — parcels,
+   * points, witnesses — takes `brand`; a count that signals a problem (alerts,
+   * quality, an auditor's requests) keeps its tone. Default `neutral`.
+   */
+  badgeTone?: BadgeTone
 }
 
 interface Props {
@@ -98,7 +104,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
       <Badge
         v-if="tab.badge !== undefined"
         :label="String(tab.badge)"
-        tone="neutral"
+        :tone="tab.badgeTone ?? 'neutral'"
         variant="pill-color"
         :size="badgeSize"
       />

@@ -124,6 +124,28 @@ export const NoBadge: Story = {
 }
 
 /**
+ * ADR-0149 — **le badge d’un onglet** : un compte de ce que l’onglet ouvre (parcelles, points, témoins) prend la
+ * couleur de la marque, `badgeTone: 'brand'` ; un compte qui signale un problème (alertes, qualité, demandes
+ * d’auditeur) garde son ton.
+ */
+export const BadgeTones: Story = {
+  name: 'Ton du badge',
+  render: () => ({
+    components: { Tabs },
+    setup: () => ({
+      a: ref('parcels'),
+      tabs: [
+        { value: 'data', label: 'Données' },
+        { value: 'parcels', label: 'Parcelles', badge: 240, badgeTone: 'brand' },
+        { value: 'alerts', label: 'Alertes', badge: 3, badgeTone: 'error' },
+        { value: 'report', label: 'Rapport' },
+      ],
+    }),
+    template: `<div style="width:30rem"><Tabs v-model="a" :tabs="tabs" size="sm" /></div>`,
+  }),
+}
+
+/**
  * ADR-0141 — **un onglet ne coupe jamais son contenu** : chacun part de la largeur de ce qu’il porte, la place qui
  * reste est partagée ; si même ainsi ça ne tient pas, le libellé s’ellipse et le compte reste entier. Les cas réels :
  * la tête d’un `MapPanel lg` (25rem moins le bouton replier), « Données · Parcelles 128 · Rapport » ; puis une bande
@@ -135,8 +157,8 @@ export const ContentWidth: Story = {
     components: { Tabs },
     setup: () => ({
       a: ref('data'), b: ref('parcels'), c: ref('data'),
-      dmrv: [{ value: 'data', label: 'Données' }, { value: 'parcels', label: 'Parcelles', badge: 28 }, { value: 'report', label: 'Rapport' }],
-      arr: [{ value: 'data', label: 'Données' }, { value: 'parcels', label: 'Parcelles', badge: 128 }, { value: 'report', label: 'Rapport' }],
+      dmrv: [{ value: 'data', label: 'Données' }, { value: 'parcels', label: 'Parcelles', badge: 28, badgeTone: 'brand' }, { value: 'report', label: 'Rapport' }],
+      arr: [{ value: 'data', label: 'Données' }, { value: 'parcels', label: 'Parcelles', badge: 128, badgeTone: 'brand' }, { value: 'report', label: 'Rapport' }],
     }),
     template: `
       <div style="display:flex;flex-direction:column;gap:24px">
