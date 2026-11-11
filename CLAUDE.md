@@ -592,7 +592,7 @@ Before working on any component, read:
   set by the design owner on the Figma component; the roles' descriptions were rewritten to match
   (`heading-xl` had said *Page title* and is now only the figures' step). `subtitle` + `#subtitle`
   (the prop as fallback); neither = no line and no gap. `#actions` on the right, centred on the text — **`Button md`**, never `lg` (amended 5 Nov.).
-  `spacing-xs` / `spacing-xl`, subtitle capped at the frame's 720 (`45rem`, a ceiling). **No outer
+  `spacing-xs` / `spacing-xl`, subtitle capped at the frame's 720 (`45rem`, a ceiling — **removed by ADR-0158**). **No outer
   margin** — the 24 below belongs to the page. In a narrow column the actions **drop under the text**
   when it would go below `20rem` — intrinsic, no breakpoint. A `<div>`, not a `<header>` (the bar is the
   banner). Figma component `2103:4619` with an `Actions` slot.
@@ -1475,6 +1475,9 @@ Before working on any component, read:
   filled**. `readonly` drops the actions; FormField's error = `border-error-solid` on the card. Remove asks nothing and
   the focus goes to « Définir la zone ». `Skeleton` gains **`surface="tinted"`** (a `text-strong` veil: 1.33 / 1.45:1
   where the greys were 1.02).
+- **ADR-0158**: **`PageHeader`'s sentence takes the room it has** — no `max-width` (the 45rem cap wrapped a 110-character
+  ARR line beside empty space; Nuxt UI, Cloudscape, Primer, Ant Pro cap nothing, none caps at a fixed width): it wraps
+  only where it no longer fits, **never cut** (no ellipsis, no clamp). Measured: one line at 1 600 and 1 280px.
 
 ## Architecture
 

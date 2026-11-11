@@ -18,7 +18,8 @@ const meta: Meta<typeof PageHeader> = {
         component:
           "L'en-tête d'une page : son nom — **le seul `<h1>` de la page** —, une ligne dessous, et les " +
           'actions de la page à droite. Titre en `heading-lg` (20/28), ' +
-          'sous-titre en `body-md` `text-subtle`, `spacing-xs` entre les deux et `spacing-xl` jusqu\'aux ' +
+          'sous-titre en `body-md` `text-subtle`, **sans largeur maximale** — il prend la place que laissent les actions et ' +
+          'ne passe à la ligne que lorsqu\'il n\'y tient plus, jamais coupé (ADR-0158) —, `spacing-xs` entre les deux et `spacing-xl` jusqu\'aux ' +
           "actions — des **`Button` `md`**, jamais `lg`. **Aucune marge externe** : l'écart sous l'en-tête (24 dans la maquette) appartient à " +
           'la page. En colonne étroite, les actions passent sous le texte dès que celui-ci descendrait ' +
           'sous `20rem` — sans point de rupture, c\'est la colonne qui décide.',
@@ -104,6 +105,29 @@ export const SeveralActions: Story = {
         <template #actions>
           <Button label="Exporter" variant="secondary-gray" size="md" />
           <Button label="Créer un rôle" size="md" />
+        </template>
+      </PageHeader>
+    `,
+  }),
+}
+
+/**
+ * ADR-0158 — une phrase longue (les onglets ARR, ~110 caractères) tient sur **une ligne** tant que la place jusqu'aux
+ * actions le permet ; elle passe à la ligne seulement quand elle n'y tient plus — jamais coupée.
+ */
+export const LongSubtitle: Story = {
+  name: 'Phrase longue',
+  args: {
+    title: 'Dynamic baseline',
+    subtitle: 'Mesurez ce qui aurait poussé sans votre projet. Seul ce que votre projet ajoute devient des crédits carbone.',
+  },
+  render: args => ({
+    components: { PageHeader, Button },
+    setup: () => ({ args }),
+    template: `
+      <PageHeader v-bind="args">
+        <template #actions>
+          <Button label="Créer une baseline" size="md" />
         </template>
       </PageHeader>
     `,

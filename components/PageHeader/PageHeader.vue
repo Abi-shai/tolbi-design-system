@@ -98,14 +98,17 @@ const hasSubtitle = computed(() => !!props.subtitle || !!slots.subtitle)
 }
 
 /*
-  `45rem` is the frame's 720px, and a ceiling rather than a size (ADR-0031): the
-  line wraps there instead of running the width of the page.
+  No ceiling (ADR-0158): the sentence takes the room the actions leave and
+  wraps only where it no longer fits. A 45rem cap (ADR-0051) broke a 110-
+  character line in two beside empty space, and none of the measured systems
+  caps it at a fixed width. Never cut either — a sentence cut loses its sense,
+  and a reader cannot know what was hidden.
 */
 .ds-page-header__subtitle {
   margin: 0;
-  max-width: 45rem;
   font: var(--ds-font-body-md);
   color: var(--ds-text-subtle);
+  overflow-wrap: break-word;
 }
 
 .ds-page-header__actions {
