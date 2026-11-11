@@ -1467,6 +1467,14 @@ Before working on any component, read:
   `PhoneField`'s number, `TextareaInputField`, OTP cells, `DatePicker` box and segments even though a press opens the
   calendar, a list's filter field, `readonly`); **chosen → hand** (calendar icon, `DatePicker multiple`, dropdown
   triggers, `PhoneField`'s country); disabled `not-allowed`. ADR-0155's press on the padding stays.
+- **ADR-0157**: **`ZoneField`** — the project's zone as a field (9 creation panels, inventory `4134:1427`). One shell
+  (`Card sunk` md, title `label-lg-strong`, sentence `body-md`) and one element that changes: « Définir la zone »
+  (`define`) while empty, then a `bg-brand-subtle` row — `ProjectGlyph` 40 in a 52 slot (one 68px row whatever the
+  pile), the **area** written by `locale` (`Intl` hectare, one decimal under 10, never abbreviated; `'pending'` = a
+  placeholder, `null` = « Surface inconnue »), the **method** in words, `edit` / `remove`. **`method` decides it is
+  filled**. `readonly` drops the actions; FormField's error = `border-error-solid` on the card. Remove asks nothing and
+  the focus goes to « Définir la zone ». `Skeleton` gains **`surface="tinted"`** (a `text-strong` veil: 1.33 / 1.45:1
+  where the greys were 1.02).
 
 ## Architecture
 

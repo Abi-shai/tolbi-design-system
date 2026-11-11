@@ -11,9 +11,18 @@ export type SkeletonVariant = 'text' | 'rect' | 'circle'
  */
 export type SkeletonEmphasis = 'default' | 'strong'
 
+/**
+ * What the placeholder stands on (ADR-0157). `neutral` is the page and its
+ * recessed grounds. `tinted` is a coloured ground — a `bg-brand-subtle` row —
+ * where the neutral greys measure ~1.0:1 and vanish: the bar becomes a veil of
+ * `text-strong`, which stacks on any tint in either mode.
+ */
+export type SkeletonSurface = 'neutral' | 'tinted'
+
 interface Props {
   variant?: SkeletonVariant
   emphasis?: SkeletonEmphasis
+  surface?: SkeletonSurface
   width?: number | string
   height?: number | string
   /** `text` only — renders several lines, the last one short like real prose. */
@@ -23,6 +32,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   variant: 'text',
   emphasis: 'default',
+  surface: 'neutral',
   lines: 1,
 })
 
@@ -47,7 +57,7 @@ const style = computed(() => ({
       v-for="n in lines"
       :key="n"
       class="ds-skeleton ds-skeleton--text"
-      :class="`ds-skeleton--${emphasis}`"
+      :class="[`ds-skeleton--${emphasis}`, `ds-skeleton--on-${surface}`]"
       :style="n === lines ? { width: '60%' } : style"
     />
   </div>
@@ -55,7 +65,7 @@ const style = computed(() => ({
   <span
     v-else
     class="ds-skeleton"
-    :class="[`ds-skeleton--${variant}`, `ds-skeleton--${emphasis}`]"
+    :class="[`ds-skeleton--${variant}`, `ds-skeleton--${emphasis}`, `ds-skeleton--on-${surface}`]"
     :style="style"
     aria-hidden="true"
   />
@@ -111,6 +121,23 @@ const style = computed(() => ({
 .ds-skeleton--strong {
   --skeleton-base:  var(--ds-bg-pending);
   --skeleton-sheen: var(--ds-bg-neutral);
+}
+
+/*
+  On a tint (ADR-0157): the greys above are solved against the page, and on
+  `bg-brand-subtle` they measure ~1.0:1 — the bar is gone. A veil of
+  `text-strong` stacks on any ground instead, the row actions' own idea
+  (ADR-0111). The sheen keeps its rule — one step toward the ground — by being
+  the thinner veil. The same weight axis: strong is the heavier pair.
+*/
+.ds-skeleton--on-tinted {
+  --skeleton-base:  color-mix(in srgb, var(--ds-text-strong) 10%, transparent);
+  --skeleton-sheen: color-mix(in srgb, var(--ds-text-strong) 4%, transparent);
+}
+
+.ds-skeleton--on-tinted.ds-skeleton--strong {
+  --skeleton-base:  color-mix(in srgb, var(--ds-text-strong) 14%, transparent);
+  --skeleton-sheen: color-mix(in srgb, var(--ds-text-strong) 6%, transparent);
 }
 
 /* One corner for every bar — `inner-sm` (4px), as drawn. A placeholder is not a

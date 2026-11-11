@@ -203,7 +203,7 @@ export type { CardVariant, CardPadding } from './Card'
 export { Spinner } from './Spinner'
 
 export { Skeleton } from './Skeleton'
-export type { SkeletonVariant, SkeletonEmphasis } from './Skeleton'
+export type { SkeletonVariant, SkeletonEmphasis, SkeletonSurface } from './Skeleton'
 
 export { MetricValue } from './MetricValue'
 export type { MetricTrend, MetricSize } from './MetricValue'
@@ -235,6 +235,8 @@ export type { PasswordRule } from './PasswordField'
 
 export { PhoneField, dialCodes, dialCodeFor, dialCodesFor } from './PhoneField'
 export type { DialCode } from './PhoneField'
+export { ZoneField } from './ZoneField'
+export type { ZoneFieldProps, ZoneFieldGlyph } from './ZoneField'
 
 export { FileDropzone } from './FileDropzone'
 export type { DropzoneFile } from './FileDropzone'
