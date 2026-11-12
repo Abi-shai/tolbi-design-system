@@ -294,6 +294,7 @@ export const Heights: Story = {
         { key: 'lg-short', size: 'lg', height: 'auto', lines: 2, label: 'lg · court' },
         { key: 'lg-fixed', size: 'lg', height: 'fixed', lines: 2, label: 'lg · fixed' },
         { key: 'xl-fixed', size: 'xl', height: 'fixed', lines: 0, label: 'xl · fixed + carte' },
+        { key: 'xl-form', size: 'xl', height: 'fixed', lines: -1, label: 'xl · fixed + #form' },
       ] as const
       return { open, CASES, PAGE }
     },
@@ -312,8 +313,14 @@ export const Heights: Story = {
           :title="'Taille ' + c.label"
           description="La hauteur suit la taille, comme la largeur."
         >
-          <p v-for="n in c.lines" :key="n" style="margin:0">Ligne {{ n }} du corps.</p>
-          <div v-if="!c.lines" data-testid="map" style="flex:1; min-height:12rem; border-radius:var(--ds-radius-surface-sm); background:var(--ds-bg-neutral);" />
+          <template v-if="c.lines >= 0" #default>
+            <p v-for="n in c.lines" :key="n" style="margin:0">Ligne {{ n }} du corps.</p>
+            <div v-if="!c.lines" data-testid="map" style="flex:1; min-height:12rem; border-radius:var(--ds-radius-surface-sm); background:var(--ds-bg-neutral);" />
+          </template>
+          <!-- The window's content in #form, the sentence in description: #form is the column that fills. -->
+          <template v-if="c.lines < 0" #form>
+            <div data-testid="map" style="flex:1; min-height:12rem; border-radius:var(--ds-radius-surface-sm); background:var(--ds-bg-neutral);" />
+          </template>
           <template #actions>
             <Button label="Fermer" variant="secondary-gray" @click="open = null" />
           </template>

@@ -61,3 +61,19 @@ phone is a cramped window. The side panel is untouched.
 | `lg` short | 241 high, the content | | 241 high |
 | `lg` fixed | 720 high | 614 high | 241 high, content kept |
 | `xl` fixed with a map | 792 high; the `flex: 1` map takes 598 of the body's 648 | | 385 high, content kept |
+
+## Amended — `#form` is the column (etolbi, 0.134)
+
+In `fixed` the default slot was the column that filled. With `description` and the content in `#form`, the sentence
+took all the free height and pushed a `flex: 1` map to the foot at 292px. The workaround — the map in the default
+slot — put a map in the window's description (`aria-describedby`). The content of a centred dialog belongs in `#form`.
+
+- **`#form` filled**: `#form` is the column that takes the free height, in a wrapper `.ds-dialog__form`, and the
+  description keeps its own height.
+- **`#form` empty**: the default slot keeps the behaviour above.
+
+The wrapper is `display: contents` everywhere else, so `ConfirmDialog`'s typed confirmation and `Carousel` lay out as
+before: their children are still the body's flex items.
+
+Measured on « Hauteurs » « xl · fixed + #form » (`description` + a `flex: 1` map in `#form`): the map takes **558px**
+of the body's 648 at 1 440 × 900. That is the body less its padding, the sentence and the gap. It was 292.

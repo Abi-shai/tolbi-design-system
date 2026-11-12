@@ -459,7 +459,8 @@ function onClick(event: MouseEvent) {
             <!-- At the side, the slot is the panel's body — a form — and describes nothing. -->
             <div v-if="slots.default" :id="side ? undefined : descriptionId" :class="side ? 'ds-dialog__content' : 'ds-dialog__description'"><slot /></div>
             <p v-else-if="description && !side" :id="descriptionId" class="ds-dialog__description">{{ description }}</p>
-            <slot name="form" />
+            <!-- No box of its own (`display: contents`) but in `height="fixed"`, where it is the column that fills (ADR-0160, amended). -->
+            <div v-if="slots.form" class="ds-dialog__form"><slot name="form" /></div>
           </div>
           </Scrollbar>
           <footer v-if="slots.actions || hasSummary" class="ds-dialog__foot">
@@ -625,13 +626,18 @@ function onClick(event: MouseEvent) {
 
 /* The body fills the viewport and the slot fills the body, a column: a child
    with `flex: 1` — a map, a table — takes the height the window has. A column
-   stacks its children, so running text goes in its own `<p>`. */
+   stacks its children, so running text goes in its own `<p>`.
+
+   With `#form` filled, `#form` is that column and the description keeps its
+   own height (amended): the default slot is what describes the window
+   (`aria-describedby`), and a map, a table or a form is not a description. */
 .ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__body {
   box-sizing: border-box;
   min-height: 100%;
 }
 
-.ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__body > .ds-dialog__description:first-child {
+.ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__body > .ds-dialog__description:first-child:not(:has(~ .ds-dialog__form)),
+.ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__form {
   display: flex;
   flex: 1 0 auto;
   flex-direction: column;
@@ -650,7 +656,8 @@ function onClick(event: MouseEvent) {
     min-height: 0;
   }
 
-  .ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__body > .ds-dialog__description:first-child {
+  .ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__body > .ds-dialog__description:first-child:not(:has(~ .ds-dialog__form)),
+  .ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__form {
     flex: none;
   }
 
@@ -729,6 +736,10 @@ function onClick(event: MouseEvent) {
   flex: 0 1 auto;
   min-height: 0;
   border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+}
+
+.ds-dialog__form {
+  display: contents;
 }
 
 .ds-dialog__body {

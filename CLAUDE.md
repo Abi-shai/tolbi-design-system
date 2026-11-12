@@ -1488,6 +1488,8 @@ Before working on any component, read:
   (720 × 720 at 1 440 × 900), `xl` **88 %**, `2xl` full, `sm`/`md` their content; past it the body scrolls. **`height="fixed"`**
   (`DialogHeight`, `lg`/`xl`) takes the ceiling whatever the content, the slot a column filling it (a `flex: 1` map takes the
   height; text in its own `<p>`). Under 40rem of width (container query) the content's height again; the side panel untouched.
+  **Amended**: with `#form` filled, **`#form` is the column that fills** and the description keeps its height (a map in
+  the default slot would be the window's description); its wrapper is `display: contents` everywhere else.
 
 ## Architecture
 
