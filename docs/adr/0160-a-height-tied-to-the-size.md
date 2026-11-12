@@ -110,3 +110,38 @@ Measured on « Hauteurs »:
 | 1 280 × 640 | 720 × 504 | 960 × 563 (the 88 % share caps) |
 | 800 × 1 000 | 720 × 504 | 768 × 538 (the narrowed width × 0.7) |
 | 390 × 844 | unchanged: content's height | unchanged: content's height |
+
+## Amended — `2xl`'s `#form` fills too; the fade only when it scrolls (etolbi, 0.134.2)
+
+**`2xl`**: the zone window moves from `xl` (choose the method) to `2xl` once a method is chosen — a map to draw on, the
+producers' table, a map to check. `2xl` is always full height, but its `#form` was not the column. A `flex: 1` map in it
+measured **0 px**. It now fills the same way as `lg`/`xl` `fixed`:
+
+- the body fills the viewport;
+- `#form` is the column that takes the free height;
+- the description keeps its own height.
+
+The default slot keeps its own layout there: a window of data's tabs (ADR-0098) is not a column.
+
+**The fade**: the body's bottom fade is `Scrollbar`'s, and it already shows only when the viewport overflows by more
+than 1px (`scrollHeight − clientHeight > 1`, ADR-0146). A block that fills `#form` exactly shows none:
+
+| Case, `xl` `fixed` at 1 440 × 900 | scrollHeight / clientHeight | Fade |
+|---|---|---|
+| `flex: 1` block | 527 / 527 | none |
+| absolutely placed child 3px past it | 527 / 527 | none |
+| content that arrives at 900px and settles to 100% | 527 / 527 | none |
+| `<canvas>` left **inline** at `height: 100%` | **554** / 527 | shown — the body really scrolls 27px |
+
+The inline case is the classic one. An inline replaced element sits on a text line, and the line's descender space is
+added below it, so the canvas pushes its container past the box. The fade is right there: 27px of content are hidden.
+The cure is the content's, not the dialog's: `display: block` on the canvas, or `overflow: hidden` on the map's box.
+A threshold raised to hide it would hide real content too.
+
+Measured on « Hauteurs » « 2xl + #form »:
+
+| Screen | Surface | Map |
+|---|---|---|
+| 1 440 × 900 | 1312 × 820 | 587 |
+| 1 440 × 768 | | 458 |
+| 390 × 844 | | 507 |

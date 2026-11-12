@@ -296,6 +296,7 @@ export const Heights: Story = {
         { key: 'lg-fixed', size: 'lg', height: 'fixed', lines: 2, label: 'lg · fixed' },
         { key: 'xl-fixed', size: 'xl', height: 'fixed', lines: 0, label: 'xl · fixed + carte' },
         { key: 'xl-form', size: 'xl', height: 'fixed', lines: -1, label: 'xl · fixed + #form' },
+        { key: '2xl-form', size: '2xl', height: 'auto', lines: -1, label: '2xl + #form' },
       ] as const
       return { open, CASES, PAGE }
     },

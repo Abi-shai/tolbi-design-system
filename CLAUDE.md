@@ -1492,6 +1492,8 @@ Before working on any component, read:
   the default slot would be the window's description); its wrapper is `display: contents` everywhere else.
   **Amended again**: **it stays landscape** — the height is also capped by the **real width × 0.7** (`min(100cqi,
   --dialog-width)`; 10:7): `lg` 720 × 504, `xl` 960 × 672 on any common screen (was 960 × 1 065 portrait on 1 920 × 1 210).
+  **And**: `2xl`'s `#form` fills too (a `flex: 1` map was 0px). The bottom fade shows only past 1px of real overflow — an
+  **inline** `<canvas>` at `height: 100%` overflows by its line's descender (+27px, it does scroll): `display: block` is the cure.
 
 ## Architecture
 

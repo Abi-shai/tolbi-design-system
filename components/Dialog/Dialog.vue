@@ -641,14 +641,19 @@ function onClick(event: MouseEvent) {
 
    With `#form` filled, `#form` is that column and the description keeps its
    own height (amended): the default slot is what describes the window
-   (`aria-describedby`), and a map, a table or a form is not a description. */
-.ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__body {
+   (`aria-describedby`), and a map, a table or a form is not a description.
+
+   `2xl` is always full height, so its `#form` fills the same way (amended,
+   0.135); its default slot keeps its own layout — a window of data's tabs. */
+.ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__body,
+.ds-dialog--centre.ds-dialog--2xl .ds-dialog__body:has(> .ds-dialog__form) {
   box-sizing: border-box;
   min-height: 100%;
 }
 
 .ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__body > .ds-dialog__description:first-child:not(:has(~ .ds-dialog__form)),
-.ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__form {
+.ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__form,
+.ds-dialog--centre.ds-dialog--2xl .ds-dialog__form {
   display: flex;
   flex: 1 0 auto;
   flex-direction: column;
