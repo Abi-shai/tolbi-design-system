@@ -1497,6 +1497,10 @@ Before working on any component, read:
 - **ADR-0161**: **actions at the foot's start** — `Dialog` `#actions-start` (a flow's way back, a side action) beside
   `#actions` at the end, the same buttons and gap; with a summary: start actions, then the summary, then the end's.
   Stacked (side under 40rem): summary, `#actions` (main on top), then `#actions-start`. Without it, nothing changes.
+- **ADR-0162**: **`ModuleName` « Inset »** (insetting, Carbone's successor; Carbone kept until the product moves) —
+  track B of three (the trees + a single ↓: absorbed, not exchanged). The brand file had no variant and the connector was
+  read-only, so the generator **derives it by subtraction** from Redd+'s exports (the ↑'s two paths dropped, matched by
+  path data, failing unless found once; nothing drawn). Export `Module=Inset` from Figma later and delete `derive`.
 
 ## Architecture
 

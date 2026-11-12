@@ -7,6 +7,7 @@
  *   Modules logos      (node 9892:11717) → the same artwork on its tile
  */
 import IllustrationCarbone from './art/illustration/carbone.vue'
+import IllustrationInset from './art/illustration/inset.vue'
 import IllustrationSource from './art/illustration/source.vue'
 import IllustrationCall from './art/illustration/call.vue'
 import IllustrationScan from './art/illustration/scan.vue'
@@ -18,6 +19,7 @@ import IllustrationSurvey from './art/illustration/survey.vue'
 import IllustrationYield from './art/illustration/yield.vue'
 import IllustrationTrace from './art/illustration/trace.vue'
 import LogoCarbone from './art/logo/carbone.vue'
+import LogoInset from './art/logo/inset.vue'
 import LogoSource from './art/logo/source.vue'
 import LogoCall from './art/logo/call.vue'
 import LogoScan from './art/logo/scan.vue'
@@ -32,6 +34,7 @@ import LogoTrace from './art/logo/trace.vue'
 /** The raw artwork, as drawn. The primitive. */
 export const illustrations = {
   'Carbone': IllustrationCarbone,
+  'Inset': IllustrationInset,
   'Source': IllustrationSource,
   'Call': IllustrationCall,
   'Scan': IllustrationScan,
@@ -47,6 +50,7 @@ export const illustrations = {
 /** The artwork on its rounded tile — what product surfaces consume. */
 export const logos = {
   'Carbone': LogoCarbone,
+  'Inset': LogoInset,
   'Source': LogoSource,
   'Call': LogoCall,
   'Scan': LogoScan,
@@ -59,7 +63,7 @@ export const logos = {
   'Trace': LogoTrace,
 } as const
 
-export const moduleNames = ['Carbone', 'Source', 'Call', 'Scan', 'Data', 'ID', 'Redd+', 'Forest', 'Survey', 'Yield', 'Trace'] as const
+export const moduleNames = ['Carbone', 'Inset', 'Source', 'Call', 'Scan', 'Data', 'ID', 'Redd+', 'Forest', 'Survey', 'Yield', 'Trace'] as const
 
 export type ModuleName = typeof moduleNames[number]
 export type ModuleVariant = 'illustration' | 'logo'

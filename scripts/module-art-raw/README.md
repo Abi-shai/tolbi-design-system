@@ -50,6 +50,14 @@ The frame has no `Eudr` variant at all.
 reports it as skipped, and `Eudr` is therefore not a valid `ModuleName`. See the "Problème ouvert"
 section of `ModuleIcon.mdx`.
 
+## `Inset` — derived, not exported (ADR-0162)
+
+`Inset` has no variant in the brand file yet: the Figma connector was read-only on 12 Nov. 2026.
+The generator derives it from `redd-plus.svg` (both variants) by dropping the ↑ arrow's two paths,
+matched by their path data, and renaming the group. No vector is added or moved. Once the brand
+file carries `Module=Inset`, export it here as `inset.svg` and delete the `derive` entry in the
+generator.
+
 ## Re-pulling from Figma
 
 Per node, via the Figma MCP:

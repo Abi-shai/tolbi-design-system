@@ -33,7 +33,8 @@ coordonnées, avec la tuile ajoutée dessous.
 
 | Module | Description |
 |---|---|
-| `Carbone` | Suivi d'empreinte carbone |
+| `Carbone` | Suivi d'empreinte carbone — remplacé par `Inset`, gardé tant que le produit n'est pas passé |
+| `Inset` | Insetting : les absorptions des parcelles des fournisseurs, déclarées en Scope 3 (ADR-0162) |
 | `Source` | Traçabilité des approvisionnements |
 | `Call` | Collecte terrain par appel |
 | `Scan` | Collecte terrain par scan |
@@ -64,6 +65,12 @@ numérote les masques par frame, si bien que les 22 exports réutilisent `mask0_
 
 Sources : `Module illustration` (nœud 9945:197) et `Modules logos` (nœud 9892:11717) dans
 `00 — Core Brand Visual Identity`.
+
+**Une exception, `Inset`** (ADR-0162) : le fichier de marque n'a pas encore sa variante. Le
+générateur la **dérive par soustraction** des exports `Redd+` — mêmes arbres, même flèche ↓, la
+flèche ↑ retirée — sans dessiner un seul vecteur ; il échoue si les deux chemins retirés ne se
+trouvent pas exactement une fois. Quand `Module=Inset` existera dans Figma, on l'exporte et la
+dérivation disparaît.
 
 ---
 
