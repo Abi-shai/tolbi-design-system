@@ -58,6 +58,13 @@ import { pushModal, removeModal } from '../../composables/useModalStack'
  */
 export type DialogPlacement = 'centre' | 'side'
 export type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
+/**
+ * The centred window's height (ADR-0160): `auto` follows the content up to its
+ * size's ceiling; `fixed` takes the ceiling whatever it holds, the body filling
+ * it — a flow whose steps must not change shape, a map or a table in the body.
+ * `lg` and `xl` only: `sm`/`md` follow their content, `2xl` is always full.
+ */
+export type DialogHeight = 'auto' | 'fixed'
 
 /** One figure of the foot's summary — « Champs liés » / « 1 champ ». */
 export interface DialogSummaryItem {
@@ -94,6 +101,8 @@ interface Props {
   placement?: DialogPlacement
   /** The surface's width — a ceiling, not a size: a narrow screen gives less. */
   size?: DialogSize
+  /** Centred `lg` / `xl`: `fixed` holds the size's height whatever the body holds (ADR-0160). */
+  height?: DialogHeight
   /**
    * What the actions will act on, at the start of the foot — « 1 champ lié ·
    * 10 ha » (ADR-0081). The foot stays while the body scrolls, so the figures
@@ -120,6 +129,7 @@ const props = withDefaults(defineProps<Props>(), {
   within: null,
   placement: 'centre',
   size: 'md',
+  height: 'auto',
   summary: undefined,
   hideTitle: false,
 })
@@ -406,7 +416,7 @@ function onClick(event: MouseEvent) {
     <dialog
       ref="el"
       class="ds-dialog"
-      :class="[`ds-dialog--${placement}`, `ds-dialog--${size}`, { 'ds-dialog--within': within, 'ds-dialog--untitled': hideTitle }]"
+      :class="[`ds-dialog--${placement}`, `ds-dialog--${size}`, { 'ds-dialog--within': within, 'ds-dialog--untitled': hideTitle, 'ds-dialog--fixed': height === 'fixed' }]"
       :popover="within ? 'manual' : undefined"
       :role="role"
       aria-modal="true"
@@ -583,6 +593,70 @@ function onClick(event: MouseEvent) {
    not shrink the window, a long one scrolls inside it. */
 .ds-dialog--centre.ds-dialog--2xl .ds-dialog__scroll {
   flex: 1 1 auto;
+}
+
+/*
+  A height tied to the size (ADR-0160), as the width is. Carbon's rule — « to
+  keep a good window ratio » — on our scale: the share of the screen grows with
+  the width, `lg` 80 % (720 × 720 at 1440 × 900, a square), `xl` 88 % (960 ×
+  792), `2xl` the whole of it. Past it, the body scrolls between the head and
+  the foot. The share is of the screen (or of the region a `within` dialog
+  covers): the dialog's own box, its 16px inset counted back in. `sm` and `md`
+  follow their content up to the screen, as before.
+*/
+.ds-dialog--centre { container-type: inline-size; }
+.ds-dialog--centre.ds-dialog--lg { --dialog-height-share: 0.8; }
+.ds-dialog--centre.ds-dialog--xl { --dialog-height-share: 0.88; }
+
+.ds-dialog--centre:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__surface {
+  --dialog-height: min(100%, calc((100% + 2 * var(--ds-spacing-xl)) * var(--dialog-height-share)));
+  max-height: var(--dialog-height);
+}
+
+/* `fixed`: the ceiling is the height, and the body fills what the head and the
+   foot leave — a step of a flow keeps the window's shape, a map has a box. */
+.ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__surface {
+  height: var(--dialog-height);
+}
+
+.ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__scroll {
+  flex: 1 1 auto;
+}
+
+/* The body fills the viewport and the slot fills the body, a column: a child
+   with `flex: 1` — a map, a table — takes the height the window has. A column
+   stacks its children, so running text goes in its own `<p>`. */
+.ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__body {
+  box-sizing: border-box;
+  min-height: 100%;
+}
+
+.ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__body > .ds-dialog__description:first-child {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+/* A small screen keeps what it had: the window takes the screen's height at
+   most and follows its content — a share of a phone is a cramped window. */
+@container (max-width: 40rem) {
+  .ds-dialog--centre:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__surface,
+  .ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__surface {
+    max-height: 100%;
+    height: auto;
+  }
+
+  .ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__body {
+    min-height: 0;
+  }
+
+  .ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__body > .ds-dialog__description:first-child {
+    flex: none;
+  }
+
+  .ds-dialog--centre.ds-dialog--fixed:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__scroll {
+    flex: 0 1 auto;
+  }
 }
 
 /* The head is ruled off from the body with the surface's own hairline; the

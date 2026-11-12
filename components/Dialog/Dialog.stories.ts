@@ -276,6 +276,53 @@ export const Sizes: Story = {
   }),
 }
 
+/**
+ * ADR-0160 — **une hauteur liée à la taille** (fenêtre centrée) : `lg` au plus 80 % de l’écran, `xl` 88 %, `2xl` toute
+ * la hauteur ; au-delà, le corps défile entre l’en-tête et le pied. **`height="fixed"`** (`lg`, `xl`) prend cette
+ * hauteur même avec peu de contenu — les étapes d’un parcours gardent la forme de la fenêtre. `sm` et `md` suivent
+ * leur contenu ; sous 40rem, toutes reprennent la hauteur du contenu.
+ */
+export const Heights: Story = {
+  name: 'Hauteurs',
+  render: () => ({
+    components: { Dialog, Button },
+    setup: () => {
+      const open = ref<string | null>(null)
+      const CASES = [
+        { key: 'lg-long', size: 'lg', height: 'auto', lines: 40, label: 'lg · long' },
+        { key: 'xl-long', size: 'xl', height: 'auto', lines: 40, label: 'xl · long' },
+        { key: 'lg-short', size: 'lg', height: 'auto', lines: 2, label: 'lg · court' },
+        { key: 'lg-fixed', size: 'lg', height: 'fixed', lines: 2, label: 'lg · fixed' },
+        { key: 'xl-fixed', size: 'xl', height: 'fixed', lines: 0, label: 'xl · fixed + carte' },
+      ] as const
+      return { open, CASES, PAGE }
+    },
+    template: `
+      <div :style="PAGE">
+        <div style="display:flex; gap:var(--ds-spacing-md); flex-wrap:wrap;">
+          <Button v-for="c in CASES" :key="c.key" :label="c.label" variant="secondary-gray" @click="open = c.key" />
+        </div>
+        <Dialog
+          v-for="c in CASES"
+          :key="c.key"
+          :open="open === c.key"
+          @update:open="(v) => { if (!v) open = null }"
+          :size="c.size"
+          :height="c.height"
+          :title="'Taille ' + c.label"
+          description="La hauteur suit la taille, comme la largeur."
+        >
+          <p v-for="n in c.lines" :key="n" style="margin:0">Ligne {{ n }} du corps.</p>
+          <div v-if="!c.lines" data-testid="map" style="flex:1; min-height:12rem; border-radius:var(--ds-radius-surface-sm); background:var(--ds-bg-neutral);" />
+          <template #actions>
+            <Button label="Fermer" variant="secondary-gray" @click="open = null" />
+          </template>
+        </Dialog>
+      </div>
+    `,
+  }),
+}
+
 const FIELDS = [
   { id: 'p1', name: 'Parcelle Ndiaye 1', ha: 4.2 },
   { id: 'p2', name: 'Parcelle Ndiaye 2', ha: 5.8 },

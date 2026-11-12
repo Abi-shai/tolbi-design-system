@@ -1484,6 +1484,10 @@ Before working on any component, read:
   **centred on the card**. Hover and focus: **the card becomes the tile** (`bg-brand-subtle`, border melted), title and
   chevron `text-on-brand-subtle`, chevron +2px, `moderate`; `:active` `bg-brand-subtle-hover`; reduced motion keeps the
   colours, not the shift. The glyph on the tint is its exact partner (brand/700 in light, ADR-0009), one step past the drawing.
+- **ADR-0160**: **a height tied to the size** (centred `Dialog`; Carbon's ratio rule) — `lg` at most **80 %** of the screen
+  (720 × 720 at 1 440 × 900), `xl` **88 %**, `2xl` full, `sm`/`md` their content; past it the body scrolls. **`height="fixed"`**
+  (`DialogHeight`, `lg`/`xl`) takes the ceiling whatever the content, the slot a column filling it (a `flex: 1` map takes the
+  height; text in its own `<p>`). Under 40rem of width (container query) the content's height again; the side panel untouched.
 
 ## Architecture
 

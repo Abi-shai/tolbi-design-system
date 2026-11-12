@@ -221,7 +221,7 @@ export { Toast, ToastRegion } from './Toast'
 export { DatePicker } from './DatePicker'
 export type { DatePickerModel, DatePickerProps, DatePickerValue, DatePickerRange, DatePickerGranularity } from './DatePicker'
 export { Dialog, ConfirmDialog } from './Dialog'
-export type { ConfirmDialogConsequence, DialogPlacement, DialogSize, DialogSummaryItem } from './Dialog'
+export type { ConfirmDialogConsequence, DialogPlacement, DialogSize, DialogHeight, DialogSummaryItem } from './Dialog'
 export type { ToastTone, ToastRegionPlacement } from './Toast'
 
 export { StatTile } from './StatTile'
