@@ -1494,6 +1494,9 @@ Before working on any component, read:
   --dialog-width)`; 10:7): `lg` 720 × 504, `xl` 960 × 672 on any common screen (was 960 × 1 065 portrait on 1 920 × 1 210).
   **And**: `2xl`'s `#form` fills too (a `flex: 1` map was 0px). The bottom fade shows only past 1px of real overflow — an
   **inline** `<canvas>` at `height: 100%` overflows by its line's descender (+27px, it does scroll): `display: block` is the cure.
+- **ADR-0161**: **actions at the foot's start** — `Dialog` `#actions-start` (a flow's way back, a side action) beside
+  `#actions` at the end, the same buttons and gap; with a summary: start actions, then the summary, then the end's.
+  Stacked (side under 40rem): summary, `#actions` (main on top), then `#actions-start`. Without it, nothing changes.
 
 ## Architecture
 

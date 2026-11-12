@@ -277,6 +277,48 @@ export const Sizes: Story = {
 }
 
 /**
+ * ADR-0161 — **des actions au début du pied** : `#actions-start`, à gauche et à l’écart, pour le retour d’un parcours
+ * (« Changer de méthode ») ou une action annexe ; `#actions` reste à droite. Avec un résumé : les actions du début, puis
+ * le résumé. Empilé (panneau latéral sous 40rem) : le résumé, `#actions` — l’action principale en haut —, puis
+ * `#actions-start`.
+ */
+export const ActionsStart: Story = {
+  name: 'Actions au début du pied',
+  render: () => ({
+    components: { Dialog, Button },
+    setup: () => ({ open: ref<string | null>(null), PAGE, summary: [{ label: 'Surface', value: '412 ha' }] }),
+    template: `
+      <div :style="PAGE">
+        <div style="display:flex; gap:var(--ds-spacing-md); flex-wrap:wrap;">
+          <Button label="Centre" variant="secondary-gray" @click="open = 'centre'" />
+          <Button label="Centre + résumé" variant="secondary-gray" @click="open = 'summary'" />
+          <Button label="Côté" variant="secondary-gray" @click="open = 'side'" />
+        </div>
+        <Dialog
+          v-for="k in ['centre', 'summary', 'side']"
+          :key="k"
+          :open="open === k"
+          @update:open="(v) => { if (!v) open = null }"
+          :placement="k === 'side' ? 'side' : 'centre'"
+          :size="k === 'side' ? 'md' : 'xl'"
+          :summary="k === 'summary' ? summary : undefined"
+          title="Zone du projet"
+          description="Tracez la zone sur la carte, puis terminez."
+        >
+          <template #actions-start>
+            <Button label="Changer de méthode" variant="secondary-gray" size="sm" icon-leading="arrow-left" />
+          </template>
+          <template #actions>
+            <Button label="Annuler" variant="secondary-gray" size="sm" @click="open = null" />
+            <Button label="Terminer" variant="primary" size="sm" @click="open = null" />
+          </template>
+        </Dialog>
+      </div>
+    `,
+  }),
+}
+
+/**
  * ADR-0160 — **une hauteur liée à la taille** (fenêtre centrée) : `lg` au plus 80 % de l’écran, `xl` 88 %, `2xl` toute
  * la hauteur — et **jamais plus de 0,7 × la largeur**, pour rester en paysage (`lg` 720 × 504, `xl` 960 × 672) ; au-delà,
  * le corps défile entre l’en-tête et le pied. **`height="fixed"`** (`lg`, `xl`) prend cette

@@ -158,6 +158,12 @@ const slots = defineSlots<{
   form?: () => unknown
   /** The actions, in the foot, on the right. */
   actions?: () => unknown
+  /**
+   * Actions at the foot's start, apart from the others (ADR-0161) — a flow's
+   * way back (« Retour », « Changer de méthode »), a side action
+   * (« Recommencer »). Before the summary; stacked under `#actions`.
+   */
+  'actions-start'?: () => unknown
   /** The foot's start, in place of `summary`. */
   summary?: () => unknown
 }>()
@@ -463,7 +469,11 @@ function onClick(event: MouseEvent) {
             <div v-if="slots.form" class="ds-dialog__form"><slot name="form" /></div>
           </div>
           </Scrollbar>
-          <footer v-if="slots.actions || hasSummary" class="ds-dialog__foot">
+          <footer v-if="slots.actions || slots['actions-start'] || hasSummary" class="ds-dialog__foot">
+            <!-- The foot's start: a way back or a side action, apart from the actions on the right (ADR-0161). -->
+            <div v-if="slots['actions-start']" class="ds-dialog__actions ds-dialog__actions--start">
+              <slot name="actions-start" />
+            </div>
             <!-- A status: the figures move as the body is ticked, and say so once each time. -->
             <div v-if="hasSummary" class="ds-dialog__summary" role="status">
               <slot name="summary">
@@ -800,6 +810,17 @@ function onClick(event: MouseEvent) {
   margin-inline-start: auto;
 }
 
+/*
+  The foot's start (ADR-0161): actions kept apart from the others — a flow's
+  way back, a side action — at the start, then the summary, then the actions
+  pushed to the end. The same buttons, the same gap; only the side differs.
+*/
+.ds-dialog__actions--start {
+  justify-content: flex-start;
+  margin-inline-start: 0;
+}
+
+
 /* The figures sit on the foot's own ground — the foot is a level already, a
    tile would be a third (ADR-0048) — label over value, as the body reads. */
 .ds-dialog__figures {
@@ -1031,6 +1052,12 @@ function onClick(event: MouseEvent) {
     flex-direction: column-reverse;
     align-items: stretch;
     margin-inline-start: 0;
+  }
+
+  /* Stacked: the summary, then the actions — the main one on top — then the
+     start's, under them (ADR-0161). */
+  .ds-dialog--side .ds-dialog__actions--start {
+    order: 1;
   }
 }
 
