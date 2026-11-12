@@ -1478,6 +1478,12 @@ Before working on any component, read:
 - **ADR-0158**: **`PageHeader`'s sentence takes the room it has** — no `max-width` (the 45rem cap wrapped a 110-character
   ARR line beside empty space; Nuxt UI, Cloudscape, Primer, Ant Pro cap nothing, none caps at a fixed width): it wraps
   only where it no longer fits, **never cut** (no ellipsis, no clamp). Measured: one line at 1 600 and 1 280px.
+- **ADR-0159**: **a card that leads wears the brand** (the owner's « Design Week 19-05-25 » `3:5143`) — only an
+  `OptionCard` that leads (`href` / click, chevron), never a choice (the brand there means « chosen »), a 40px row, a
+  disabled or a muted card: tile **48** on `bg-brand-subtle`, title **`label-xl-strong` `text-brand`**, the chevron
+  **centred on the card**. Hover and focus: **the card becomes the tile** (`bg-brand-subtle`, border melted), title and
+  chevron `text-on-brand-subtle`, chevron +2px, `moderate`; `:active` `bg-brand-subtle-hover`; reduced motion keeps the
+  colours, not the shift. The glyph on the tint is its exact partner (brand/700 in light, ADR-0009), one step past the drawing.
 
 ## Architecture
 

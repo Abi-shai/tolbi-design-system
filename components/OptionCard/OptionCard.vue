@@ -205,6 +205,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
       'ds-option-card--disabled': isDisabled,
       'ds-option-card--muted': muted && !isDisabled,
       'ds-option-card--leads': !choosing && !holds,
+      'ds-option-card--link': !choosing && !holds && !row && !isDisabled && !muted,
       'ds-option-card--holds': holds,
       'ds-option-card--row': row,
     }"
@@ -318,9 +319,10 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
     box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
-/* Hover is the contour alone: a ground would swallow the icon's tile. A row
+/* Hover is the contour alone: a ground would swallow the icon's tile (a card
+   that leads does the opposite on purpose, ADR-0159). A row
    that holds an action is not a control: only its button answers. */
-.ds-option-card:hover:not(.ds-option-card--disabled):not(.ds-option-card--checked):not(.ds-option-card--holds) {
+.ds-option-card:hover:not(.ds-option-card--disabled):not(.ds-option-card--checked):not(.ds-option-card--holds):not(.ds-option-card--link) {
   border-color: var(--ds-border-default);
 }
 
@@ -479,6 +481,84 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
 .ds-option-card--disabled .ds-option-card__meta-text,
 .ds-option-card--disabled .ds-option-card__chevron {
   color: var(--ds-text-disabled);
+}
+
+/*
+  ── A card that leads (ADR-0159) ───────────────────────────────────────
+  The owner's « Design Week 19-05-25 » card (3:5143): the brand says « this is
+  a way in », where on a choosing card it says « this one is chosen » — so it
+  is the leading card's alone, never a choice's, never a 40px row's. The tile
+  grows to 48 on the brand's tint, the title to `label-xl-strong` in the
+  brand's ink, the chevron centres on the card. The tile's glyph takes the
+  tint's exact partner (`text-on-brand-subtle`, ADR-0009): one step past the
+  drawing's brand/600 in light, the same value in dark.
+*/
+.ds-option-card--link {
+  transition:
+    border-color     var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    background-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    box-shadow       var(--ds-motion-duration-instant)  var(--ds-motion-easing-default);
+}
+
+.ds-option-card--link .ds-option-card__tile {
+  width: var(--ds-spacing-6xl);
+  height: var(--ds-spacing-6xl);
+  background: var(--ds-bg-brand-subtle);
+  color: var(--ds-text-on-brand-subtle);
+}
+
+.ds-option-card--link .ds-option-card__title {
+  font: var(--ds-font-label-xl-strong);
+  color: var(--ds-text-brand);
+  transition: color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+}
+
+/* The meta keeps the title's line box; the chevron leaves it for the card's middle. */
+.ds-option-card--link .ds-option-card__meta {
+  font: var(--ds-font-label-xl-strong);
+}
+
+.ds-option-card--link .ds-option-card__control {
+  align-self: center;
+  height: auto;
+}
+
+.ds-option-card--link .ds-option-card__chevron {
+  transition:
+    color     var(--ds-motion-duration-moderate) var(--ds-motion-easing-default),
+    transform var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
+}
+
+/*
+  Hover and the keyboard's focus: the whole card becomes the tile — its ground
+  the tint, its border melted into it, so the tile dissolves and the glyph
+  stands alone. On the tint the title takes the tint's partner, which is also
+  the brand's hover ink (brand/700 in light, unchanged in dark).
+*/
+.ds-option-card--link:is(:hover, :focus-visible) {
+  border-color: var(--ds-bg-brand-subtle);
+  background-color: var(--ds-bg-brand-subtle);
+}
+
+.ds-option-card--link:is(:hover, :focus-visible) .ds-option-card__title {
+  color: var(--ds-text-on-brand-subtle);
+}
+
+.ds-option-card--link:is(:hover, :focus-visible) .ds-option-card__chevron {
+  color: var(--ds-text-on-brand-subtle);
+  transform: translateX(2px);
+}
+
+.ds-option-card--link:active {
+  border-color: var(--ds-bg-brand-subtle-hover);
+  background-color: var(--ds-bg-brand-subtle-hover);
+}
+
+/* Less motion: the colours still turn, the chevron stays where it is. */
+@media (prefers-reduced-motion: reduce) {
+  .ds-option-card--link:is(:hover, :focus-visible) .ds-option-card__chevron {
+    transform: none;
+  }
 }
 
 /* ── Row (ADR-0143): one 40px line ──────────────────────────────────── */
