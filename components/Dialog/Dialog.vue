@@ -604,13 +604,24 @@ function onClick(event: MouseEvent) {
   the foot. The share is of the screen (or of the region a `within` dialog
   covers): the dialog's own box, its 16px inset counted back in. `sm` and `md`
   follow their content up to the screen, as before.
+
+  Amended (0.135): the share alone turned a tall screen's window portrait —
+  `xl` 960 × 1 065 on 1 920 × 1 210, the width fixed and the height not. The
+  height is also capped by the window's **real width** × 0.7 (10:7, about
+  A4 landscape's 1:√2), so it stays landscape: `lg` 720 × 504, `xl` 960 × 672
+  wherever the screen is tall enough. The real width is the declared one or
+  the dialog's own, whichever is less (`100cqi`: the dialog is the container).
 */
 .ds-dialog--centre { container-type: inline-size; }
 .ds-dialog--centre.ds-dialog--lg { --dialog-height-share: 0.8; }
 .ds-dialog--centre.ds-dialog--xl { --dialog-height-share: 0.88; }
 
 .ds-dialog--centre:is(.ds-dialog--lg, .ds-dialog--xl) .ds-dialog__surface {
-  --dialog-height: min(100%, calc((100% + 2 * var(--ds-spacing-xl)) * var(--dialog-height-share)));
+  --dialog-height: min(
+    100%,
+    calc((100% + 2 * var(--ds-spacing-xl)) * var(--dialog-height-share)),
+    calc(min(100cqi, var(--dialog-width)) * 0.7)
+  );
   max-height: var(--dialog-height);
 }
 

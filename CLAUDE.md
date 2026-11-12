@@ -1490,6 +1490,8 @@ Before working on any component, read:
   height; text in its own `<p>`). Under 40rem of width (container query) the content's height again; the side panel untouched.
   **Amended**: with `#form` filled, **`#form` is the column that fills** and the description keeps its height (a map in
   the default slot would be the window's description); its wrapper is `display: contents` everywhere else.
+  **Amended again**: **it stays landscape** — the height is also capped by the **real width × 0.7** (`min(100cqi,
+  --dialog-width)`; 10:7): `lg` 720 × 504, `xl` 960 × 672 on any common screen (was 960 × 1 065 portrait on 1 920 × 1 210).
 
 ## Architecture
 

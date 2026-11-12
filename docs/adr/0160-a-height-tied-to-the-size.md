@@ -77,3 +77,36 @@ before: their children are still the body's flex items.
 
 Measured on « Hauteurs » « xl · fixed + #form » (`description` + a `flex: 1` map in `#form`): the map takes **558px**
 of the body's 648 at 1 440 × 900. That is the body less its padding, the sentence and the gap. It was 292.
+
+## Amended — it stays landscape (etolbi, 0.134.1)
+
+The share of the screen is a height with no width to answer to: the width is a fixed `60rem`. So a tall screen turned
+the window portrait — `xl` measured 960 × 1 065 on 1 920 × 1 210 — and the taller the screen, the more so. Three short
+cards left two thirds of it empty. Carbon, the benchmark's reference, takes both the width and the height as shares of
+the screen, and its window stays landscape.
+
+The height is now also capped by the window's **real width × 0.7**:
+
+`height = min(the box, the share of the screen, real width × 0.7)`
+
+- **10:7, close to A4 landscape (1:√2).** The product suggested it, and it keeps the two sizes' ratio one ratio.
+- **The real width** is the declared width or the dialog's own, whichever is less: `min(100cqi, --dialog-width)`, the
+  dialog being the container (`cqi`).
+- It caps both the content's ceiling and `height="fixed"`.
+
+Under 40rem nothing changes.
+
+**A trade-off the request accepts.** On a 1 440 × 900 screen `lg` is now 720 × **504**, not 720 × 720, and `xl`
+960 × **672**, not 792. The ratio caps before the share does on every common landscape screen. The share of the screen
+only decides on a short one: `xl` 960 × 563 at 1 280 × 640.
+
+Measured on « Hauteurs »:
+
+| Screen | `lg` (long, fixed) | `xl` (long, fixed + `#form`) |
+|---|---|---|
+| 1 920 × 1 210 | 720 × 504 | 960 × 672 |
+| 1 440 × 900 | 720 × 504 | 960 × 672 |
+| 1 440 × 768 | 720 × 504 | 960 × 672 |
+| 1 280 × 640 | 720 × 504 | 960 × 563 (the 88 % share caps) |
+| 800 × 1 000 | 720 × 504 | 768 × 538 (the narrowed width × 0.7) |
+| 390 × 844 | unchanged: content's height | unchanged: content's height |

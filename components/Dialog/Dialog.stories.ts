@@ -278,7 +278,8 @@ export const Sizes: Story = {
 
 /**
  * ADR-0160 — **une hauteur liée à la taille** (fenêtre centrée) : `lg` au plus 80 % de l’écran, `xl` 88 %, `2xl` toute
- * la hauteur ; au-delà, le corps défile entre l’en-tête et le pied. **`height="fixed"`** (`lg`, `xl`) prend cette
+ * la hauteur — et **jamais plus de 0,7 × la largeur**, pour rester en paysage (`lg` 720 × 504, `xl` 960 × 672) ; au-delà,
+ * le corps défile entre l’en-tête et le pied. **`height="fixed"`** (`lg`, `xl`) prend cette
  * hauteur même avec peu de contenu — les étapes d’un parcours gardent la forme de la fenêtre. `sm` et `md` suivent
  * leur contenu ; sous 40rem, toutes reprennent la hauteur du contenu.
  */
