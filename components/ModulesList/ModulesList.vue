@@ -286,8 +286,10 @@ function current(item: ModulesListItem) {
 
   Amended (ADR-0167): a **launcher**, not a row. The 56px rows with their
   drawings at 32 read small on the home page, so each module is a block, its
-  drawing over its name, centred — 96px tall with the drawing at 40 (the
-  120 × 48 of 0.140 read too large; the drawer keeps its 48). Six a line at most,
+  drawing (40) over its name, centred. **A fixed square of 104** (amended
+  again): stretched to fill the line, the blocks were out of proportion
+  (176 × 96 at 1 440px, wider still on a large screen), so the block keeps
+  its size and the line takes as many as fit, from the start — no ceiling. Six a line at most,
   fewer when the room runs out (ProjectList's ceiling, by six): a column's
   floor becomes a sixth of the line once 10rem is less, gaps counted.
 */
@@ -302,10 +304,8 @@ function current(item: ModulesListItem) {
 .ds-modules-list--page .ds-modules-list__inner {
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(max(10rem, calc((100% - 5 * var(--ds-spacing-lg)) / 6)), 1fr)
-  );
+  grid-template-columns: repeat(auto-fill, 6.5rem);
+  justify-content: start;
   gap: var(--ds-spacing-lg);
   padding: 0;
   background: none;
@@ -319,8 +319,8 @@ function current(item: ModulesListItem) {
   align-items: center;
   justify-content: center;
   gap: var(--ds-spacing-lg);
-  width: auto;
-  height: 6rem;
+  width: 6.5rem;
+  height: 6.5rem;
   padding: 0 var(--ds-spacing-lg);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
@@ -330,7 +330,7 @@ function current(item: ModulesListItem) {
 .ds-modules-list--page .ds-modules-list__label {
   width: 100%;
   min-width: 0;
-  font: var(--ds-font-label-lg-strong);
+  font: var(--ds-font-label-md-strong);
   color: var(--ds-text-strong);
   text-align: center;
 }
@@ -346,13 +346,14 @@ function current(item: ModulesListItem) {
 /*
   The way out (ADR-0165): an `arrow-up-right`, in `text-subtle`, arriving
   with the hover ground on the same pace and leaving with it — and on the
-  keyboard's focus too. In the launcher's top-right corner, `spacing-lg`
-  from both edges (ADR-0167), out of the flow: it never moves the name.
+  keyboard's focus too. In the launcher's top-right corner, `spacing-md`
+  from both edges in the 104 square (ADR-0167), out of the flow: it never
+  moves the name.
 */
 .ds-modules-list__go {
   position: absolute;
-  top: var(--ds-spacing-lg);
-  right: var(--ds-spacing-lg);
+  top: var(--ds-spacing-md);
+  right: var(--ds-spacing-md);
   color: var(--ds-text-subtle);
   opacity: 0;
   transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-default);

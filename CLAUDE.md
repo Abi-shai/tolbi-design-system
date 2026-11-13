@@ -1524,6 +1524,8 @@ Before working on any component, read:
 - **ADR-0167**: **a launcher on the home page** — `ModulesList layout="page"` becomes blocks, the drawing over the name (`label-lg-strong`, centred, cut), `spacing-lg` apart; the arrow goes to the top-right
   corner, absolute, never moving the name; **six a line at most** (`max(10rem, (100% − 5 × lg) / 6)`), the fold kept. The
   drawer unchanged. **Amended**: more compact — **96px, the drawing at 40** (10 above and below; the drawer keeps 48).
+  **Amended again**: a **fixed 104 square** (`repeat(auto-fill, 6.5rem)`, start-aligned, no ceiling), name `label-md-strong`,
+  arrow `spacing-md` from the corner — stretched blocks were out of proportion. In reserve: an 88 square (drawing 32).
 
 ## Architecture
 

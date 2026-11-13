@@ -53,3 +53,25 @@ change.
 What is left is 96 − (40 + 12 + 24) = 20px: 10 above and 10 below, measured. The arrow (16px, 12px from the top, 13
 with the border) never meets the drawing, which is centred: at the narrowest block, 10rem = 160px, 31px separate
 them. At 1 440px there are 6 blocks of 225 × 96, and 63px between arrow and drawing.
+
+## Amended again — a fixed square of 104 (etolbi, 13 Nov., « B » for a trial in the app)
+
+Stretched to fill their line, the blocks were out of proportion: 176 × 96 at 1 440px, and wider still on a large
+screen. The block now **keeps its size**: a **6.5rem square** (104 × 104).
+
+| Part | Value |
+|---|---|
+| Drawing | 40, unchanged |
+| Name | `label-md-strong` (14/20), was `label-lg-strong`; centred, one line, cut |
+| Drawing → name | `spacing-lg`, unchanged |
+| Arrow | `spacing-md` from the corner's edges, since the block is smaller (9px measured, with the border) |
+| Grid | `repeat(auto-fill, 6.5rem)`, `spacing-lg` apart, aligned to the start |
+
+The six-a-line ceiling goes: a line takes as many squares as fit.
+
+Measured, eleven modules: 11 a line at 1 920px and 1 440px with the list at the viewport's width (etolbi's narrower home
+column gives 9 + 2), 10 at 1 200px, 5 at 600px, 2 at 360px. 16px above the drawing and below the name. 7px between
+the arrow and the drawing. No name of the catalogue is cut.
+
+**Kept in reserve** if B does not suit in the app: a square of 88 (5.5rem, drawing 32, `label-md-strong`,
+`spacing-md` between), with which the eleven modules hold on one line at 1 440px.
