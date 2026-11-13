@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import { within, expect } from '@storybook/test'
 import ModulesList from './ModulesList.vue'
 
 // Modules du design Figma (node 518:15253) — ordre et labels exacts
@@ -53,4 +54,31 @@ export const WithDisabledModules: Story = {
 export const SixOrFewer: Story = {
   name: 'Six modules ou moins',
   args: { modules: FIGMA_MODULES.slice(0, 6) },
+}
+
+/**
+ * ADR-0164 — **sur une page** (l’accueil d’etolbi) : `layout="page"`, une grille fluide qui se replie, sans hauteur
+ * fixe ni ombre ; chaque module un bloc bordé, le dessin à 32 et le nom. Avec `href`, chaque entrée est un vrai lien
+ * — clic milieu, nouvel onglet — et émet toujours `select` avec le clic, qu’un routeur peut reprendre.
+ */
+export const OnAPage: Story = {
+  name: 'Sur une page',
+  parameters: { layout: 'padded' },
+  args: {
+    layout: 'page',
+    modules: FIGMA_MODULES.map(m => ({ ...m, href: `#${m.name.toLowerCase()}`, active: m.name === 'Yield' })),
+  },
+  render: args => ({
+    components: { ModulesList },
+    setup: () => ({ args }),
+    template: `<div style="max-width: 1100px"><ModulesList v-bind="args" /></div>`,
+  }),
+  /* Guarded: the entries are links, the current one says it is the page. */
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const links = canvas.getAllByRole('link')
+    await expect(links).toHaveLength(FIGMA_MODULES.length)
+    await expect(canvas.getByRole('link', { name: 'Yield' })).toHaveAttribute('aria-current', 'page')
+    await expect(canvas.getByRole('link', { name: 'Carbone' })).toHaveAttribute('href', '#carbone')
+  },
 }

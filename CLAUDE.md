@@ -1506,6 +1506,11 @@ Before working on any component, read:
   rows — half a drawing, tried first, read too faint), hugging two rows
   at six modules or fewer; `Scrollbar` gains **`persistent`** (the thumb stands while there is something to scroll —
   a list opened to choose from, unlike ADR-0146's reading panels), so the inner panel keeps a 12px gutter for it.
+- **ADR-0164**: **modules as links, and on a page** (etolbi's home) — `ModulesListItem.href` renders a real `<a>` (middle
+  click, new tab) that still emits `select(item, event)` for a router (`HorizontalNavigation`'s `module-select` passes the
+  click too); `layout: 'panel' | 'page'` — `page` is etolbi's recomposition as drawn: a fluid grid (`minmax(10rem, 1fr)`), no
+  height, no shadow, 56px bordered rows, drawing 32 + name. A `<ul>` now; the hover on `quick`/`easing-default`, cut under
+  reduced motion; and the focus ring it never had.
 
 ## Architecture
 

@@ -63,7 +63,7 @@ export type { TolbiAiFeedback, TolbiAiConversation, TolbiAiHistoryLabels } from 
 export { TolbiAiLauncher } from './TolbiAiLauncher'
 
 export { ModulesList } from './ModulesList'
-export type { ModulesListItem } from './ModulesList'
+export type { ModulesListItem, ModulesListLayout } from './ModulesList'
 
 export { IconButton } from './IconButton'
 export type { IconButtonSize, IconButtonVariant, IconButtonTone } from './IconButton'

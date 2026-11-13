@@ -157,7 +157,8 @@ const emit = defineEmits<{
    */
   user:            []
   credits:         []
-  'module-select': [module: NavModule]
+  /** With the click: a module with an `href` is a link, which a router may take over (ADR-0164). */
+  'module-select': [module: NavModule, event: MouseEvent]
 }>()
 
 const activeTooltip = ref<string | null>(null)
@@ -226,9 +227,9 @@ const modulesWithCurrent = computed<NavModule[]>(() =>
   props.modules.map(mod => ({ ...mod, active: mod.name === props.module })),
 )
 
-function selectModule(mod: NavModule) {
+function selectModule(mod: NavModule, event: MouseEvent) {
   if (mod.disabled) return
-  emit('module-select', mod)
+  emit('module-select', mod, event)
   modulesOpen.value = false
 }
 

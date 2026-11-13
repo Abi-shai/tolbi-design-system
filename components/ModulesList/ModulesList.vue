@@ -8,58 +8,100 @@ export interface ModulesListItem {
   label?:    string
   active?:   boolean
   disabled?: boolean
+  /**
+   * Where the module lives (ADR-0164). Given, the entry is a real `<a>` —
+   * middle click, a new tab, the address on hover — and still emits `select`
+   * with the click, so a router can take over (`event.preventDefault()`).
+   */
+  href?:     string
 }
+
+/**
+ * Where the list stands (ADR-0164). `panel` — the bar's drawer: a fixed
+ * 3-column box of 48px drawings, two rows and the drawings of a third, its
+ * own elevation (ADR-0163). `page` — the modules on a page (etolbi's home):
+ * a fluid grid, no fixed height, no shadow, each entry a row — the drawing at
+ * 32 and the name — on a bordered block.
+ */
+export type ModulesListLayout = 'panel' | 'page'
 
 interface Props {
   modules?: ModulesListItem[]
+  layout?:  ModulesListLayout
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modules: () => [],
+  layout:  'panel',
 })
 
 const emit = defineEmits<{
-  select: [item: ModulesListItem]
+  /** An entry was pressed — with the click, so a link's navigation can be taken over. */
+  select: [item: ModulesListItem, event: MouseEvent]
 }>()
 
-function onSelect(item: ModulesListItem) {
-  if (item.disabled) return
-  emit('select', item)
+function onSelect(item: ModulesListItem, event: MouseEvent) {
+  if (item.disabled) {
+    event.preventDefault()
+    return
+  }
+  emit('select', item, event)
+}
+
+/* A link that is the current page says so as a page (ADR-0033); a button says
+   « current » — this is where you are. */
+function current(item: ModulesListItem) {
+  if (!item.active) return undefined
+  return item.href ? 'page' : 'true'
 }
 </script>
 
 <template>
-  <div class="ds-modules-list">
-    <Scrollbar class="ds-modules-list__viewport" shadows persistent>
-      <div class="ds-modules-list__inner">
-        <button
-          v-for="mod in modules"
-          :key="mod.name"
-          class="ds-modules-list__item"
-          :class="{
-            'ds-modules-list__item--active':   mod.active,
-            'ds-modules-list__item--disabled': mod.disabled,
-          }"
-          :disabled="mod.disabled"
-          :aria-current="mod.active ? 'true' : undefined"
-          @click="onSelect(mod)"
-        >
+  <div class="ds-modules-list" :class="`ds-modules-list--${layout}`">
+    <!-- The drawer scrolls inside its box; a page scrolls itself. -->
+    <component
+      :is="layout === 'panel' ? Scrollbar : 'div'"
+      class="ds-modules-list__viewport"
+      v-bind="layout === 'panel' ? { shadows: true, persistent: true } : {}"
+    >
+      <ul class="ds-modules-list__inner">
+        <li v-for="mod in modules" :key="mod.name" class="ds-modules-list__entry">
           <!--
-            The primitive, not the logo: the item button already supplies the surface
-            (its own radius, hover background, and bg-selected when current), so the
-            logo's tile would be a tile inside a tile and would fight the active state.
-            aria-label is null because the visible label below already names the module.
+            A link when the module has an address (ADR-0164), else a button.
+            A disabled link keeps its look and drops its `href`: an `<a>`
+            without one is not focusable and goes nowhere.
           -->
-          <ModuleIcon
-            :module="mod.name"
-            variant="illustration"
-            :size="48"
-            :aria-label="null"
-          />
-          <span class="ds-modules-list__label">{{ mod.label ?? mod.name }}</span>
-        </button>
-      </div>
-    </Scrollbar>
+          <component
+            :is="mod.href ? 'a' : 'button'"
+            class="ds-modules-list__item"
+            :class="{
+              'ds-modules-list__item--active':   mod.active,
+              'ds-modules-list__item--disabled': mod.disabled,
+            }"
+            :href="mod.href && !mod.disabled ? mod.href : undefined"
+            :type="mod.href ? undefined : 'button'"
+            :disabled="!mod.href && mod.disabled ? true : undefined"
+            :aria-disabled="mod.href && mod.disabled ? 'true' : undefined"
+            :aria-current="current(mod)"
+            @click="onSelect(mod, $event)"
+          >
+            <!--
+              The primitive, not the logo: the entry already supplies the surface
+              (its own radius, hover background, and bg-selected when current), so the
+              logo's tile would be a tile inside a tile and would fight the active state.
+              aria-label is null because the visible label already names the module.
+            -->
+            <ModuleIcon
+              :module="mod.name"
+              variant="illustration"
+              :size="layout === 'page' ? 32 : 48"
+              :aria-label="null"
+            />
+            <span class="ds-modules-list__label">{{ mod.label ?? mod.name }}</span>
+          </component>
+        </li>
+      </ul>
+    </component>
   </div>
 </template>
 
@@ -121,6 +163,8 @@ function onSelect(item: ModulesListItem) {
 }
 
 .ds-modules-list__inner {
+  margin: 0;
+  list-style: none;
   /* 246 for three columns, plus a gutter for the thumb, which now stands
      (ADR-0163): floating over the third column it cut the current module's
      ground by 4px. The thumb is 8px inset 4 — `spacing-lg` of room. */
@@ -134,6 +178,10 @@ function onSelect(item: ModulesListItem) {
   flex-wrap: wrap;
   gap: var(--ds-spacing-xl);
   align-content: flex-start;
+}
+
+.ds-modules-list__entry {
+  display: flex;
 }
 
 .ds-modules-list__item {
@@ -154,10 +202,29 @@ function onSelect(item: ModulesListItem) {
   cursor: pointer;
   overflow: hidden;
   flex-shrink: 0;
-  transition: background 0.12s ease;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  /* The package's own pace (ADR-0164), not a hand-written 0.12s; the focus
+     ring at `instant`, as every ring (ADR-0022). */
+  transition:
+    background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),
+    box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
-.ds-modules-list__item:hover:not(:disabled) {
+/* It had none: a keyboard reached the modules unseen. */
+.ds-modules-list__item:focus-visible {
+  outline: none;
+  box-shadow: var(--ds-focus-ring-brand);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-modules-list__item {
+    transition: none;
+  }
+}
+
+.ds-modules-list__item:hover:not(:disabled):not([aria-disabled='true']) {
   background: var(--ds-bg-hover);
 }
 
@@ -175,7 +242,7 @@ function onSelect(item: ModulesListItem) {
   background: var(--ds-bg-selected);
 }
 
-.ds-modules-list__item--active:hover:not(:disabled) {
+.ds-modules-list__item--active:hover:not(:disabled):not([aria-disabled='true']) {
   background: var(--ds-bg-selected-hover);
 }
 
@@ -195,6 +262,60 @@ function onSelect(item: ModulesListItem) {
 
 .ds-modules-list__item--active .ds-modules-list__label {
   font: var(--ds-font-label-md-strong);
+  color: var(--ds-text-on-brand-subtle);
+}
+
+/*
+  ── On a page (ADR-0164) ────────────────────────────────────────────────
+  etolbi's home, as its own recomposition drew it (`modules-row.vue`): a
+  fluid grid that folds (six a row on a desktop, fewer when room runs out),
+  each module a bordered block with its drawing at 32 and its name on one
+  line. No fixed height, no shadow, no ground of its own — the page is the
+  ground. The current module keeps the drawer's mark (ADR-0050).
+*/
+.ds-modules-list--page {
+  display: block;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.ds-modules-list--page .ds-modules-list__inner {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--ds-spacing-lg);
+  padding: 0;
+  background: none;
+  border-radius: 0;
+}
+
+.ds-modules-list--page .ds-modules-list__item {
+  flex: 1;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: auto;
+  height: 3.5rem;
+  padding: 0 var(--ds-spacing-lg);
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-surface);
+  background: var(--ds-bg-default);
+}
+
+.ds-modules-list--page .ds-modules-list__label {
+  width: auto;
+  min-width: 0;
+  font: var(--ds-font-label-md-strong);
+  color: var(--ds-text-strong);
+  text-align: start;
+}
+
+.ds-modules-list--page .ds-modules-list__item--active {
+  background: var(--ds-bg-selected);
+}
+
+.ds-modules-list--page .ds-modules-list__item--active .ds-modules-list__label {
   color: var(--ds-text-on-brand-subtle);
 }
 </style>
