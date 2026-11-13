@@ -325,11 +325,12 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
   width: 100%;
   margin: 0;
   padding: var(--ds-spacing-xl);
-  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  /* Raised on map glass (ADR-0173): an ink edge and a short shadow. */
+  border: var(--ds-border-width-default) solid var(--on-glass-raised-edge, var(--ds-border-subtle));
   border-radius: var(--ds-radius-surface-sm);
   /* At 70 % inside map glass (ADR-0172): opaque white blocks read as a patchwork. */
   background: var(--on-glass-raised, var(--ds-bg-default));
-  box-shadow: var(--option-card-contour), var(--option-card-focus);
+  box-shadow: var(--option-card-contour), var(--option-card-focus), var(--on-glass-raised-shadow, 0 0 transparent);
   color: inherit;
   font: inherit;
   text-align: left;
@@ -400,7 +401,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
   width: var(--ds-spacing-5xl);
   height: var(--ds-spacing-5xl);
   border-radius: var(--ds-radius-control);
-  background: var(--ds-bg-neutral-subtle);
+  background: var(--on-glass-tile, var(--ds-bg-neutral-subtle));
   color: var(--ds-text-default);
 }
 
@@ -598,7 +599,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
   width: 28px;
   height: 28px;
   border-radius: var(--ds-radius-inner);
-  background: var(--ds-bg-neutral);
+  background: var(--on-glass-tile, var(--ds-bg-neutral));
 }
 
 /* The title and its badge on one line; the title gives, the badge does not. */

@@ -71,7 +71,9 @@ withDefaults(defineProps<Props>(), {
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
   --on-glass-control-radius: var(--ds-radius-pill);
-  box-shadow: var(--ds-elevation-raised);
+  --on-glass-rule: color-mix(in srgb, var(--ds-text-strong) 8%, transparent);
+  /* A rim of light on top, a wide soft shadow (ADR-0173). */
+  box-shadow: var(--ds-elevation-map-glass);
   pointer-events: none;
   animation: ds-map-hover-card-in var(--ds-motion-duration-quick) var(--ds-motion-easing-default)
     var(--ds-motion-duration-quick) both;

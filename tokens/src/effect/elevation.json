@@ -15,6 +15,18 @@
     "overlay": {
       "$value": "{shadow.lg}",
       "$description": "Dropdowns, toasts, tooltips — anything floating above the page"
+    },
+    "map-glass": {
+      "$value": "{shadow.glass}",
+      "$description": "Map glass (ADR-0173): a rim of light along the top edge and a wide, soft shadow — the pane catches the light, it is not outlined"
+    },
+    "map-raised": {
+      "$value": "{shadow.glass-raised}",
+      "$description": "A raised block inside map glass (ADR-0173): Card outlined, OptionCard"
+    },
+    "map-selected": {
+      "$value": "{shadow.glass-selected}",
+      "$description": "The chosen tab inside map glass (ADR-0173): it rises off the recessed track"
     }
   }
 }

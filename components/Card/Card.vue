@@ -54,7 +54,8 @@ const slots = defineSlots<{
 }
 
 .ds-card--outlined {
-  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border: var(--ds-border-width-default) solid var(--on-glass-raised-edge, var(--ds-border-subtle));
+  box-shadow: var(--on-glass-raised-shadow, none);
   /* Opaque white blocks on glass read as a patchwork (ADR-0172). */
   background-color: var(--on-glass-raised, var(--ds-bg-default));
 }
@@ -67,6 +68,8 @@ const slots = defineSlots<{
 .ds-card--sunk {
   border: var(--ds-border-width-default) solid transparent;
   background-color: var(--on-glass-sunk, var(--ds-bg-neutral-subtle));
+  /* On map glass, a section in hollow: the ink at 4 % and a 3 % inner line (ADR-0173). */
+  box-shadow: var(--on-glass-sunk-edge, none);
 }
 
 .ds-card--pad-none { --card-pad: 0px; }
@@ -82,7 +85,7 @@ const slots = defineSlots<{
 }
 
 /* Dividers only appear when there is something to divide. */
-.ds-card__header { border-bottom: var(--ds-border-width-default) solid var(--ds-border-subtle); }
+.ds-card__header { border-bottom: var(--ds-border-width-default) solid var(--on-glass-rule, var(--ds-border-subtle)); }
 .ds-card__footer { border-top: var(--ds-border-width-default) solid var(--ds-border-subtle); }
 
 .ds-card__body { flex: 1 1 auto; }

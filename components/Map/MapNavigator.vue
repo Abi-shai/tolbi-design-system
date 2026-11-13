@@ -322,7 +322,9 @@ function by(d: number) {
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
   --on-glass-control-radius: var(--ds-radius-pill);
-  box-shadow: var(--ds-elevation-raised);
+  --on-glass-rule: color-mix(in srgb, var(--ds-text-strong) 8%, transparent);
+  /* A rim of light on top, a wide soft shadow (ADR-0173). */
+  box-shadow: var(--ds-elevation-map-glass);
 }
 
 .ds-map-navigator__group {
@@ -364,7 +366,8 @@ function by(d: number) {
   flex: none;
   width: 20px;
   height: var(--ds-border-width-default);
-  background: var(--ds-border-subtle);
+  /* Translucent ink, not an opaque grey (ADR-0173). */
+  background: var(--on-glass-rule, var(--ds-border-subtle));
 }
 
 /*
@@ -391,11 +394,19 @@ function by(d: number) {
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
   --on-glass-control-radius: var(--ds-radius-pill);
+  --on-glass-raised-edge: color-mix(in srgb, var(--ds-text-strong) 6%, transparent);
+  --on-glass-raised-shadow: var(--ds-elevation-map-raised);
+  --on-glass-sunk-border: transparent;
+  --on-glass-sunk-edge: inset 0 0 0 var(--ds-border-width-default) color-mix(in srgb, var(--ds-text-strong) 3%, transparent);
+  --on-glass-tile: color-mix(in srgb, var(--ds-text-strong) 5%, transparent);
+  --on-glass-selected-shadow: var(--ds-elevation-map-selected);
+  --on-glass-rule: color-mix(in srgb, var(--ds-text-strong) 8%, transparent);
   --on-glass-card-radius: var(--ds-radius-surface-lg);
   --on-glass-row-radius: var(--ds-radius-surface);
   --on-glass-raised: var(--ds-bg-map-raised);
   --on-glass-sunk: var(--ds-bg-map-sunk);
-  box-shadow: var(--ds-elevation-raised);
+  /* A rim of light on top, a wide soft shadow (ADR-0173). */
+  box-shadow: var(--ds-elevation-map-glass);
   transform-origin: top right;
 }
 

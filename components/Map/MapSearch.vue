@@ -166,7 +166,7 @@ function onKey(e: KeyboardEvent) {
 .ds-map-search__scroll {
   flex: 1 1 auto;
   min-height: 0;
-  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-top: var(--ds-border-width-default) solid var(--on-glass-rule, var(--ds-border-subtle));
 }
 
 .ds-map-search__list {
@@ -178,7 +178,7 @@ function onKey(e: KeyboardEvent) {
 .ds-map-search__group + .ds-map-search__group {
   margin-top: var(--ds-spacing-xs);
   padding-top: var(--ds-spacing-xs);
-  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-top: var(--ds-border-width-default) solid var(--on-glass-rule, var(--ds-border-subtle));
 }
 
 /* A group is titled as `SideNavGroup` titles a run of rows: `label-md`, `text-subtle`. */
@@ -223,7 +223,7 @@ function onKey(e: KeyboardEvent) {
   width: 32px;
   height: 32px;
   border-radius: var(--ds-radius-control);
-  background: var(--ds-bg-neutral-subtle);
+  background: var(--on-glass-tile, var(--ds-bg-neutral-subtle));
   color: var(--ds-text-subtle);
 }
 

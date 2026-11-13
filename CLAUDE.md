@@ -1562,6 +1562,13 @@ Before working on any component, read:
   `prefers-reduced-transparency` → opaque. **Pressed = pill** (`--on-glass-control-radius`: Button, CloseButton,
   InputField, Tabs; the column a capsule, its buttons round), **read = large curve**: `MapPanel lg` and the tool card
   `--ds-radius-surface-xl` (24, minted), cards inside 16, rows 12, `MapHoverCard` 16.
+- **ADR-0173**: **glass finish** (0.144 review) — **levels by light, not grey borders**: hollow (`Card sunk`, `Tabs` track) =
+  ink 4 % + a 3 % inner line, no border; relief (`Card outlined`, `OptionCard`) = white 94 % + ink 6 % edge +
+  `elevation-map-raised`; chosen tab `elevation-map-selected`; icon tiles ink 5 %. **Rules in ink** (`--on-glass-rule`, 8 %;
+  `MapPanel` head and foot 6 %, the head gains its inset rule). Every map surface takes `--ds-elevation-map-glass` (a top
+  rim of light + a wide soft shadow). `Scrollbar` **`mask`**: the content fades, nothing painted (the painted fade was a
+  white band on glass). **Folded, `MapPanel` keeps its button**: the same `IconButton sm subtle`, on the same pixel
+  (measured on the press), in a pill of pilot glass with the panel's title beside it.
 
 ## Architecture
 

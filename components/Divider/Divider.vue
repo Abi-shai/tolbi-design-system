@@ -43,7 +43,7 @@ withDefaults(defineProps<Props>(), {
 .ds-divider {
   margin: 0;
   border: 0;
-  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-top: var(--ds-border-width-default) solid var(--on-glass-rule, var(--ds-border-subtle)); /* ink on map glass (ADR-0173) */
 }
 
 .ds-divider--vertical {
@@ -51,7 +51,7 @@ withDefaults(defineProps<Props>(), {
   align-self: stretch;
   min-height: 1em;
   border-top: 0;
-  border-left: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-left: var(--ds-border-width-default) solid var(--on-glass-rule, var(--ds-border-subtle)); /* ink on map glass (ADR-0173) */
 }
 
 .ds-divider--labelled {
@@ -63,7 +63,7 @@ withDefaults(defineProps<Props>(), {
 
 .ds-divider__line {
   flex: 1;
-  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-top: var(--ds-border-width-default) solid var(--on-glass-rule, var(--ds-border-subtle)); /* ink on map glass (ADR-0173) */
 }
 
 /* At the start, a stub of line before the label rather than none. */

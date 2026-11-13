@@ -219,6 +219,7 @@ function onFocus() {
   background: var(--ds-bg-map-control);
   -webkit-backdrop-filter: var(--ds-backdrop-map-control);
   backdrop-filter: var(--ds-backdrop-map-control);
+  box-shadow: var(--ds-elevation-map-glass);
 }
 
 @media (prefers-reduced-transparency: reduce) {

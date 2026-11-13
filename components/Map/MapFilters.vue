@@ -56,7 +56,7 @@ const emit = defineEmits<{ clear: [] }>()
 }
 
 .ds-map-filters__body > :deep(* + *) {
-  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-top: var(--ds-border-width-default) solid var(--on-glass-rule, var(--ds-border-subtle));
 }
 
 .ds-map-filters__foot {
@@ -66,7 +66,7 @@ const emit = defineEmits<{ clear: [] }>()
   justify-content: space-between;
   gap: var(--ds-spacing-md);
   padding: var(--ds-spacing-md) var(--ds-spacing-lg);
-  border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-top: var(--ds-border-width-default) solid var(--on-glass-rule, var(--ds-border-subtle));
 }
 
 .ds-map-filters__result {

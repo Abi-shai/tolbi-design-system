@@ -130,13 +130,25 @@ const titled = computed(() => props.closable && !!props.title && !!slots.header)
 */
 const atEnd = ref(false)
 let pressed = false
+/* Where the head's fold stood, from the place's corner (ADR-0173): the folded
+   pill puts the same button on the same pixel. Measured on the press; folded
+   from the product, the head's own padding stands in. */
+const foldAt = ref<{ x: number; y: number } | null>(null)
 async function fold(next: boolean) {
   if (next) atEnd.value = !!host.value?.closest('.ds-map-overlay--end, .ds-map-overlay--top-end, .ds-map-overlay--bottom-end')
+  if (next) {
+    const button = host.value?.querySelector<HTMLElement>('[data-map-panel-fold]')?.getBoundingClientRect()
+    const place = host.value?.parentElement?.getBoundingClientRect()
+    foldAt.value = button && place ? { x: button.left - place.left, y: button.top - place.top } : null
+  }
   pressed = true
   collapsed.value = next
   await nextTick()
 }
-const unfoldAt = computed(() => ({ transformOrigin: atEnd.value ? 'top right' : 'top left' }))
+const unfoldAt = computed(() => ({
+  transformOrigin: atEnd.value ? 'top right' : 'top left',
+  ...(foldAt.value && !atEnd.value ? { '--map-panel-fold-x': `${foldAt.value.x}px`, '--map-panel-fold-y': `${foldAt.value.y}px` } : {}),
+}))
 /* Only when the fold was pressed here: a product folding the panel through
    `v-model:collapsed` does not take the reader's focus (ADR-0062). */
 function focusArrived() {
@@ -198,18 +210,22 @@ onBeforeUnmount(() => {
       <!-- The transition is the wrapper's: `Button` declares its own `transition`,
            which outweighs the surface's and would make it arrive in one frame. -->
       <div v-if="collapsible && collapsed && iconFold" key="open-icon" class="ds-map-panel__unfold" :style="unfoldAt">
-      <Button
-        data-map-panel-open
-        variant="secondary-gray"
-        size="sm"
-        icon-only
-        icon-leading="panel-left"
-        :label="named(expandLabel)"
-        aria-expanded="false"
-        :aria-controls="panelId"
-        @click="fold(false)"
-      />
-      <slot name="folded" />
+        <!-- The same button as in the open head, at the same pixel, in a pill of
+             pilot glass that says what is folded (ADR-0173). -->
+        <div class="ds-map-panel__capsule">
+          <IconButton
+            data-map-panel-open
+            icon="panel-left"
+            size="sm"
+            variant="subtle"
+            :ariaLabel="named(expandLabel)"
+            aria-expanded="false"
+            :aria-controls="panelId"
+            @click="fold(false)"
+          />
+          <span v-if="title" class="ds-map-panel__capsule-title" aria-hidden="true" @click="fold(false)">{{ title }}</span>
+        </div>
+        <slot name="folded" />
       </div>
       <!-- A small panel: a button bearing its title, in its place. -->
       <div v-else-if="collapsible && collapsed" key="open-title" class="ds-map-panel__unfold">
@@ -277,7 +293,7 @@ onBeforeUnmount(() => {
         <div v-else-if="loading" class="ds-map-panel__head" aria-hidden="true">
           <Skeleton width="40%" />
         </div>
-        <component :is="size === 'lg' ? Scrollbar : AsIs" :shadows="size === 'lg' || undefined" class="ds-map-panel__scroll">
+        <component :is="size === 'lg' ? Scrollbar : AsIs" :shadows="size === 'lg' || undefined" :mask="size === 'lg' || undefined" class="ds-map-panel__scroll">
         <div class="ds-map-panel__body">
           <slot v-if="!loading" />
           <slot v-else name="loading">
@@ -320,11 +336,19 @@ onBeforeUnmount(() => {
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
   --on-glass-control-radius: var(--ds-radius-pill);
+  --on-glass-raised-edge: color-mix(in srgb, var(--ds-text-strong) 6%, transparent);
+  --on-glass-raised-shadow: var(--ds-elevation-map-raised);
+  --on-glass-sunk-border: transparent;
+  --on-glass-sunk-edge: inset 0 0 0 var(--ds-border-width-default) color-mix(in srgb, var(--ds-text-strong) 3%, transparent);
+  --on-glass-tile: color-mix(in srgb, var(--ds-text-strong) 5%, transparent);
+  --on-glass-selected-shadow: var(--ds-elevation-map-selected);
+  --on-glass-rule: color-mix(in srgb, var(--ds-text-strong) 8%, transparent);
   --on-glass-card-radius: var(--ds-radius-surface-lg);
   --on-glass-row-radius: var(--ds-radius-surface);
   --on-glass-raised: var(--ds-bg-map-raised);
   --on-glass-sunk: var(--ds-bg-map-sunk);
-  box-shadow: var(--ds-elevation-raised);
+  /* A rim of light on top, a wide soft shadow (ADR-0173). */
+  box-shadow: var(--ds-elevation-map-glass);
   /* ADR-0021: the consuming surface sets its own origin — it goes to its
      corner, where the control it becomes stands. */
   transform-origin: top left;
@@ -411,8 +435,21 @@ onBeforeUnmount(() => {
 }
 
 .ds-map-panel--lg .ds-map-panel__head {
+  position: relative;
   flex: none;
   padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
+}
+
+/* The head's rule, inset as the foot's (ADR-0173): the head stays while the body
+   scrolls, and the rule says where the scroll begins. */
+.ds-map-panel--lg .ds-map-panel__head::after {
+  content: '';
+  position: absolute;
+  right: var(--ds-spacing-xl);
+  bottom: 0;
+  left: var(--ds-spacing-xl);
+  height: var(--ds-border-width-default);
+  background: color-mix(in srgb, var(--ds-text-strong) 6%, transparent);
 }
 
 .ds-map-panel__pending {
@@ -524,7 +561,8 @@ onBeforeUnmount(() => {
   right: var(--ds-spacing-xl);
   left: var(--ds-spacing-xl);
   height: var(--ds-border-width-default);
-  background: var(--ds-border-subtle);
+  /* Ink at 6 %, not an opaque grey: on glass a grey line reads as a seam (ADR-0173). */
+  background: color-mix(in srgb, var(--ds-text-strong) 6%, transparent);
 }
 
 .ds-map-panel__unfold {
@@ -532,6 +570,55 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: var(--ds-spacing-md);
   transform-origin: top left;
+}
+
+/*
+  Folded (ADR-0173): a pill of pilot glass, 8px around the head's own fold
+  button — an `IconButton sm subtle`, 36px, round, the one the open head shows.
+  Placed so that button lands **on the pixel** it held in the head — measured
+  on the press (centred on the tabs, it is not at the head's padding), the
+  head's padding standing in when the product folds it — less the pill's own
+  8px and border. The title beside it
+  says what is folded; it takes the pointer too, the button keeps the name.
+*/
+.ds-map-panel__capsule {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-xs);
+  box-sizing: border-box;
+  max-width: 25rem;
+  margin-block-start: calc(var(--map-panel-fold-y, calc(var(--ds-spacing-lg) + var(--ds-border-width-default))) - var(--ds-spacing-md) - var(--ds-border-width-default));
+  margin-inline-start: calc(var(--map-panel-fold-x, calc(var(--ds-spacing-xl) + var(--ds-border-width-default))) - var(--ds-spacing-md) - var(--ds-border-width-default));
+  padding: var(--ds-spacing-md);
+  border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-bg-map-control);
+  -webkit-backdrop-filter: var(--ds-backdrop-map-control);
+  backdrop-filter: var(--ds-backdrop-map-control);
+  box-shadow: var(--ds-elevation-map-glass);
+}
+
+.ds-map-panel__capsule:has(.ds-map-panel__capsule-title) {
+  padding-inline-end: var(--ds-spacing-xl);
+}
+
+.ds-map-panel__capsule-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--ds-font-label-lg-strong);
+  color: var(--ds-text-strong);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ds-map-panel__capsule {
+    border-color: var(--ds-border-subtle);
+    background: var(--ds-bg-default);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 /* Less transparency asked for: the same surface, opaque, nothing blurred (ADR-0172). */

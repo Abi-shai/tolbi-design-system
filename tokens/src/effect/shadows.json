@@ -20,6 +20,15 @@
     },
     "3xl": {
       "$value": "0px 32px 64px -12px color-mix(in srgb, var(--ds-color-gray-light-900) 14%, transparent)"
+    },
+    "glass": {
+      "$value": "inset 0px 1px 0px 0px color-mix(in srgb, var(--ds-color-base-white) 85%, transparent), 0px 12px 32px -8px color-mix(in srgb, var(--ds-color-gray-light-900) 18%, transparent), 0px 2px 6px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 5%, transparent)"
+    },
+    "glass-raised": {
+      "$value": "0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 6%, transparent)"
+    },
+    "glass-selected": {
+      "$value": "0px 1px 3px 0px color-mix(in srgb, var(--ds-color-gray-light-900) 10%, transparent)"
     }
   }
 }

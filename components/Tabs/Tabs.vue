@@ -122,7 +122,8 @@ function onKeydown(e: KeyboardEvent, i: number) {
   width: 100%;
   /* On map glass a track at 55 %, and the strip a pill (ADR-0172). */
   background-color: var(--on-glass-sunk, var(--ds-bg-neutral-subtle));
-  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border: var(--ds-border-width-default) solid var(--on-glass-sunk-border, var(--ds-border-subtle));
+  box-shadow: var(--on-glass-sunk-edge, none);
   gap: var(--ds-spacing-xs);
 }
 
@@ -149,7 +150,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
   top: 0;
   border-radius: var(--on-glass-control-radius, var(--ds-radius-inner));
   background-color: var(--ds-bg-default);
-  box-shadow: var(--ds-elevation-surface);
+  box-shadow: var(--on-glass-selected-shadow, var(--ds-elevation-surface));
   pointer-events: none;
   z-index: 0;
   /* No transition until after first paint to prevent mount jump */

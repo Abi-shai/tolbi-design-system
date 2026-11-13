@@ -18,6 +18,14 @@ export interface ScrollbarProps {
    */
   shadows?: boolean
   /**
+   * The edges fade the **content**, through a mask, instead of painting the
+   * ground over it (ADR-0173): on glass there is no ground to paint — the
+   * painted fade was an opaque white band over a translucent pane. With
+   * `shadows`, the same edges, the same 24px, the same rule (only while there
+   * is more that way).
+   */
+  mask?: boolean
+  /**
    * The thumb stays shown while there is something to scroll, from the first
    * frame (ADR-0163) — for a short list a person opens to choose from, where
    * « there is more » must be said before anyone scrolls. Off, it shows while
@@ -27,7 +35,7 @@ export interface ScrollbarProps {
   persistent?: boolean
 }
 
-const props = withDefaults(defineProps<ScrollbarProps>(), { horizontal: false, shadows: false, persistent: false })
+const props = withDefaults(defineProps<ScrollbarProps>(), { horizontal: false, shadows: false, persistent: false, mask: false })
 
 /**
  * The native scrollbar is hidden and replaced by an absolutely positioned thumb.
@@ -186,7 +194,8 @@ defineExpose({ viewport })
     class="ds-scrollbar"
     :class="{
       'ds-scrollbar--horizontal': horizontal,
-      'ds-scrollbar--shadows': shadows && scrollable,
+      'ds-scrollbar--shadows': shadows && scrollable && !mask,
+      'ds-scrollbar--mask': shadows && scrollable && mask,
       'ds-scrollbar--at-start': atStart,
       'ds-scrollbar--at-end': atEnd,
     }"
@@ -219,7 +228,7 @@ defineExpose({ viewport })
     />
 
     <!-- Purely decorative, and never intercepting a pointer. -->
-    <template v-if="shadows && scrollable">
+    <template v-if="shadows && scrollable && !mask">
       <span class="ds-scrollbar__fade ds-scrollbar__fade--start" aria-hidden="true" />
       <span class="ds-scrollbar__fade ds-scrollbar__fade--end" aria-hidden="true" />
     </template>
@@ -328,6 +337,22 @@ defineExpose({ viewport })
 
 .ds-scrollbar--horizontal .ds-scrollbar__fade--start { top: 0; bottom: 0; left: 0; right: auto; height: auto; width: var(--fade-size); background: linear-gradient(to right, var(--fade-color), transparent); }
 .ds-scrollbar--horizontal .ds-scrollbar__fade--end   { top: 0; bottom: 0; right: 0; left: auto; height: auto; width: var(--fade-size); background: linear-gradient(to left, var(--fade-color), transparent); }
+
+/* ── Masked edges (ADR-0173): the content fades, nothing is painted ── */
+.ds-scrollbar--mask .ds-scrollbar__viewport {
+  --mask-start: 24px;
+  --mask-end: 24px;
+  /* token-lint-disable-next-line no-colour-literal — a mask's alpha, not a colour */
+  mask-image: linear-gradient(to bottom, transparent 0, black var(--mask-start), black calc(100% - var(--mask-end)), transparent 100%);
+}
+
+.ds-scrollbar--mask.ds-scrollbar--horizontal .ds-scrollbar__viewport {
+  /* token-lint-disable-next-line no-colour-literal — a mask's alpha, not a colour */
+  mask-image: linear-gradient(to right, transparent 0, black var(--mask-start), black calc(100% - var(--mask-end)), transparent 100%);
+}
+
+.ds-scrollbar--mask.ds-scrollbar--at-start .ds-scrollbar__viewport { --mask-start: 0px; }
+.ds-scrollbar--mask.ds-scrollbar--at-end .ds-scrollbar__viewport { --mask-end: 0px; }
 
 /* Hide the fade on the edge that has nothing left to reveal. */
 .ds-scrollbar--at-start .ds-scrollbar__fade--start,

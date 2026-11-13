@@ -273,14 +273,14 @@
       "$description": "ground — glass for what is read on a map (ADR-0172): bg-default at 90 %"
     },
     "map-raised": {
-      "$value": "color-mix(in srgb, {color.gray-forest.900} 70%, transparent)",
+      "$value": "color-mix(in srgb, {color.gray-forest.800} 94%, transparent)",
       "$type": "color",
-      "$description": "ground — a raised block inside map glass (ADR-0172): bg-default at 70 %"
+      "$description": "ground — a raised block inside map glass in dark (ADR-0173): a layer rises in dark (ADR-0029), gray-forest/800 at 94 %"
     },
     "map-sunk": {
-      "$value": "color-mix(in srgb, {color.gray-forest.800} 55%, transparent)",
+      "$value": "color-mix(in srgb, {color.gray-forest.100} 4%, transparent)",
       "$type": "color",
-      "$description": "ground — a recessed block inside map glass (ADR-0172): bg-neutral-subtle at 55 %"
+      "$description": "ground — a recessed section inside map glass in dark (ADR-0173): the dark ink (text-strong's gray-forest/100) at 4 %"
     }
   },
   "border": {

@@ -273,14 +273,14 @@
       "$description": "ground — glass for what is read on a map (ADR-0172): MapPanel, the navigator's tool card. bg-default at 90 % under backdrop-map-read"
     },
     "map-raised": {
-      "$value": "color-mix(in srgb, {color.base.white} 70%, transparent)",
+      "$value": "color-mix(in srgb, {color.base.white} 94%, transparent)",
       "$type": "color",
-      "$description": "ground — a raised block inside map glass (ADR-0172): Card outlined, OptionCard row. Opaque white blocks on glass read as a patchwork"
+      "$description": "ground — a raised block inside map glass (ADR-0172, amended by ADR-0173): Card outlined, OptionCard. White at 94 %, with an ink edge and a short shadow — the three levels are told by light, not by grey borders"
     },
     "map-sunk": {
-      "$value": "color-mix(in srgb, {color.gray-light.50} 55%, transparent)",
+      "$value": "color-mix(in srgb, {color.gray-light.900} 4%, transparent)",
       "$type": "color",
-      "$description": "ground — a recessed block inside map glass (ADR-0172): Card sunk, the Tabs track. bg-neutral-subtle at 55 %"
+      "$description": "ground — a recessed section inside map glass (ADR-0173): Card sunk, the Tabs track. The ink at 4 %, no border — the glass darkened, not a grey block laid on it"
     }
   },
   "border": {
