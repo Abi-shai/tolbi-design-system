@@ -212,8 +212,12 @@ function focusArrived() {
   background: var(--ds-bg-default);
   box-shadow: var(--ds-elevation-raised);
   transform-origin: top right;
-  /* Its own height in any row it lands in — a stretched card is a hole in the map. */
-  align-self: flex-start;
+  /* Its own height in any row it lands in — a stretched card is a hole in the
+     map — said by its height, not by `align-self`: a self-alignment overrode
+     the overlay's, so in `end` it sat at the start of the column and jumped
+     242px left when a sheet widened it (ADR-0170). Across, the overlay places
+     it — against its edge, whatever is stacked under it. */
+  height: fit-content;
 }
 
 .ds-map-navigator--folded {

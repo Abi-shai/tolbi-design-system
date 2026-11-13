@@ -218,7 +218,7 @@ const PARCELS = [
 export const Selection: Story = {
   name: 'Sélection d’un objet',
   render: () => ({
-    components: { MapOverlay, MapPanel, MapTimeline, MapLegend, MapHoverCard, MapPin, OptionList, OptionCard },
+    components: { MapOverlay, MapPanel, MapTimeline, MapLegend, MapHoverCard, MapPin, MapNavigator, OptionList, OptionCard },
     setup() {
       const hovered = ref<string | null>(null)
       const chosen = ref<string | null>(null)
@@ -236,7 +236,8 @@ export const Selection: Story = {
       const onParcel = (id: string, e: MouseEvent) => { pin.value = at(e); chosen.value = id }
       const close = () => { pin.value = null; chosen.value = null }
       const choose = (id: string | null) => { chosen.value = id; pin.value = null }
-      return { GIS_MAP, PARCELS, hovered, chosen, year, years, current, sheet, pin, onMap, onParcel, close, choose }
+      const zoom = ref(12)
+      return { GIS_MAP, PARCELS, hovered, chosen, year, years, current, sheet, pin, onMap, onParcel, close, choose, zoom }
     },
     template: `
       <div :style="GIS_MAP" data-map @click="onMap">
@@ -254,6 +255,8 @@ export const Selection: Story = {
           <MapTimeline v-model="year" :periods="years" label="Année" />
         </MapOverlay>
         <MapOverlay position="end">
+          <!-- As in Carbone: the navigator, then the sheet under it — it stays at the edge (ADR-0170). -->
+          <MapNavigator v-model:zoom="zoom" />
           <MapPanel v-if="sheet" :key="sheet.id" size="lg" :title="sheet.id" closable @close="close">
             <p style="margin:0; font:var(--ds-font-body-md); color:var(--ds-text-default)">{{ sheet.owner }} · {{ sheet.area }}</p>
             <p style="margin:0; font:var(--ds-font-heading-xl); color:var(--ds-text-strong)">{{ sheet.carbon }} <span style="font:var(--ds-font-body-sm); color:var(--ds-text-subtle)">tCO2e</span></p>

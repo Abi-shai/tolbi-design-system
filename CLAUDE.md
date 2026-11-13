@@ -1539,6 +1539,9 @@ Before working on any component, read:
   anchors bottom centre); drops 8px on `enter`/`easing-out`, **drops again when `at` changes** (no glide), fades on
   `exit` through a ghost placed by measure in the nearest positioned ancestor; `aria-hidden`, `pointer-events: none`.
   `no-colour-literal` no longer reads a token's name (`--ds-color-base-white`) as the keyword.
+- **ADR-0170**: **a control stays put when a panel appears** — `MapNavigator`'s `align-self: flex-start` (meant to keep it
+  unstretched in a row) overrode `end`'s `flex-end`, so a sheet stacked under it widened the overlay and the navigator
+  jumped 242px left; the overlay places it now (against its edge), and `height: fit-content` keeps it unstretched.
 
 ## Architecture
 
