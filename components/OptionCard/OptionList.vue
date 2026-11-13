@@ -29,6 +29,11 @@ interface Props {
   /** The group's name, when nothing on screen says it. */
   ariaLabel?: string
   disabled?: boolean
+  /**
+   * The row to show as hovered without it being chosen (ADR-0168) — the object
+   * the pointer is over on the map. It takes its own hover's look, nothing more.
+   */
+  highlighted?: OptionValue | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -40,11 +45,14 @@ const props = withDefaults(defineProps<Props>(), {
   legend: undefined,
   ariaLabel: undefined,
   disabled: false,
+  highlighted: null,
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: OptionValue]
   'update:values': [values: OptionValue[]]
+  /** A row the pointer entered (its value) or left (`null`) — the map can answer it (ADR-0168). */
+  hover: [value: OptionValue | null]
 }>()
 
 provide(OPTION_LIST_KEY, {
@@ -56,6 +64,8 @@ provide(OPTION_LIST_KEY, {
     if (!props.multiple) return emit('update:modelValue', value)
     emit('update:values', props.values.includes(value) ? props.values.filter(v => v !== value) : [...props.values, value])
   },
+  highlighted: computed(() => props.highlighted),
+  hover: value => emit('hover', value),
 })
 </script>
 

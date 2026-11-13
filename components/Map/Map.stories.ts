@@ -7,6 +7,8 @@ import MapNavigator from './MapNavigator.vue'
 import MapTimeline from './MapTimeline.vue'
 import MapLegend from './MapLegend.vue'
 import MapTooltip from './MapTooltip.vue'
+import MapHoverCard from './MapHoverCard.vue'
+import { OptionList, OptionCard } from '../OptionCard'
 import MapCanvas, { type MapCanvasBasemap } from './MapCanvas.vue'
 import MapStatus, { type MapStatusState } from './MapStatus.vue'
 import { SOUBRE_PARCELS, SOUBRE_SIZE } from './MapLoading.demo'
@@ -34,7 +36,8 @@ const meta: Meta<typeof MapOverlay> = {
           '| `MapNavigator` | La mini-carte, − la jauge de zoom + et recentrer ; replié en barre |\n' +
           '| `MapTimeline` | La frise du temps : année / mois / jour, comparer deux dates |\n' +
           '| `MapLegend` | La légende : l’indicateur affiché, son dégradé, ses bornes, les symboles |\n' +
-          '| `MapTooltip` | Ce que dit un clic sur un point : un petit dialogue que le moteur place |\n\n' +
+          '| `MapTooltip` | Ce que dit un clic sur un point : un petit dialogue que le moteur place |\n' +
+          '| `MapHoverCard` | Ce que le pointeur survole : une petite carte, non interactive, que le moteur place |\n\n' +
           'Voir l’histoire « Écran SIG — toutes les pièces » pour les voir ensemble.\n\n' +
           'Ce qui se pose sur une carte (ADR-0087), d’après le dessin du propriétaire (« Tester la conformité ») : ' +
           '`MapOverlay` est une place — six, les quatre coins et le milieu du haut et du bas — à 16 px des bords, qui empile ' +
@@ -188,6 +191,67 @@ export const GisScreen: Story = {
           style="position:absolute; left:62%; top:46%; width:14px; height:14px; padding:0; border:2px solid var(--ds-bg-default); border-radius:3px; background:var(--ds-bg-brand-solid); cursor:pointer"></button>
         <div v-if="point" style="position:absolute; left:calc(62% + 22px); top:calc(46% - 12px)">
           <MapTooltip title="Point du projet P-17" description="Ses points de contrôle, du plus proche au plus éloigné" :rows="rows" @close="point = false" />
+        </div>
+      </div>
+    `,
+  }),
+}
+
+/*
+  Selecting an object, Weather Lab's way (ADR-0168): the pointer over a parcel
+  shows its card beside it and underlines its row in the panel's list; a row
+  hovered lights the parcel back; a click opens its sheet at the end, which
+  arrives from its edge, and the legend and the timeline recentre in the room
+  left between the two panels.
+*/
+const PARCELS = [
+  { id: 'P-2041', owner: 'Koné Affoué', area: '18,5 ha', carbon: '412', status: 'Éligible', tone: 'success' as const, left: '46%', top: '38%' },
+  { id: 'P-2042', owner: 'Yao Kouassi', area: '7,2 ha', carbon: '96', status: 'À revoir', tone: 'warning' as const, left: '58%', top: '54%' },
+  { id: 'P-2047', owner: 'Bamba Mariam', area: '12,0 ha', carbon: '238', status: 'Éligible', tone: 'success' as const, left: '66%', top: '30%' },
+]
+
+/** ADR-0168 — sélectionner un objet : survol (carte résumé + ligne soulignée), clic (la fiche entre de son bord), la légende et la frise recentrées entre les deux panneaux. */
+export const Selection: Story = {
+  name: 'Sélection d’un objet',
+  render: () => ({
+    components: { MapOverlay, MapPanel, MapTimeline, MapLegend, MapHoverCard, OptionList, OptionCard },
+    setup() {
+      const hovered = ref<string | null>(null)
+      const chosen = ref<string | null>(null)
+      const year = ref('2026')
+      const years = Array.from({ length: 6 }, (_, i) => String(2021 + i)).map(y => ({ value: y, label: y }))
+      const current = computed(() => PARCELS.find(p => p.id === hovered.value) ?? null)
+      const sheet = computed(() => PARCELS.find(p => p.id === chosen.value) ?? null)
+      return { GIS_MAP, PARCELS, hovered, chosen, year, years, current, sheet }
+    },
+    template: `
+      <div :style="GIS_MAP">
+        <MapOverlay position="start">
+          <MapPanel size="lg" title="Parcelles">
+            <OptionList :model-value="chosen" :highlighted="hovered" aria-label="Parcelles" @update:model-value="chosen = $event" @hover="hovered = $event">
+              <OptionCard v-for="p in PARCELS" :key="p.id" :value="p.id" density="row" icon="land-plot" :label="p.id" :meta="p.area" :badge="p.status" :badge-tone="p.tone" />
+            </OptionList>
+          </MapPanel>
+        </MapOverlay>
+        <MapOverlay position="top">
+          <MapLegend title="Carbone" unit="CO2e/ha" :ticks="['0 t', '8 t', '16 t']" />
+        </MapOverlay>
+        <MapOverlay position="bottom">
+          <MapTimeline v-model="year" :periods="years" label="Année" />
+        </MapOverlay>
+        <MapOverlay position="end">
+          <MapPanel v-if="sheet" :key="sheet.id" size="lg" :title="sheet.id" closable @close="chosen = null">
+            <p style="margin:0; font:var(--ds-font-body-md); color:var(--ds-text-default)">{{ sheet.owner }} · {{ sheet.area }}</p>
+            <p style="margin:0; font:var(--ds-font-heading-xl); color:var(--ds-text-strong)">{{ sheet.carbon }} <span style="font:var(--ds-font-body-sm); color:var(--ds-text-subtle)">tCO2e</span></p>
+          </MapPanel>
+        </MapOverlay>
+        <button v-for="p in PARCELS" :key="p.id" type="button" :aria-label="'Parcelle ' + p.id" :data-parcel="p.id"
+          @mouseenter="hovered = p.id" @mouseleave="hovered = null" @click="chosen = p.id"
+          :style="{ position: 'absolute', left: p.left, top: p.top, width: '72px', height: '52px', padding: 0, cursor: 'pointer', borderRadius: '6px',
+            border: '2px solid ' + (hovered === p.id || chosen === p.id ? 'var(--ds-border-brand)' : 'var(--ds-bg-default)'),
+            background: 'color-mix(in srgb, var(--ds-bg-success-solid) 35%, transparent)' }"></button>
+        <div v-if="current" :style="{ position: 'absolute', left: 'calc(' + current.left + ' + 84px)', top: current.top, zIndex: 2 }">
+          <MapHoverCard :title="current.id" :status="current.status" :status-tone="current.tone" :meta="current.owner + ' · ' + current.area" :value="current.carbon" unit="tCO2e" />
         </div>
       </div>
     `,

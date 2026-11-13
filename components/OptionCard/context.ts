@@ -10,6 +10,10 @@ export interface OptionListContext {
   disabled: ComputedRef<boolean>
   isChecked: (value: OptionValue) => boolean
   toggle: (value: OptionValue) => void
+  /** The row shown as hovered from outside — the object hovered on a map (ADR-0168). */
+  highlighted: ComputedRef<OptionValue | null | undefined>
+  /** A row hovered, or left (`null`) — for the way back to the map. */
+  hover: (value: OptionValue | null) => void
 }
 
 export const OPTION_LIST_KEY: InjectionKey<OptionListContext> = Symbol('ds-option-list')

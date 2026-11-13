@@ -75,6 +75,12 @@ interface Props {
    * → « Afficher… »). Not `hidden`, which is the HTML attribute that removes it.
    */
   muted?: boolean
+  /**
+   * Shown as hovered, without being hovered or chosen (ADR-0168): the object
+   * the pointer is over elsewhere — on a map. In an `OptionList`, the list's
+   * `highlighted` decides it by `value`.
+   */
+  highlighted?: boolean
   /** A row that leads somewhere: a link. Without it and outside a list, a button. */
   href?: string
   /** The row's one action, its name and its tooltip — « Télécharger ». Emits `action`. */
@@ -151,6 +157,18 @@ function onChange() {
   if (!isDisabled.value && choosing.value) list!.toggle(props.value!)
 }
 
+const isHighlighted = computed(() =>
+  props.highlighted || (list !== null && props.value !== undefined && list.highlighted.value === props.value),
+)
+
+/* The way back to the map: a row hovered says which, and its leaving says none. */
+function onEnter() {
+  if (list && props.value !== undefined) list.hover(props.value)
+}
+function onLeave() {
+  if (list && props.value !== undefined) list.hover(null)
+}
+
 function onClick(event: MouseEvent) {
   if (!choosing.value && !holds.value && !isDisabled.value) emit('click', event)
 }
@@ -208,8 +226,11 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
       'ds-option-card--link': !choosing && !holds && !row && !isDisabled && !muted,
       'ds-option-card--holds': holds,
       'ds-option-card--row': row,
+      'ds-option-card--highlighted': isHighlighted && !isDisabled,
     }"
     @click="onClick"
+    @mouseenter="onEnter"
+    @mouseleave="onLeave"
   >
     <!-- The real control, hidden: the card is its label, the keyboard the browser's. -->
     <input
@@ -322,7 +343,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
 /* Hover is the contour alone: a ground would swallow the icon's tile (a card
    that leads does the opposite on purpose, ADR-0159). A row
    that holds an action is not a control: only its button answers. */
-.ds-option-card:hover:not(.ds-option-card--disabled):not(.ds-option-card--checked):not(.ds-option-card--holds):not(.ds-option-card--link) {
+.ds-option-card:is(:hover, .ds-option-card--highlighted):not(.ds-option-card--disabled):not(.ds-option-card--checked):not(.ds-option-card--holds):not(.ds-option-card--link) {
   border-color: var(--ds-border-default);
 }
 
@@ -535,16 +556,16 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
   stands alone. On the tint the title takes the tint's partner, which is also
   the brand's hover ink (brand/700 in light, unchanged in dark).
 */
-.ds-option-card--link:is(:hover, :focus-visible) {
+.ds-option-card--link:is(:hover, :focus-visible, .ds-option-card--highlighted) {
   border-color: var(--ds-bg-brand-subtle);
   background-color: var(--ds-bg-brand-subtle);
 }
 
-.ds-option-card--link:is(:hover, :focus-visible) .ds-option-card__title {
+.ds-option-card--link:is(:hover, :focus-visible, .ds-option-card--highlighted) .ds-option-card__title {
   color: var(--ds-text-on-brand-subtle);
 }
 
-.ds-option-card--link:is(:hover, :focus-visible) .ds-option-card__chevron {
+.ds-option-card--link:is(:hover, :focus-visible, .ds-option-card--highlighted) .ds-option-card__chevron {
   color: var(--ds-text-on-brand-subtle);
   transform: translateX(2px);
 }
@@ -556,7 +577,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
 
 /* Less motion: the colours still turn, the chevron stays where it is. */
 @media (prefers-reduced-motion: reduce) {
-  .ds-option-card--link:is(:hover, :focus-visible) .ds-option-card__chevron {
+  .ds-option-card--link:is(:hover, :focus-visible, .ds-option-card--highlighted) .ds-option-card__chevron {
     transform: none;
   }
 }

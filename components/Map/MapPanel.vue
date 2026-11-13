@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useId, type FunctionalComponent } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, useId, type FunctionalComponent } from 'vue'
 import { Button } from '../Button'
 import { CloseButton } from '../CloseButton'
 import { IconButton } from '../IconButton'
 import { Scrollbar } from '../Scrollbar'
 import { Skeleton } from '../Skeleton'
 import { SurfaceTransition } from '../SurfaceTransition'
+import { readDuration } from '../../composables/cssTime'
 
 export type MapPanelSize = 'sm' | 'lg'
 
@@ -143,12 +144,56 @@ function focusArrived() {
   pressed = false
   host.value?.querySelector<HTMLElement>(collapsed.value ? '[data-map-panel-open]' : '[data-map-panel-fold]')?.focus()
 }
+
+/*
+  Its leave (ADR-0168). A component cannot animate its own removal — the
+  parent's `v-if` takes it out of the document in one frame (ADR-0052's
+  finding, `ToastRegion`). So the panel leaves a **ghost**: a copy of what is
+  shown, put in its place in the overlay, inert and hidden from readers, that
+  plays the surface's exit (`exit` + `easing-in`; a `lg` panel 24px toward its
+  edge, a small one back to 96 %) and is then removed. It holds the panel's
+  room for that time, so what centres on the free space (`MapOverlay` top and
+  bottom) moves when the panel is gone, not before. Nothing under reduced motion.
+*/
+onBeforeUnmount(() => {
+  const shown = host.value?.firstElementChild as HTMLElement | null | undefined
+  const place = host.value?.parentElement
+  if (!shown || !place || !place.isConnected) return
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+  const duration = readDuration(shown, '--ds-motion-duration-exit')
+  if (!duration) return
+  const easing = getComputedStyle(shown).getPropertyValue('--ds-motion-easing-in').trim() || 'ease-in'
+  const ghost = shown.cloneNode(true) as HTMLElement
+  ghost.removeAttribute('id')
+  ghost.setAttribute('aria-hidden', 'true')
+  ghost.setAttribute('inert', '')
+  ghost.style.pointerEvents = 'none'
+  /* Put in once the panel is out — a microtask, before the next paint. Put in
+     now, beside the panel, it falls inside the slot's fragment and Vue sweeps
+     it out with the panel. It takes the panel's place among the other
+     elements. */
+  const index = [...place.children].indexOf(host.value!)
+  const side = getComputedStyle(shown).getPropertyValue('--map-panel-side').trim() === '1' ? 1 : -1
+  const travel = getComputedStyle(shown).getPropertyValue('--ds-spacing-3xl').trim()
+  const lg = shown.classList.contains('ds-map-panel--lg')
+  const scale = getComputedStyle(shown).getPropertyValue('--ds-motion-scale-enter').trim() || '0.96'
+  queueMicrotask(() => {
+    if (!place.isConnected) return
+    place.insertBefore(ghost, place.children[index] ?? null)
+    /* The travel is the one SurfaceTransition's `lg` rule uses, read off the cascade. */
+    const to = lg ? (travel ? `translateX(calc(${side} * ${travel}))` : 'none') : `scale(${scale})`
+    const run = ghost.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: to }], { duration, easing, fill: 'forwards' })
+    run.finished.then(() => ghost.remove(), () => ghost.remove())
+  })
+})
 </script>
 
 <template>
-  <!-- A box of no box: it only keeps hold of whichever form is shown. -->
+  <!-- A box of no box: it only keeps hold of whichever form is shown. It
+       enters on its first frame too (`appear`, ADR-0168): a parcel's sheet
+       mounted with `v-if` arrives from its edge, as a fold's return does. -->
   <div ref="host" class="ds-map-panel-host">
-    <SurfaceTransition mode="out-in" @enter="focusArrived">
+    <SurfaceTransition mode="out-in" appear @enter="focusArrived">
       <!-- With a head of its own: a map control at the panel's corner. -->
       <!-- The transition is the wrapper's: `Button` declares its own `transition`,
            which outweighs the surface's and would make it arrive in one frame. -->

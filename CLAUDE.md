@@ -1526,6 +1526,12 @@ Before working on any component, read:
   drawer unchanged. **Amended**: more compact — **96px, the drawing at 40** (10 above and below; the drawer keeps 48).
   **Amended again**: a **fixed 104 square** (`repeat(auto-fill, 6.5rem)`, start-aligned, no ceiling), name `label-md-strong`,
   arrow `spacing-md` from the corner — stretched blocks were out of proportion. In reserve: an 88 square (drawing 32).
+- **ADR-0168**: **selecting an object on a map** (Weather Lab; Carbone dMRV) — **`MapHoverCard`** (code + status `Badge`, a
+  line, a figure; no close, no focus, `pointer-events: none`, `aria-hidden`, fades in after `quick`, nothing on touch; the
+  click still opens the sheet); **`OptionList highlighted`** (a row takes its own hover's look) + **`hover(value | null)`**,
+  `OptionCard highlighted`; **`MapOverlay` top/bottom centre in the free room** — sides publish `--map-overlay-start/-end`
+  on the map's container, the middle glides over `enter`; **`MapPanel` enters on mount** (`appear`) and **leaves through a
+  ghost** (a copy inserted a microtask later at its index — beside it, Vue's fragment sweep took it — playing `exit`).
 
 ## Architecture
 

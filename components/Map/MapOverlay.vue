@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+
 /**
  * A place on a map (ADR-0087): one of six — the four corners of the owner's
  * drawing, and the middle of the top and the bottom edges (a toolbar centred,
@@ -27,13 +29,54 @@ export type MapOverlayPosition =
   | 'bottom-start' | 'bottom' | 'bottom-end'
   | 'start' | 'end'
 
-withDefaults(defineProps<{ position?: MapOverlayPosition }>(), {
+const props = withDefaults(defineProps<{ position?: MapOverlayPosition }>(), {
   position: 'top-start',
+})
+
+/*
+  `top` and `bottom` centre in the room the sides leave (ADR-0168). A side
+  (`start`, `end`) says how much of the map it takes — from the map's edge to
+  its own far edge, the 16px inset counted — on the map's container, and the
+  middle places sit between those two marks. They move when a side changes: a
+  reading panel folded into its button, a parcel's sheet opened at the end.
+  Before, the legend and the timeline stayed centred on the whole map and
+  passed under the sheet. Nothing is published while a side holds nothing.
+*/
+const root = ref<HTMLElement | null>(null)
+let observer: ResizeObserver | null = null
+let published: { host: HTMLElement; name: string } | null = null
+
+function publish() {
+  const el = root.value
+  const host = el?.parentElement
+  if (!el || !host) return
+  const name = props.position === 'start' ? '--map-overlay-start' : '--map-overlay-end'
+  const r = el.getBoundingClientRect()
+  const h = host.getBoundingClientRect()
+  const rtl = getComputedStyle(host).direction === 'rtl'
+  const atStart = props.position === 'start'
+  const taken = atStart !== rtl ? r.right - h.left : h.right - r.left
+  if (r.width < 1) host.style.removeProperty(name)
+  else host.style.setProperty(name, `${Math.round(taken)}px`)
+  published = { host, name }
+}
+
+onMounted(() => {
+  if (props.position !== 'start' && props.position !== 'end') return
+  if (typeof ResizeObserver === 'undefined') return
+  observer = new ResizeObserver(publish)
+  if (root.value) observer.observe(root.value)
+  publish()
+})
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  published?.host.style.removeProperty(published.name)
 })
 </script>
 
 <template>
-  <div class="ds-map-overlay" :class="`ds-map-overlay--${position}`">
+  <div ref="root" class="ds-map-overlay" :class="`ds-map-overlay--${position}`">
     <slot />
   </div>
 </template>
@@ -103,8 +146,22 @@ withDefaults(defineProps<{ position?: MapOverlayPosition }>(), {
 
 .ds-map-overlay--top,
 .ds-map-overlay--bottom {
-  left: 50%;
-  translate: -50% 0;
+  /* Between the sides' marks (ADR-0168), not on the whole map: the box spans
+     the free room and centres what it holds. It glides there at the sheet's
+     own pace when a side changes. */
+  inset-inline-start: calc(var(--map-overlay-start, 0px) + var(--ds-spacing-xl));
+  inset-inline-end: calc(var(--map-overlay-end, 0px) + var(--ds-spacing-xl));
+  max-width: none;
   align-items: center;
+  transition:
+    inset-inline-start var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
+    inset-inline-end   var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-map-overlay--top,
+  .ds-map-overlay--bottom {
+    transition: none;
+  }
 }
 </style>
