@@ -1521,6 +1521,10 @@ Before working on any component, read:
   drawing carries the status), the name (cut first) + optional `Badge` + the date at the end, then the module (illustration
   16 + name). Links with ADR-0164/0165's contract; `loading` = `loadingRows` skeleton rows (72px, as the real ones); empty = nothing.
   **Amended**: **three columns at most** — the floor is `max(24rem, (100% − 2 × md) / 3)` (four at 2 560px was too many).
+- **ADR-0167**: **a launcher on the home page** — `ModulesList layout="page"` becomes 120px blocks, the drawing at **48**
+  (the drawer's size) over the name (`label-lg-strong`, centred, cut), `spacing-lg` apart; the arrow goes to the top-right
+  corner, absolute, never moving the name; **six a line at most** (`max(10rem, (100% − 5 × lg) / 6)`), the fold kept. The
+  drawer unchanged.
 
 ## Architecture
 

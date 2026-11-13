@@ -99,7 +99,7 @@ function current(item: ModulesListItem) {
             <ModuleIcon
               :module="mod.name"
               variant="illustration"
-              :size="layout === 'page' ? 32 : 48"
+              :size="48"
               :aria-label="null"
             />
             <span class="ds-modules-list__label">{{ mod.label ?? mod.name }}</span>
@@ -280,11 +280,16 @@ function current(item: ModulesListItem) {
 
 /*
   ── On a page (ADR-0164) ────────────────────────────────────────────────
-  etolbi's home, as its own recomposition drew it (`modules-row.vue`): a
-  fluid grid that folds (six a row on a desktop, fewer when room runs out),
-  each module a bordered block with its drawing at 32 and its name on one
-  line. No fixed height, no shadow, no ground of its own — the page is the
-  ground. The current module keeps the drawer's mark (ADR-0050).
+  etolbi's home: a fluid grid that folds, no fixed height, no shadow, no
+  ground of its own — the page is the ground. The current module keeps the
+  drawer's mark (ADR-0050).
+
+  Amended (ADR-0167): a **launcher**, not a row. The 56px rows with their
+  drawings at 32 read small on the home page, so each module is a 120px
+  block, its drawing at 48 — the drawer's size, so a module is recognised
+  the same in both places — over its name, centred. Six a line at most,
+  fewer when the room runs out (ProjectList's ceiling, by six): a column's
+  floor becomes a sixth of the line once 10rem is less, gaps counted.
 */
 .ds-modules-list--page {
   display: block;
@@ -297,7 +302,10 @@ function current(item: ModulesListItem) {
 .ds-modules-list--page .ds-modules-list__inner {
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(max(10rem, calc((100% - 5 * var(--ds-spacing-lg)) / 6)), 1fr)
+  );
   gap: var(--ds-spacing-lg);
   padding: 0;
   background: none;
@@ -305,11 +313,14 @@ function current(item: ModulesListItem) {
 }
 
 .ds-modules-list--page .ds-modules-list__item {
+  position: relative;
   flex: 1;
-  flex-direction: row;
-  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-spacing-lg);
   width: auto;
-  height: 3.5rem;
+  height: 7.5rem;
   padding: 0 var(--ds-spacing-lg);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
@@ -317,11 +328,11 @@ function current(item: ModulesListItem) {
 }
 
 .ds-modules-list--page .ds-modules-list__label {
-  width: auto;
+  width: 100%;
   min-width: 0;
-  font: var(--ds-font-label-md-strong);
+  font: var(--ds-font-label-lg-strong);
   color: var(--ds-text-strong);
-  text-align: start;
+  text-align: center;
 }
 
 .ds-modules-list--page .ds-modules-list__item--active {
@@ -333,15 +344,15 @@ function current(item: ModulesListItem) {
 }
 
 /*
-  The way out (ADR-0165): an `arrow-up-right` at the block's end, in
-  `text-subtle`, arriving with the hover ground on the same pace and leaving
-  with it — and on the keyboard's focus too. It is always in the row, only
-  transparent, so the name's ellipsis is the same with or without it: the
-  arrow never pushes the name.
+  The way out (ADR-0165): an `arrow-up-right`, in `text-subtle`, arriving
+  with the hover ground on the same pace and leaving with it — and on the
+  keyboard's focus too. In the launcher's top-right corner, `spacing-lg`
+  from both edges (ADR-0167), out of the flow: it never moves the name.
 */
 .ds-modules-list__go {
-  flex: none;
-  margin-inline-start: auto;
+  position: absolute;
+  top: var(--ds-spacing-lg);
+  right: var(--ds-spacing-lg);
   color: var(--ds-text-subtle);
   opacity: 0;
   transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
