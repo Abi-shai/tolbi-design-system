@@ -99,7 +99,7 @@ function current(item: ModulesListItem) {
             <ModuleIcon
               :module="mod.name"
               variant="illustration"
-              :size="48"
+              :size="layout === 'page' ? 40 : 48"
               :aria-label="null"
             />
             <span class="ds-modules-list__label">{{ mod.label ?? mod.name }}</span>
@@ -285,9 +285,9 @@ function current(item: ModulesListItem) {
   drawer's mark (ADR-0050).
 
   Amended (ADR-0167): a **launcher**, not a row. The 56px rows with their
-  drawings at 32 read small on the home page, so each module is a 120px
-  block, its drawing at 48 — the drawer's size, so a module is recognised
-  the same in both places — over its name, centred. Six a line at most,
+  drawings at 32 read small on the home page, so each module is a block, its
+  drawing over its name, centred — 96px tall with the drawing at 40 (the
+  120 × 48 of 0.140 read too large; the drawer keeps its 48). Six a line at most,
   fewer when the room runs out (ProjectList's ceiling, by six): a column's
   floor becomes a sixth of the line once 10rem is less, gaps counted.
 */
@@ -320,7 +320,7 @@ function current(item: ModulesListItem) {
   justify-content: center;
   gap: var(--ds-spacing-lg);
   width: auto;
-  height: 7.5rem;
+  height: 6rem;
   padding: 0 var(--ds-spacing-lg);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
