@@ -222,10 +222,11 @@ provide(FORM_FIELD_KEY, null as unknown as FormFieldContext)
   align-items: center;
   gap: var(--ds-spacing-md);   /* 8px entre content et trailing */
   width: 100%;
-  background: var(--ds-bg-default);
-  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  /* The relief recipe on map glass (ADR-0174). */
+  background: var(--on-glass-field-bg, var(--ds-bg-default));
+  border: var(--ds-border-width-default) solid var(--on-glass-field-border, var(--ds-border-default));
   border-radius: var(--on-glass-control-radius, var(--ds-radius-control)); /* a pill on map glass (ADR-0172) */
-  box-shadow: var(--ds-elevation-control);
+  box-shadow: var(--on-glass-field-shadow, var(--ds-elevation-control));
   box-sizing: border-box;
   transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
   padding: var(--ds-control-padding-md); /* md */

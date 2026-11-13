@@ -218,12 +218,12 @@ function onKeydown(e: KeyboardEvent, i: number) {
 
 /* ── Focus (inactive) — ring only, no extra bg needed ─────────────── */
 .ds-tabs__tab:not(.ds-tabs__tab--active):focus-visible {
-  box-shadow: var(--ds-focus-ring-gray-shadow-sm);
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-gray-shadow-sm));
 }
 
 /* ── Focus (active) — ring layered on top of the indicator shadow ──── */
 .ds-tabs__tab--active:focus-visible {
-  box-shadow: var(--ds-focus-ring-gray-shadow-sm);
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-gray-shadow-sm));
 }
 
 /* ── Label ─────────────────────────────────────────────────────────── */

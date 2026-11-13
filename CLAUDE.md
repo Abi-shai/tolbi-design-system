@@ -1569,6 +1569,15 @@ Before working on any component, read:
   rim of light + a wide soft shadow). `Scrollbar` **`mask`**: the content fades, nothing painted (the painted fade was a
   white band on glass). **Folded, `MapPanel` keeps its button**: the same `IconButton sm subtle`, on the same pixel
   (measured on the press), in a pill of pilot glass with the panel's title beside it.
+- **ADR-0174**: **the map glass, audited** (725 texts in the app) — `--ds-text-success` → **success/700** (600 was 3.8:1 on
+  white, 3.1 on a sunk card); pilot backdrop **`brightness(1.12)`** (brand 4.49 → 4.57, subtle 4.48 → 4.56 on a dark
+  ground) and **`brightness(0.88)` in dark** (new `layer-dark.css`); **`--ds-focus-ring-map`** (2px white + 2px brand-700)
+  read through `--on-glass-focus` by IconButton, CloseButton, Tabs, Button (not danger), OptionCard, HelpIcon, the gauge
+  thumb, the launcher; forced colours keep the legend ramp (`forced-color-adjust: none`) and outline the chosen period;
+  disabled subtle IconButton on glass = whole `text-disabled`; `HelpIcon` target 24 × 24; PanelBlock hairline and
+  StatusRow rules follow the glass; **fields and secondary buttons on glass = relief** (`--on-glass-field-*`: 94 %, short
+  shadow, ink 16 % edge — **measured 1.40:1, not 3:1**; 3:1 needs ≈ 47 %); the tool card clips to its curve, MapSearch fades
+  by mask.
 
 ## Architecture
 

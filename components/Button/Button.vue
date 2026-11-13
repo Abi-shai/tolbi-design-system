@@ -241,13 +241,16 @@ function handleClick(event: MouseEvent) {
   border-color: var(--ds-border-brand-solid-hover);
 }
 .ds-button--primary:focus-visible:not(:disabled) {
-  box-shadow: var(--ds-focus-ring-brand-shadow-xs);
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-brand-shadow-xs));
 }
 
 /* ── Secondary gray ───────────────────────────────────────────────── */
 .ds-button--secondary-gray {
-  background-color: var(--ds-bg-default);
-  border-color: var(--ds-border-default);
+  /* On map glass, the relief recipe (ADR-0174): white at 94 %, a short shadow,
+     an ink edge at 16 % — border-default is 1.5:1 there, the edge must hold 3:1. */
+  background-color: var(--on-glass-field-bg, var(--ds-bg-default));
+  border-color: var(--on-glass-field-border, var(--ds-border-default));
+  box-shadow: var(--on-glass-field-shadow, var(--ds-elevation-control));
   color: var(--ds-text-default);
 }
 .ds-button--secondary-gray:hover:not(:disabled) {
@@ -255,7 +258,7 @@ function handleClick(event: MouseEvent) {
   color: var(--ds-text-default-hover);
 }
 .ds-button--secondary-gray:focus-visible:not(:disabled) {
-  box-shadow: var(--ds-focus-ring-gray-shadow-xs);
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-gray-shadow-xs));
 }
 
 /* ── Secondary color ──────────────────────────────────────────────── */
@@ -269,7 +272,7 @@ function handleClick(event: MouseEvent) {
   color: var(--ds-text-brand-hover);
 }
 .ds-button--secondary-color:focus-visible:not(:disabled) {
-  box-shadow: var(--ds-focus-ring-brand-shadow-xs);
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-brand-shadow-xs));
 }
 
 /* ── Tertiary ─────────────────────────────────────────────────────── */
@@ -284,7 +287,7 @@ function handleClick(event: MouseEvent) {
   color: var(--ds-text-brand-hover);
 }
 .ds-button--tertiary:focus-visible:not(:disabled) {
-  box-shadow: var(--ds-focus-ring-brand-shadow-xs);
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-brand-shadow-xs));
 }
 
 /* ── Link ─────────────────────────────────────────────────────────── */
@@ -301,7 +304,7 @@ function handleClick(event: MouseEvent) {
   text-decoration: underline;
 }
 .ds-button--link:focus-visible:not(:disabled) {
-  box-shadow: var(--ds-focus-ring-brand-shadow-xs);
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-brand-shadow-xs));
 }
 
 /* ── Danger ───────────────────────────────────────────────────────── */
@@ -344,7 +347,7 @@ function handleClick(event: MouseEvent) {
   color: var(--ds-text-default);
 }
 .ds-button--ghost:focus-visible:not(:disabled) {
-  box-shadow: var(--ds-focus-ring-gray-shadow-xs);
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-gray-shadow-xs));
 }
 
 /* ── Icon-only ────────────────────────────────────────────────────── */

@@ -170,7 +170,8 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 /* ADR-0006: one focus treatment, and no component defines its own. */
 .ds-icon-button:focus-visible {
   outline: none;
-  box-shadow: var(--ds-focus-ring-gray);
+  /* On map glass the pale halo is under 3:1: a white gap and 2px of brand-700 (ADR-0174). */
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-gray));
 }
 
 .ds-icon-button:disabled {
@@ -193,7 +194,9 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
    timeline's spent ‹ › still read as live. Half of it, then: a disabled
    control owes no contrast, it owes being seen as unavailable. */
 .ds-icon-button--subtle:disabled {
-  color: color-mix(in srgb, var(--ds-text-disabled) 50%, transparent);
+  /* On map glass the half ink measured 1.7:1 — the button no longer read as
+     present; the whole `text-disabled` there (ADR-0174). */
+  color: var(--on-glass-disabled, color-mix(in srgb, var(--ds-text-disabled) 50%, transparent));
 }
 
 /*
@@ -227,7 +230,7 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 }
 
 .ds-icon-button--primary:focus-visible {
-  box-shadow: var(--ds-focus-ring-brand);
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-brand));
 }
 
 .ds-icon-button--primary:disabled {

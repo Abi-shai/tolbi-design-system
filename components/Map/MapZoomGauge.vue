@@ -279,7 +279,8 @@ onBeforeUnmount(() => {
 }
 
 .ds-map-zoom-gauge__input:focus-visible + .ds-map-zoom-gauge__span .ds-map-zoom-gauge__thumb {
-  box-shadow: var(--ds-focus-ring-gray);
+  /* The pale halo did not read at all on the column's glass (ADR-0174). */
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-gray));
 }
 
 /* ── Upright (ADR-0171) ─────────────────────────────────────────────

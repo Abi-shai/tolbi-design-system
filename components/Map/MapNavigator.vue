@@ -322,6 +322,11 @@ function by(d: number) {
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
   --on-glass-control-radius: var(--ds-radius-pill);
+  --on-glass-focus: var(--ds-focus-ring-map);
+  --on-glass-field-bg: var(--ds-bg-map-raised);
+  --on-glass-field-border: color-mix(in srgb, var(--ds-text-strong) 16%, transparent);
+  --on-glass-field-shadow: var(--ds-elevation-map-raised);
+  --on-glass-disabled: var(--ds-text-disabled);
   --on-glass-rule: color-mix(in srgb, var(--ds-text-strong) 8%, transparent);
   /* A rim of light on top, a wide soft shadow (ADR-0173). */
   box-shadow: var(--ds-elevation-map-glass);
@@ -394,6 +399,11 @@ function by(d: number) {
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
   --on-glass-control-radius: var(--ds-radius-pill);
+  --on-glass-focus: var(--ds-focus-ring-map);
+  --on-glass-field-bg: var(--ds-bg-map-raised);
+  --on-glass-field-border: color-mix(in srgb, var(--ds-text-strong) 16%, transparent);
+  --on-glass-field-shadow: var(--ds-elevation-map-raised);
+  --on-glass-disabled: var(--ds-text-disabled);
   --on-glass-raised-edge: color-mix(in srgb, var(--ds-text-strong) 6%, transparent);
   --on-glass-raised-shadow: var(--ds-elevation-map-raised);
   --on-glass-sunk-border: transparent;
@@ -408,6 +418,9 @@ function by(d: number) {
   /* A rim of light on top, a wide soft shadow (ADR-0173). */
   box-shadow: var(--ds-elevation-map-glass);
   transform-origin: top right;
+  /* What it holds is cut to its curve (ADR-0174): a scroller's square corners
+     showed under the rounded foot. */
+  overflow: clip;
 }
 
 .ds-map-navigator__flyout--minimap {

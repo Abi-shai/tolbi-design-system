@@ -112,6 +112,10 @@ await Promise.all([
   // ADR-0020: two scales several components had agreed on without naming.
   buildTokenFile('tokens/src/border/semantic.json',      'border.css'),
   buildTokenFile('tokens/src/layer/semantic.json',       'layer.css'),
+  // ADR-0174: a backdrop that brightens the map under light glass would cost
+  // light text its contrast under dark glass — the dark one darkens instead.
+  buildTokenFile('tokens/src/layer/semantic.dark.json',  'layer-dark.css',
+    { selector: '[data-theme="dark"]' }),
   buildTokenFile('tokens/src/spacing/primitives.json',  'space.css'),
 
   buildTokenFile(
@@ -383,7 +387,7 @@ const tokenFiles = [
   'font-roles', 'font-roles-mobile', 'control',
   'shadows', 'shadows-dark', 'elevation', 'elevation-dark',
   'focus-rings', 'focus-rings-dark', 'semantic', 'semantic-dark', 'chart', 'motion',
-  'border', 'layer',
+  'border', 'layer', 'layer-dark',
 ]
 const combined = tokenFiles
   .map(f => readFileSync(`tokens/dist/${f}.css`, 'utf8'))

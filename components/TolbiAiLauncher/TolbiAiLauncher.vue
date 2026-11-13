@@ -231,6 +231,11 @@ function onFocus() {
   }
 }
 
+/* On map glass the focus is the map's ring (ADR-0174). */
+.ds-tolbi-ai-launcher--map .ds-tolbi-ai-launcher__button:focus-visible {
+  box-shadow: var(--ds-focus-ring-map);
+}
+
 /* On white no tint can say hover (ADR-0044): the contour steps up instead, as
    `IconButton`'s white disc does. */
 .ds-tolbi-ai-launcher__button:hover,

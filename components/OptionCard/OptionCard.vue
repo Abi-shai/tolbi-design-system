@@ -359,7 +359,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
 /* The ring is the card's, whichever holds the focus — its input or itself. */
 .ds-option-card:has(.ds-option-card__input:focus-visible),
 .ds-option-card--leads:focus-visible {
-  --option-card-focus: var(--ds-focus-ring-brand);
+  --option-card-focus: var(--on-glass-focus, var(--ds-focus-ring-brand));
 
   outline: none;
 }

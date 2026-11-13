@@ -57,6 +57,7 @@ const placement = computed(() => anchored[props.placement])
 
 <style scoped>
 .ds-help-icon__btn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,6 +74,14 @@ const placement = computed(() => anchored[props.placement])
   border-radius: var(--ds-radius-pill);
 }
 
+/* The drawing stays 16; the target is 24 × 24 (WCAG 2.5.8, ADR-0174) — an
+   invisible pseudo-element, centred, so nothing around it moves. */
+.ds-help-icon__btn::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--ds-spacing-xs));
+}
+
 .ds-help-icon__btn:hover {
   color: var(--ds-text-subtle);
 }
@@ -80,6 +89,6 @@ const placement = computed(() => anchored[props.placement])
 .ds-help-icon__btn:focus-visible {
   outline: none;
   color: var(--ds-text-subtle);
-  box-shadow: var(--ds-focus-ring-brand);
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-brand));
 }
 </style>

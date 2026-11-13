@@ -113,7 +113,7 @@ function onKey(e: KeyboardEvent) {
       </InputField>
     </div>
 
-    <Scrollbar v-if="shown.length" shadows class="ds-map-search__scroll">
+    <Scrollbar v-if="shown.length" shadows mask class="ds-map-search__scroll">
       <div :id="listId" ref="list" class="ds-map-search__list" role="listbox" :aria-label="label">
         <div v-for="(g, gi) in shown" :key="g.label" class="ds-map-search__group" role="group" :aria-labelledby="`${id}-g${gi}`">
           <div :id="`${id}-g${gi}`" class="ds-map-search__group-label">{{ g.label }}</div>

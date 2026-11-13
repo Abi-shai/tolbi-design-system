@@ -56,9 +56,9 @@
       "$description": "contract — on bg-default only. NOT valid on bg-warning-subtle (3.34)"
     },
     "success": {
-      "$value": "{color.success.600}",
+      "$value": "{color.success.700}",
       "$type": "color",
-      "$description": "contract — on bg-default only. NOT valid on bg-success-subtle (3.70)"
+      "$description": "contract — 5.17:1 on bg-default, ≥ 4.5 on a sunk block (ADR-0174: success/600 was 3.8:1 on white, 3.1:1 on a sunk card — a delta « +1,6 » failed AA). NOT valid on bg-success-subtle — text-on-success-subtle is"
     },
     "on-brand-subtle": {
       "$value": "{color.brand.700}",

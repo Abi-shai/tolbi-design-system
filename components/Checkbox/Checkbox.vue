@@ -217,8 +217,9 @@ function handleChange(event: Event) {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: var(--ds-border-width-default) solid var(--ds-border-default);
-  background-color: var(--ds-bg-default);
+  /* The relief recipe on map glass (ADR-0174). */
+  border: var(--ds-border-width-default) solid var(--on-glass-field-border, var(--ds-border-default));
+  background-color: var(--on-glass-field-bg, var(--ds-bg-default));
   color: var(--ds-text-on-brand-solid);
   overflow: hidden;
   transition:

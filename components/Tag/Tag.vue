@@ -137,8 +137,10 @@ function onTagClick() {
   /* 24px with the border: `label-md`'s 20px line and 1px above and below —
      the type grew to 14/20 and the tag held its height (ADR-0144). */
   padding: 1px var(--ds-spacing-md);
-  background-color: var(--ds-bg-default);
-  border: var(--ds-border-width-default) solid var(--ds-border-default);
+  /* The relief recipe on map glass (ADR-0174). */
+  background-color: var(--on-glass-field-bg, var(--ds-bg-default));
+  border: var(--ds-border-width-default) solid var(--on-glass-field-border, var(--ds-border-default));
+  box-shadow: var(--on-glass-field-shadow, none);
   border-radius: var(--ds-radius-inner);
   color: var(--ds-text-default);
   font: var(--ds-font-label-md);

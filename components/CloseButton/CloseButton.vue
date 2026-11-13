@@ -91,7 +91,7 @@ function handleClick(event: MouseEvent) {
 
 .ds-close-button:focus-visible:not(:disabled) {
   background-color: var(--ds-bg-default);
-  box-shadow: var(--ds-focus-ring-gray);
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-gray)); /* ADR-0174 */
 }
 
 .ds-close-button:hover:not(:disabled) {

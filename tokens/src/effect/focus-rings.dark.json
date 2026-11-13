@@ -35,6 +35,10 @@
     "error-shadow-xs": {
       "$value": "0px 1px 2px 0px color-mix(in srgb, var(--ds-color-gray-forest-950) 5%, transparent), 0px 0px 0px 4px color-mix(in srgb, var(--ds-color-error-400) 24%, transparent)",
       "$description": "shadow-xs + error-400 · 24%"
+    },
+    "map": {
+      "$value": "0px 0px 0px 2px var(--ds-color-gray-forest-900), 0px 0px 0px 4px var(--ds-color-brand-200)",
+      "$description": "On map glass in dark (ADR-0174): the dark ground's gap then 2px of brand-200 (text-brand's dark step)"
     }
   }
 }

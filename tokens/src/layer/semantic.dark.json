@@ -1,0 +1,12 @@
+{
+  "backdrop": {
+    "map-control": {
+      "$value": "blur(24px) saturate(1.6) brightness(0.88)",
+      "$description": "Dark (ADR-0174): the same blur, the backdrop darkened 12 % instead — under dark glass the text is light, and brightening the map would cost it contrast"
+    },
+    "map-read": {
+      "$value": "blur(20px) saturate(1.6)",
+      "$description": "Dark: unchanged from light — at 90 % the pane already holds"
+    }
+  }
+}

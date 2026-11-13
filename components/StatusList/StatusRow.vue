@@ -72,7 +72,7 @@ const mark = computed(() => GLYPH[props.tone])
 }
 
 .ds-status-row + .ds-status-row {
-  border-top: var(--ds-border-width-default) solid var(--ds-border-subtlest);
+  border-top: var(--ds-border-width-default) solid var(--on-glass-rule, var(--ds-border-subtlest)); /* ink on map glass (ADR-0174) */
 }
 
 .ds-status-row__label {

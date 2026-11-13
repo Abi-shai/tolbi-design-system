@@ -113,7 +113,8 @@ const Nodes: FunctionalComponent<{ nodes: VNode[] }> = (p) => p.nodes
   `Card sunk` draws a transparent 1px border, so this moves nothing.
 */
 .ds-panel-block {
-  border-color: var(--ds-border-subtle);
+  /* On map glass the hollow has no border: its ink and inner line say it (ADR-0173/0174). */
+  border-color: var(--on-glass-sunk-border, var(--ds-border-subtle));
 }
 
 /*

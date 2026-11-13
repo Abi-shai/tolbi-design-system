@@ -18,8 +18,8 @@
   },
   "backdrop": {
     "map-control": {
-      "$value": "blur(24px) saturate(1.8)",
-      "$description": "What a pilot surface does to the map under it (ADR-0172): with bg-map-control, the imagery reads as colour, not detail"
+      "$value": "blur(24px) saturate(1.6) brightness(1.12)",
+      "$description": "What a pilot surface does to the map under it (ADR-0172, ADR-0174): with bg-map-control the imagery reads as colour, not detail — and brightened 12 %, which lifts the darkest ground under 72 % glass without making it more opaque (brand text 4.1 → ≥ 4.5:1)"
     },
     "map-read": {
       "$value": "blur(20px) saturate(1.6)",

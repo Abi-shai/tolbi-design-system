@@ -509,6 +509,11 @@ function exitCompare() {
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
   --on-glass-control-radius: var(--ds-radius-pill);
+  --on-glass-focus: var(--ds-focus-ring-map);
+  --on-glass-field-bg: var(--ds-bg-map-raised);
+  --on-glass-field-border: color-mix(in srgb, var(--ds-text-strong) 16%, transparent);
+  --on-glass-field-shadow: var(--ds-elevation-map-raised);
+  --on-glass-disabled: var(--ds-text-disabled);
   --on-glass-rule: color-mix(in srgb, var(--ds-text-strong) 8%, transparent);
   /* A rim of light on top, a wide soft shadow (ADR-0173). */
   box-shadow: var(--ds-elevation-map-glass);
@@ -799,6 +804,18 @@ function exitCompare() {
     backdrop-filter: none;
     --on-glass-raised: var(--ds-bg-default);
     --on-glass-sunk: var(--ds-bg-neutral-subtle);
+  }
+}
+
+/* Forced colours (ADR-0174): the pill's fill is painted away, so the chosen
+   period would look like the others. A 2px edge in the system's ink says it. */
+@media (forced-colors: active) {
+  .ds-map-timeline__pill,
+  .ds-map-timeline__tick--chosen,
+  .ds-map-timeline__tick--current {
+    /* An outline drawn inside: a border would grow the measured pill. */
+    outline: var(--ds-border-width-strong) solid CanvasText;
+    outline-offset: calc(-1 * var(--ds-border-width-strong));
   }
 }
 </style>
