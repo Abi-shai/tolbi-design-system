@@ -34,13 +34,14 @@ const props = withDefaults(defineProps<{ position?: MapOverlayPosition }>(), {
 })
 
 /*
-  `top` and `bottom` centre in the room the sides leave (ADR-0168). A side
-  (`start`, `end`) says how much of the map it takes — from the map's edge to
-  its own far edge, the 16px inset counted — on the map's container, and the
-  middle places sit between those two marks. They move when a side changes: a
-  reading panel folded into its button, a parcel's sheet opened at the end.
-  Before, the legend and the timeline stayed centred on the whole map and
-  passed under the sheet. Nothing is published while a side holds nothing.
+  `top` and `bottom` stay centred on the **whole map** (ADR-0168, amended): a
+  legend that slid each time the reading panel folded was a movement nobody
+  asked for, and at 1 440px it never met the sheet. What the sides publish —
+  how much of the map each takes, from the map's edge to its own far edge — only
+  **caps** the middle's width, symmetrically, so its centre never moves: short of
+  room, the legend narrows (its ramp is the elastic part) and the timeline
+  scrolls, neither passes under a panel. Nothing is published while a side holds
+  nothing.
 */
 const root = ref<HTMLElement | null>(null)
 let observer: ResizeObserver | null = null
@@ -146,22 +147,27 @@ onBeforeUnmount(() => {
 
 .ds-map-overlay--top,
 .ds-map-overlay--bottom {
-  /* Between the sides' marks (ADR-0168), not on the whole map: the box spans
-     the free room and centres what it holds. It glides there at the sheet's
-     own pace when a side changes. */
-  inset-inline-start: calc(var(--map-overlay-start, 0px) + var(--ds-spacing-xl));
-  inset-inline-end: calc(var(--map-overlay-end, 0px) + var(--ds-spacing-xl));
+  /* Centred on the whole map, capped by the wider side (ADR-0168, amended):
+     the box is inset by the same amount on both sides, so a side that opens or
+     folds changes at most how wide the middle may be — never where its centre
+     is. No transition: below the cap nothing moves at all. The cap stops at
+     20rem — narrower, the timeline's strip has no period left to show and the
+     legend's words spill out of its pill, which is worse than reaching a
+     panel's edge — and the map's own 16px margin always holds. */
+  --map-overlay-side: max(var(--map-overlay-start, 0px), var(--map-overlay-end, 0px));
+  inset-inline: max(
+    var(--ds-spacing-xl),
+    min(calc(var(--map-overlay-side) + var(--ds-spacing-xl)), calc((100% - 20rem) / 2))
+  );
   max-width: none;
   align-items: center;
-  transition:
-    inset-inline-start var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
-    inset-inline-end   var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ds-map-overlay--top,
-  .ds-map-overlay--bottom {
-    transition: none;
-  }
+.ds-map-overlay--top > :deep(*),
+.ds-map-overlay--bottom > :deep(*) {
+  /* Narrowed down to what its content still holds, never past it: under
+     that, a pill whose words spill out of it is worse than one that reaches
+     a panel's edge. Centred either way. */
+  max-width: 100%;
 }
 </style>

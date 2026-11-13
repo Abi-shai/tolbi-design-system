@@ -201,8 +201,8 @@ export const GisScreen: Story = {
   Selecting an object, Weather Lab's way (ADR-0168): the pointer over a parcel
   shows its card beside it and underlines its row in the panel's list; a row
   hovered lights the parcel back; a click opens its sheet at the end, which
-  arrives from its edge, and the legend and the timeline recentre in the room
-  left between the two panels.
+  arrives from its edge. The legend and the timeline stay centred on the whole
+  map — nothing on the map moves when a panel opens, folds or closes.
 */
 const PARCELS = [
   { id: 'P-2041', owner: 'Koné Affoué', area: '18,5 ha', carbon: '412', status: 'Éligible', tone: 'success' as const, left: '46%', top: '38%' },
@@ -210,7 +210,7 @@ const PARCELS = [
   { id: 'P-2047', owner: 'Bamba Mariam', area: '12,0 ha', carbon: '238', status: 'Éligible', tone: 'success' as const, left: '66%', top: '30%' },
 ]
 
-/** ADR-0168 — sélectionner un objet : survol (carte résumé + ligne soulignée), clic (la fiche entre de son bord), la légende et la frise recentrées entre les deux panneaux. */
+/** ADR-0168 — sélectionner un objet : survol (carte résumé + ligne soulignée), clic (la fiche entre de son bord) ; la légende et la frise restent centrées sur la carte. */
 export const Selection: Story = {
   name: 'Sélection d’un objet',
   render: () => ({

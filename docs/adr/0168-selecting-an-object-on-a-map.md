@@ -35,15 +35,21 @@ The scenario needed four pieces the package did not have:
 - `OptionCard` takes a `highlighted` boolean for standalone use.
 - A disabled card is never lit. A chosen card keeps its chosen look.
 
-**3. The middle centres in the free room.**
+**3. The middle stays centred on the map** — *amended the same day (etolbi, 0.141.0 reversed)*.
 
-- A side overlay (`start`, `end`) publishes how much of the map it takes, from the map's edge to its own far edge, as
-  `--map-overlay-start` / `--map-overlay-end` on the map's container. It is measured by a `ResizeObserver`, works for
-  RTL, and is removed while the side holds nothing.
-- `top` and `bottom` now span the room between those marks and centre what they hold.
-- They glide there over `duration-enter` + `easing-in-out` when a side changes: a reading panel folded into its
-  button, a parcel's sheet opened. Under reduced motion they move at once.
-- Before, the legend and the timeline stayed centred on the whole map and passed under the sheet.
+- Shipped first: `top` and `bottom` centred in the room the sides leave, and glided there when a side changed. When
+  the reading panel opened or folded, the legend and the timeline slid right and back — a movement the owner does
+  not want, and one that bought nothing: at 1 440px the legend centred on the whole map ends at 1 000px and the
+  sheet starts at 1 016px.
+- Now they are centred on the **whole map** whatever the sides hold, and they do not move when a panel opens,
+  folds or closes. No transition.
+- Short of room, the middle **narrows rather than moves**. A side overlay (`start`, `end`) still publishes how much
+  of the map it takes (`--map-overlay-start` / `--map-overlay-end` on the map's container, from a `ResizeObserver`,
+  RTL included, removed while the side holds nothing). The wider of the two **caps** the middle symmetrically, so
+  its centre stays the map's. Under the cap the legend's ramp gives (then its short label) and the timeline's strip
+  scrolls under its edge fade (ADR-0116).
+- The cap stops at **20rem**. Narrower, the timeline has no period left to show and the legend's words spill out of
+  its pill (measured at 220px), which is worse than reaching a panel's edge. The map's own 16px margin always holds.
 
 **4. A `MapPanel` arrives and leaves.**
 
@@ -56,8 +62,6 @@ The scenario needed four pieces the package did not have:
   - It is put in **a microtask later**, at the panel's index among the overlay's elements. Put in at once beside the
     panel, it lay inside the slot's fragment, and Vue swept it out with the panel: found by watching the overlay's
     mutations, the ghost was added and removed in the same tick.
-  - The ghost holds the panel's room while it leaves, so the middle overlays recentre **after** the sheet has gone,
-    not under it.
   - Nothing plays under reduced motion.
 
 The API does not change elsewhere: `MapPanel`'s `loading`, `closable` and `v-model:collapsed` already serve the
@@ -69,8 +73,8 @@ product.
 
 | What | Result |
 |---|---|
-| Legend and timeline centres, no sheet | 928px, the free room's centre between the 400px panel and the map's edge (the map's own centre is 720) |
-| Legend and timeline centres, sheet open | 720px; the legend ends at 1 000px, the sheet starts at 1 016px |
+| Legend and timeline centres (amended) | 720px with no sheet, with the sheet, panel open or folded — the same value in every frame of the fold; the legend ends at 1 000px, the sheet starts at 1 016px |
+| Narrow map (`GisScreen`, panel open) | 1 240px: 360px wide, centred at 620, the strip scrolling; 1 100px: held at 320px (20rem), centred at 550 |
 | Hover card | opacity 0 at 60ms, 1 at 360ms; `pointer-events: none` |
 | Row under the hovered parcel | `--highlighted`, its contour `border-default` |
 | Row hovered | lights the parcel back |
