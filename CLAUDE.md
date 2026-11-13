@@ -1515,6 +1515,11 @@ Before working on any component, read:
   `text-subtle`) at the block's end with the hover ground and the keyboard focus (`quick`, opacity only, cut under reduced
   motion), **its place always kept** so the name's ellipsis never moves; the drawer unchanged. A link clicked with
   ⌘/Ctrl/Shift/Alt or a non-main button **does not emit `select`** — the browser's tab, window, download.
+- **ADR-0166**: **`ProjectList`** — the home page's latest projects, one line each (etolbi's recomposition taken as drawn;
+  Drive's widget, not `ProjectCard`'s figures). A `bg-neutral-subtle` frame (`radius-surface-lg`, **minted** = 16px: a
+  frame holding a surface) around a `bg-default` grid `minmax(24rem, 1fr)`; a row = `ProjectGlyph` 40 in a 3.5rem tile (the
+  drawing carries the status), the name (cut first) + optional `Badge` + the date at the end, then the module (illustration
+  16 + name). Links with ADR-0164/0165's contract; `loading` = `loadingRows` skeleton rows (72px, as the real ones); empty = nothing.
 
 ## Architecture
 

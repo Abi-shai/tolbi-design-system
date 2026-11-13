@@ -25,6 +25,11 @@
       "$type": "dimension",
       "$description": "Cards, toasts, callouts, tables, popovers — anything that holds content"
     },
+    "surface-lg": {
+      "$value": "{radius.2xl}",
+      "$type": "dimension",
+      "$description": "A frame that holds a surface — the ground around a list that is itself a surface (ProjectList, ADR-0166): one step past the surface it holds"
+    },
     "pill": {
       "$value": "{radius.full}",
       "$type": "dimension",
