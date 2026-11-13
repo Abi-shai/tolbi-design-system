@@ -203,7 +203,9 @@ export function lintSource(rel, src) {
   for (const m of src.matchAll(/(?:^|[{;])\s*(--[a-z][a-z0-9-]*|[a-z-]+)\s*:\s*([^;{}]+)/gm)) {
     const [, prop, value] = m
     if (!prop.startsWith('--') && !/colou?r|background|fill|stroke|border|outline|shadow/.test(prop)) continue
-    const kw = value.match(/\b(white|black)\b/)
+    // A token's name is not a keyword: `var(--ds-color-base-white)` is the
+    // primitive, which `no-raw-primitive` judges (ADR-0169).
+    const kw = value.replace(/--[a-z0-9-]+/g, '').match(/\b(white|black)\b/)
     if (kw) report('no-colour-literal', rel, lineOf(m.index), kw[1])
   }
 

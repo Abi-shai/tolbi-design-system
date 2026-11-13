@@ -54,6 +54,9 @@ test('no-colour-literal covers keywords, not just hex and rgb()', () => {
   silent('no-colour-literal', style('.a { color: inherit; }'))
   // and the word has to be a value, not part of a name
   silent('no-colour-literal', style('.ds-avatar--white-label { padding: 0; }'))
+  // nor part of a token's name, which is no-raw-primitive's to judge (ADR-0169)
+  silent('no-colour-literal', style('.a { --edge: var(--ds-color-base-white); }'))
+  fires('no-colour-literal', style('.a { --edge: var(--ds-color-base-white, white); }'))
 })
 
 test('regression: three `color: white` sat under a linter reporting zero (ADR-0029)', () => {

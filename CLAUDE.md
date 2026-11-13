@@ -1533,6 +1533,12 @@ Before working on any component, read:
   0.141.0 slid them on every fold and was reversed the same day) — the sides' published `--map-overlay-start/-end` only
   **cap** the middle symmetrically, so short of room it narrows (ramp, scrolling strip), floored at 20rem, never moves; **`MapPanel` enters on mount** (`appear`) and **leaves through a
   ghost** (a copy inserted a microtask later at its index — beside it, Vue's fragment sweep took it — playing `exit`).
+- **ADR-0169**: **`MapPin`** — the clicked place (Weather Lab's point forecast: every click pins, the end sheet gives the
+  place's data). A 24 × 32 drop, `brand/500` + white dot + white edge + a two-layer `drop-shadow`, **inks that do not
+  follow the theme** (the imagery has no dark mode; named primitive suppressions); **its tip is the point** (the product
+  anchors bottom centre); drops 8px on `enter`/`easing-out`, **drops again when `at` changes** (no glide), fades on
+  `exit` through a ghost placed by measure in the nearest positioned ancestor; `aria-hidden`, `pointer-events: none`.
+  `no-colour-literal` no longer reads a token's name (`--ds-color-base-white`) as the keyword.
 
 ## Architecture
 

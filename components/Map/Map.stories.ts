@@ -8,6 +8,7 @@ import MapTimeline from './MapTimeline.vue'
 import MapLegend from './MapLegend.vue'
 import MapTooltip from './MapTooltip.vue'
 import MapHoverCard from './MapHoverCard.vue'
+import MapPin from './MapPin.vue'
 import { OptionList, OptionCard } from '../OptionCard'
 import MapCanvas, { type MapCanvasBasemap } from './MapCanvas.vue'
 import MapStatus, { type MapStatusState } from './MapStatus.vue'
@@ -37,7 +38,8 @@ const meta: Meta<typeof MapOverlay> = {
           '| `MapTimeline` | La frise du temps : année / mois / jour, comparer deux dates |\n' +
           '| `MapLegend` | La légende : l’indicateur affiché, son dégradé, ses bornes, les symboles |\n' +
           '| `MapTooltip` | Ce que dit un clic sur un point : un petit dialogue que le moteur place |\n' +
-          '| `MapHoverCard` | Ce que le pointeur survole : une petite carte, non interactive, que le moteur place |\n\n' +
+          '| `MapHoverCard` | Ce que le pointeur survole : une petite carte, non interactive, que le moteur place |\n' +
+          '| `MapPin` | L’endroit cliqué : une épingle, sa pointe sur le point, décorative |\n\n' +
           'Voir l’histoire « Écran SIG — toutes les pièces » pour les voir ensemble.\n\n' +
           'Ce qui se pose sur une carte (ADR-0087), d’après le dessin du propriétaire (« Tester la conformité ») : ' +
           '`MapOverlay` est une place — six, les quatre coins et le milieu du haut et du bas — à 16 px des bords, qui empile ' +
@@ -201,8 +203,10 @@ export const GisScreen: Story = {
   Selecting an object, Weather Lab's way (ADR-0168): the pointer over a parcel
   shows its card beside it and underlines its row in the panel's list; a row
   hovered lights the parcel back; a click opens its sheet at the end, which
-  arrives from its edge. The legend and the timeline stay centred on the whole
-  map — nothing on the map moves when a panel opens, folds or closes.
+  arrives from its edge. Every click sets a pin where it landed (ADR-0169) —
+  on a parcel, its sheet; elsewhere, the place's. The legend and the timeline
+  stay centred on the whole map — nothing on the map moves when a panel opens,
+  folds or closes.
 */
 const PARCELS = [
   { id: 'P-2041', owner: 'Koné Affoué', area: '18,5 ha', carbon: '412', status: 'Éligible', tone: 'success' as const, left: '46%', top: '38%' },
@@ -210,11 +214,11 @@ const PARCELS = [
   { id: 'P-2047', owner: 'Bamba Mariam', area: '12,0 ha', carbon: '238', status: 'Éligible', tone: 'success' as const, left: '66%', top: '30%' },
 ]
 
-/** ADR-0168 — sélectionner un objet : survol (carte résumé + ligne soulignée), clic (la fiche entre de son bord) ; la légende et la frise restent centrées sur la carte. */
+/** ADR-0168 — sélectionner un objet : survol (carte résumé + ligne soulignée), clic (l’épingle se pose, la fiche entre de son bord — d’une parcelle ou d’un simple lieu) ; la légende et la frise restent centrées sur la carte. */
 export const Selection: Story = {
   name: 'Sélection d’un objet',
   render: () => ({
-    components: { MapOverlay, MapPanel, MapTimeline, MapLegend, MapHoverCard, OptionList, OptionCard },
+    components: { MapOverlay, MapPanel, MapTimeline, MapLegend, MapHoverCard, MapPin, OptionList, OptionCard },
     setup() {
       const hovered = ref<string | null>(null)
       const chosen = ref<string | null>(null)
@@ -222,13 +226,23 @@ export const Selection: Story = {
       const years = Array.from({ length: 6 }, (_, i) => String(2021 + i)).map(y => ({ value: y, label: y }))
       const current = computed(() => PARCELS.find(p => p.id === hovered.value) ?? null)
       const sheet = computed(() => PARCELS.find(p => p.id === chosen.value) ?? null)
-      return { GIS_MAP, PARCELS, hovered, chosen, year, years, current, sheet }
+      /* Every click sets the pin where it landed (ADR-0169): on a parcel, its sheet; elsewhere, the place's. */
+      const pin = ref<{ x: number; y: number } | null>(null)
+      const at = (e: MouseEvent) => {
+        const map = (e.currentTarget as HTMLElement).closest('[data-map]')!.getBoundingClientRect()
+        return { x: Math.round(e.clientX - map.left), y: Math.round(e.clientY - map.top) }
+      }
+      const onMap = (e: MouseEvent) => { if (e.target !== e.currentTarget) return; pin.value = at(e); chosen.value = null }
+      const onParcel = (id: string, e: MouseEvent) => { pin.value = at(e); chosen.value = id }
+      const close = () => { pin.value = null; chosen.value = null }
+      const choose = (id: string | null) => { chosen.value = id; pin.value = null }
+      return { GIS_MAP, PARCELS, hovered, chosen, year, years, current, sheet, pin, onMap, onParcel, close, choose }
     },
     template: `
-      <div :style="GIS_MAP">
+      <div :style="GIS_MAP" data-map @click="onMap">
         <MapOverlay position="start">
           <MapPanel size="lg" title="Parcelles">
-            <OptionList :model-value="chosen" :highlighted="hovered" aria-label="Parcelles" @update:model-value="chosen = $event" @hover="hovered = $event">
+            <OptionList :model-value="chosen" :highlighted="hovered" aria-label="Parcelles" @update:model-value="choose" @hover="hovered = $event">
               <OptionCard v-for="p in PARCELS" :key="p.id" :value="p.id" density="row" icon="land-plot" :label="p.id" :meta="p.area" :badge="p.status" :badge-tone="p.tone" />
             </OptionList>
           </MapPanel>
@@ -240,16 +254,23 @@ export const Selection: Story = {
           <MapTimeline v-model="year" :periods="years" label="Année" />
         </MapOverlay>
         <MapOverlay position="end">
-          <MapPanel v-if="sheet" :key="sheet.id" size="lg" :title="sheet.id" closable @close="chosen = null">
+          <MapPanel v-if="sheet" :key="sheet.id" size="lg" :title="sheet.id" closable @close="close">
             <p style="margin:0; font:var(--ds-font-body-md); color:var(--ds-text-default)">{{ sheet.owner }} · {{ sheet.area }}</p>
             <p style="margin:0; font:var(--ds-font-heading-xl); color:var(--ds-text-strong)">{{ sheet.carbon }} <span style="font:var(--ds-font-body-sm); color:var(--ds-text-subtle)">tCO2e</span></p>
           </MapPanel>
+          <MapPanel v-else-if="pin" :key="'place-' + pin.x + ',' + pin.y" size="lg" title="Lieu" closable @close="close">
+            <p style="margin:0; font:var(--ds-font-body-md); color:var(--ds-text-default)">6,07° N · 6,61° O — hors des parcelles</p>
+            <p style="margin:0; font:var(--ds-font-heading-xl); color:var(--ds-text-strong)">4,2 <span style="font:var(--ds-font-body-sm); color:var(--ds-text-subtle)">tCO2e/ha</span></p>
+          </MapPanel>
         </MapOverlay>
         <button v-for="p in PARCELS" :key="p.id" type="button" :aria-label="'Parcelle ' + p.id" :data-parcel="p.id"
-          @mouseenter="hovered = p.id" @mouseleave="hovered = null" @click="chosen = p.id"
+          @mouseenter="hovered = p.id" @mouseleave="hovered = null" @click="onParcel(p.id, $event)"
           :style="{ position: 'absolute', left: p.left, top: p.top, width: '72px', height: '52px', padding: 0, cursor: 'pointer', borderRadius: '6px',
             border: '2px solid ' + (hovered === p.id || chosen === p.id ? 'var(--ds-border-brand)' : 'var(--ds-bg-default)'),
             background: 'color-mix(in srgb, var(--ds-bg-success-solid) 35%, transparent)' }"></button>
+        <div v-if="pin" :style="{ position: 'absolute', left: pin.x + 'px', top: pin.y + 'px', transform: 'translate(-50%, -100%)', zIndex: 2 }">
+          <MapPin :at="pin.x + ',' + pin.y" />
+        </div>
         <div v-if="current" :style="{ position: 'absolute', left: 'calc(' + current.left + ' + 84px)', top: current.top, zIndex: 2 }">
           <MapHoverCard :title="current.id" :status="current.status" :status-tone="current.tone" :meta="current.owner + ' · ' + current.area" :value="current.carbon" unit="tCO2e" />
         </div>
