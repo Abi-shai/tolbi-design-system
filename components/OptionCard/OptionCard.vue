@@ -346,7 +346,8 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
    that leads does the opposite on purpose, ADR-0159). A row
    that holds an action is not a control: only its button answers. */
 .ds-option-card:is(:hover, .ds-option-card--highlighted):not(.ds-option-card--disabled):not(.ds-option-card--checked):not(.ds-option-card--holds):not(.ds-option-card--link) {
-  border-color: var(--ds-border-default);
+  /* On map glass the contour is ink, not an opaque gray-300 (ADR-0175). */
+  border-color: var(--on-glass-field-border, var(--ds-border-default));
 }
 
 .ds-option-card--checked {

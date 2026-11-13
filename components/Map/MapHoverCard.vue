@@ -76,6 +76,8 @@ withDefaults(defineProps<Props>(), {
   --on-glass-field-border: color-mix(in srgb, var(--ds-text-strong) 16%, transparent);
   --on-glass-field-shadow: var(--ds-elevation-map-raised);
   --on-glass-disabled: var(--ds-text-disabled);
+  /* Brand text at 72 % over near-black imagery: brand-600 measured 4.08:1, brand-700 holds (ADR-0175). */
+  --on-glass-brand: var(--ds-text-brand-hover);
   --on-glass-rule: color-mix(in srgb, var(--ds-text-strong) 8%, transparent);
   /* A rim of light on top, a wide soft shadow (ADR-0173). */
   box-shadow: var(--ds-elevation-map-glass);

@@ -1578,6 +1578,10 @@ Before working on any component, read:
   StatusRow rules follow the glass; **fields and secondary buttons on glass = relief** (`--on-glass-field-*`: 94 %, short
   shadow, ink 16 % edge — **measured 1.40:1, not 3:1**; 3:1 needs ≈ 47 %); the tool card clips to its curve, MapSearch fades
   by mask.
+- **ADR-0175**: **brand ink on pilot glass** — the audit's last failure (14 → 1): « Comparer » at 72 % over near-black
+  imagery, brand-600 4.08:1. Pilot surfaces set `--on-glass-brand` (`text-brand-hover`: brand-700, 5.45:1 on the measured
+  ground), read by `Button link` / `tertiary`; reading glass unchanged. A highlighted `OptionCard` on glass takes the ink
+  edge, not gray-300.
 
 ## Architecture
 

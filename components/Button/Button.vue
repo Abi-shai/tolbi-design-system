@@ -279,7 +279,8 @@ function handleClick(event: MouseEvent) {
 .ds-button--tertiary {
   background-color: transparent;
   border-color: transparent;
-  color: var(--ds-text-brand);
+  /* On pilot glass over near-black imagery brand-600 is 4.08:1; brand-700 (ADR-0175). */
+  color: var(--on-glass-brand, var(--ds-text-brand));
   box-shadow: none;
 }
 .ds-button--tertiary:hover:not(:disabled) {
@@ -296,7 +297,7 @@ function handleClick(event: MouseEvent) {
   padding: 0;
   background-color: transparent;
   border-color: transparent;
-  color: var(--ds-text-brand);
+  color: var(--on-glass-brand, var(--ds-text-brand)); /* ADR-0175 */
   box-shadow: none;
 }
 .ds-button--link:hover:not(:disabled) {
