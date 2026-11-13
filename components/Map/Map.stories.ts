@@ -62,6 +62,13 @@ const MAP = 'position:relative; height:560px; margin:var(--ds-spacing-2xl); over
   'var(--ds-bg-neutral);'
 
 /* The retained frames' map: 1424 × 828 inside a 1440 page. */
+/* The product's tools, as Carbone's column has them (ADR-0171). */
+const TOOLS = [
+  { value: 'search', icon: 'search' as const, label: 'Rechercher' },
+  { value: 'filters', icon: 'filter' as const, label: 'Filtres' },
+  { value: 'layers', icon: 'layers' as const, label: 'Couches' },
+]
+
 const GIS_MAP = MAP.replace('height:560px', 'height:828px').replace('margin:var(--ds-spacing-2xl)', 'margin:var(--ds-spacing-md)')
 
 /** Le dessin : la consigne et l’année en haut à gauche, les contrôles en haut à droite, la barre d’outils en bas à droite, la légende en bas à gauche. */
@@ -159,7 +166,7 @@ export const GisScreen: Story = {
         { label: 'Moyen', value: '0,232', color: 'var(--ds-chart-sequential-3)' },
         { label: 'Fort', value: '0,353', color: 'var(--ds-chart-sequential-5)' },
       ]
-      return { GIS_MAP, tab, zoom, year, comparison, scale, years, metric, metrics, legendScale, point, rows, SCALES_LIST: [{ value: 'year', label: 'Année' }, { value: 'month', label: 'Mois' }, { value: 'day', label: 'Jour' }] }
+      return { GIS_MAP, TOOLS, tab, zoom, year, comparison, scale, years, metric, metrics, legendScale, point, rows, SCALES_LIST: [{ value: 'year', label: 'Année' }, { value: 'month', label: 'Mois' }, { value: 'day', label: 'Jour' }] }
     },
     template: `
       <div :style="GIS_MAP">
@@ -178,8 +185,8 @@ export const GisScreen: Story = {
         <MapOverlay position="top">
           <MapLegend v-model:metric="metric" :metrics="metrics" :title="legendScale.title" :unit="legendScale.unit" :ticks="legendScale.ticks" />
         </MapOverlay>
-        <MapOverlay position="top-end">
-          <MapNavigator v-model:zoom="zoom">
+        <MapOverlay position="end">
+          <MapNavigator v-model:zoom="zoom" :tools="TOOLS">
             <svg viewBox="0 0 148 96" style="display:block;width:100%;height:100%;background:var(--ds-bg-neutral-subtle)">
               <circle cx="74" cy="48" r="40" fill="none" stroke="var(--ds-bg-brand-solid)" stroke-dasharray="3 3" />
               <rect x="29" y="3" width="91" height="91" rx="3" fill="none" stroke="var(--ds-text-strong)" stroke-width="1.2" />
@@ -237,7 +244,7 @@ export const Selection: Story = {
       const close = () => { pin.value = null; chosen.value = null }
       const choose = (id: string | null) => { chosen.value = id; pin.value = null }
       const zoom = ref(12)
-      return { GIS_MAP, PARCELS, hovered, chosen, year, years, current, sheet, pin, onMap, onParcel, close, choose, zoom }
+      return { GIS_MAP, TOOLS, PARCELS, hovered, chosen, year, years, current, sheet, pin, onMap, onParcel, close, choose, zoom }
     },
     template: `
       <div :style="GIS_MAP" data-map @click="onMap">
@@ -256,7 +263,7 @@ export const Selection: Story = {
         </MapOverlay>
         <MapOverlay position="end">
           <!-- As in Carbone: the navigator, then the sheet under it — it stays at the edge (ADR-0170). -->
-          <MapNavigator v-model:zoom="zoom" />
+          <MapNavigator v-model:zoom="zoom" :tools="TOOLS" />
           <MapPanel v-if="sheet" :key="sheet.id" size="lg" :title="sheet.id" closable @close="close">
             <p style="margin:0; font:var(--ds-font-body-md); color:var(--ds-text-default)">{{ sheet.owner }} · {{ sheet.area }}</p>
             <p style="margin:0; font:var(--ds-font-heading-xl); color:var(--ds-text-strong)">{{ sheet.carbon }} <span style="font:var(--ds-font-body-sm); color:var(--ds-text-subtle)">tCO2e</span></p>
@@ -322,7 +329,7 @@ const LOADING_SCREEN = `
     <MapOverlay position="top">
       <MapLegend v-model:metric="metric" :metrics="metrics" title="Carbone" unit="CO2e/ha" :ticks="empty ? [] : ['0 t', '8 t', '16 t']" :loading="!data" />
     </MapOverlay>
-    <MapOverlay position="top-end">
+    <MapOverlay position="end">
       <MapNavigator v-model:zoom="zoom" :disabled="basemap === 'pending'" />
     </MapOverlay>
     <MapOverlay position="bottom">

@@ -38,6 +38,13 @@ export type IconButtonVariant = 'ghost' | 'primary' | 'surface' | 'neutral' | 's
  */
 export type IconButtonTone = 'neutral' | 'danger'
 
+/**
+ * `round` is the catalogue's disc. `square` takes `radius-control`: a button
+ * among others in a toolbar — `MapNavigator`'s column (ADR-0171) — where a
+ * row of discs reads as separate badges and the chosen one needs a tile.
+ */
+export type IconButtonShape = 'round' | 'square'
+
 interface Props {
   /** The glyph. Mirrors the `Icône` instance-swap on the Figma component. */
   icon: IconName
@@ -62,6 +69,15 @@ interface Props {
   /** `danger` for an action that destroys: red on approach only (ADR-0112). */
   tone?: IconButtonTone
   type?: 'button' | 'submit' | 'reset'
+  /** The box's corners (ADR-0171). */
+  shape?: IconButtonShape
+  /**
+   * The tool is on — its panel open, its mode chosen: `Button`'s `selected`,
+   * ADR-0050's mark (`bg-selected` + `text-on-brand-subtle`), the same in every
+   * variant that has no fill of its own. The meaning (`aria-expanded`,
+   * `aria-pressed`) is the caller's: only it knows what « on » opens.
+   */
+  selected?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -71,6 +87,8 @@ const props = withDefaults(defineProps<Props>(), {
   variant: 'ghost',
   tone: 'neutral',
   type: 'button',
+  shape: 'round',
+  selected: false,
 })
 
 /*
@@ -92,7 +110,7 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
     :disabled="disabled"
     :aria-label="ariaLabel"
     class="ds-icon-button"
-    :class="[`ds-icon-button--${size}`, `ds-icon-button--${variant}`, { 'ds-icon-button--active': active, 'ds-icon-button--danger': tone === 'danger' }]"
+    :class="[`ds-icon-button--${size}`, `ds-icon-button--${variant}`, { 'ds-icon-button--active': active, 'ds-icon-button--danger': tone === 'danger', 'ds-icon-button--square': shape === 'square', 'ds-icon-button--selected': selected }]"
     @click="emit('click', $event)"
   >
     <!-- The glyph, by default. A composite that animates its glyph — a check
@@ -214,6 +232,21 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 
 .ds-icon-button--primary:disabled {
   background: var(--ds-bg-disabled);
+}
+
+/* ── Square (ADR-0171): a tool among tools ─────────────────────────── */
+.ds-icon-button--square {
+  border-radius: var(--ds-radius-control);
+}
+
+/* ── Selected (ADR-0171): the tool is on — ADR-0050's mark ──────────── */
+.ds-icon-button--selected:is(.ds-icon-button--ghost, .ds-icon-button--subtle, .ds-icon-button--surface, .ds-icon-button--neutral):not(:disabled) {
+  background: var(--ds-bg-selected);
+  color: var(--ds-text-on-brand-subtle);
+}
+
+.ds-icon-button--selected:is(.ds-icon-button--ghost, .ds-icon-button--subtle, .ds-icon-button--surface, .ds-icon-button--neutral):hover:not(:disabled) {
+  background: var(--ds-bg-selected-hover);
 }
 
 /* ── Surface and neutral: a disc that stands off its ground ────────── */

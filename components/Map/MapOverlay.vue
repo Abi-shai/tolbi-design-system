@@ -118,6 +118,49 @@ onBeforeUnmount(() => {
   align-items: flex-end;
 }
 
+/*
+  The end side with a tools column (ADR-0171). Three things share it and none
+  moves when another comes or goes: the column against the edge, under the
+  top; a sheet (`MapPanel lg`) to its left, full height; Tolbi xAI's launcher
+  at the column's foot, on its axis. The sheet's track is **always there**,
+  25rem — `MapPanel lg`'s declared width — so the side's published width is
+  the same, sheet open or not, and the legend and the timeline keep one size
+  (ADR-0168's cap): 26.5rem at 1 440px, finishing before the sheet.
+*/
+.ds-map-overlay--end:has(> .ds-map-navigator--column) {
+  display: grid;
+  grid-template-columns: 25rem 44px;
+  grid-template-rows: minmax(0, 1fr);
+  column-gap: var(--ds-spacing-md);
+  align-items: start;
+}
+
+/* `MapPanel` keeps hold of its forms in a box of no box: its panel is the item. */
+.ds-map-overlay--end:has(> .ds-map-navigator--column) > :deep(*),
+.ds-map-overlay--end:has(> .ds-map-navigator--column) > :deep(.ds-map-panel-host > *) {
+  grid-area: 1 / 1;
+  align-self: start;
+  justify-self: end;
+  min-height: 0;
+}
+
+/* A reading sheet takes the side's whole height. */
+.ds-map-overlay--end:has(> .ds-map-navigator--column) > :deep(.ds-map-panel--lg),
+.ds-map-overlay--end:has(> .ds-map-navigator--column) > :deep(.ds-map-panel-host > .ds-map-panel--lg) {
+  align-self: stretch;
+}
+
+.ds-map-overlay--end:has(> .ds-map-navigator--column) > :deep(.ds-map-navigator--column) {
+  grid-area: 1 / 2;
+  align-self: start;
+}
+
+.ds-map-overlay--end:has(> .ds-map-navigator--column) > :deep(.ds-tolbi-ai-launcher) {
+  grid-area: 1 / 2;
+  align-self: end;
+  justify-self: center;
+}
+
 /* Top: the first child against the edge, the next under it. */
 .ds-map-overlay--top-start,
 .ds-map-overlay--top,

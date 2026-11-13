@@ -66,7 +66,7 @@ export { ModulesList } from './ModulesList'
 export type { ModulesListItem, ModulesListLayout } from './ModulesList'
 
 export { IconButton } from './IconButton'
-export type { IconButtonSize, IconButtonVariant, IconButtonTone } from './IconButton'
+export type { IconButtonSize, IconButtonVariant, IconButtonTone, IconButtonShape } from './IconButton'
 export { HorizontalNavigation } from './HorizontalNavigation'
 export type { BreadcrumbItem, NavModule, HorizontalNavigationHomeIcon } from './HorizontalNavigation'
 
@@ -249,8 +249,8 @@ export { ChartTooltip } from './ChartTooltip'
 export type { ChartTooltipSeries } from './ChartTooltip'
 export { Sparkline } from './Sparkline'
 
-export { MapOverlay, MapPanel, MapControls, MapNavigator, MapTimeline, MapTooltip, MapHoverCard, MapPin, MapLegend, MapCanvas, MapStatus } from './Map'
-export type { MapOverlayPosition, MapControl, MapTimelinePeriod, MapTimelineScale, MapTooltipRow, MapPanelSize, MapCanvasBasemap, MapStatusState, MapLegendMetric } from './Map'
+export { MapOverlay, MapPanel, MapControls, MapNavigator, MapSearch, MapFilters, MapFilterSection, MapFilterOption, MapTimeline, MapTooltip, MapHoverCard, MapPin, MapLegend, MapCanvas, MapStatus } from './Map'
+export type { MapOverlayPosition, MapControl, MapTimelinePeriod, MapTimelineScale, MapTooltipRow, MapPanelSize, MapCanvasBasemap, MapStatusState, MapLegendMetric, MapTool, MapSearchItem, MapSearchGroup } from './Map'
 
 export { ChartLegend } from './ChartLegend'
 export type { ChartLegendItem, ChartLegendShape, ChartLegendOrientation } from './ChartLegend'

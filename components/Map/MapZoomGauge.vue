@@ -36,6 +36,12 @@ const props = defineProps<{
   step: number
   label: string
   disabled?: boolean
+  /**
+   * Upright, in the tools column (ADR-0171): + above, − below, the larger zoom
+   * up. The native range is turned a quarter, so the pointer, the arrows and
+   * the reader keep the native control; the drawn thumb travels the height.
+   */
+  vertical?: boolean
 }>()
 
 const value = defineModel<number>({ required: true })
@@ -152,7 +158,7 @@ onBeforeUnmount(() => {
   <span
     ref="root"
     class="ds-map-zoom-gauge"
-    :class="{ 'ds-map-zoom-gauge--gliding': gliding, 'ds-map-zoom-gauge--disabled': disabled }"
+    :class="{ 'ds-map-zoom-gauge--gliding': gliding, 'ds-map-zoom-gauge--disabled': disabled, 'ds-map-zoom-gauge--vertical': vertical }"
     :style="{ '--at': at }"
   >
     <input
@@ -165,6 +171,7 @@ onBeforeUnmount(() => {
       :aria-label="label"
       :disabled="disabled"
       :aria-valuetext="String(Math.round(shown * 10) / 10)"
+      :aria-orientation="vertical ? 'vertical' : undefined"
       @input="onInput"
       @keydown="onKey"
       @pointerdown="press"
@@ -273,5 +280,36 @@ onBeforeUnmount(() => {
 
 .ds-map-zoom-gauge__input:focus-visible + .ds-map-zoom-gauge__span .ds-map-zoom-gauge__thumb {
   box-shadow: var(--ds-focus-ring-gray);
+}
+
+/* ── Upright (ADR-0171) ─────────────────────────────────────────────
+   The column is 32 wide and the trip 64 tall (`spacing-7xl`). The native range
+   is laid out at the trip's length and turned a quarter anticlockwise, so its
+   minimum is at the bottom; the drawn thumb's span is the height less one
+   thumb, and it rises as the zoom grows. */
+.ds-map-zoom-gauge--vertical {
+  flex: none;
+  width: 32px;
+  height: var(--ds-spacing-7xl);
+}
+
+.ds-map-zoom-gauge--vertical .ds-map-zoom-gauge__input {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--ds-spacing-7xl);
+  height: 32px;
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.ds-map-zoom-gauge--vertical .ds-map-zoom-gauge__span {
+  inset-inline: 0;
+  inset-block: 0 12px;
+}
+
+.ds-map-zoom-gauge--vertical .ds-map-zoom-gauge__mover {
+  align-items: flex-start;
+  justify-content: center;
+  transform: translateY(calc((1 - var(--at)) * 100%));
 }
 </style>

@@ -1542,6 +1542,17 @@ Before working on any component, read:
 - **ADR-0170**: **a control stays put when a panel appears** — `MapNavigator`'s `align-self: flex-start` (meant to keep it
   unstretched in a row) overrode `end`'s `flex-end`, so a sheet stacked under it widened the overlay and the navigator
   jumped 242px left; the overlay places it now (against its edge), and `height: fit-content` keeps it unstretched.
+- **ADR-0171**: **the map's tools column** — nothing on a map outside a group of tools, a control never moves when a panel
+  appears, one thing at a time on the right. `MapNavigator` is a **44px upright column** at the end edge: the product's
+  `tools` (glyph, name, `badge` count, `pressed`), « Mini-carte » when `#default` holds one (no longer in the navigator;
+  `collapsed` deprecated), a rule, + / **upright gauge** (`MapZoomGauge vertical`) / −, a rule, « Recentrer ». A tool with
+  a `#tool-<value>` slot opens a **card to the column's left**, top on its button, `spacing-md` away (`v-model:tool`,
+  `selected` + `aria-expanded`; Escape, outside, re-press close; a sheet arriving closes it); without one it is a toggle
+  (`press`). **`MapSearch`** (grouped results, combobox keys, `select`), **`MapFilters`** / `MapFilterSection` /
+  `MapFilterOption` (live, « Effacer » + « N parcelles »). `IconButton` gains **`shape: 'square'`** and **`selected`**.
+  `MapOverlay end` with the column is a grid: column at the edge, sheet (25rem track **always reserved**) to its left
+  full height, `TolbiAiLauncher placement="map"` at its foot on its axis — so the legend and timeline cap is constant
+  (26.5rem at 1 440).
 
 ## Architecture
 

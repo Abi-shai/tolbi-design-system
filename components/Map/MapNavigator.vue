@@ -1,40 +1,60 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useSlots } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, useSlots, watch } from 'vue'
+import type { IconName } from '../Icon'
 import { IconButton } from '../IconButton'
 import { SurfaceTransition } from '../SurfaceTransition'
 import { Tooltip, type TooltipPlacement } from '../Tooltip'
 import MapZoomGauge from './MapZoomGauge.vue'
 
 /**
- * The map's navigator (ADR-0100, Figma « Carte/Navigateur » `3552:3437`), at
- * the top right of a map, in the owner's drawing — two forms:
+ * The map's tools column (ADR-0171, after ADR-0100 / ADR-0120): one upright
+ * strip at the map's end edge, under its top — **nothing is added on a map
+ * outside a group of tools**. From the top:
  *
- * - **open**: the mini-map (`#default`, the engine's — the system draws its
- *   frame, ADR-0006) with its fold on its corner, and under it − **the zoom
- *   gauge** + and « Recentrer »;
- * - **folded**: a bar — − + « Recentrer », a rule, and the mini-map's button.
+ * - the product's **tools** (`tools`: a glyph, a name, a count, on or off) —
+ *   Rechercher, Filtres, Couches — then « Mini-carte » when there is one
+ *   (`#default`, the engine's canvas);
+ * - a rule, + **the zoom gauge** −, a rule, « Recentrer ».
  *
- * **The fold and the unfold share a corner** (the owner, 5 Nov.): the
- * mini-map's button closes the bar, at its top right, where the fold sits on
- * the open mini-map — so folding and unfolding again is the same press in the
- * same place, the pointer never moves. The drawing put it first in the bar.
+ * A tool with something to show (a `#tool-<value>` slot, or the mini-map)
+ * **opens it in a card to the column's left**, its top on the button's,
+ * `spacing-md` away; the button stays on while it is open (`v-model:tool`).
+ * Escape, a press outside or the button again close it. **One thing at a time
+ * on the right**: a `MapPanel` arriving in the same overlay (a parcel's sheet)
+ * closes it, and the mini-map goes back into its button. A tool with nothing
+ * to show is a toggle: it emits `press`, and the product says it is on
+ * (`pressed`).
  *
- * **Without a mini-map** (no `#default`, ADR-0120 — the presence decides,
- * ADR-0053) there is nothing to fold: the navigator is the bar alone, − the
- * gauge + « Recentrer », in the folded form's chrome — no rule, no mini-map
- * button, and `v-model:collapsed` is ignored.
+ * **A control never moves when a panel appears.** Put the column in
+ * `MapOverlay position="end"`: the overlay keeps it against the edge and puts
+ * a sheet (`MapPanel lg`) to its left, full height, and a `TolbiAiLauncher
+ * placement="map"` at its foot, on its axis — none of them moves when the
+ * sheet opens or closes.
  *
- * The zoom is a model (`v-model:zoom`, between `zoomMin` and `zoomMax`):
- * the gauge shows it — **any** value, the product passes the map's zoom as it
- * moves — and moves it; − and + step it by `zoomStep` and stop at the ends, and
- * the thumb travels with the map (`MapZoomGauge`, ADR-0121). « Recentrer » emits; the engine knows where the centre is.
- *
- * The two forms are two surfaces of two shapes, so the fold is a surface
- * leaving and another arriving at the same corner (`SurfaceTransition`, out
- * then in — `MapPanel`'s fold, ADR-0099); the focus goes to the button that
- * replaced the one pressed.
+ * The zoom is a model (`v-model:zoom`, between `zoomMin` and `zoomMax`): the
+ * gauge shows **any** value — the product passes the map's zoom as it moves —
+ * and moves it; + and − step it by `zoomStep` and stop at the ends, and the
+ * thumb travels with the map (`MapZoomGauge`, ADR-0121). « Recentrer » emits;
+ * the engine knows where the centre is.
  */
+export interface MapTool {
+  value: string
+  icon: IconName
+  /** Its name: the button's, and its tooltip. */
+  label: string
+  /** A count on the button — the filters in force. Nothing at 0. */
+  badge?: number
+  /** A tool with nothing to show is a toggle: the product says it is on. */
+  pressed?: boolean
+  disabled?: boolean
+}
+
 interface Props {
+  tools?: MapTool[]
+  /** The mini-map's tool, when `#default` holds one. */
+  minimapLabel?: string
+  /** The column's name, for a reader. */
+  label?: string
   zoomMin?: number
   zoomMax?: number
   zoomStep?: number
@@ -42,20 +62,23 @@ interface Props {
   zoomInLabel?: string
   zoomOutLabel?: string
   recenterLabel?: string
+  /** @deprecated The mini-map is a tool now (ADR-0171); use `minimapLabel`. */
   expandLabel?: string
+  /** @deprecated The mini-map is a tool now (ADR-0171). Ignored. */
   collapseLabel?: string
-  /** The tooltips' side: away from the edge the navigator stands on. */
+  /** The tooltips' side: away from the edge the column stands on. */
   tooltipPlacement?: TooltipPlacement
   /**
    * The map does not exist yet (ADR-0122): every control is there and off, so
-   * the corner keeps its shape and nothing moves when the map arrives. Only
-   * until then — once there is a map, its zoom is always offered (0 of 30
-   * products disable it).
+   * the column keeps its shape and nothing moves when the map arrives.
    */
   disabled?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  tools: () => [],
+  minimapLabel: 'Mini-carte',
+  label: 'Outils de la carte',
   zoomMin: 0,
   zoomMax: 20,
   zoomStep: 1,
@@ -63,203 +86,316 @@ const props = withDefaults(defineProps<Props>(), {
   zoomInLabel: 'Zoomer',
   zoomOutLabel: 'Dézoomer',
   recenterLabel: 'Recentrer',
-  expandLabel: 'Afficher la mini-carte',
-  collapseLabel: 'Masquer la mini-carte',
+  expandLabel: undefined,
+  collapseLabel: undefined,
   tooltipPlacement: 'left',
   disabled: false,
 })
 
-const emit = defineEmits<{ recenter: [] }>()
+const emit = defineEmits<{ recenter: []; press: [value: string] }>()
 
 defineSlots<{
-  /** The mini-map — the engine's canvas. */
+  /** The mini-map — the engine's canvas. Its presence adds the « Mini-carte » tool. */
   default?: () => unknown
+} & {
+  /** What a tool opens: the slot named after its `value`. */
+  [key: `tool-${string}`]: (() => unknown) | undefined
 }>()
 
-const collapsed = defineModel<boolean>('collapsed', { default: false })
-/* No mini-map, nothing to fold: the slot's presence decides (ADR-0120). */
-const slots = useSlots() as Record<string, unknown>
-const hasMinimap = computed<boolean>(() => !!slots.default)
+/** The tool whose card is open, or `null`. */
+const tool = defineModel<string | null>('tool', { default: null })
+/** @deprecated The mini-map is a tool now (ADR-0171): `v-model:tool`, value `minimap`. Ignored. */
+defineModel<boolean>('collapsed', { default: true })
 const zoom = defineModel<number>('zoom', { default: 10 })
 
+const slots = useSlots() as Record<string, unknown>
+const MINIMAP = 'minimap'
+
+const allTools = computed<MapTool[]>(() => {
+  const list = [...props.tools]
+  if (slots.default) list.push({ value: MINIMAP, icon: 'map', label: props.expandLabel ?? props.minimapLabel })
+  return list
+})
+const opens = (t: MapTool) => t.value === MINIMAP || !!slots[`tool-${t.value}`]
+const current = computed(() => allTools.value.find((t) => t.value === tool.value && opens(t)) ?? null)
+
+const id = useId()
+const flyoutId = `${id}-flyout`
+const column = ref<HTMLElement | null>(null)
+const flyout = ref<HTMLElement | null>(null)
+const top = ref(0)
+
+function buttonOf(value: string) {
+  return column.value?.querySelector<HTMLElement>(`[data-map-tool="${value}"] button`) ?? null
+}
+
+/* The card's top on its button's, measured when it opens. */
+function place(value: string) {
+  const wrap = column.value?.querySelector<HTMLElement>(`[data-map-tool="${value}"]`)
+  top.value = wrap ? wrap.offsetTop : 0
+}
+
+let pressedHere = false
+function onTool(t: MapTool) {
+  if (!opens(t)) {
+    emit('press', t.value)
+    return
+  }
+  if (tool.value === t.value) {
+    tool.value = null
+    return
+  }
+  pressedHere = true
+  place(t.value)
+  tool.value = t.value
+}
+
+/* Opened by a press here, the card takes the focus — the search's field
+   first (`[data-autofocus]`, then the first field or control). Opened by the
+   product, it does not take the reader's focus (ADR-0062). */
+function focusArrived() {
+  if (!pressedHere) return
+  pressedHere = false
+  const card = flyout.value
+  card?.querySelector<HTMLElement>('[data-autofocus], input:not([type="hidden"]), textarea, select, button, [tabindex]:not([tabindex="-1"])')?.focus()
+}
+
+watch(tool, (now) => {
+  if (now) void nextTick(() => place(now))
+}, { immediate: true })
+
+function close(handBack: boolean) {
+  const was = tool.value
+  tool.value = null
+  if (handBack && was) void nextTick(() => buttonOf(was)?.focus())
+}
+
+/* Escape from the card or its button closes it and hands the focus back. A
+   layer of its own inside the card (an open list) takes its Escape first. */
+function onKey(e: KeyboardEvent) {
+  if (e.key !== 'Escape' || !tool.value || e.defaultPrevented) return
+  const t = e.target as Element | null
+  if (t?.closest('[role="listbox"], [role="menu"], [popover]')) return
+  e.preventDefault()
+  close(true)
+}
+
+/* A press outside closes it — the map, the panel. */
+function onOutside(e: PointerEvent) {
+  if (!tool.value) return
+  const t = e.target as Node | null
+  if (t && column.value?.contains(t)) return
+  close(false)
+}
+
+/* One thing at a time on the right: a sheet arriving beside the column
+   closes the card (a ghost leaving is not an arrival). */
+let watcher: MutationObserver | null = null
+onMounted(() => {
+  document.addEventListener('pointerdown', onOutside, true)
+  const overlay = column.value?.parentElement
+  if (!overlay || typeof MutationObserver === 'undefined') return
+  watcher = new MutationObserver((records) => {
+    if (!tool.value) return
+    for (const r of records) for (const n of r.addedNodes) {
+      /* `MapPanel` arrives inside its host, a box of no box. */
+      const sheet = '.ds-map-panel:not([aria-hidden])'
+      if (n instanceof HTMLElement && (n.matches(sheet) || n.querySelector(sheet))) {
+        /* A focus inside the card would fall to the page: it goes back to the tool. */
+        close(!!flyout.value?.contains(document.activeElement))
+        return
+      }
+    }
+  })
+  watcher.observe(overlay, { childList: true })
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', onOutside, true)
+  watcher?.disconnect()
+})
+
+/* ── Zoom ─────────────────────────────────────────────────────────── */
 const clamp = (z: number) => Math.min(props.zoomMax, Math.max(props.zoomMin, z))
 const atMin = computed(() => zoom.value <= props.zoomMin)
 const atMax = computed(() => zoom.value >= props.zoomMax)
-/* − or + that reaches its end disables itself, and a disabled button drops the
-   focus to the page (ADR-0059): it goes to the gauge open, to the other step
-   folded. */
 const gauge = ref<InstanceType<typeof MapZoomGauge> | null>(null)
+/* A step that reaches its end disables its button, and a disabled button drops
+   the focus to the page (ADR-0059): it goes to the gauge. */
 function by(d: number) {
-  /* With a gauge, the step is the gauge's: from where its thumb is going, and
-     the thumb travels with the map (ADR-0121). */
   if (gauge.value) gauge.value.stepBy(d)
   else zoom.value = clamp(zoom.value + d * props.zoomStep)
-  nextTick(() => {
+  void nextTick(() => {
     const a = document.activeElement as HTMLButtonElement | null
     if (a && a !== document.body && !a.disabled) return
-    const to = host.value?.querySelector<HTMLElement>('.ds-map-zoom-gauge__input')
-      ?? host.value?.querySelector<HTMLElement>(`[aria-label="${d > 0 ? props.zoomOutLabel : props.zoomInLabel}"]`)
-    to?.focus()
+    column.value?.querySelector<HTMLElement>('.ds-map-zoom-gauge__input')?.focus()
   })
-}
-
-const host = ref<HTMLElement | null>(null)
-/* The focus follows the fold only when the fold was pressed here: a product
-   folding it through `v-model:collapsed` does not take the reader's focus
-   (ADR-0062 — a focus is not held hostage). */
-let pressed = false
-function fold(next: boolean) {
-  pressed = true
-  collapsed.value = next
-}
-function focusArrived() {
-  if (!pressed) return
-  pressed = false
-  host.value?.querySelector<HTMLElement>(collapsed.value ? '[data-map-navigator-open] button' : '[data-map-navigator-fold] button')?.focus()
 }
 </script>
 
 <template>
-  <div ref="host" class="ds-map-navigator-host">
-    <!-- ── Without a mini-map: the bar alone ─────────────────────────── -->
-    <div v-if="!hasMinimap" class="ds-map-navigator ds-map-navigator--folded">
-      <div class="ds-map-navigator__zoom">
-        <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
-          <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
-        </Tooltip>
-        <MapZoomGauge ref="gauge" v-model="zoom" :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" :disabled="disabled" />
-        <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
-          <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
-        </Tooltip>
-        <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
-          <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" :disabled="disabled" />
-        </Tooltip>
-      </div>
-    </div>
-
-    <SurfaceTransition v-else mode="out-in" @enter="focusArrived">
-      <!-- ── Open ──────────────────────────────────────────────────── -->
-      <div v-if="!collapsed" key="open" class="ds-map-navigator">
-        <div class="ds-map-navigator__minimap">
-          <slot />
-          <Tooltip :title="collapseLabel" :placement="tooltipPlacement" class="ds-map-navigator__fold" data-map-navigator-fold>
+  <div ref="column" class="ds-map-navigator ds-map-navigator--column" role="group" :aria-label="label" @keydown="onKey">
+    <template v-if="allTools.length">
+      <div class="ds-map-navigator__group">
+        <span v-for="t in allTools" :key="t.value" class="ds-map-navigator__tool" :data-map-tool="t.value">
+          <Tooltip :title="t.label" :placement="tooltipPlacement">
             <IconButton
-              icon="minimize-2"
+              :icon="t.icon"
               size="xs"
-              variant="surface"
-              :ariaLabel="collapseLabel"
-              aria-expanded="true"
-              :disabled="disabled"
-              @click="fold(true)"
+              variant="subtle"
+              shape="square"
+              :ariaLabel="t.badge ? `${t.label} (${t.badge})` : t.label"
+              :selected="opens(t) ? tool === t.value : !!t.pressed"
+              :aria-expanded="opens(t) ? tool === t.value : undefined"
+              :aria-controls="opens(t) && tool === t.value ? flyoutId : undefined"
+              :aria-pressed="opens(t) ? undefined : !!t.pressed"
+              :disabled="disabled || t.disabled"
+              @click="onTool(t)"
             />
           </Tooltip>
-        </div>
-        <div class="ds-map-navigator__zoom">
-          <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
-            <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
-          </Tooltip>
-          <MapZoomGauge ref="gauge" v-model="zoom" :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" :disabled="disabled" />
-          <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
-            <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
-          </Tooltip>
-          <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
-            <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" :disabled="disabled" />
-          </Tooltip>
-        </div>
+          <span v-if="t.badge" class="ds-map-navigator__count" aria-hidden="true">{{ t.badge }}</span>
+        </span>
       </div>
+      <span class="ds-map-navigator__rule" aria-hidden="true" />
+    </template>
 
-      <!-- ── Folded: a bar ─────────────────────────────────────────── -->
-      <div v-else key="folded" class="ds-map-navigator ds-map-navigator--folded">
-        <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
-          <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
-        </Tooltip>
-        <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
-          <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
-        </Tooltip>
-        <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
-          <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" @click="emit('recenter')" :disabled="disabled" />
-        </Tooltip>
-        <!-- Last, so it lands in the corner the fold leaves: the pointer that
-             folded the mini-map is already on the button that opens it. -->
-        <span class="ds-map-navigator__rule" aria-hidden="true" />
-        <Tooltip :title="expandLabel" :placement="tooltipPlacement" data-map-navigator-open>
-          <IconButton icon="map" size="xs" variant="subtle" :ariaLabel="expandLabel" aria-expanded="false" :disabled="disabled" @click="fold(false)" />
-        </Tooltip>
+    <div class="ds-map-navigator__group">
+      <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
+        <IconButton icon="plus" size="xs" variant="subtle" shape="square" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
+      </Tooltip>
+      <MapZoomGauge ref="gauge" v-model="zoom" vertical :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" :disabled="disabled" />
+      <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
+        <IconButton icon="minus" size="xs" variant="subtle" shape="square" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
+      </Tooltip>
+    </div>
+
+    <span class="ds-map-navigator__rule" aria-hidden="true" />
+
+    <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
+      <IconButton icon="crosshair" size="xs" variant="subtle" shape="square" :ariaLabel="recenterLabel" :disabled="disabled" @click="emit('recenter')" />
+    </Tooltip>
+
+    <!-- What the open tool shows: a card to the column's left, its top on its button's. -->
+    <SurfaceTransition @enter="focusArrived">
+      <div
+        v-if="current"
+        :id="flyoutId"
+        :key="current.value"
+        ref="flyout"
+        class="ds-map-navigator__flyout"
+        :class="{ 'ds-map-navigator__flyout--minimap': current.value === MINIMAP }"
+        role="dialog"
+        :aria-label="current.label"
+        :style="{ top: `${top}px` }"
+      >
+        <div v-if="current.value === MINIMAP" class="ds-map-navigator__minimap"><slot /></div>
+        <slot v-else :name="`tool-${current.value}`" />
       </div>
     </SurfaceTransition>
   </div>
 </template>
 
 <style scoped>
-.ds-map-navigator-host {
-  display: contents;
+/*
+  The column (ADR-0171): 44 wide — 32px buttons in 6px of margin, under a
+  hairline — on the map's floating surface (`bg-default`, `border-subtle`,
+  `elevation-raised`, `radius-surface`), its groups ruled off. Its own height
+  in any row it lands in (ADR-0170): a stretched column is a hole in the map.
+*/
+.ds-map-navigator {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-spacing-xs);
+  box-sizing: border-box;
+  width: 44px;
+  height: fit-content;
+  padding: var(--ds-spacing-xs) 0;
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-surface);
+  background: var(--ds-bg-default);
+  box-shadow: var(--ds-elevation-raised);
+}
+
+.ds-map-navigator__group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-spacing-xxs);
+}
+
+.ds-map-navigator__tool {
+  position: relative;
+  display: inline-flex;
+}
+
+/* The count rides the button's corner, on the brand's fill — a count of what
+   a control holds (ADR-0149's ground) — clear of the glyph: a `Badge` (20px)
+   covered a 16px glyph whole. 16px tall, the type at the reading floor. */
+.ds-map-navigator__count {
+  position: absolute;
+  top: calc(-1 * var(--ds-spacing-xs));
+  right: calc(-1 * var(--ds-spacing-xs));
+  box-sizing: border-box;
+  min-width: 16px;
+  height: 16px;
+  padding-inline: var(--ds-spacing-xs);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-bg-brand-solid);
+  color: var(--ds-text-on-brand-solid);
+  font: var(--ds-font-label-md-strong);
+  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 var(--ds-border-width-strong) var(--ds-bg-default);
+  pointer-events: none;
+}
+
+.ds-map-navigator__rule {
+  flex: none;
+  width: 20px;
+  height: var(--ds-border-width-default);
+  background: var(--ds-border-subtle);
 }
 
 /*
-  The drawing: `bg-default`, `border-subtle`, `elevation-raised`, 8 around and
-  between. The open form takes `radius-surface` (Figma's 14 is no step; 12 is
-  the role of a surface that holds content), the bar `radius-surface-sm` (10,
-  exactly as drawn). Both grow from the top right, the corner they stand in.
+  The card a tool opens: the same floating surface, `spacing-md` to the
+  column's left, its top on its button's, growing from the corner nearest the
+  button. Its width is its content's — the search and the filters are 20rem.
 */
-.ds-map-navigator {
-  display: inline-flex;
+.ds-map-navigator__flyout {
+  position: absolute;
+  right: calc(100% + var(--ds-spacing-md));
+  display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-md);
   box-sizing: border-box;
-  padding: var(--ds-spacing-md);
+  width: max-content;
+  max-width: 24rem;
+  max-height: min(36rem, 70vh);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
   background: var(--ds-bg-default);
   box-shadow: var(--ds-elevation-raised);
   transform-origin: top right;
-  /* Its own height in any row it lands in — a stretched card is a hole in the
-     map — said by its height, not by `align-self`: a self-alignment overrode
-     the overlay's, so in `end` it sat at the start of the column and jumped
-     242px left when a sheet widened it (ADR-0170). Across, the overlay places
-     it — against its edge, whatever is stacked under it. */
-  height: fit-content;
 }
 
-.ds-map-navigator--folded {
-  flex-direction: row;
-  align-items: center;
-  gap: var(--ds-spacing-xxs);
-  padding: var(--ds-spacing-xs);
-  border-radius: var(--ds-radius-surface-sm);
+.ds-map-navigator__flyout--minimap {
+  padding: var(--ds-spacing-md);
 }
 
-/* 148 × 96, as drawn; the engine's canvas fills it. */
+/* 200 × 128: the ring, the points and the view's frame read at a glance. */
 .ds-map-navigator__minimap {
-  position: relative;
-  width: 9.25rem;
-  height: 6rem;
+  width: 12.5rem;
+  height: 8rem;
   overflow: hidden;
   border-radius: var(--ds-radius-inner);
   background: var(--ds-bg-neutral-subtle);
 }
 
-.ds-map-navigator__minimap > :deep(:not(.ds-map-navigator__fold)) {
+.ds-map-navigator__minimap > :deep(*) {
   width: 100%;
   height: 100%;
-}
-
-.ds-map-navigator__fold {
-  position: absolute;
-  top: var(--ds-spacing-xs);
-  right: var(--ds-spacing-xs);
-}
-
-.ds-map-navigator__zoom {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-xxs);
-  width: 9.25rem;
-}
-
-.ds-map-navigator__rule {
-  flex: none;
-  width: var(--ds-border-width-default);
-  height: 20px;
-  background: var(--ds-border-subtle);
 }
 </style>

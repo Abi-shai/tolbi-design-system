@@ -30,6 +30,13 @@ interface Props {
   controls?: string
   /** Listen for ⌘J / Ctrl+J while the launcher is on the page. */
   shortcut?: boolean
+  /**
+   * `page` floats over the page's bottom-right corner (ADR-0070). `map` stands
+   * at the foot of a map's tools column (ADR-0171): put it in the same
+   * `MapOverlay position="end"` as the `MapNavigator`, which aligns it on the
+   * column and keeps it there, sheet open or not.
+   */
+  placement?: 'page' | 'map'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -37,6 +44,7 @@ const props = withDefaults(defineProps<Props>(), {
   tooltip: 'Interroger Tolbi xAI',
   controls: undefined,
   shortcut: true,
+  placement: 'page',
 })
 
 const open = defineModel<boolean>('open', { default: false })
@@ -119,7 +127,7 @@ function onFocus() {
 
 <template>
   <SurfaceTransition>
-    <div v-show="!open" class="ds-tolbi-ai-launcher">
+    <div v-show="!open" class="ds-tolbi-ai-launcher" :class="{ 'ds-tolbi-ai-launcher--map': placement === 'map' }">
       <button
         ref="button"
         type="button"
@@ -164,6 +172,13 @@ function onFocus() {
   z-index: var(--ds-z-raised);
   display: inline-flex;
   transform-origin: center;
+}
+
+/* At the foot of a map's tools column (ADR-0171): the overlay places it. */
+.ds-tolbi-ai-launcher--map {
+  position: relative;
+  right: auto;
+  bottom: auto;
 }
 
 /*

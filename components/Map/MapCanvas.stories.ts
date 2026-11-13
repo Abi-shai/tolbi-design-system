@@ -58,7 +58,7 @@ export const Default: Story = {
         </div>
         <MapCanvas :basemap="basemap" style="height:420px;border-radius:var(--ds-radius-surface)">
           <template #engine>${ENGINE}</template>
-          <MapOverlay position="top-end"><MapNavigator :disabled="basemap === 'pending'" /></MapOverlay>
+          <MapOverlay position="end"><MapNavigator :disabled="basemap === 'pending'" /></MapOverlay>
         </MapCanvas>
       </div>
     `,
