@@ -15,5 +15,15 @@
       "$type": "number",
       "$description": "Anything that must cover a popover — the nav's module panel today, a modal scrim when one exists. Pairs with bg-overlay"
     }
+  },
+  "backdrop": {
+    "map-control": {
+      "$value": "blur(24px) saturate(1.8)",
+      "$description": "What a pilot surface does to the map under it (ADR-0172): with bg-map-control, the imagery reads as colour, not detail"
+    },
+    "map-read": {
+      "$value": "blur(20px) saturate(1.6)",
+      "$description": "What a reading surface does to the map under it (ADR-0172): with bg-map-read, almost opaque — the text is long"
+    }
   }
 }

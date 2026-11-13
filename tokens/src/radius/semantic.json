@@ -30,6 +30,11 @@
       "$type": "dimension",
       "$description": "A frame that holds a surface — the ground around a list that is itself a surface (ProjectList, ADR-0166): one step past the surface it holds"
     },
+    "surface-xl": {
+      "$value": "{radius.4xl}",
+      "$type": "dimension",
+      "$description": "A reading panel floating on a map, and the card a map tool opens (ADR-0172): what is read takes the large curve, what is pressed the pill — two steps past the cards it holds (surface-lg, 16)"
+    },
     "pill": {
       "$value": "{radius.full}",
       "$type": "dimension",

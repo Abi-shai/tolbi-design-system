@@ -169,7 +169,8 @@ function handleClick(event: MouseEvent) {
   justify-content: center;
   padding: var(--ds-control-padding-md);
   border: var(--ds-border-width-default) solid transparent;
-  border-radius: var(--ds-radius-control);
+  /* On map glass, what is pressed is a pill (ADR-0172). */
+  border-radius: var(--on-glass-control-radius, var(--ds-radius-control));
   font: var(--ds-font-label-lg-strong);
   white-space: nowrap;
   cursor: pointer;

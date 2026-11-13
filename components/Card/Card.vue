@@ -48,11 +48,16 @@ const slots = defineSlots<{
   display: flex;
   flex-direction: column;
   min-width: 0;
-  border-radius: var(--ds-radius-surface);
+  /* Inside map glass, 16 (ADR-0172) — still the surface's own, not a prop. */
+  border-radius: var(--on-glass-card-radius, var(--ds-radius-surface));
   background-color: var(--ds-bg-default);
 }
 
-.ds-card--outlined { border: var(--ds-border-width-default) solid var(--ds-border-subtle); }
+.ds-card--outlined {
+  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  /* Opaque white blocks on glass read as a patchwork (ADR-0172). */
+  background-color: var(--on-glass-raised, var(--ds-bg-default));
+}
 
 .ds-card--elevated {
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
@@ -61,7 +66,7 @@ const slots = defineSlots<{
 
 .ds-card--sunk {
   border: var(--ds-border-width-default) solid transparent;
-  background-color: var(--ds-bg-neutral-subtle);
+  background-color: var(--on-glass-sunk, var(--ds-bg-neutral-subtle));
 }
 
 .ds-card--pad-none { --card-pad: 0px; }

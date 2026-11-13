@@ -261,6 +261,26 @@
       "$value": "{color.success.700}",
       "$type": "color",
       "$description": "fill — repointed from 600, where white was 3.91:1 and failed AA"
+    },
+    "map-control": {
+      "$value": "color-mix(in srgb, {color.base.white} 72%, transparent)",
+      "$type": "color",
+      "$description": "ground — glass for what pilots a map (ADR-0172): MapLegend, MapTimeline, MapNavigator, MapStatus, MapHoverCard, the launcher at the map's foot. bg-default at 72 % under backdrop-map-control; on the darkest imagery behind it text-subtle measures 4.6:1, text-subtlest fails, so a glass surface re-points subtlest to subtle"
+    },
+    "map-read": {
+      "$value": "color-mix(in srgb, {color.base.white} 90%, transparent)",
+      "$type": "color",
+      "$description": "ground — glass for what is read on a map (ADR-0172): MapPanel, the navigator's tool card. bg-default at 90 % under backdrop-map-read"
+    },
+    "map-raised": {
+      "$value": "color-mix(in srgb, {color.base.white} 70%, transparent)",
+      "$type": "color",
+      "$description": "ground — a raised block inside map glass (ADR-0172): Card outlined, OptionCard row. Opaque white blocks on glass read as a patchwork"
+    },
+    "map-sunk": {
+      "$value": "color-mix(in srgb, {color.gray-light.50} 55%, transparent)",
+      "$type": "color",
+      "$description": "ground — a recessed block inside map glass (ADR-0172): Card sunk, the Tabs track. bg-neutral-subtle at 55 %"
     }
   },
   "border": {
@@ -363,6 +383,11 @@
       "$value": "{color.accent.200}",
       "$type": "color",
       "$description": "decorative — 1.13:1 hairline on bg-accent-subtle. Mirrors Figma border/on-accent-subtle"
+    },
+    "map-edge": {
+      "$value": "color-mix(in srgb, {color.base.white} 55%, transparent)",
+      "$type": "color",
+      "$description": "decorative — the edge of map glass (ADR-0172): white at 55 %, a rim of light rather than border-subtle's grey line, which reads as dirt on imagery"
     }
   }
 }

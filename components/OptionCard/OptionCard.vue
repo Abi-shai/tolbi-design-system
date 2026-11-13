@@ -327,7 +327,8 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
   padding: var(--ds-spacing-xl);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface-sm);
-  background: var(--ds-bg-default);
+  /* At 70 % inside map glass (ADR-0172): opaque white blocks read as a patchwork. */
+  background: var(--on-glass-raised, var(--ds-bg-default));
   box-shadow: var(--option-card-contour), var(--option-card-focus);
   color: inherit;
   font: inherit;
@@ -589,7 +590,8 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
   gap: var(--ds-spacing-md);
   min-height: 40px; /* token-lint-disable spacing-on-ramp — a row's height, the tile's 28 + its inset; not rhythm */
   padding: 0 var(--ds-spacing-lg) 0 var(--ds-spacing-sm);
-  border-radius: var(--ds-radius-control);
+  /* Inside map glass, 12 (ADR-0172). */
+  border-radius: var(--on-glass-row-radius, var(--ds-radius-control));
 }
 
 .ds-option-card--row .ds-option-card__tile {

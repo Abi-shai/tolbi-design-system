@@ -64,7 +64,7 @@ function handleClick(event: MouseEvent) {
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: var(--ds-radius-control);
+  border-radius: var(--on-glass-control-radius, var(--ds-radius-control)); /* a pill on map glass (ADR-0172) */
   background-color: transparent;
   cursor: pointer;
   outline: none;

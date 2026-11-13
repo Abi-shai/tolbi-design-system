@@ -213,6 +213,23 @@ function onFocus() {
     box-shadow   var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
+/* At the map's foot (ADR-0172): pilot glass, as the column above it. */
+.ds-tolbi-ai-launcher--map .ds-tolbi-ai-launcher__button {
+  border-color: var(--ds-border-map-edge);
+  background: var(--ds-bg-map-control);
+  -webkit-backdrop-filter: var(--ds-backdrop-map-control);
+  backdrop-filter: var(--ds-backdrop-map-control);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ds-tolbi-ai-launcher--map .ds-tolbi-ai-launcher__button {
+    border-color: var(--ds-border-subtlest);
+    background: var(--ds-bg-default);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 /* On white no tint can say hover (ADR-0044): the contour steps up instead, as
    `IconButton`'s white disc does. */
 .ds-tolbi-ai-launcher__button:hover,

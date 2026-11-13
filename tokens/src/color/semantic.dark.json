@@ -261,6 +261,26 @@
       "$value": "{color.success.700}",
       "$type": "color",
       "$description": "fill — white is 5.69:1"
+    },
+    "map-control": {
+      "$value": "color-mix(in srgb, {color.gray-forest.900} 72%, transparent)",
+      "$type": "color",
+      "$description": "ground — glass for what pilots a map (ADR-0172): bg-default (gray-forest/900) at 72 % under backdrop-map-control"
+    },
+    "map-read": {
+      "$value": "color-mix(in srgb, {color.gray-forest.900} 90%, transparent)",
+      "$type": "color",
+      "$description": "ground — glass for what is read on a map (ADR-0172): bg-default at 90 %"
+    },
+    "map-raised": {
+      "$value": "color-mix(in srgb, {color.gray-forest.900} 70%, transparent)",
+      "$type": "color",
+      "$description": "ground — a raised block inside map glass (ADR-0172): bg-default at 70 %"
+    },
+    "map-sunk": {
+      "$value": "color-mix(in srgb, {color.gray-forest.800} 55%, transparent)",
+      "$type": "color",
+      "$description": "ground — a recessed block inside map glass (ADR-0172): bg-neutral-subtle at 55 %"
     }
   },
   "border": {
@@ -363,6 +383,11 @@
       "$value": "{color.accent.dark-border}",
       "$type": "color",
       "$description": "decorative — 1.35:1 hairline on bg-accent-subtle"
+    },
+    "map-edge": {
+      "$value": "color-mix(in srgb, {color.base.white} 12%, transparent)",
+      "$type": "color",
+      "$description": "decorative — the edge of map glass in dark (ADR-0172): white at 12 %; 55 % (light's) glares around a gray-forest pane"
     }
   }
 }

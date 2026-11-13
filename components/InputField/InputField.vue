@@ -224,7 +224,7 @@ provide(FORM_FIELD_KEY, null as unknown as FormFieldContext)
   width: 100%;
   background: var(--ds-bg-default);
   border: var(--ds-border-width-default) solid var(--ds-border-default);
-  border-radius: var(--ds-radius-control);
+  border-radius: var(--on-glass-control-radius, var(--ds-radius-control)); /* a pill on map glass (ADR-0172) */
   box-shadow: var(--ds-elevation-control);
   box-sizing: border-box;
   transition: border-color var(--ds-motion-duration-moderate) var(--ds-motion-easing-default), box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);

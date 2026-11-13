@@ -310,9 +310,20 @@ onBeforeUnmount(() => {
   max-width: 20rem;
   min-width: min-content;
   padding: var(--ds-spacing-lg);
-  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
-  border-radius: var(--ds-radius-surface-sm);
-  background: var(--ds-bg-default);
+  border-radius: var(--ds-radius-surface-lg);
+  /* Reading glass (ADR-0172): almost opaque — the text is long. What it holds
+     follows (`--on-glass-*`): blocks at 70 % / 55 %, what is pressed in a pill. */
+  border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
+  background: var(--ds-bg-map-read);
+  -webkit-backdrop-filter: var(--ds-backdrop-map-read);
+  backdrop-filter: var(--ds-backdrop-map-read);
+  /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
+  --ds-text-subtlest: var(--ds-text-subtle);
+  --on-glass-control-radius: var(--ds-radius-pill);
+  --on-glass-card-radius: var(--ds-radius-surface-lg);
+  --on-glass-row-radius: var(--ds-radius-surface);
+  --on-glass-raised: var(--ds-bg-map-raised);
+  --on-glass-sunk: var(--ds-bg-map-sunk);
   box-shadow: var(--ds-elevation-raised);
   /* ADR-0021: the consuming surface sets its own origin — it goes to its
      corner, where the control it becomes stands. */
@@ -395,7 +406,8 @@ onBeforeUnmount(() => {
   max-height: 100%;
   gap: 0;
   padding: 0;
-  border-radius: var(--ds-radius-surface);
+  /* What is read takes the large curve (ADR-0172). */
+  border-radius: var(--ds-radius-surface-xl);
 }
 
 .ds-map-panel--lg .ds-map-panel__head {
@@ -520,5 +532,17 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: var(--ds-spacing-md);
   transform-origin: top left;
+}
+
+/* Less transparency asked for: the same surface, opaque, nothing blurred (ADR-0172). */
+@media (prefers-reduced-transparency: reduce) {
+  .ds-map-panel {
+    border-color: var(--ds-border-subtle);
+    background: var(--ds-bg-default);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    --on-glass-raised: var(--ds-bg-default);
+    --on-glass-sunk: var(--ds-bg-neutral-subtle);
+  }
 }
 </style>

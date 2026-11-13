@@ -61,9 +61,16 @@ withDefaults(defineProps<Props>(), {
   width: max-content;
   max-width: 17.5rem;
   padding: var(--ds-spacing-lg);
-  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
-  border-radius: var(--ds-radius-control);
-  background: var(--ds-bg-default);
+  border-radius: var(--ds-radius-surface-lg);
+  /* Pilot glass (ADR-0172): the map shows through as colour. */
+  border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
+  background: var(--ds-bg-map-control);
+  -webkit-backdrop-filter: var(--ds-backdrop-map-control);
+  backdrop-filter: var(--ds-backdrop-map-control);
+  /* On the darkest imagery behind it, text-subtlest fails (3.0–4.3:1); subtle holds (4.6). */
+  /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
+  --ds-text-subtlest: var(--ds-text-subtle);
+  --on-glass-control-radius: var(--ds-radius-pill);
   box-shadow: var(--ds-elevation-raised);
   pointer-events: none;
   animation: ds-map-hover-card-in var(--ds-motion-duration-quick) var(--ds-motion-easing-default)
@@ -125,5 +132,17 @@ withDefaults(defineProps<Props>(), {
   margin-inline-start: var(--ds-spacing-xs);
   font: var(--ds-font-body-sm);
   color: var(--ds-text-subtle);
+}
+
+/* Less transparency asked for: the same surface, opaque, nothing blurred (ADR-0172). */
+@media (prefers-reduced-transparency: reduce) {
+  .ds-map-hover-card {
+    border-color: var(--ds-border-subtle);
+    background: var(--ds-bg-default);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    --on-glass-raised: var(--ds-bg-default);
+    --on-glass-sunk: var(--ds-bg-neutral-subtle);
+  }
 }
 </style>

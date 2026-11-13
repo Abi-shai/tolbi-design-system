@@ -1553,6 +1553,15 @@ Before working on any component, read:
   `MapOverlay end` with the column is a grid: column at the edge, sheet (25rem track **always reserved**) to its left
   full height, `TolbiAiLauncher placement="map"` at its foot on its axis — so the legend and timeline cap is constant
   (26.5rem at 1 440).
+- **ADR-0172**: **glass and round shapes on a map** (Weather Lab; on map surfaces only) — **pilot** glass (`MapLegend`,
+  `MapTimeline`, the navigator column, `MapStatus`, `MapHoverCard`, the launcher at the map's foot): `--ds-bg-map-control`
+  (72 %) + `--ds-backdrop-map-control` (`blur(24px) saturate(1.8)`); **reading** glass (`MapPanel`, the tool card):
+  `--ds-bg-map-read` (90 %) + `--ds-backdrop-map-read`; edge `--ds-border-map-edge` (white 55 %, 12 % in dark). What it
+  holds follows through private `--on-glass-*` context variables: `Card outlined`/`OptionCard` at 70 %, `Card sunk`/`Tabs`
+  track at 55 %; **`--ds-text-subtlest` takes subtle's value** on glass (subtle 4.48–4.6:1 on the darkest imagery);
+  `prefers-reduced-transparency` → opaque. **Pressed = pill** (`--on-glass-control-radius`: Button, CloseButton,
+  InputField, Tabs; the column a capsule, its buttons round), **read = large curve**: `MapPanel lg` and the tool card
+  `--ds-radius-surface-xl` (24, minted), cards inside 16, rows 12, `MapHoverCard` 16.
 
 ## Architecture
 

@@ -194,7 +194,7 @@ function onKey(e: KeyboardEvent) {
   gap: var(--ds-spacing-md);
   margin-inline: var(--ds-spacing-xs);
   padding: var(--ds-spacing-sm) var(--ds-spacing-md);
-  border-radius: var(--ds-radius-control);
+  border-radius: var(--on-glass-row-radius, var(--ds-radius-control));
   cursor: pointer;
 }
 
