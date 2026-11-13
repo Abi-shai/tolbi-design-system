@@ -1511,6 +1511,10 @@ Before working on any component, read:
   click too); `layout: 'panel' | 'page'` — `page` is etolbi's recomposition as drawn: a fluid grid (`minmax(10rem, 1fr)`), no
   height, no shadow, 56px bordered rows, drawing 32 + name. A `<ul>` now; the hover on `quick`/`easing-default`, cut under
   reduced motion; and the focus ring it never had.
+- **ADR-0165**: **the way out, and the browser's clicks** — `ModulesList layout="page"` shows an **`arrow-up-right`** (16,
+  `text-subtle`) at the block's end with the hover ground and the keyboard focus (`quick`, opacity only, cut under reduced
+  motion), **its place always kept** so the name's ellipsis never moves; the drawer unchanged. A link clicked with
+  ⌘/Ctrl/Shift/Alt or a non-main button **does not emit `select`** — the browser's tab, window, download.
 
 ## Architecture
 

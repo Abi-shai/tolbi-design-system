@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '../Icon'
 import { ModuleIcon } from '../ModuleIcon'
 import { Scrollbar } from '../Scrollbar'
 import type { ModuleName } from '../ModuleIcon'
@@ -45,6 +46,10 @@ function onSelect(item: ModulesListItem, event: MouseEvent) {
     event.preventDefault()
     return
   }
+  /* A link clicked with a modifier is the browser's (ADR-0165): a new tab, a
+     new window, a download. Emitting would let a router take a click the
+     person meant for the browser — so the product had to filter it itself. */
+  if (item.href && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)) return
   emit('select', item, event)
 }
 
@@ -98,6 +103,14 @@ function current(item: ModulesListItem) {
               :aria-label="null"
             />
             <span class="ds-modules-list__label">{{ mod.label ?? mod.name }}</span>
+            <!-- On a page, the way out of it (ADR-0165): shown with the hover, its place kept. -->
+            <Icon
+              v-if="layout === 'page' && !mod.disabled"
+              name="arrow-up-right"
+              :size="16"
+              class="ds-modules-list__go"
+              aria-hidden="true"
+            />
           </component>
         </li>
       </ul>
@@ -317,5 +330,30 @@ function current(item: ModulesListItem) {
 
 .ds-modules-list--page .ds-modules-list__item--active .ds-modules-list__label {
   color: var(--ds-text-on-brand-subtle);
+}
+
+/*
+  The way out (ADR-0165): an `arrow-up-right` at the block's end, in
+  `text-subtle`, arriving with the hover ground on the same pace and leaving
+  with it — and on the keyboard's focus too. It is always in the row, only
+  transparent, so the name's ellipsis is the same with or without it: the
+  arrow never pushes the name.
+*/
+.ds-modules-list__go {
+  flex: none;
+  margin-inline-start: auto;
+  color: var(--ds-text-subtle);
+  opacity: 0;
+  transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+}
+
+.ds-modules-list__item:is(:hover, :focus-visible) .ds-modules-list__go {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-modules-list__go {
+    transition: none;
+  }
 }
 </style>

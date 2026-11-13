@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import { within, expect } from '@storybook/test'
+import { within, expect, userEvent, fn } from '@storybook/test'
 import ModulesList from './ModulesList.vue'
 
 // Modules du design Figma (node 518:15253) — ordre et labels exacts
@@ -67,18 +67,30 @@ export const OnAPage: Story = {
   args: {
     layout: 'page',
     modules: FIGMA_MODULES.map(m => ({ ...m, href: `#${m.name.toLowerCase()}`, active: m.name === 'Yield' })),
+    onSelect: fn(),
   },
   render: args => ({
     components: { ModulesList },
     setup: () => ({ args }),
     template: `<div style="max-width: 1100px"><ModulesList v-bind="args" /></div>`,
   }),
-  /* Guarded: the entries are links, the current one says it is the page. */
-  play: async ({ canvasElement }) => {
+  /* Guarded: the entries are links, the current one says it is the page; a modified click is the browser's
+     (no `select`, ADR-0165), a plain one emits it. */
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const links = canvas.getAllByRole('link')
     await expect(links).toHaveLength(FIGMA_MODULES.length)
     await expect(canvas.getByRole('link', { name: 'Yield' })).toHaveAttribute('aria-current', 'page')
     await expect(canvas.getByRole('link', { name: 'Carbone' })).toHaveAttribute('href', '#carbone')
+    const carbone = canvas.getByRole('link', { name: 'Carbone' })
+    for (const mod of ['ctrlKey', 'metaKey', 'shiftKey', 'altKey'] as const) {
+      const click = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0, [mod]: true })
+      carbone.addEventListener('click', e => e.preventDefault(), { once: true })
+      carbone.dispatchEvent(click)
+    }
+    await expect(args.onSelect).not.toHaveBeenCalled()
+    carbone.addEventListener('click', e => e.preventDefault(), { once: true })
+    await userEvent.click(carbone)
+    await expect(args.onSelect).toHaveBeenCalledTimes(1)
   },
 }
