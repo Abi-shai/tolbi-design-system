@@ -1501,6 +1501,11 @@ Before working on any component, read:
   track B of three (the trees + a single ↓: absorbed, not exchanged). The brand file had no variant and the connector was
   read-only, so the generator **derives it by subtraction** from Redd+'s exports (the ↑'s two paths dropped, matched by
   path data, failing unless found once; nothing drawn). Export `Module=Inset` from Figma later and delete `derive`.
+- **ADR-0163**: **a list that says there is more** — `ModulesList` shows **two rows and the drawings of a third** (a 56px
+  peek: the row's padding + its whole drawing, the label below, under `Scrollbar`'s end fade; 288px, was 224 flush on two
+  rows — half a drawing, tried first, read too faint), hugging two rows
+  at six modules or fewer; `Scrollbar` gains **`persistent`** (the thumb stands while there is something to scroll —
+  a list opened to choose from, unlike ADR-0146's reading panels), so the inner panel keeps a 12px gutter for it.
 
 ## Architecture
 

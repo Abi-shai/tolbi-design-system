@@ -30,7 +30,7 @@ function onSelect(item: ModulesListItem) {
 
 <template>
   <div class="ds-modules-list">
-    <Scrollbar class="ds-modules-list__viewport">
+    <Scrollbar class="ds-modules-list__viewport" shadows persistent>
       <div class="ds-modules-list__inner">
         <button
           v-for="mod in modules"
@@ -66,21 +66,32 @@ function onSelect(item: ModulesListItem) {
 <style scoped>
 /*
  * Figma node 518:15253
- * Outer  : h-224px fixe, p-sm (6px), scroll délégué à <Scrollbar>, align-items flex-start
- *          → content area = 224 - 12 = 212px
+ * Outer  : p-sm (6px), scroll délégué à <Scrollbar>, align-items flex-start
+ *          → hauteur : deux rangées et le dessin d'une troisième (ADR-0163), 288px
  * Inner  : w-246px, p-md (8px), flex wrap, gap-xl (16px)
- *          2 rangées = 8+90+16+90+8 = 212px → fit exact, green visible 4 côtés
- *          3 rangées = 318px → scroll, green visible en fin de scroll
+ *          2 rangées = 8+90+16+90+8 = 212px → la boîte s'arrête là
+ *          3 rangées et plus → 276px visibles (2 rangées + 16 + 56 : le dessin de la 3e), le reste défile
  * Item   : w-66px, h-90px, p-md (8px), flex-col, gap-md (8px)
  */
 
 /*
  * Scrolling is delegated to <Scrollbar> (ADR-0001), whose thumb is absolutely
- * positioned over the content. Nothing here reserves a gutter: the panel keeps
- * its full 246px and the thumb floats above its right edge.
+ * positioned over the content. It stands from the first frame here
+ * (`persistent`, ADR-0163), so the inner panel keeps a gutter for it.
  */
+/*
+  Two rows and the top of a third (ADR-0163): the panel used to stop exactly
+  under the second row (224px), so the eleven modules past the sixth were
+  out of sight with nothing saying so. It now shows the third row's padding
+  and its whole drawing, the label left below — the modules are recognised,
+  and a row without its words reads as « more below » — under the viewport's
+  end fade, and the thumb stands from the first frame. Fewer than seven
+  modules, it hugs its two rows.
+*/
 .ds-modules-list {
-  height: 224px;
+  --modules-list-item: 90px;
+  --modules-list-peek: calc(var(--ds-spacing-md) + 48px);
+
   box-sizing: border-box;
   background: var(--ds-bg-neutral-subtle);
   border-radius: var(--ds-radius-surface);
@@ -102,15 +113,23 @@ function onSelect(item: ModulesListItem) {
 }
 
 .ds-modules-list__viewport {
-  max-height: 100%;
+  /* The inner's top padding, two rows and their gaps, then the peek. */
+  max-height: calc(var(--ds-spacing-md) + 2 * var(--modules-list-item) + 2 * var(--ds-spacing-xl) + var(--modules-list-peek));
+  /* The cut follows the inner panel's corners rather than slicing it flat. */
+  border-radius: var(--ds-radius-surface);
+  overflow: hidden;
 }
 
 .ds-modules-list__inner {
-  width: 246px;
+  /* 246 for three columns, plus a gutter for the thumb, which now stands
+     (ADR-0163): floating over the third column it cut the current module's
+     ground by 4px. The thumb is 8px inset 4 — `spacing-lg` of room. */
+  width: calc(246px + var(--ds-spacing-lg));
   box-sizing: border-box;
   background: var(--ds-bg-default);
   border-radius: var(--ds-radius-surface);
   padding: var(--ds-spacing-md);
+  padding-inline-end: calc(var(--ds-spacing-md) + var(--ds-spacing-lg));
   display: flex;
   flex-wrap: wrap;
   gap: var(--ds-spacing-xl);
@@ -119,7 +138,7 @@ function onSelect(item: ModulesListItem) {
 
 .ds-modules-list__item {
   width: 66px;
-  height: 90px;
+  height: var(--modules-list-item);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

@@ -17,9 +17,17 @@ export interface ScrollbarProps {
    * would mean a second scroller nested inside this one.
    */
   shadows?: boolean
+  /**
+   * The thumb stays shown while there is something to scroll, from the first
+   * frame (ADR-0163) — for a short list a person opens to choose from, where
+   * « there is more » must be said before anyone scrolls. Off, it shows while
+   * scrolling and fades a second after (ADR-0146): in a reading panel the
+   * pointer is always there, and a standing bar is noise.
+   */
+  persistent?: boolean
 }
 
-const props = withDefaults(defineProps<ScrollbarProps>(), { horizontal: false, shadows: false })
+const props = withDefaults(defineProps<ScrollbarProps>(), { horizontal: false, shadows: false, persistent: false })
 
 /**
  * The native scrollbar is hidden and replaced by an absolutely positioned thumb.
@@ -195,7 +203,7 @@ defineExpose({ viewport })
     <div
       v-if="scrollable"
       class="ds-scrollbar__thumb"
-      :class="{ 'ds-scrollbar__thumb--visible': visible, 'ds-scrollbar__thumb--held': dragging }"
+      :class="{ 'ds-scrollbar__thumb--visible': visible || persistent, 'ds-scrollbar__thumb--held': dragging }"
       :style="
         horizontal
           ? { width: `${thumbSize}px`, transform: `translateX(${thumbOffset}px)` }

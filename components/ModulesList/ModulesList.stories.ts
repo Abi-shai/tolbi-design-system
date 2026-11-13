@@ -48,3 +48,9 @@ export const WithDisabledModules: Story = {
     })),
   },
 }
+
+/** Six modules ou moins : deux rangées, la boîte s’arrête là — rien à faire dépasser, rien à faire défiler (ADR-0163). */
+export const SixOrFewer: Story = {
+  name: 'Six modules ou moins',
+  args: { modules: FIGMA_MODULES.slice(0, 6) },
+}
