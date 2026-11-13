@@ -62,3 +62,21 @@ lines of text at 60 % and 35 %.
   ends 8px from the row's edge.
 - **Loading**: six rows at the same 72px height, so nothing moves on arrival.
 - **`play`**: six links; four modified clicks emit nothing; a plain click emits once.
+
+## Amended — three columns at most (etolbi, 13 Nov.)
+
+On a wide screen `auto-fill, minmax(24rem, 1fr)` put four projects or more on a line. The owner: three at most, four is
+too many. A column's floor is now `max(24rem, (100% − 2 × spacing-md) / 3)`. Once 24rem is less than a third of the
+line, the gaps counted, the floor becomes that third and a fourth column never fits. The fold to two columns, then
+one, is kept.
+
+Measured with the list stretched to the viewport:
+
+| Viewport | Columns | Column width |
+|---|---|---|
+| 2 560px | 3 | 827px |
+| 1 920px | 3 | 613px |
+| 1 440px | 3 | 453px |
+| 1 200px | 2 | 564px |
+| 800px | 1 | 736px |
+| 480px | 1 | 416px |

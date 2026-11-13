@@ -1520,6 +1520,7 @@ Before working on any component, read:
   frame holding a surface) around a `bg-default` grid `minmax(24rem, 1fr)`; a row = `ProjectGlyph` 40 in a 3.5rem tile (the
   drawing carries the status), the name (cut first) + optional `Badge` + the date at the end, then the module (illustration
   16 + name). Links with ADR-0164/0165's contract; `loading` = `loadingRows` skeleton rows (72px, as the real ones); empty = nothing.
+  **Amended**: **three columns at most** — the floor is `max(24rem, (100% − 2 × md) / 3)` (four at 2 560px was too many).
 
 ## Architecture
 

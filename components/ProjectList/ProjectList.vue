@@ -109,10 +109,18 @@ function onSelect(item: ProjectListItem, event: MouseEvent) {
   background: var(--ds-bg-neutral-subtle);
 }
 
-/* Two columns on a desktop, one when the room runs out. */
+/*
+  Two columns on a desktop, one when the room runs out — and three at most
+  (ADR-0166, amended): on a wide screen `auto-fill` put four or more on a line.
+  A column's floor becomes a third of the line once 24rem is less than that,
+  the gaps counted, so a fourth never fits.
+*/
 .ds-project-list__list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(max(24rem, calc((100% - 2 * var(--ds-spacing-md)) / 3)), 1fr)
+  );
   gap: var(--ds-spacing-xs) var(--ds-spacing-md);
   margin: 0;
   padding: var(--ds-spacing-md);
