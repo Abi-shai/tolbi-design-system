@@ -192,6 +192,11 @@
       "$type": "color",
       "$description": "ground — 1.14:1 on bg-default — pairs with text-on-brand-subtle"
     },
+    "brand-subtlest": {
+      "$value": "color-mix(in srgb, {color.brand.dark-subtle} 50%, transparent)",
+      "$type": "color",
+      "$description": "ground — the plate an illustration sits on, in dark (ADR-0176): brand/dark-subtle at 50 %, half of bg-brand-subtle, which the plate takes on hover. Holds no text"
+    },
     "brand-subtle-hover": {
       "$value": "{color.brand.dark-border}",
       "$type": "color",

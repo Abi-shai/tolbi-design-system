@@ -96,12 +96,16 @@ function current(item: ModulesListItem) {
               logo's tile would be a tile inside a tile and would fight the active state.
               aria-label is null because the visible label already names the module.
             -->
-            <ModuleIcon
-              :module="mod.name"
-              variant="illustration"
-              :size="layout === 'page' ? 40 : 48"
-              :aria-label="null"
-            />
+            <!-- On a page, the drawing sits on a plate (ADR-0176); in the drawer the
+                 plate is a box of no box. -->
+            <span class="ds-modules-list__plate">
+              <ModuleIcon
+                :module="mod.name"
+                variant="illustration"
+                :size="layout === 'page' ? 40 : 48"
+                :aria-label="null"
+              />
+            </span>
             <span class="ds-modules-list__label">{{ mod.label ?? mod.name }}</span>
             <!-- On a page, the way out of it (ADR-0165): shown with the hover, its place kept. -->
             <Icon
@@ -264,6 +268,11 @@ function current(item: ModulesListItem) {
   cursor: not-allowed;
 }
 
+/* In the drawer the plate is no box at all: the entry is the surface (ADR-0176). */
+.ds-modules-list__plate {
+  display: contents;
+}
+
 .ds-modules-list__label {  font: var(--ds-font-label-md);
   text-align: center;
   color: var(--ds-text-default);
@@ -317,14 +326,55 @@ function current(item: ModulesListItem) {
   flex: 1;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--ds-spacing-lg);
+  justify-content: flex-start;
+  gap: var(--ds-spacing-sm);
   width: 6.5rem;
   height: 6.5rem;
-  padding: 0 var(--ds-spacing-lg);
+  padding: var(--ds-spacing-sm);
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
   background: var(--ds-bg-default);
+}
+
+/*
+  The plate (ADR-0176, the owner's T4): the drawing sits on a ground of its
+  own, the tile's whole inner width and whatever height the name leaves, 6px
+  inside the tile all round. Its curve is `surface-sm` (10), softer than the
+  concentric 12 − 6 would be. The plate, not the tile, answers the pointer:
+  `bg-brand-subtlest` at rest, `bg-brand-subtle` under the pointer; the current
+  module's plate one step up on each.
+*/
+.ds-modules-list--page .ds-modules-list__plate {
+  display: flex;
+  flex: 1 1 auto;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  border-radius: var(--ds-radius-surface-sm);
+  background: var(--ds-bg-brand-subtlest);
+  transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+}
+
+.ds-modules-list--page .ds-modules-list__item:hover:not(:disabled):not([aria-disabled='true']),
+.ds-modules-list--page .ds-modules-list__item--active,
+.ds-modules-list--page .ds-modules-list__item--active:hover:not(:disabled):not([aria-disabled='true']) {
+  background: var(--ds-bg-default);
+}
+
+.ds-modules-list--page .ds-modules-list__item:hover:not(:disabled):not([aria-disabled='true']) .ds-modules-list__plate,
+.ds-modules-list--page .ds-modules-list__item--active .ds-modules-list__plate {
+  background: var(--ds-bg-brand-subtle);
+}
+
+.ds-modules-list--page .ds-modules-list__item--active:hover:not(:disabled):not([aria-disabled='true']) .ds-modules-list__plate {
+  background: var(--ds-bg-brand-subtle-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-modules-list--page .ds-modules-list__plate {
+    transition: none;
+  }
 }
 
 .ds-modules-list--page .ds-modules-list__label {
@@ -333,10 +383,6 @@ function current(item: ModulesListItem) {
   font: var(--ds-font-label-md-strong);
   color: var(--ds-text-strong);
   text-align: center;
-}
-
-.ds-modules-list--page .ds-modules-list__item--active {
-  background: var(--ds-bg-selected);
 }
 
 .ds-modules-list--page .ds-modules-list__item--active .ds-modules-list__label {

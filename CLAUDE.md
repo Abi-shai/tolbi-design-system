@@ -1582,6 +1582,11 @@ Before working on any component, read:
   imagery, brand-600 4.08:1. Pilot surfaces set `--on-glass-brand` (`text-brand-hover`: brand-700, 5.45:1 on the measured
   ground), read by `Button link` / `tertiary`; reading glass unchanged. A highlighted `OptionCard` on glass takes the ink
   edge, not gray-300.
+- **ADR-0176**: **modules on a plate** (the owner's T4) — `ModulesList layout="page"`: the 104 tile keeps its size, border and
+  ground; inside, 6px all round, the 40px drawing sits on a **plate** (full inner width × what the label leaves: 90 × 64)
+  on **`--ds-bg-brand-subtlest`** (minted: brand/25; dark brand/dark-subtle 50 %), curve **`radius-surface-sm`** (10px — the
+  step already has its role, no `inner-lg`). The **plate, not the tile, answers**: hover `bg-brand-subtle`; current
+  module `bg-brand-subtle` → `-hover`, the tile `bg-default`. Drawer unchanged (plate `display: contents`).
 
 ## Architecture
 
