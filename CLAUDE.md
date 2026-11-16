@@ -1667,6 +1667,12 @@ Before working on any component, read:
   3px, part of the image and its name (40 → 50.25px box). `MapCluster` gains `alerts` + `alertSeverity`: a badge bottom
   left at the gravest hue, **figure in ink** (white measures 3.76 / 2.35 / 2.58:1, ink 4.72 / 7.56 / 6.89), the name
   « 18 parcelles, dont 3 en alerte ». `flyGlyphs` flies any family.
+- **ADR-0195**: **an article card for the home page** (track B / G2) — `ArticleCard`: a 16:9 picture inside the card's
+  inset (`radius-control`, `cover`), the title `label-md-strong` on two lines at most, a facts line written by the product
+  (« Article · 24 févr. 2026 »); `bg-neutral`, no edge, `radius-surface`, `spacing-sm` inset; a **link** opening a new
+  tab, said (`aria-describedby`), its name the title alone; hover/focus a step darker (`text-strong` 7 % veil) + ring,
+  nothing moves; no or broken picture = the frame + `file-text`, same size; loading = the same geometry, exactly.
+  `ArticleList`: 3 equal columns, `spacing-lg`, one under 40rem (container query).
 
 ## Architecture
 
