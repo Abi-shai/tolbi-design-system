@@ -211,7 +211,8 @@ onBeforeUnmount(() => {
            which outweighs the surface's and would make it arrive in one frame. -->
       <div v-if="collapsible && collapsed && iconFold" key="open-icon" class="ds-map-panel__unfold" :style="unfoldAt">
         <!-- The same button as in the open head, at the same pixel, in a capsule of
-             pilot glass that says what is folded (ADR-0173). -->
+             pilot glass that hugs it (ADR-0173; the title beside it removed by
+             ADR-0178 — the panel's name stays in the button's). -->
         <div class="ds-map-panel__capsule">
           <IconButton
             data-map-panel-open
@@ -223,7 +224,6 @@ onBeforeUnmount(() => {
             :aria-controls="panelId"
             @click="fold(false)"
           />
-          <span v-if="title" class="ds-map-panel__capsule-title" aria-hidden="true" @click="fold(false)">{{ title }}</span>
         </div>
         <slot name="folded" />
       </div>
@@ -579,15 +579,13 @@ onBeforeUnmount(() => {
   Placed so that button lands **on the pixel** it held in the head — measured
   on the press (centred on the tabs, it is not at the head's padding), the
   head's padding standing in when the product folds it — less the capsule's own
-  8px and border. The title beside it
-  says what is folded; it takes the pointer too, the button keeps the name.
+  8px and border. The button alone (ADR-0178): the panel's name is said in its
+  label, « Déplier le panneau <titre> », not written beside it.
 */
 .ds-map-panel__capsule {
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-xs);
   box-sizing: border-box;
-  max-width: 25rem;
   margin-block-start: calc(var(--map-panel-fold-y, calc(var(--ds-spacing-lg) + var(--ds-border-width-default))) - var(--ds-spacing-md) - var(--ds-border-width-default));
   margin-inline-start: calc(var(--map-panel-fold-x, calc(var(--ds-spacing-xl) + var(--ds-border-width-default))) - var(--ds-spacing-md) - var(--ds-border-width-default));
   padding: var(--ds-spacing-md);
@@ -598,20 +596,6 @@ onBeforeUnmount(() => {
   backdrop-filter: var(--ds-backdrop-map-control);
   box-shadow: var(--ds-elevation-map-glass);
   --on-glass-focus: var(--ds-focus-ring-map);
-}
-
-.ds-map-panel__capsule:has(.ds-map-panel__capsule-title) {
-  padding-inline-end: var(--ds-spacing-xl);
-}
-
-.ds-map-panel__capsule-title {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font: var(--ds-font-label-lg-strong);
-  color: var(--ds-text-strong);
-  cursor: pointer;
 }
 
 @media (prefers-reduced-transparency: reduce) {

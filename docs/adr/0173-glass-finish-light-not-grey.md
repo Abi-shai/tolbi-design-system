@@ -44,6 +44,8 @@ is no ground to paint, so it made an opaque white band over a translucent pane. 
 
 ### 5. The folded panel keeps its button
 
+> **Amended by ADR-0178** (16 Nov.): the title beside the button is removed; the button alone, in its capsule.
+
 Folded, a `MapPanel` with its own head (`lg` or `#header`) shows **the same `IconButton`** as the open head: `sm`,
 36px, round, `subtle`.
 - It sits **on the same pixel**. Its place is measured on the press: centred on the tabs, it is not at the head's

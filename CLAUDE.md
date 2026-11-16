@@ -1566,7 +1566,7 @@ Before working on any component, read:
   `MapPanel` head and foot 6 %, the head gains its inset rule). Every map surface takes `--ds-elevation-map-glass` (a top
   rim of light + a wide soft shadow). `Scrollbar` **`mask`**: the content fades, nothing painted (the painted fade was a
   white band on glass). **Folded, `MapPanel` keeps its button**: the same `IconButton sm subtle`, on the same pixel
-  (measured on the press), in a pill of pilot glass with the panel's title beside it.
+  (measured on the press), in a capsule of pilot glass — **amended by ADR-0178**: the button alone, no title.
 - **ADR-0174**: **the map glass, audited** (725 texts in the app) — `--ds-text-success` → **success/700** (600 was 3.8:1 on
   white, 3.1 on a sunk card); pilot backdrop **`brightness(1.12)`** (brand 4.49 → 4.57, subtle 4.48 → 4.56 on a dark
   ground) and **`brightness(0.88)` in dark** (new `layer-dark.css`); **`--ds-focus-ring-map`** (2px white + 2px brand-700)
@@ -1589,6 +1589,9 @@ Before working on any component, read:
   (ADR-0173) and the audit (ADR-0174/0175) stay. Column `radius-surface` with square tools, tool card and `MapPanel lg`
   `radius-surface`, small `MapPanel` `surface-sm`, `MapHoverCard` `control`; nested controls, cards and rows keep their own
   radius (`--on-glass-control/card/row-radius` deleted); the folded capsule `radius-surface`. `--ds-radius-surface-xl` deleted.
+- **ADR-0178**: **the folded panel is its button alone** — ADR-0173's title beside the folded `MapPanel`'s button (never asked
+  for) is removed: the same `IconButton sm`, same pixel (41, 42), in a glass capsule that hugs it (54 × 54); the name stays
+  in its `aria-label` (`expandLabel` + title); the button alone reopens. Small panels keep their titled `Button`.
 
 ## Architecture
 
