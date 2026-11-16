@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Tray } from '../Tray'
 import ArticleCard from './ArticleCard.vue'
 
 /** One article (ADR-0195): what `ArticleCard` shows, and an id to key it by. */
@@ -13,8 +14,10 @@ export interface ArticleListItem {
 }
 
 /**
- * The home page's « À lire » row (ADR-0195) — `ProjectList`'s counterpart:
- * the package lays the cards, the product fills them. The cards keep their
+ * The home page's « À lire » row (ADR-0195) — `ProjectList`'s counterpart,
+ * **on the same `Tray`** (ADR-0198, track R3): the tray groups the block, so the
+ * cards carry no ground of their own. The package lays the cards, the product
+ * fills them. The cards keep their
  * **18rem** and line up from the start, `spacing-lg` apart — the row no longer
  * fills the width (ADR-0196: shared columns grew the pictures without limit on
  * a wide screen); short of room they wrap, never narrower than 18rem. **Under
@@ -43,6 +46,7 @@ withDefaults(defineProps<Props>(), {
 
 <template>
   <div v-if="loading || items.length" class="ds-article-list" :aria-busy="loading || undefined">
+    <Tray>
     <ul class="ds-article-list__grid">
       <template v-if="loading">
         <li v-for="n in loadingCount" :key="`skeleton-${n}`"><ArticleCard loading /></li>
@@ -59,6 +63,7 @@ withDefaults(defineProps<Props>(), {
         />
       </li>
     </ul>
+    </Tray>
   </div>
 </template>
 

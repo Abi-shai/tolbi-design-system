@@ -11,10 +11,12 @@ import { Skeleton } from '../Skeleton'
  * with its inset; the title, `label-md-strong`, **two lines at most**; one line
  * of facts written by the product (« Article · 24 févr. 2026 »).
  *
- * The ground is `bg-neutral-subtle` — `Card sunk`'s — with no edge
- * (ADR-0196: `bg-neutral` weighed too much on the page). Under the pointer and
- * on keyboard focus it **darkens a step**, to `bg-neutral-subtle-hover`;
- * nothing moves. The card is **18rem wide** (288px, its picture 162px high):
+ * **It has no ground and no edge** (ADR-0198, track R3): the card is its
+ * picture and its words, on the white surface of `ArticleList`'s `Tray` — the
+ * tray groups, the card no longer has to. Under the pointer and on keyboard
+ * focus it **takes a ground**, as a `ProjectList` row does (`bg-hover`,
+ * `radius-surface`), and the picture's frame steps a grey darker so it does
+ * not melt into it; nothing moves. The card is **18rem wide** (288px, its picture 162px high):
  * 16 made the pictures' text unreadable, 20 stood too large beside
  * `ModulesList`'s tiles. A list may widen it to its column (one column, narrow).
  *
@@ -99,7 +101,7 @@ const hintId = `ds-article-card-${useId()}`
 </template>
 
 <style scoped>
-/* `bg-neutral-subtle`, no edge, `radius-surface`, 6 inside, 12 between the picture and the words (ADR-0197); 18rem wide. */
+/* No ground, no edge (ADR-0198); 6 inside, 12 between the picture and the words (ADR-0197); 18rem wide. */
 .ds-article-card {
   position: relative;
   box-sizing: border-box;
@@ -111,7 +113,7 @@ const hintId = `ds-article-card-${useId()}`
   min-width: 0;
   padding: var(--ds-spacing-sm);
   border-radius: var(--ds-radius-surface);
-  background: var(--ds-bg-neutral-subtle);
+  background: transparent;
   color: inherit;
   text-decoration: none;
 }
@@ -123,16 +125,16 @@ a.ds-article-card {
     box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
-/* A step darker: the sunk surface's own hover (ADR-0196). */
+/* A ground under the pointer, as a `ProjectList` row takes (ADR-0198). */
 a.ds-article-card:hover,
 a.ds-article-card:focus-visible {
-  background: var(--ds-bg-neutral-subtle-hover);
+  background: var(--ds-bg-hover);
 }
 
-/* `bg-neutral-subtle-hover` and `bg-neutral` are one grey: an empty frame would
-   melt into the darkened card, so it steps too, a veil of ink over its own grey. */
+/* `bg-hover` and `bg-neutral-subtle` are one grey: the empty frame would melt
+   into the card's new ground, so it steps a grey darker. */
 a.ds-article-card:is(:hover, :focus-visible) .ds-article-card__frame {
-  background: color-mix(in srgb, var(--ds-text-strong) 7%, var(--ds-bg-neutral));
+  background: var(--ds-bg-neutral);
 }
 
 a.ds-article-card:focus-visible {
@@ -156,7 +158,7 @@ a.ds-article-card:focus-visible {
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: var(--ds-radius-control);
-  background: var(--ds-bg-neutral);
+  background: var(--ds-bg-neutral-subtle);
   color: var(--ds-text-subtle);
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }

@@ -10,9 +10,10 @@ const meta: Meta<typeof ArticleCard> = {
       description: {
         component:
           'Un article de Tolbi sur l’accueil (ADR-0195, piste B / G2) : l’image 16:9 dans la marge de la carte, le titre ' +
-          '(`label-md-strong`, deux lignes au plus), une ligne de faits écrite par le produit. **18rem** de large, fond ' +
-          '`bg-neutral-subtle` (celui de `Card sunk`), sans bordure (ADR-0196) ; au survol et au focus il **fonce d’un ' +
-          'cran** (`bg-neutral-subtle-hover`), rien ne bouge. **Un lien** : ' +
+          '(`label-md-strong`, deux lignes au plus), une ligne de faits écrite par le produit. **18rem** de large, **sans ' +
+          'fond ni bordure** (ADR-0198) : la carte est son image et son texte, posés sur la surface du `Tray`. Au survol ' +
+          'et au focus elle **prend un fond**, comme une ligne de `ProjectList` (`bg-hover`), et le cadre de l’image fonce ' +
+          'd’un cran ; rien ne bouge. **Un lien** : ' +
           'l’article sur tolbi.ai dans un nouvel onglet, annoncé comme tel ; le nom du lien est le titre. Image absente ou ' +
           'cassée : le cadre reste, avec `file-text`.',
       },

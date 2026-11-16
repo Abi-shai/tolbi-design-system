@@ -3,6 +3,7 @@ import { Badge } from '../Badge'
 import { ModuleIcon, type ModuleName } from '../ModuleIcon'
 import { ProjectGlyph, type ProjectGlyphKind, type ProjectGlyphStatus } from '../ProjectGlyph'
 import { Skeleton } from '../Skeleton'
+import { Tray } from '../Tray'
 
 /** One project on one line (ADR-0166). */
 export interface ProjectListItem {
@@ -54,7 +55,7 @@ function onSelect(item: ProjectListItem, event: MouseEvent) {
 </script>
 
 <template>
-  <div v-if="loading || items.length" class="ds-project-list" :aria-busy="loading || undefined">
+  <Tray v-if="loading || items.length" class="ds-project-list" :aria-busy="loading || undefined">
     <ul class="ds-project-list__list">
       <template v-if="loading">
         <li v-for="n in loadingRows" :key="`skeleton-${n}`" class="ds-project-list__row" aria-hidden="true">
@@ -92,22 +93,14 @@ function onSelect(item: ProjectListItem, event: MouseEvent) {
         </component>
       </li>
     </ul>
-  </div>
+  </Tray>
 </template>
 
 <style scoped>
 /*
-  The Drive widget's frame (ADR-0166): a recessed ground, the list laid on it
-  as a surface. The frame is a surface that holds a surface, so it takes the
-  step past the surface's own corner (`radius-surface-lg`, minted here).
+  The Drive widget's frame (ADR-0166) is the package's `Tray` (ADR-0198): a
+  recessed ground, one white surface on it, the list laid on that.
 */
-.ds-project-list {
-  box-sizing: border-box;
-  width: 100%;
-  padding: var(--ds-spacing-md);
-  border-radius: var(--ds-radius-surface-lg);
-  background: var(--ds-bg-neutral-subtle);
-}
 
 /*
   Two columns on a desktop, one when the room runs out — and three at most
@@ -123,10 +116,8 @@ function onSelect(item: ProjectListItem, event: MouseEvent) {
   );
   gap: var(--ds-spacing-xs) var(--ds-spacing-md);
   margin: 0;
-  padding: var(--ds-spacing-md);
+  padding: 0;
   list-style: none;
-  border-radius: var(--ds-radius-surface);
-  background: var(--ds-bg-default);
 }
 
 .ds-project-list__row {

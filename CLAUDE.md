@@ -1680,6 +1680,11 @@ Before working on any component, read:
 - **ADR-0197**: **more air around the article card's words** (S1) — picture → words `spacing-lg` (12), words' inset
   `0 spacing-sm spacing-lg` (0 6 12), title → facts `spacing-xs` (4): 18px from the date to the foot; card 288 × 255, the
   placeholder the same.
+- **ADR-0198**: **a tray that groups a block** (track R3) — `Tray` (`Structure/Tray`) is `ProjectList`'s frame extracted:
+  `bg-neutral-subtle` + `spacing-md` + `radius-surface-lg`, one `bg-default` surface inside (`spacing-md`,
+  `radius-surface`), one slot; `ProjectList` renders it (measured identical). `ArticleList` lays its cards on it, and
+  `ArticleCard` **loses its ground** — picture and words on the white; hover/focus takes `bg-hover` (a `ProjectList` row's),
+  the empty frame `bg-neutral-subtle` → `bg-neutral` so it does not melt.
 
 ## Architecture
 
