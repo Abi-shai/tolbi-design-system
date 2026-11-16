@@ -1603,6 +1603,9 @@ Before working on any component, read:
   `SurfaceTransition` (enter / exit, leaving **in place**); bubble, guide and dots **glide** (`moderate`), content through
   `SwapTransition`, a change of side the same glide; marks tagged `data-chart-column` fade to 0.35 over `quick`. Colours
   are the data's.
+- **ADR-0181**: **the folded panel on the column's gauge** — `MapPanel`'s fold is `IconButton md square` (40, 8px), open and
+  folded, same pixel; the folded capsule **52 × 52**, `radius-surface`, pilot glass, the button 6px in; the open head keeps
+  its height (the button lends 2px above and below: 60 / 70 / 120 unchanged).
 
 ## Architecture
 

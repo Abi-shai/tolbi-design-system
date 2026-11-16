@@ -217,8 +217,9 @@ onBeforeUnmount(() => {
           <IconButton
             data-map-panel-open
             icon="panel-left"
-            size="sm"
+            size="md"
             variant="subtle"
+            shape="square"
             :ariaLabel="named(expandLabel)"
             aria-expanded="false"
             :aria-controls="panelId"
@@ -259,8 +260,9 @@ onBeforeUnmount(() => {
             v-if="collapsible"
             data-map-panel-fold
             icon="panel-left"
-            size="sm"
+            size="md"
             variant="subtle"
+            shape="square"
             :ariaLabel="named(collapseLabel)"
             aria-expanded="true"
             :aria-controls="panelId"
@@ -487,6 +489,13 @@ onBeforeUnmount(() => {
   gap: var(--ds-spacing-lg) var(--ds-spacing-md);
 }
 
+/* The fold is the tools column's 40px button (ADR-0181), and the head keeps the
+   height its 36px one gave it: the box lends 2px above and below, so a head
+   with only a title stays 60 tall; beside the tabs (44) it changes nothing. */
+.ds-map-panel__head--slot > [data-map-panel-fold] {
+  margin-block: calc(-1 * var(--ds-spacing-xxs));
+}
+
 .ds-map-panel__head--folds {
   grid-template-columns: auto minmax(0, 1fr);
 }
@@ -586,9 +595,13 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  margin-block-start: calc(var(--map-panel-fold-y, calc(var(--ds-spacing-lg) + var(--ds-border-width-default))) - var(--ds-spacing-md) - var(--ds-border-width-default));
-  margin-inline-start: calc(var(--map-panel-fold-x, calc(var(--ds-spacing-xl) + var(--ds-border-width-default))) - var(--ds-spacing-md) - var(--ds-border-width-default));
-  padding: var(--ds-spacing-md);
+  justify-content: center;
+  /* The tools column's gauge (ADR-0179, ADR-0181): a 52 square holding the
+     40px button, 6px from its outer edge on every side. */
+  width: 52px;
+  height: 52px;
+  margin-block-start: calc(var(--map-panel-fold-y, calc(var(--ds-spacing-lg) + var(--ds-border-width-default))) - var(--ds-spacing-sm));
+  margin-inline-start: calc(var(--map-panel-fold-x, calc(var(--ds-spacing-xl) + var(--ds-border-width-default))) - var(--ds-spacing-sm));
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
   border-radius: var(--ds-radius-surface);
   background: var(--ds-bg-map-control);
