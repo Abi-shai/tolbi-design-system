@@ -1616,6 +1616,9 @@ Before working on any component, read:
   opening from the map) takes ADR-0182's shell too: the template follows a private `shown`, every model change goes
   through one queued `change()` (a change mid-motion waits, then goes where the model stands). Focus still follows a
   press only.
+- **ADR-0184**: **the hover's bubble uses the frame** — held inside the plot, a narrow sheet's bubble fit on neither side
+  and was pushed over the column it describes; its room is now the whole `ChartFrame` (the value axis included), its gap
+  counted from the column's edge (`band`: half a band + 4), after → before → the roomier side, never out of the frame.
 
 ## Architecture
 

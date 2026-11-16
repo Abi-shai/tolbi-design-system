@@ -45,6 +45,19 @@ const tip = ref<HTMLElement | null>(null)
 const width = ref(0)
 const height = ref(0)
 const tipWidth = ref(0)
+/* The frame's own edges, from the plot's left: the bubble may use the whole
+   frame — the value axis included — never more (ADR-0184). */
+const frameLeft = ref(0)
+const frameRight = ref(0)
+function measureFrame() {
+  const el = layer.value
+  const frame = el?.closest('.ds-chart-frame')
+  if (!el || !frame) return
+  const l = el.getBoundingClientRect()
+  const f = frame.getBoundingClientRect()
+  frameLeft.value = f.left - l.left
+  frameRight.value = f.right - l.left
+}
 
 let ro: ResizeObserver | null = null
 onMounted(() => {
@@ -53,10 +66,12 @@ onMounted(() => {
     width.value = layer.value?.clientWidth ?? 0
     height.value = layer.value?.clientHeight ?? 0
     tipWidth.value = tip.value?.offsetWidth ?? 0
+    measureFrame()
   })
   ro.observe(layer.value)
   width.value = layer.value.clientWidth
   height.value = layer.value.clientHeight
+  measureFrame()
 })
 onBeforeUnmount(() => ro?.disconnect())
 /* The bubble's width changes as its content swaps: the side is measured again. */
@@ -101,21 +116,38 @@ const dots = computed(() =>
       }),
 )
 
-/* The bubble: beside the column, after it while it fits, else before it —
-   the same glide either way — and never past the plot. */
+/*
+  The bubble: beside the column, after it while it fits, else before it — the
+  same glide either way. Its room is the **frame's**, not the plot's (ADR-0184):
+  in a narrow sheet a bubble fits on neither side of the plot alone, and held
+  inside it, it was pushed back over the very column it describes; the value
+  axis beside the plot is room it may cover while it reads. Neither side
+  fitting even so, it takes the roomier one; it never leaves the frame.
+*/
 const GAP = 12
-const fitsAfter = computed(() => x.value + GAP + tipWidth.value <= width.value)
-const side = computed<'after' | 'before'>(() => (fitsAfter.value ? 'after' : 'before'))
+/* From the column's edge, not its centre: a bar fills most of its band, and a
+   gap counted from the centre left the bubble touching it. A line's column is a
+   hairline, so its gap counts from the point. */
+const off = computed(() => (props.xScale === 'band' && n.value ? width.value / n.value / 2 : 0) + (props.xScale === 'band' ? 4 : GAP))
+const lo = computed(() => Math.min(0, frameLeft.value))
+const hi = computed(() => Math.max(width.value, frameRight.value))
+const side = computed<'after' | 'before'>(() => {
+  const w = tipWidth.value
+  if (x.value + off.value + w <= hi.value) return 'after'
+  if (x.value - off.value - w >= lo.value) return 'before'
+  return hi.value - x.value >= x.value - lo.value ? 'after' : 'before'
+})
 const tipX = computed(() => {
   const w = tipWidth.value
-  const to = side.value === 'after' ? x.value + GAP : x.value - GAP - w
-  return Math.min(Math.max(0, to), Math.max(0, width.value - w))
+  const to = side.value === 'after' ? x.value + off.value : x.value - off.value - w
+  return Math.min(Math.max(lo.value, to), Math.max(lo.value, hi.value - w))
 })
 
 /* A hover that starts does not glide in from where the last one ended. */
 const settled = ref(false)
 watch(hover, (now, was) => {
   if (now !== null && was === null) {
+    measureFrame()
     settled.value = false
     requestAnimationFrame(() => requestAnimationFrame(() => (settled.value = true)))
   }

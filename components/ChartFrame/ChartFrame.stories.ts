@@ -198,6 +198,30 @@ export const HoverBars: Story = {
   }),
 }
 
+/**
+ * ADR-0184 — **dans une fiche étroite** (Carbone) : la bulle ne tient d’aucun côté du tracé seul. Elle prend la place
+ * du cadre entier, axe des valeurs compris, et reste à côté de la colonne au lieu de la recouvrir.
+ */
+export const HoverNarrow: Story = {
+  name: 'Survol — dans une fiche étroite',
+  render: () => ({
+    components: { ChartFrame, ChartTooltip },
+    setup: () => ({ hover: ref<number | null>(null), YEARS, CARBON, GREEN, pct }),
+    template: `
+      <div style="width:22rem">
+        <ChartFrame v-model:hover="hover" title="Carbone par année" :y-ticks="['45 tCO2e/ha', '23 tCO2e/ha', '0 tCO2e/ha']" :x-ticks="['2021', '2023', '2026']" :height="150" :columns="6">
+          <svg viewBox="0 0 600 100" preserveAspectRatio="none" style="width:100%; height:100%; display:block">
+            <rect v-for="(v, i) in CARBON" :key="i" :data-chart-column="i" :x="i * 100 + 18" :width="64" :y="100 - v / 45 * 100" :height="v / 45 * 100" :fill="GREEN" fill-opacity="0.45" />
+          </svg>
+          <template #tooltip="{ index }">
+            <ChartTooltip :title="YEARS[index]" :value="String(Math.round(CARBON[index]))" unit="tCO2e/ha"
+              :series="index ? [{ label: 'Depuis 2021', value: pct(CARBON[0], CARBON[index]), color: GREEN }] : []" />
+          </template>
+        </ChartFrame>
+      </div>`,
+  }),
+}
+
 const STOCK = [10610, 11050, 11480, 12087, 12844, 12320]
 const BASE = 10938
 
