@@ -191,11 +191,17 @@ onBeforeUnmount(() => {
   drawn. The channel is the native track; the thumb is drawn over it.
 */
 .ds-map-zoom-gauge {
+  /* The gauge's three sizes, one place (ADR-0179): the thumb, the channel, and
+     the box across the trip. Upright, in the column, they grow. */
+  --gauge-thumb: 12px;
+  --gauge-track: 4px;
+  --gauge-cross: 32px;
+
   position: relative;
   display: flex;
   flex: 1 1 auto;
   min-width: 0;
-  height: 32px;
+  height: var(--gauge-cross);
 }
 
 .ds-map-zoom-gauge__input {
@@ -210,29 +216,29 @@ onBeforeUnmount(() => {
 }
 
 .ds-map-zoom-gauge__input::-webkit-slider-runnable-track {
-  height: 4px;
+  height: var(--gauge-track);
   border-radius: var(--ds-radius-pill);
   background: var(--ds-border-subtle);
 }
 
 .ds-map-zoom-gauge__input::-moz-range-track {
-  height: 4px;
+  height: var(--gauge-track);
   border-radius: var(--ds-radius-pill);
   background: var(--ds-border-subtle);
 }
 
 /* The native thumb keeps its size — it is what the pointer grabs — and shows nothing. */
 .ds-map-zoom-gauge__input::-webkit-slider-thumb {
-  width: 12px;
-  height: 12px;
-  margin-top: -4px;
+  width: var(--gauge-thumb);
+  height: var(--gauge-thumb);
+  margin-top: calc((var(--gauge-track) - var(--gauge-thumb)) / 2);
   opacity: 0;
   appearance: none;
 }
 
 .ds-map-zoom-gauge__input::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
+  width: var(--gauge-thumb);
+  height: var(--gauge-thumb);
   border: none;
   opacity: 0;
 }
@@ -241,7 +247,7 @@ onBeforeUnmount(() => {
 .ds-map-zoom-gauge__span {
   position: absolute;
   inset-block: 0;
-  inset-inline: 0 12px;
+  inset-inline: 0 var(--gauge-thumb);
   pointer-events: none;
 }
 
@@ -260,8 +266,8 @@ onBeforeUnmount(() => {
 
 .ds-map-zoom-gauge__thumb {
   flex: none;
-  width: 12px;
-  height: 12px;
+  width: var(--gauge-thumb);
+  height: var(--gauge-thumb);
   box-sizing: border-box;
   border: var(--ds-border-width-strong) solid var(--ds-text-default);
   border-radius: var(--ds-radius-pill);
@@ -284,13 +290,18 @@ onBeforeUnmount(() => {
 }
 
 /* ── Upright (ADR-0171) ─────────────────────────────────────────────
-   The column is 32 wide and the trip 64 tall (`spacing-7xl`). The native range
+   The box is 40 wide (ADR-0179) and the trip 64 tall (`spacing-7xl`). The native range
    is laid out at the trip's length and turned a quarter anticlockwise, so its
    minimum is at the bottom; the drawn thumb's span is the height less one
    thumb, and it rises as the zoom grows. */
 .ds-map-zoom-gauge--vertical {
+  /* In the column (ADR-0179): a 40px box like its buttons, a 16px thumb, a 6px channel. */
+  --gauge-thumb: 16px;
+  --gauge-track: 6px;
+  --gauge-cross: 40px;
+
   flex: none;
-  width: 32px;
+  width: var(--gauge-cross);
   height: var(--ds-spacing-7xl);
 }
 
@@ -299,13 +310,13 @@ onBeforeUnmount(() => {
   top: 50%;
   left: 50%;
   width: var(--ds-spacing-7xl);
-  height: 32px;
+  height: var(--gauge-cross);
   transform: translate(-50%, -50%) rotate(-90deg);
 }
 
 .ds-map-zoom-gauge--vertical .ds-map-zoom-gauge__span {
   inset-inline: 0;
-  inset-block: 0 12px;
+  inset-block: 0 var(--gauge-thumb);
 }
 
 .ds-map-zoom-gauge--vertical .ds-map-zoom-gauge__mover {

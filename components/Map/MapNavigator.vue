@@ -241,7 +241,7 @@ function by(d: number) {
           <Tooltip :title="t.label" :placement="tooltipPlacement">
             <IconButton
               :icon="t.icon"
-              size="xs"
+              size="md"
               variant="subtle"
               shape="square"
              
@@ -262,18 +262,18 @@ function by(d: number) {
 
     <div class="ds-map-navigator__group">
       <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
-        <IconButton icon="plus" size="xs" variant="subtle" shape="square" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
+        <IconButton icon="plus" size="md" variant="subtle" shape="square" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
       </Tooltip>
       <MapZoomGauge ref="gauge" v-model="zoom" vertical :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" :disabled="disabled" />
       <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
-        <IconButton icon="minus" size="xs" variant="subtle" shape="square" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
+        <IconButton icon="minus" size="md" variant="subtle" shape="square" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
       </Tooltip>
     </div>
 
     <span class="ds-map-navigator__rule" aria-hidden="true" />
 
     <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
-      <IconButton icon="crosshair" size="xs" variant="subtle" shape="square" :ariaLabel="recenterLabel" :disabled="disabled" @click="emit('recenter')" />
+      <IconButton icon="crosshair" size="md" variant="subtle" shape="square" :ariaLabel="recenterLabel" :disabled="disabled" @click="emit('recenter')" />
     </Tooltip>
 
     <!-- What the open tool shows: a card to the column's left, its top on its button's. -->
@@ -298,7 +298,7 @@ function by(d: number) {
 
 <style scoped>
 /*
-  The column (ADR-0171): 44 wide — 32px buttons in 6px of margin, under a
+  The column (ADR-0171, ADR-0179): 52 wide — 40px buttons in 6px of margin, under a
   hairline — on the map's floating surface (`bg-default`, `border-subtle`,
   `elevation-raised`, `radius-surface`), its groups ruled off. Its own height
   in any row it lands in (ADR-0170): a stretched column is a hole in the map.
@@ -310,9 +310,9 @@ function by(d: number) {
   align-items: center;
   gap: var(--ds-spacing-xs);
   box-sizing: border-box;
-  width: 44px;
+  width: 52px;
   height: fit-content;
-  padding: var(--ds-spacing-xs) 0;
+  padding: var(--ds-spacing-sm) 0;
   border-radius: var(--ds-radius-surface);
   /* Pilot glass (ADR-0172): the map shows through as colour. */
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
@@ -371,7 +371,7 @@ function by(d: number) {
 
 .ds-map-navigator__rule {
   flex: none;
-  width: 20px;
+  width: 24px;
   height: var(--ds-border-width-default);
   /* Translucent ink, not an opaque grey (ADR-0173). */
   background: var(--on-glass-rule, var(--ds-border-subtle));

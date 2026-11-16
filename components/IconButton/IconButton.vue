@@ -8,7 +8,7 @@ import { Icon, type IconName } from '../Icon'
  * `xs` goes below it, for a control riding on someone else's content rather
  * than sitting in a bar of its own.
  */
-export type IconButtonSize = 'xs' | 'sm'
+export type IconButtonSize = 'xs' | 'sm' | 'md'
 
 /**
  * `ghost` — no fill of its own: it takes the surface behind it, the bar or a
@@ -151,6 +151,9 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 }
 
 .ds-icon-button--sm { width: 36px; height: 36px; }
+/* 40, the glyph still 20 (ADR-0179): a target for a pointer on a map, where Google
+   Maps' controls are ~40 — the box grows, the mark does not, as `Button` does above 36. */
+.ds-icon-button--md { width: 40px; height: 40px; }
 .ds-icon-button--xs { width: 32px; height: 32px; }
 
 .ds-icon-button:hover:not(:disabled),

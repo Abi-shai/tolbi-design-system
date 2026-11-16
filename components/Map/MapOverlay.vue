@@ -129,7 +129,7 @@ onBeforeUnmount(() => {
 */
 .ds-map-overlay--end:has(> .ds-map-navigator--column) {
   display: grid;
-  grid-template-columns: 25rem 44px;
+  grid-template-columns: 25rem 52px;
   grid-template-rows: minmax(0, 1fr);
   column-gap: var(--ds-spacing-md);
   align-items: start;

@@ -1592,6 +1592,10 @@ Before working on any component, read:
 - **ADR-0178**: **the folded panel is its button alone** — ADR-0173's title beside the folded `MapPanel`'s button (never asked
   for) is removed: the same `IconButton sm`, same pixel (41, 42), in a glass capsule that hugs it (54 × 54); the name stays
   in its `aria-label` (`expandLabel` + title); the button alone reopens. Small panels keep their titled `Button`.
+- **ADR-0179**: **larger targets in the tools column** (Google Maps ≈ 40) — `IconButton` gains **`size="md"`** (40, glyph 20);
+  the column's buttons take it (square, 8px), the column is **52px** (6px margin, `spacing-sm` padding, 24px rules, the
+  overlay's track 52); the gauge's box 40, thumb **16**, channel 6 (`--gauge-thumb/-track/-cross`). Count, tool card,
+  launcher axis follow.
 
 ## Architecture
 
