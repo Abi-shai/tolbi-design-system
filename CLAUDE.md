@@ -1629,6 +1629,8 @@ Before working on any component, read:
   emits **`claim`** so the product closes its sheet. The mini-map aligns with the column's first tool. An off tool shows:
   `Tooltip`'s anchor carries `not-allowed` for a disabled trigger (it takes the pointer the control drops), and the
   column's buttons are `ghost` (`text-default` on, `text-disabled` off — two steps, not one).
+- **ADR-0187**: **a cross on the mini-map** — `IconButton xs surface` `x` at its top-right corner (where the old fold stood),
+  `minimapCloseLabel` « Fermer la mini-carte »: turns it off like its button, the focus back to that button.
 
 ## Architecture
 

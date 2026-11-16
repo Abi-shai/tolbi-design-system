@@ -58,6 +58,8 @@ interface Props {
   tools?: MapTool[]
   /** The mini-map's tool, when `#default` holds one. */
   minimapLabel?: string
+  /** The cross at the mini-map's top-right corner (ADR-0187). */
+  minimapCloseLabel?: string
   /** The column's name, for a reader. */
   label?: string
   zoomMin?: number
@@ -83,6 +85,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   tools: () => [],
   minimapLabel: 'Mini-carte',
+  minimapCloseLabel: 'Fermer la mini-carte',
   label: 'Outils de la carte',
   zoomMin: 0,
   zoomMax: 20,
@@ -218,6 +221,13 @@ watch(minimapOpen, (open) => {
   if (tool.value) tool.value = null
   emit('claim', MINIMAP)
 })
+
+/* The cross on the mini-map closes it, as its button does (ADR-0187); the
+   focus goes back to that button, the way to open it again. */
+function closeMinimap() {
+  minimapOpen.value = false
+  void nextTick(() => buttonOf(MINIMAP)?.focus())
+}
 
 /* At the top, on the first tool's line — not facing its own button (ADR-0186):
    it is a picture of the whole map, read before the tools. */
@@ -374,6 +384,11 @@ function by(d: number) {
         :style="{ top: `${minimapTop}px` }"
       >
         <div class="ds-map-navigator__minimap"><slot /></div>
+        <!-- Where the old fold stood (ADR-0100): the top-right corner, a white
+             disc that stands off the drawing. -->
+        <Tooltip :title="minimapCloseLabel" :placement="tooltipPlacement" class="ds-map-navigator__close">
+          <IconButton icon="x" size="xs" variant="surface" :ariaLabel="minimapCloseLabel" @click="closeMinimap" />
+        </Tooltip>
       </div>
     </SurfaceTransition>
   </div>
@@ -521,6 +536,13 @@ function by(d: number) {
 .ds-map-navigator__minimap > :deep(*) {
   width: 100%;
   height: 100%;
+}
+
+/* The mini-map's top-right corner, 4px inside it (ADR-0187). */
+.ds-map-navigator__close {
+  position: absolute;
+  top: calc(var(--ds-spacing-md) + var(--ds-spacing-xs));
+  right: calc(var(--ds-spacing-md) + var(--ds-spacing-xs));
 }
 
 /* Less transparency asked for: the same surface, opaque, nothing blurred (ADR-0172). */
