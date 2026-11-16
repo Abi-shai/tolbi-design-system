@@ -1677,6 +1677,9 @@ Before working on any component, read:
   `bg-neutral-subtle-hover`, the frame `bg-neutral` (one grey with the hover, so on hover the frame takes a 7 % ink veil).
   **18rem** cards (288; picture 276 × 155 inside the 6px inset), laid from the start (`auto-fill, 18rem`), wrapping, never
   narrower; one full-width column under 40rem.
+- **ADR-0197**: **more air around the article card's words** (S1) — picture → words `spacing-lg` (12), words' inset
+  `0 spacing-sm spacing-lg` (0 6 12), title → facts `spacing-xs` (4): 18px from the date to the foot; card 288 × 255, the
+  placeholder the same.
 
 ## Architecture
 

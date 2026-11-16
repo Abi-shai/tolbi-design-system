@@ -99,7 +99,7 @@ const hintId = `ds-article-card-${useId()}`
 </template>
 
 <style scoped>
-/* `bg-neutral-subtle`, no edge, `radius-surface`, 6 inside, 8 between the picture and the words; 18rem wide. */
+/* `bg-neutral-subtle`, no edge, `radius-surface`, 6 inside, 12 between the picture and the words (ADR-0197); 18rem wide. */
 .ds-article-card {
   position: relative;
   box-sizing: border-box;
@@ -107,7 +107,7 @@ const hintId = `ds-article-card-${useId()}`
   max-width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-md);
+  gap: var(--ds-spacing-lg);
   min-width: 0;
   padding: var(--ds-spacing-sm);
   border-radius: var(--ds-radius-surface);
@@ -173,20 +173,21 @@ a.ds-article-card:focus-visible {
   background: none;
 }
 
-/* The words 4 in from the card's inset, two of them: the title over its facts. */
+/* The words 6 in from the card's inset and 12 above its foot (ADR-0197, S1: the
+   facts were ~10px from the edge), the title 4 above its facts. */
 .ds-article-card__text {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-xxs);
+  gap: var(--ds-spacing-xs);
   min-width: 0;
-  padding: 0 var(--ds-spacing-xs) var(--ds-spacing-xs);
+  padding: 0 var(--ds-spacing-sm) var(--ds-spacing-lg);
 }
 
 /* The placeholder holds the real card's height: two title lines and the facts' line, 20 each. */
 .ds-article-card--loading .ds-article-card__text {
   gap: var(--ds-spacing-sm);
   box-sizing: content-box;
-  min-height: calc(3lh + var(--ds-spacing-xxs));
+  min-height: calc(3lh + var(--ds-spacing-xs));
   font: var(--ds-font-label-md-strong);
 }
 
