@@ -1606,6 +1606,12 @@ Before working on any component, read:
 - **ADR-0181**: **the folded panel on the column's gauge** — `MapPanel`'s fold is `IconButton md square` (40, 8px), open and
   folded, same pixel; the folded capsule **52 × 52**, `radius-surface`, pilot glass, the button 6px in; the open head keeps
   its height (the button lends 2px above and below: 60 / 70 / 120 unchanged).
+- **ADR-0182**: **folding a panel is one surface changing shape** — a shell (the glass alone: edge, rim, shadow) travels
+  between the capsule's 52 box and the panel's over **`considered` + `easing-in-out`**, its ground and backdrop crossing
+  from pilot to reading glass, while the real surfaces are bare and still. Unfold: content veiled, fades in over `enter`
+  at ¾; fold: content out over `exit`, then the shell closes. The button never moves (41, 40 every frame). Reduced
+  motion: a fade in place (WAAPI, past `motion.css`). Found: toggling `<Transition :css>` mid-swap breaks Vue's patch
+  (`duration: 0` instead); opacity on a `display: contents` box does nothing.
 
 ## Architecture
 

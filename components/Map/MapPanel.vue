@@ -142,8 +142,146 @@ async function fold(next: boolean) {
     foldAt.value = button && place ? { x: button.left - place.left, y: button.top - place.top } : null
   }
   pressed = true
+  if (iconFold.value && !atEnd.value && host.value?.parentElement) {
+    await (canMorph() ? (next ? morphFold() : morphUnfold()) : crossFade(next))
+    return
+  }
   collapsed.value = next
   await nextTick()
+}
+
+/* Reduced motion (ADR-0182): nothing stretches — the new form fades in where
+   it stands, over `quick`. Web Animations, which `motion.css` does not cut:
+   a fade is not a movement. */
+async function crossFade(next: boolean) {
+  morph.value = 'settling'
+  collapsed.value = next
+  const el = await arrived(next ? '.ds-map-panel__unfold' : '.ds-map-panel')
+  const ms = readDuration(host.value!.parentElement!, '--ds-motion-duration-quick')
+  if (el && ms) await (el as HTMLElement).animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms, easing: 'linear' }).finished.catch(() => undefined)
+  morph.value = 'none'
+}
+
+/*
+  ── One surface that changes shape (ADR-0182) ─────────────────────────
+  Folding and unfolding used to swap two surfaces, so the panel's edge jumped
+  between 6px from the button (the capsule) and 16px from it (the panel). Now a
+  **shell** — the glass alone, border, rim and shadow, no content — stands in
+  the place and travels between the capsule's box and the panel's over
+  `considered` + `easing-in-out`, its ground and backdrop crossing from pilot
+  glass to reading glass, while the real surfaces are bare. The button does not
+  move: it stays drawn throughout, the others' content fades.
+  - Unfolding: the shell grows from the capsule; the panel's content fades in
+    over `enter` once the shell is three quarters open.
+  - Folding: the content fades out over `exit`, then the shell closes on the
+    button, and the capsule takes its place.
+  Under reduced motion nothing stretches: the surfaces swap in place.
+*/
+const morph = ref<'none' | 'veiled' | 'reveal' | 'leaving' | 'settling'>('none')
+const morphing = computed(() => morph.value !== 'none')
+function canMorph() {
+  return typeof window !== 'undefined' && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches && !!host.value?.parentElement
+}
+type Box = { left: number; top: number; width: number; height: number }
+function boxOf(el: Element, place: HTMLElement): Box {
+  const r = el.getBoundingClientRect()
+  const p = place.getBoundingClientRect()
+  return { left: r.left - p.left - place.clientLeft, top: r.top - p.top - place.clientTop, width: r.width, height: r.height }
+}
+const px = (b: Box) => ({ left: `${b.left}px`, top: `${b.top}px`, width: `${b.width}px`, height: `${b.height}px` })
+function glassOf(place: HTMLElement) {
+  const cs = getComputedStyle(place)
+  const read = cs.getPropertyValue('--ds-backdrop-map-read').trim()
+  const control = cs.getPropertyValue('--ds-backdrop-map-control').trim()
+  const names = (f: string) => f.replace(/\([^)]*\)/g, '()')
+  // The two backdrops must list the same functions to interpolate, or the glass blinks.
+  const readMatched = names(read) === names(control) ? read : `${read} brightness(1)`
+  return {
+    control: { backgroundColor: cs.getPropertyValue('--ds-bg-map-control').trim(), backdropFilter: control },
+    read: { backgroundColor: cs.getPropertyValue('--ds-bg-map-read').trim(), backdropFilter: names(read) === names(control) ? read : readMatched },
+  }
+}
+function makeShell(place: HTMLElement, at: Box): HTMLElement {
+  const el = document.createElement('div')
+  el.setAttribute('aria-hidden', 'true')
+  Object.assign(el.style, {
+    position: 'absolute',
+    zIndex: '-1',
+    boxSizing: 'border-box',
+    border: 'var(--ds-border-width-default) solid var(--ds-border-map-edge)',
+    borderRadius: 'var(--ds-radius-surface)',
+    boxShadow: 'var(--ds-elevation-map-glass)',
+    pointerEvents: 'none',
+    ...px(at),
+  })
+  place.appendChild(el)
+  return el
+}
+const capsuleBox = (b: Box): Box => {
+  /* The capsule's box, from where the button stands: 6px around a 40 square. */
+  const inset = (52 - b.width) / 2
+  return { left: b.left - inset, top: b.top - inset, width: 52, height: 52 }
+}
+
+async function morphUnfold() {
+  const place = host.value!.parentElement!
+  const button = host.value!.querySelector('[data-map-panel-open]')
+  if (!button) { collapsed.value = false; return }
+  const from = capsuleBox(boxOf(button, place))
+  const shapeMs = readDuration(place, '--ds-motion-duration-considered')
+  const easing = getComputedStyle(place).getPropertyValue('--ds-motion-easing-in-out').trim() || 'ease-in-out'
+  const glass = glassOf(place)
+  morph.value = 'veiled'
+  collapsed.value = false
+  const panel = await arrived('.ds-map-panel')
+  if (!panel) { morph.value = 'none'; return }
+  const to = boxOf(panel, place)
+  const shell = makeShell(place, from)
+  const run = shell.animate([{ ...px(from), ...glass.control }, { ...px(to), ...glass.read }], { duration: shapeMs, easing, fill: 'forwards' })
+  setTimeout(() => { if (morph.value === 'veiled') morph.value = 'reveal' }, shapeMs * 0.75)
+  await run.finished.catch(() => undefined)
+  morph.value = 'none'
+  shell.remove()
+}
+
+async function morphFold() {
+  const place = host.value!.parentElement!
+  const panel = host.value!.querySelector('.ds-map-panel')
+  const button = host.value!.querySelector('[data-map-panel-fold]')
+  if (!panel || !button) { collapsed.value = true; return }
+  const from = boxOf(panel, place)
+  const to = capsuleBox(boxOf(button, place))
+  const shapeMs = readDuration(place, '--ds-motion-duration-considered')
+  const fadeMs = readDuration(place, '--ds-motion-duration-exit')
+  const easing = getComputedStyle(place).getPropertyValue('--ds-motion-easing-in-out').trim() || 'ease-in-out'
+  const glass = glassOf(place)
+  morph.value = 'leaving'
+  await new Promise((r) => setTimeout(r, fadeMs))
+  const shell = makeShell(place, from)
+  morph.value = 'veiled'
+  const run = shell.animate([{ ...px(from), ...glass.read }, { ...px(to), ...glass.control }], { duration: shapeMs, easing, fill: 'forwards' })
+  await run.finished.catch(() => undefined)
+  collapsed.value = true
+  /* The swap must happen with the transitions still off, or the panel would
+     play its old exit under the shell. */
+  await arrived('.ds-map-panel__capsule')
+  shell.remove()
+  /* A frame or two still, while the swap's classes clear. */
+  morph.value = 'settling'
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+  morph.value = 'none'
+}
+
+/* What the swap brings in, once it is in the document: out-in inserts it a few
+   frames after the leaver has gone. */
+async function arrived(selector: string): Promise<Element | null> {
+  for (let i = 0; i < 10; i++) {
+    await nextTick()
+    const el = host.value?.querySelector(selector)
+    if (el) return el
+    await new Promise((r) => requestAnimationFrame(r))
+  }
+  return null
 }
 const unfoldAt = computed(() => ({
   transformOrigin: atEnd.value ? 'top right' : 'top left',
@@ -205,15 +343,15 @@ onBeforeUnmount(() => {
        enters on its first frame too (`appear`, ADR-0168): a parcel's sheet
        mounted with `v-if` arrives from its edge, as a fold's return does. -->
   <div ref="host" class="ds-map-panel-host">
-    <SurfaceTransition mode="out-in" appear @enter="focusArrived">
+    <SurfaceTransition mode="out-in" appear :duration="morphing ? 0 : undefined" @enter="focusArrived">
       <!-- With a head of its own: a map control at the panel's corner. -->
       <!-- The transition is the wrapper's: `Button` declares its own `transition`,
            which outweighs the surface's and would make it arrive in one frame. -->
-      <div v-if="collapsible && collapsed && iconFold" key="open-icon" class="ds-map-panel__unfold" :style="unfoldAt">
+      <div v-if="collapsible && collapsed && iconFold" key="open-icon" class="ds-map-panel__unfold" :class="{ 'ds-map-panel__unfold--still': morphing }" :style="unfoldAt">
         <!-- The same button as in the open head, at the same pixel, in a capsule of
              pilot glass that hugs it (ADR-0173; the title beside it removed by
              ADR-0178 — the panel's name stays in the button's). -->
-        <div class="ds-map-panel__capsule">
+        <div class="ds-map-panel__capsule" :class="{ 'ds-map-panel__capsule--bare': morphing }">
           <IconButton
             data-map-panel-open
             icon="panel-left"
@@ -247,7 +385,7 @@ onBeforeUnmount(() => {
         :id="panelId"
         key="panel"
         class="ds-map-panel"
-        :class="`ds-map-panel--${size}`"
+        :class="[`ds-map-panel--${size}`, morph !== 'none' && `ds-map-panel--morph-${morph} ds-map-panel--still`]"
         :aria-label="props.title"
         :aria-busy="loading || undefined"
       >
@@ -609,6 +747,49 @@ onBeforeUnmount(() => {
   backdrop-filter: var(--ds-backdrop-map-control);
   box-shadow: var(--ds-elevation-map-glass);
   --on-glass-focus: var(--ds-focus-ring-map);
+}
+
+/*
+  The morph (ADR-0182): while the shell carries the glass, the surfaces are
+  bare; the content but the fold button is veiled, then revealed over `enter`,
+  or leaves over `exit`.
+*/
+/* The swap itself does not move: the shell is the movement. */
+.ds-map-panel.ds-map-panel--still,
+.ds-map-panel__unfold.ds-map-panel__unfold--still {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.ds-map-panel:is(.ds-map-panel--morph-veiled, .ds-map-panel--morph-reveal),
+.ds-map-panel__capsule--bare {
+  border-color: transparent;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.ds-map-panel[class*='--morph-'] > :not(.ds-map-panel__head),
+.ds-map-panel[class*='--morph-'] .ds-map-panel__head > :not([data-map-panel-fold]),
+.ds-map-panel[class*='--morph-'] .ds-map-panel__header > :deep(*),
+.ds-map-panel[class*='--morph-'] .ds-map-panel__head::after {
+  transition: opacity var(--ds-motion-duration-exit) var(--ds-motion-easing-in);
+}
+
+.ds-map-panel:is(.ds-map-panel--morph-veiled, .ds-map-panel--morph-leaving) > :not(.ds-map-panel__head),
+.ds-map-panel:is(.ds-map-panel--morph-veiled, .ds-map-panel--morph-leaving) .ds-map-panel__head > :not([data-map-panel-fold]),
+.ds-map-panel:is(.ds-map-panel--morph-veiled, .ds-map-panel--morph-leaving) .ds-map-panel__header > :deep(*),
+.ds-map-panel:is(.ds-map-panel--morph-veiled, .ds-map-panel--morph-leaving) .ds-map-panel__head::after {
+  opacity: 0;
+}
+
+.ds-map-panel--morph-reveal > :not(.ds-map-panel__head),
+.ds-map-panel--morph-reveal .ds-map-panel__head > :not([data-map-panel-fold]),
+.ds-map-panel--morph-reveal .ds-map-panel__header > :deep(*),
+.ds-map-panel--morph-reveal .ds-map-panel__head::after {
+  transition: opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-out);
 }
 
 @media (prefers-reduced-transparency: reduce) {
