@@ -1624,6 +1624,11 @@ Before working on any component, read:
   (2.95:1 computed on the darkest glass), its tooltip kept with `MapTool.disabledHint`; the mini-map is a toggle
   (`v-model:minimap-open`, default `true`, `aria-pressed`) closed only by its button, hidden while a tool card or a sheet
   is on the right and back when they leave.
+- **ADR-0186**: **one thing on the right, the last action wins** (amends ADR-0185) — a card opening turns the mini-map off,
+  the mini-map opening closes the card, a sheet arriving (or present on arrival) turns it off for good; opening either
+  emits **`claim`** so the product closes its sheet. The mini-map aligns with the column's first tool. An off tool shows:
+  `Tooltip`'s anchor carries `not-allowed` for a disabled trigger (it takes the pointer the control drops), and the
+  column's buttons are `ghost` (`text-default` on, `text-disabled` off — two steps, not one).
 
 ## Architecture
 

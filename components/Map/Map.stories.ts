@@ -266,7 +266,7 @@ export const Selection: Story = {
         </MapOverlay>
         <MapOverlay position="end">
           <!-- As in Carbone: the navigator, then the sheet under it — it stays at the edge (ADR-0170). -->
-          <MapNavigator v-model:zoom="zoom" :tools="TOOLS" />
+          <MapNavigator v-model:zoom="zoom" :tools="TOOLS" @claim="close" />
           <MapPanel v-if="sheet" :key="sheet.id" size="lg" :title="sheet.id" closable @close="close">
             <p style="margin:0; font:var(--ds-font-body-md); color:var(--ds-text-default)">{{ sheet.owner }} · {{ sheet.area }}</p>
             <p style="margin:0; font:var(--ds-font-heading-xl); color:var(--ds-text-strong)">{{ sheet.carbon }} <span style="font:var(--ds-font-body-sm); color:var(--ds-text-subtle)">tCO2e</span></p>

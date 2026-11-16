@@ -166,6 +166,12 @@ onMounted(() => {
   pointer-events: none;
 }
 
+/* …and so the anchor is what the pointer is on: it carries the control's
+   « not allowed », or the column's own cursor showed (ADR-0186). */
+.ds-tooltip-anchor:has(> :is(:disabled, [aria-disabled='true'])) {
+  cursor: not-allowed;
+}
+
 /* Visually hidden, still read — never display:none. */
 .ds-tooltip-anchor__description {
   position: absolute;

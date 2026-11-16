@@ -94,7 +94,7 @@ const TOOLS_SCREEN = defineComponent({
   template: `
     <div :style="GROUND">
       <MapOverlay position="end">
-        <MapNavigator v-model:tool="tool" v-model:minimap-open="minimapOpen" v-model:zoom="zoom" :tools="tools" @press="v => v === 'layers' && (layers = !layers)">
+        <MapNavigator v-model:tool="tool" v-model:minimap-open="minimapOpen" v-model:zoom="zoom" :tools="tools" @claim="sheet = false" @press="v => v === 'layers' && (layers = !layers)">
           <template #tool-search>
             <MapSearch v-model="query" :groups="results" @select="choose">
               <template #media="{ item }">

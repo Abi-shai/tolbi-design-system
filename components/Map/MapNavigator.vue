@@ -97,7 +97,15 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
 })
 
-const emit = defineEmits<{ recenter: []; press: [value: string] }>()
+const emit = defineEmits<{
+  recenter: []
+  press: [value: string]
+  /**
+   * The column took the right (ADR-0186): a tool's card or the mini-map just
+   * opened. One thing at a time — a sheet there should close.
+   */
+  claim: [value: string]
+}>()
 
 defineSlots<{
   /** The mini-map — the engine's canvas. Its presence adds the « Mini-carte » tool. */
@@ -110,11 +118,12 @@ defineSlots<{
 /** The tool whose card is open, or `null`. The mini-map is not one: see `minimapOpen`. */
 const tool = defineModel<string | null>('tool', { default: null })
 /**
- * The mini-map is a **toggle that persists** (ADR-0185): open on arrival, it
- * stays open until its button turns it off — no press outside, no Escape. A
- * tool's card or a sheet on the right hides it while they are there; it comes
- * back by itself when they leave, its button still on. A model, so the product
- * can keep it for the session.
+ * The mini-map is a **toggle** (ADR-0185), open on arrival; no press outside
+ * and no Escape close it. **One thing at a time on the right** (ADR-0186): the
+ * last action wins and the one before goes out, its button too — a tool's card
+ * opening turns the mini-map off, the mini-map opening closes the card, a
+ * sheet arriving turns it off. It does not come back by itself; its button
+ * reopens it. A model, so the product can keep it for the session.
  */
 const minimapOpen = defineModel<boolean>('minimapOpen', { default: true })
 /** @deprecated The mini-map is a tool now (ADR-0171): `v-model:minimap-open`. Ignored. */
@@ -198,11 +207,26 @@ watch(tool, (now) => {
   if (now) void nextTick(() => place(now))
 }, { immediate: true })
 
-watch(minimapShown, (now) => {
+/* One thing at a time on the right (ADR-0186): what opens last wins. */
+watch(current, (now) => {
   if (!now) return
-  const wrap = column.value?.querySelector<HTMLElement>(`[data-map-tool="${MINIMAP}"]`)
-  minimapTop.value = wrap ? wrap.offsetTop : 0
-}, { immediate: true, flush: 'post' })
+  if (minimapOpen.value) minimapOpen.value = false
+  emit('claim', now.value)
+})
+watch(minimapOpen, (open) => {
+  if (!open) return
+  if (tool.value) tool.value = null
+  emit('claim', MINIMAP)
+})
+
+/* At the top, on the first tool's line — not facing its own button (ADR-0186):
+   it is a picture of the whole map, read before the tools. */
+function placeMinimap() {
+  const first = column.value?.querySelector<HTMLElement>('[data-map-tool]')
+  minimapTop.value = first ? first.offsetTop : 0
+}
+watch(minimapShown, (now) => { if (now) placeMinimap() }, { flush: 'post' })
+onMounted(placeMinimap)
 
 function close(handBack: boolean) {
   const was = tool.value
@@ -237,8 +261,13 @@ onMounted(() => {
   if (!overlay || typeof MutationObserver === 'undefined') return
   const sheet = '.ds-map-panel:not([aria-hidden])'
   sheetPresent.value = !!overlay.querySelector(sheet)
+  /* A sheet on the right on arrival: it is the one thing there. */
+  if (sheetPresent.value) minimapOpen.value = false
   watcher = new MutationObserver((records) => {
+    const was = sheetPresent.value
     sheetPresent.value = !!overlay.querySelector(sheet)
+    /* A sheet arriving (a point, a polygon selected) turns the mini-map off. */
+    if (sheetPresent.value && !was) minimapOpen.value = false
     if (!tool.value) return
     for (const r of records) for (const n of r.addedNodes) {
       /* `MapPanel` arrives inside its host, a box of no box. */
@@ -284,7 +313,7 @@ function by(d: number) {
             <IconButton
               :icon="t.icon"
               size="md"
-              variant="subtle"
+              variant="ghost"
               shape="square"
              
               :ariaLabel="t.badge ? `${t.label} (${t.badge})` : t.label"
@@ -304,18 +333,18 @@ function by(d: number) {
 
     <div class="ds-map-navigator__group">
       <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
-        <IconButton icon="plus" size="md" variant="subtle" shape="square" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
+        <IconButton icon="plus" size="md" variant="ghost" shape="square" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
       </Tooltip>
       <MapZoomGauge ref="gauge" v-model="zoom" vertical :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" :disabled="disabled" />
       <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
-        <IconButton icon="minus" size="md" variant="subtle" shape="square" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
+        <IconButton icon="minus" size="md" variant="ghost" shape="square" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
       </Tooltip>
     </div>
 
     <span class="ds-map-navigator__rule" aria-hidden="true" />
 
     <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
-      <IconButton icon="crosshair" size="md" variant="subtle" shape="square" :ariaLabel="recenterLabel" :disabled="disabled" @click="emit('recenter')" />
+      <IconButton icon="crosshair" size="md" variant="ghost" shape="square" :ariaLabel="recenterLabel" :disabled="disabled" @click="emit('recenter')" />
     </Tooltip>
 
     <!-- What the open tool shows: a card to the column's left, its top on its button's. -->

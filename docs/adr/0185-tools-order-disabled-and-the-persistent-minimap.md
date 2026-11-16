@@ -33,6 +33,8 @@ is said after the name while the tool is off: « Informations — sélectionnez 
 
 ### 3. The mini-map is a toggle that persists
 
+> **Amended by ADR-0186**: the last action wins — a card or a sheet turns the mini-map off, it no longer comes back by itself; it sits at the column's top.
+
 **State.** `v-model:minimap-open`, **`true` by default**: a screen with a mini-map arrives with it open. The product
 may keep the state for the session.
 
