@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, useId, type FunctionalComponent } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, useId, watch, type FunctionalComponent } from 'vue'
 import { Button } from '../Button'
 import { CloseButton } from '../CloseButton'
 import { IconButton } from '../IconButton'
@@ -99,6 +99,10 @@ const slots = defineSlots<{
 }>()
 
 const collapsed = defineModel<boolean>('collapsed', { default: false })
+/* What is drawn (ADR-0183): it follows the model, but only through the change
+   below — so a fold asked for by the product shapes the surface exactly as a
+   press does. */
+const shown = ref(collapsed.value)
 
 const host = ref<HTMLElement | null>(null)
 const panelId = `ds-map-panel-${useId()}`
@@ -134,19 +138,35 @@ let pressed = false
    capsule puts the same button on the same pixel. Measured on the press; folded
    from the product, the head's own padding stands in. */
 const foldAt = ref<{ x: number; y: number } | null>(null)
-async function fold(next: boolean) {
+function fold(next: boolean) {
+  pressed = true
+  collapsed.value = next
+}
+
+/*
+  Every change of `collapsed` comes here, whoever made it — the fold pressed,
+  or the product making room for a sheet (ADR-0183). One at a time: a change
+  asked for while the surface is still moving waits for it, then goes to
+  wherever the model stands by then.
+*/
+let queue: Promise<void> = Promise.resolve()
+watch(collapsed, () => {
+  queue = queue.then(() => change(collapsed.value))
+})
+
+async function change(next: boolean) {
+  if (next === shown.value) return
   if (next) atEnd.value = !!host.value?.closest('.ds-map-overlay--end, .ds-map-overlay--top-end, .ds-map-overlay--bottom-end')
   if (next) {
     const button = host.value?.querySelector<HTMLElement>('[data-map-panel-fold]')?.getBoundingClientRect()
     const place = host.value?.parentElement?.getBoundingClientRect()
     foldAt.value = button && place ? { x: button.left - place.left, y: button.top - place.top } : null
   }
-  pressed = true
   if (iconFold.value && !atEnd.value && host.value?.parentElement) {
     await (canMorph() ? (next ? morphFold() : morphUnfold()) : crossFade(next))
     return
   }
-  collapsed.value = next
+  shown.value = next
   await nextTick()
 }
 
@@ -155,7 +175,7 @@ async function fold(next: boolean) {
    a fade is not a movement. */
 async function crossFade(next: boolean) {
   morph.value = 'settling'
-  collapsed.value = next
+  shown.value = next
   const el = await arrived(next ? '.ds-map-panel__unfold' : '.ds-map-panel')
   const ms = readDuration(host.value!.parentElement!, '--ds-motion-duration-quick')
   if (el && ms) await (el as HTMLElement).animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms, easing: 'linear' }).finished.catch(() => undefined)
@@ -226,13 +246,13 @@ const capsuleBox = (b: Box): Box => {
 async function morphUnfold() {
   const place = host.value!.parentElement!
   const button = host.value!.querySelector('[data-map-panel-open]')
-  if (!button) { collapsed.value = false; return }
+  if (!button) { shown.value = false; return }
   const from = capsuleBox(boxOf(button, place))
   const shapeMs = readDuration(place, '--ds-motion-duration-considered')
   const easing = getComputedStyle(place).getPropertyValue('--ds-motion-easing-in-out').trim() || 'ease-in-out'
   const glass = glassOf(place)
   morph.value = 'veiled'
-  collapsed.value = false
+  shown.value = false
   const panel = await arrived('.ds-map-panel')
   if (!panel) { morph.value = 'none'; return }
   const to = boxOf(panel, place)
@@ -248,7 +268,7 @@ async function morphFold() {
   const place = host.value!.parentElement!
   const panel = host.value!.querySelector('.ds-map-panel')
   const button = host.value!.querySelector('[data-map-panel-fold]')
-  if (!panel || !button) { collapsed.value = true; return }
+  if (!panel || !button) { shown.value = true; return }
   const from = boxOf(panel, place)
   const to = capsuleBox(boxOf(button, place))
   const shapeMs = readDuration(place, '--ds-motion-duration-considered')
@@ -261,7 +281,7 @@ async function morphFold() {
   morph.value = 'veiled'
   const run = shell.animate([{ ...px(from), ...glass.read }, { ...px(to), ...glass.control }], { duration: shapeMs, easing, fill: 'forwards' })
   await run.finished.catch(() => undefined)
-  collapsed.value = true
+  shown.value = true
   /* The swap must happen with the transitions still off, or the panel would
      play its old exit under the shell. */
   await arrived('.ds-map-panel__capsule')
@@ -292,7 +312,7 @@ const unfoldAt = computed(() => ({
 function focusArrived() {
   if (!pressed) return
   pressed = false
-  host.value?.querySelector<HTMLElement>(collapsed.value ? '[data-map-panel-open]' : '[data-map-panel-fold]')?.focus()
+  host.value?.querySelector<HTMLElement>(shown.value ? '[data-map-panel-open]' : '[data-map-panel-fold]')?.focus()
 }
 
 /*
@@ -347,7 +367,7 @@ onBeforeUnmount(() => {
       <!-- With a head of its own: a map control at the panel's corner. -->
       <!-- The transition is the wrapper's: `Button` declares its own `transition`,
            which outweighs the surface's and would make it arrive in one frame. -->
-      <div v-if="collapsible && collapsed && iconFold" key="open-icon" class="ds-map-panel__unfold" :class="{ 'ds-map-panel__unfold--still': morphing }" :style="unfoldAt">
+      <div v-if="collapsible && shown && iconFold" key="open-icon" class="ds-map-panel__unfold" :class="{ 'ds-map-panel__unfold--still': morphing }" :style="unfoldAt">
         <!-- The same button as in the open head, at the same pixel, in a capsule of
              pilot glass that hugs it (ADR-0173; the title beside it removed by
              ADR-0178 — the panel's name stays in the button's). -->
@@ -367,7 +387,7 @@ onBeforeUnmount(() => {
         <slot name="folded" />
       </div>
       <!-- A small panel: a button bearing its title, in its place. -->
-      <div v-else-if="collapsible && collapsed" key="open-title" class="ds-map-panel__unfold">
+      <div v-else-if="collapsible && shown" key="open-title" class="ds-map-panel__unfold">
       <Button
         data-map-panel-open
         variant="secondary-gray"

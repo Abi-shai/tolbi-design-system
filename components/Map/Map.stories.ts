@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import MapOverlay from './MapOverlay.vue'
 import MapPanel from './MapPanel.vue'
 import MapControls from './MapControls.vue'
@@ -244,12 +244,15 @@ export const Selection: Story = {
       const close = () => { pin.value = null; chosen.value = null }
       const choose = (id: string | null) => { chosen.value = id; pin.value = null }
       const zoom = ref(12)
-      return { GIS_MAP, TOOLS, PARCELS, hovered, chosen, year, years, current, sheet, pin, onMap, onParcel, close, choose, zoom }
+      /* The product makes room for a sheet: the panel folds when one opens and comes back when it closes (ADR-0183). */
+      const folded = ref(false)
+      watch(() => !!(sheet.value || pin.value), (open) => { folded.value = open })
+      return { GIS_MAP, TOOLS, PARCELS, hovered, chosen, year, years, current, sheet, pin, onMap, onParcel, close, choose, zoom, folded }
     },
     template: `
       <div :style="GIS_MAP" data-map @click="onMap">
         <MapOverlay position="start">
-          <MapPanel size="lg" title="Parcelles">
+          <MapPanel v-model:collapsed="folded" size="lg" title="Parcelles" collapsible expand-label="Afficher le panneau">
             <OptionList :model-value="chosen" :highlighted="hovered" aria-label="Parcelles" @update:model-value="choose" @hover="hovered = $event">
               <OptionCard v-for="p in PARCELS" :key="p.id" :value="p.id" density="row" icon="land-plot" :label="p.id" :meta="p.area" :badge="p.status" :badge-tone="p.tone" />
             </OptionList>

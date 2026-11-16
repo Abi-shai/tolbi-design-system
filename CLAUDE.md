@@ -1612,6 +1612,10 @@ Before working on any component, read:
   at ¾; fold: content out over `exit`, then the shell closes. The button never moves (41, 40 every frame). Reduced
   motion: a fade in place (WAAPI, past `motion.css`). Found: toggling `<Transition :css>` mid-swap breaks Vue's patch
   (`duration: 0` instead); opacity on a `display: contents` box does nothing.
+- **ADR-0183**: **the same stretch whoever folds** — the product folding `MapPanel` through `v-model:collapsed` (a sheet
+  opening from the map) takes ADR-0182's shell too: the template follows a private `shown`, every model change goes
+  through one queued `change()` (a change mid-motion waits, then goes where the model stands). Focus still follows a
+  press only.
 
 ## Architecture
 
