@@ -67,31 +67,34 @@ const TOOLS_SCREEN = defineComponent({
   props: { initialTool: { type: String, default: null }, sheetOpen: { type: Boolean, default: false } },
   setup(props) {
     const tool = ref<string | null>(props.initialTool)
+    const sheet = ref(props.sheetOpen)
+    const minimapOpen = ref(true)
     const zoom = ref(12)
     const query = ref('Kon')
     const layers = ref(false)
     const alerts = ref<Record<string, boolean>>({ Bloque: true, 'À surveiller': true, 'À revoir': false, 'Sans alerte': false })
     const lots = ref<string[]>(['2023'])
     const area = ref<[number, number]>([5, 18])
-    const sheet = ref(props.sheetOpen)
     const results = computed(() => (query.value.trim() ? RESULTS : []))
     const active = computed(() => Object.values(alerts.value).filter(Boolean).length + (lots.value.length ? 1 : 0) + (area.value[0] > 0 || area.value[1] < 30 ? 1 : 0))
+    /* Passed in any order: the package sorts the ones it knows (ADR-0185). */
     const tools = computed(() => [
-      { value: 'search', icon: 'search', label: 'Rechercher' },
-      { value: 'filters', icon: 'filter', label: 'Filtres', badge: active.value },
       { value: 'layers', icon: 'layers', label: 'Couches', pressed: layers.value },
+      { value: 'info', icon: 'info', label: 'Informations', disabled: !sheet.value, disabledHint: 'sélectionnez un élément' },
+      { value: 'filters', icon: 'filter', label: 'Filtres', badge: active.value },
+      { value: 'search', icon: 'search', label: 'Rechercher' },
     ])
     const toggleLot = (y: string) => (lots.value = lots.value.includes(y) ? lots.value.filter((l) => l !== y) : [...lots.value, y])
     const clear = () => { alerts.value = { Bloque: false, 'À surveiller': false, 'À revoir': false, 'Sans alerte': false }; lots.value = []; area.value = [0, 30] }
     const colors: Record<string, string> = { Bloque: 'var(--ds-chart-status-critical)', 'À surveiller': 'var(--ds-chart-status-warning)', 'À revoir': 'var(--ds-chart-status-neutral)', 'Sans alerte': 'var(--ds-chart-categorical-1)' }
     const counts: Record<string, number> = { Bloque: 9, 'À surveiller': 4, 'À revoir': 2, 'Sans alerte': 13 }
     const choose = () => { sheet.value = true }
-    return { tool, zoom, query, layers, alerts, lots, area, sheet, results, tools, toggleLot, clear, colors, counts, choose, minimap, GROUND }
+    return { tool, minimapOpen, zoom, query, layers, alerts, lots, area, sheet, results, tools, toggleLot, clear, colors, counts, choose, minimap, GROUND }
   },
   template: `
     <div :style="GROUND">
       <MapOverlay position="end">
-        <MapNavigator v-model:tool="tool" v-model:zoom="zoom" :tools="tools" @press="v => v === 'layers' && (layers = !layers)">
+        <MapNavigator v-model:tool="tool" v-model:minimap-open="minimapOpen" v-model:zoom="zoom" :tools="tools" @press="v => v === 'layers' && (layers = !layers)">
           <template #tool-search>
             <MapSearch v-model="query" :groups="results" @select="choose">
               <template #media="{ item }">
@@ -141,10 +144,13 @@ export const Filters: Story = {
   render: () => ({ components: { TOOLS_SCREEN }, template: '<TOOLS_SCREEN initial-tool="filters" />' }),
 }
 
-/** La mini-carte est un outil : elle s’ouvre à gauche de la colonne, comme la recherche. */
+/**
+ * La mini-carte est une **bascule persistante** (ADR-0185) : ouverte à l’arrivée, son bouton l’allume et l’éteint ; ni un clic
+ * ailleurs ni Échap ne la ferment. Un outil ouvert ou une fiche la masquent le temps de leur présence, elle revient seule.
+ */
 export const Minimap: Story = {
   name: 'Mini-carte',
-  render: () => ({ components: { TOOLS_SCREEN }, template: '<TOOLS_SCREEN initial-tool="minimap" />' }),
+  render: () => ({ components: { TOOLS_SCREEN }, template: '<TOOLS_SCREEN />' }),
 }
 
 /**

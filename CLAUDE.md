@@ -1619,6 +1619,11 @@ Before working on any component, read:
 - **ADR-0184**: **the hover's bubble uses the frame** — held inside the plot, a narrow sheet's bubble fit on neither side
   and was pushed over the column it describes; its room is now the whole `ChartFrame` (the value axis included), its gap
   counted from the column's edge (`band`: half a band + 4), after → before → the roomier side, never out of the frame.
+- **ADR-0185**: **the tools column's order, an off tool, a persistent mini-map** — the package sorts known tools (`search`,
+  `filters`, `info`), unknown ones after them, the mini-map last; an off tool is `not-allowed`, no hover, `text-disabled`
+  (2.95:1 computed on the darkest glass), its tooltip kept with `MapTool.disabledHint`; the mini-map is a toggle
+  (`v-model:minimap-open`, default `true`, `aria-pressed`) closed only by its button, hidden while a tool card or a sheet
+  is on the right and back when they leave.
 
 ## Architecture
 

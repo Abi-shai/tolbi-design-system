@@ -47,6 +47,11 @@ export interface MapTool {
   /** A tool with nothing to show is a toggle: the product says it is on. */
   pressed?: boolean
   disabled?: boolean
+  /**
+   * Said after the name while the tool is off (ADR-0185): « Informations —
+   * sélectionnez un élément ». The tooltip still shows on a tool that is off.
+   */
+  disabledHint?: string
 }
 
 interface Props {
@@ -102,22 +107,47 @@ defineSlots<{
   [key: `tool-${string}`]: (() => unknown) | undefined
 }>()
 
-/** The tool whose card is open, or `null`. */
+/** The tool whose card is open, or `null`. The mini-map is not one: see `minimapOpen`. */
 const tool = defineModel<string | null>('tool', { default: null })
-/** @deprecated The mini-map is a tool now (ADR-0171): `v-model:tool`, value `minimap`. Ignored. */
+/**
+ * The mini-map is a **toggle that persists** (ADR-0185): open on arrival, it
+ * stays open until its button turns it off — no press outside, no Escape. A
+ * tool's card or a sheet on the right hides it while they are there; it comes
+ * back by itself when they leave, its button still on. A model, so the product
+ * can keep it for the session.
+ */
+const minimapOpen = defineModel<boolean>('minimapOpen', { default: true })
+/** @deprecated The mini-map is a tool now (ADR-0171): `v-model:minimap-open`. Ignored. */
 defineModel<boolean>('collapsed', { default: true })
 const zoom = defineModel<number>('zoom', { default: 10 })
 
 const slots = useSlots() as Record<string, unknown>
 const MINIMAP = 'minimap'
 
+/*
+  One order in every module (ADR-0185): the package sorts the tools it knows —
+  Rechercher, Filtres, Informations — whatever order the product passes them
+  in; a missing one leaves no gap. A tool the package does not know comes after
+  them, in the product's order, and the mini-map closes the group.
+*/
+const KNOWN = ['search', 'filters', 'info']
 const allTools = computed<MapTool[]>(() => {
-  const list = [...props.tools]
+  const known = KNOWN.map((v) => props.tools.find((t) => t.value === v)).filter((t): t is MapTool => !!t)
+  const other = props.tools.filter((t) => !KNOWN.includes(t.value) && t.value !== MINIMAP)
+  const list = [...known, ...other]
   if (slots.default) list.push({ value: MINIMAP, icon: 'map', label: props.expandLabel ?? props.minimapLabel })
   return list
 })
-const opens = (t: MapTool) => t.value === MINIMAP || !!slots[`tool-${t.value}`]
+const opens = (t: MapTool) => t.value !== MINIMAP && !!slots[`tool-${t.value}`]
 const current = computed(() => allTools.value.find((t) => t.value === tool.value && opens(t)) ?? null)
+const tipOf = (t: MapTool) => (t.disabled && t.disabledHint ? `${t.label} — ${t.disabledHint}` : t.label)
+
+/* A sheet on the right (a `MapPanel` beside the column) hides the mini-map
+   while it is there; read off the overlay, as the tool card's closing is. */
+const sheetPresent = ref(false)
+const minimapShown = computed(() => !!slots.default && minimapOpen.value && !current.value && !sheetPresent.value)
+const minimapId = `${useId()}-minimap`
+const minimapTop = ref(0)
 
 const id = useId()
 const flyoutId = `${id}-flyout`
@@ -137,6 +167,10 @@ function place(value: string) {
 
 let pressedHere = false
 function onTool(t: MapTool) {
+  if (t.value === MINIMAP) {
+    minimapOpen.value = !minimapOpen.value
+    return
+  }
   if (!opens(t)) {
     emit('press', t.value)
     return
@@ -163,6 +197,12 @@ function focusArrived() {
 watch(tool, (now) => {
   if (now) void nextTick(() => place(now))
 }, { immediate: true })
+
+watch(minimapShown, (now) => {
+  if (!now) return
+  const wrap = column.value?.querySelector<HTMLElement>(`[data-map-tool="${MINIMAP}"]`)
+  minimapTop.value = wrap ? wrap.offsetTop : 0
+}, { immediate: true, flush: 'post' })
 
 function close(handBack: boolean) {
   const was = tool.value
@@ -195,11 +235,13 @@ onMounted(() => {
   document.addEventListener('pointerdown', onOutside, true)
   const overlay = column.value?.parentElement
   if (!overlay || typeof MutationObserver === 'undefined') return
+  const sheet = '.ds-map-panel:not([aria-hidden])'
+  sheetPresent.value = !!overlay.querySelector(sheet)
   watcher = new MutationObserver((records) => {
+    sheetPresent.value = !!overlay.querySelector(sheet)
     if (!tool.value) return
     for (const r of records) for (const n of r.addedNodes) {
       /* `MapPanel` arrives inside its host, a box of no box. */
-      const sheet = '.ds-map-panel:not([aria-hidden])'
       if (n instanceof HTMLElement && (n.matches(sheet) || n.querySelector(sheet))) {
         /* A focus inside the card would fall to the page: it goes back to the tool. */
         close(!!flyout.value?.contains(document.activeElement))
@@ -207,7 +249,7 @@ onMounted(() => {
       }
     }
   })
-  watcher.observe(overlay, { childList: true })
+  watcher.observe(overlay, { childList: true, subtree: true })
 })
 
 onBeforeUnmount(() => {
@@ -238,7 +280,7 @@ function by(d: number) {
     <template v-if="allTools.length">
       <div class="ds-map-navigator__group">
         <span v-for="t in allTools" :key="t.value" class="ds-map-navigator__tool" :data-map-tool="t.value">
-          <Tooltip :title="t.label" :placement="tooltipPlacement">
+          <Tooltip :title="tipOf(t)" :placement="tooltipPlacement">
             <IconButton
               :icon="t.icon"
               size="md"
@@ -246,10 +288,10 @@ function by(d: number) {
               shape="square"
              
               :ariaLabel="t.badge ? `${t.label} (${t.badge})` : t.label"
-              :selected="opens(t) ? tool === t.value : !!t.pressed"
+              :selected="t.value === MINIMAP ? minimapOpen : opens(t) ? tool === t.value : !!t.pressed"
               :aria-expanded="opens(t) ? tool === t.value : undefined"
-              :aria-controls="opens(t) && tool === t.value ? flyoutId : undefined"
-              :aria-pressed="opens(t) ? undefined : !!t.pressed"
+              :aria-controls="opens(t) && tool === t.value ? flyoutId : t.value === MINIMAP && minimapShown ? minimapId : undefined"
+              :aria-pressed="t.value === MINIMAP ? minimapOpen : opens(t) ? undefined : !!t.pressed"
               :disabled="disabled || t.disabled"
               @click="onTool(t)"
             />
@@ -284,13 +326,25 @@ function by(d: number) {
         :key="current.value"
         ref="flyout"
         class="ds-map-navigator__flyout"
-        :class="{ 'ds-map-navigator__flyout--minimap': current.value === MINIMAP }"
         role="dialog"
         :aria-label="current.label"
         :style="{ top: `${top}px` }"
       >
-        <div v-if="current.value === MINIMAP" class="ds-map-navigator__minimap"><slot /></div>
-        <slot v-else :name="`tool-${current.value}`" />
+        <slot :name="`tool-${current.value}`" />
+      </div>
+    </SurfaceTransition>
+
+    <!-- The mini-map: on while its toggle is, out of the way while a card or a sheet is there. -->
+    <SurfaceTransition>
+      <div
+        v-if="minimapShown"
+        :id="minimapId"
+        class="ds-map-navigator__flyout ds-map-navigator__flyout--minimap"
+        role="region"
+        :aria-label="expandLabel ?? minimapLabel"
+        :style="{ top: `${minimapTop}px` }"
+      >
+        <div class="ds-map-navigator__minimap"><slot /></div>
       </div>
     </SurfaceTransition>
   </div>
