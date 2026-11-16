@@ -11,10 +11,12 @@ import { Skeleton } from '../Skeleton'
  * with its inset; the title, `label-md-strong`, **two lines at most**; one line
  * of facts written by the product (« Article · 24 févr. 2026 »).
  *
- * The ground is `bg-neutral` with no edge — `bg-neutral-subtle` (`Card sunk`)
- * read too faint. Under the pointer and on keyboard focus it **darkens a
- * step**, a veil of `text-strong` over the grey that stacks in both modes, as
- * the package's other rows answer; nothing moves.
+ * The ground is `bg-neutral-subtle` — `Card sunk`'s — with no edge
+ * (ADR-0196: `bg-neutral` weighed too much on the page). Under the pointer and
+ * on keyboard focus it **darkens a step**, to `bg-neutral-subtle-hover`;
+ * nothing moves. The card is **18rem wide** (288px, its picture 162px high):
+ * 16 made the pictures' text unreadable, 20 stood too large beside
+ * `ModulesList`'s tiles. A list may widen it to its column (one column, narrow).
  *
  * It is a **link**: the article on tolbi.ai, in a new tab by default — said to
  * a reader (`aria-describedby`), the link's name staying the title alone
@@ -97,17 +99,19 @@ const hintId = `ds-article-card-${useId()}`
 </template>
 
 <style scoped>
-/* `bg-neutral`, no edge, `radius-surface`, 6 inside, 8 between the picture and the words. */
+/* `bg-neutral-subtle`, no edge, `radius-surface`, 6 inside, 8 between the picture and the words; 18rem wide. */
 .ds-article-card {
   position: relative;
   box-sizing: border-box;
+  width: 18rem;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   gap: var(--ds-spacing-md);
   min-width: 0;
   padding: var(--ds-spacing-sm);
   border-radius: var(--ds-radius-surface);
-  background: var(--ds-bg-neutral);
+  background: var(--ds-bg-neutral-subtle);
   color: inherit;
   text-decoration: none;
 }
@@ -119,9 +123,15 @@ a.ds-article-card {
     box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
-/* A step darker: a veil of ink over the grey, which stacks in both modes (ADR-0111's veil). */
+/* A step darker: the sunk surface's own hover (ADR-0196). */
 a.ds-article-card:hover,
 a.ds-article-card:focus-visible {
+  background: var(--ds-bg-neutral-subtle-hover);
+}
+
+/* `bg-neutral-subtle-hover` and `bg-neutral` are one grey: an empty frame would
+   melt into the darkened card, so it steps too, a veil of ink over its own grey. */
+a.ds-article-card:is(:hover, :focus-visible) .ds-article-card__frame {
   background: color-mix(in srgb, var(--ds-text-strong) 7%, var(--ds-bg-neutral));
 }
 
@@ -131,7 +141,8 @@ a.ds-article-card:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  a.ds-article-card {
+  a.ds-article-card,
+  .ds-article-card__frame {
     transition: none;
   }
 }
@@ -145,8 +156,9 @@ a.ds-article-card:focus-visible {
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: var(--ds-radius-control);
-  background: var(--ds-bg-neutral-strong);
+  background: var(--ds-bg-neutral);
   color: var(--ds-text-subtle);
+  transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
 .ds-article-card__image {

@@ -1673,6 +1673,10 @@ Before working on any component, read:
   tab, said (`aria-describedby`), its name the title alone; hover/focus a step darker (`text-strong` 7 % veil) + ring,
   nothing moves; no or broken picture = the frame + `file-text`, same size; loading = the same geometry, exactly.
   `ArticleList`: 3 equal columns, `spacing-lg`, one under 40rem (container query).
+- **ADR-0196**: **a lighter article card, at a fixed width** — `bg-neutral-subtle` (`Card sunk`'s), hover
+  `bg-neutral-subtle-hover`, the frame `bg-neutral` (one grey with the hover, so on hover the frame takes a 7 % ink veil).
+  **18rem** cards (288; picture 276 × 155 inside the 6px inset), laid from the start (`auto-fill, 18rem`), wrapping, never
+  narrower; one full-width column under 40rem.
 
 ## Architecture
 

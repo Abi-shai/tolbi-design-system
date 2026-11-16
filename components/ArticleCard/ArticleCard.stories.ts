@@ -10,8 +10,9 @@ const meta: Meta<typeof ArticleCard> = {
       description: {
         component:
           'Un article de Tolbi sur l’accueil (ADR-0195, piste B / G2) : l’image 16:9 dans la marge de la carte, le titre ' +
-          '(`label-md-strong`, deux lignes au plus), une ligne de faits écrite par le produit. Fond `bg-neutral`, sans ' +
-          'bordure ; au survol et au focus il **fonce d’un cran** (un voile d’encre), rien ne bouge. **Un lien** : ' +
+          '(`label-md-strong`, deux lignes au plus), une ligne de faits écrite par le produit. **18rem** de large, fond ' +
+          '`bg-neutral-subtle` (celui de `Card sunk`), sans bordure (ADR-0196) ; au survol et au focus il **fonce d’un ' +
+          'cran** (`bg-neutral-subtle-hover`), rien ne bouge. **Un lien** : ' +
           'l’article sur tolbi.ai dans un nouvel onglet, annoncé comme tel ; le nom du lien est le titre. Image absente ou ' +
           'cassée : le cadre reste, avec `file-text`.',
       },
@@ -23,7 +24,6 @@ const meta: Meta<typeof ArticleCard> = {
     image: './stories/articles/collecte-sacs.jpg',
     meta: 'Article · 24 févr. 2026',
   },
-  decorators: [() => ({ template: '<div style="width:340px"><story /></div>' })],
 }
 
 export default meta

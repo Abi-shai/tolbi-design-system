@@ -14,9 +14,12 @@ export interface ArticleListItem {
 
 /**
  * The home page's « À lire » row (ADR-0195) — `ProjectList`'s counterpart:
- * the package lays the cards, the product fills them. Three equal columns,
- * `spacing-lg` apart; **one column under 40rem of its own width** (a container
- * query, as `Dialog`'s: the package has no breakpoints, ADR-0020). The
+ * the package lays the cards, the product fills them. The cards keep their
+ * **18rem** and line up from the start, `spacing-lg` apart — the row no longer
+ * fills the width (ADR-0196: shared columns grew the pictures without limit on
+ * a wide screen); short of room they wrap, never narrower than 18rem. **Under
+ * 40rem of its own width, one column at full width** (a container query, as
+ * `Dialog`'s: the package has no breakpoints, ADR-0020). The
  * section's title and its « Voir tout » are the product's. Nothing to show and
  * nothing loading: nothing rendered.
  */
@@ -67,7 +70,8 @@ withDefaults(defineProps<Props>(), {
 
 .ds-article-list__grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, 18rem);
+  justify-content: start;
   gap: var(--ds-spacing-lg);
   margin: 0;
   padding: 0;
@@ -79,13 +83,13 @@ withDefaults(defineProps<Props>(), {
   min-width: 0;
 }
 
-.ds-article-list__grid > li > * {
-  flex: 1;
-}
-
 @container (width < 40rem) {
   .ds-article-list__grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ds-article-list__grid > li > :deep(.ds-article-card) {
+    width: 100%;
   }
 }
 </style>

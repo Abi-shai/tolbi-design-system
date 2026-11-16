@@ -34,8 +34,10 @@ const meta: Meta<typeof ArticleList> = {
       description: {
         component:
           'La rangée « À lire » de l’accueil (ADR-0195) — l’équivalent de `ProjectList` : le paquet pose les cartes, le ' +
-          'produit les remplit. Trois colonnes égales, `spacing-lg` entre elles ; **une colonne sous 40rem de sa propre ' +
-          'largeur** (requête de conteneur — le paquet n’a pas de points de rupture). Le titre de section (« À lire », ' +
+          'produit les remplit. Des cartes de **18rem**, alignées au début, `spacing-lg` entre elles — la rangée ne ' +
+          'remplit plus la largeur (ADR-0196) ; à court de place elles passent à la ligne, jamais sous 18rem. **Une ' +
+          'colonne pleine largeur sous 40rem de sa propre largeur** (requête de conteneur — le paquet n’a pas de points de ' +
+          'rupture). Le titre de section (« À lire », ' +
           '`heading-md`) et « Voir tout » sont au produit. Rien à montrer et rien en chargement : rien.',
       },
     },
