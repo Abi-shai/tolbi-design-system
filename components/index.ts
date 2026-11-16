@@ -256,3 +256,4 @@ export { ChartLegend } from './ChartLegend'
 export type { ChartLegendItem, ChartLegendShape, ChartLegendOrientation } from './ChartLegend'
 
 export { ChartFrame } from './ChartFrame'
+export type { ChartMarker, ChartXScale } from './ChartFrame'

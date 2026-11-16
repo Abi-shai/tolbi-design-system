@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SwapTransition } from '../SwapTransition'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import ChartHoverLayer from './ChartHoverLayer.vue'
 import { Spinner } from '../Spinner'
 import { EmptyState } from '../EmptyState'
 
@@ -19,6 +20,21 @@ import { EmptyState } from '../EmptyState'
  * a `ChartFrame`; `Sparkline` stands alone, beside a figure (`ProjectCard`'s
  * `#insight`, a `StatTile`); `MapLegend` and `MapTooltip` are a map's.
  */
+/**
+ * Where a chart's columns sit (ADR-0180): `band` — a bar per column, the
+ * column's centre; `point` — a line's points, first and last on the plot's
+ * edges.
+ */
+export type ChartXScale = 'band' | 'point'
+
+/** One series' dot under the hover: a value per column, its colour, a ring when `dashed` (a reference). */
+export interface ChartMarker {
+  values: (number | null)[]
+  /** Any CSS colour — the data's, never imposed (pass `var(--ds-chart-sequential-4)`, …). */
+  color: string
+  dashed?: boolean
+}
+
 interface Props {
   title?: string
   /** One sentence under the title — what is measured, the threshold it is held to (ADR-0096). */
@@ -36,6 +52,19 @@ interface Props {
   empty?: boolean
   emptyTitle?: string
   emptyDescription?: string
+  /**
+   * How many columns the chart has (ADR-0180). Given, the plot takes a hover:
+   * one target per column over its whole height (a short bar is as easy to
+   * point at as a tall one), ← → on the keyboard, `v-model:hover`.
+   */
+  columns?: number
+  xScale?: ChartXScale
+  /** The y axis' bounds, bottom then top — to place the `markers`. */
+  yDomain?: [number, number]
+  /** A dot per series on the hovered column. */
+  markers?: ChartMarker[]
+  /** The vertical guide on the hovered column. Default: on for `point`, or when there are markers. */
+  guide?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -46,7 +75,25 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   empty: false,
   emptyTitle: 'Aucune donnée sur la période',
+  columns: 0,
+  xScale: 'band',
+  yDomain: undefined,
+  markers: () => [],
+  guide: undefined,
 })
+
+/** The hovered column, `null` off the chart (ADR-0180). */
+const hover = defineModel<number | null>('hover', { default: null })
+
+defineSlots<{
+  default?: (props: { hover: number | null }) => unknown
+  legend?: () => unknown
+  /** The bubble for the hovered column — the product's `ChartTooltip`. The frame places it. */
+  tooltip?: (props: { index: number }) => unknown
+}>()
+
+const slotEl = ref<HTMLElement | null>(null)
+const guideShown = computed(() => props.guide ?? (props.xScale === 'point' || props.markers.length > 0))
 
 const plotHeight = computed(() =>
   typeof props.height === 'number' ? `${props.height}px` : props.height,
@@ -98,10 +145,24 @@ const gridLines = computed(() => (props.yTicks.length ? props.yTicks.length : 5)
             />
 
             <!-- The plot itself. The design system supplies no renderer. -->
-            <div v-else class="ds-chart-frame__slot">
-              <slot />
+            <div v-else ref="slotEl" class="ds-chart-frame__slot">
+              <slot :hover="hover" />
             </div>
           </SwapTransition>
+
+          <ChartHoverLayer
+            v-if="columns > 0 && !loading && !empty"
+            v-model="hover"
+            :columns="columns"
+            :x-scale="xScale"
+            :y-domain="yDomain"
+            :markers="markers"
+            :guide="guideShown"
+            :label="title ?? 'Graphique'"
+            :plot="slotEl"
+          >
+            <template v-if="$slots.tooltip" #tooltip="{ index }"><slot name="tooltip" :index="index" /></template>
+          </ChartHoverLayer>
         </div>
 
         <div v-if="xTicks.length && !empty" class="ds-chart-frame__x-axis" aria-hidden="true">
@@ -221,4 +282,23 @@ const gridLines = computed(() => (props.yTicks.length ? props.yTicks.length : 5)
 }
 
 .ds-chart-frame__empty { padding-block: var(--ds-spacing-xl); }
+
+/*
+  The bars the hover is not on fade (ADR-0180): the product tags its marks
+  `data-chart-column="<index>"`, the hover marks the others `data-chart-dimmed`.
+  Polaris' signal — the hovered group bright, the rest at about a third.
+*/
+.ds-chart-frame__slot :deep([data-chart-column]) {
+  transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+}
+
+.ds-chart-frame__slot :deep([data-chart-dimmed]) {
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-chart-frame__slot :deep([data-chart-column]) {
+    transition: none;
+  }
+}
 </style>

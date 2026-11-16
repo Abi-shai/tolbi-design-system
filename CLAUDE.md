@@ -1596,6 +1596,13 @@ Before working on any component, read:
   the column's buttons take it (square, 8px), the column is **52px** (6px margin, `spacing-sm` padding, 24px rules, the
   overlay's track 52); the gauge's box 40, thumb **16**, channel 6 (`--gauge-thumb/-track/-cross`). Count, tool card,
   launcher axis follow.
+- **ADR-0180**: **a chart's hover, on the package's motion** — `ChartFrame` gains `columns` (+ `xScale` `band | point`),
+  `v-model:hover`, `markers` on a `yDomain` (full dot; ring when `dashed`), `guide`, and `#tooltip="{ index }"` for the
+  product's `ChartTooltip`: one target per column over the whole height, ← → / Home / End / Escape (keyboard opens on the
+  latest column), the bubble beside the column inside the plot, after it or before it, never past the edges. Bubble in
+  `SurfaceTransition` (enter / exit, leaving **in place**); bubble, guide and dots **glide** (`moderate`), content through
+  `SwapTransition`, a change of side the same glide; marks tagged `data-chart-column` fade to 0.35 over `quick`. Colours
+  are the data's.
 
 ## Architecture
 
