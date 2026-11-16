@@ -43,7 +43,7 @@ export default meta
 type Story = StoryObj<typeof MapNavigator>
 
 const minimap = `
-  <svg viewBox="0 0 200 128" style="display:block;width:100%;height:100%;background:var(--ds-bg-neutral-subtle)">
+  <svg viewBox="0 0 200 128" style="display:block;width:100%;height:100%">
     <circle cx="100" cy="64" r="52" fill="none" stroke="var(--ds-bg-brand-solid)" stroke-dasharray="3 3" />
     <rect x="70" y="40" width="60" height="48" rx="3" fill="none" stroke="var(--ds-text-strong)" stroke-width="1.2" />
     <circle cx="96" cy="62" r="5" fill="var(--ds-bg-brand-solid)" />

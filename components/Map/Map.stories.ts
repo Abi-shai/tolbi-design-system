@@ -187,7 +187,7 @@ export const GisScreen: Story = {
         </MapOverlay>
         <MapOverlay position="end">
           <MapNavigator v-model:zoom="zoom" :tools="TOOLS">
-            <svg viewBox="0 0 148 96" style="display:block;width:100%;height:100%;background:var(--ds-bg-neutral-subtle)">
+            <svg viewBox="0 0 148 96" style="display:block;width:100%;height:100%">
               <circle cx="74" cy="48" r="40" fill="none" stroke="var(--ds-bg-brand-solid)" stroke-dasharray="3 3" />
               <rect x="29" y="3" width="91" height="91" rx="3" fill="none" stroke="var(--ds-text-strong)" stroke-width="1.2" />
             </svg>

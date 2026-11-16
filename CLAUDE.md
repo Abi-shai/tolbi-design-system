@@ -1631,6 +1631,8 @@ Before working on any component, read:
   column's buttons are `ghost` (`text-default` on, `text-disabled` off — two steps, not one).
 - **ADR-0187**: **a cross on the mini-map** — `IconButton xs surface` `x` at its top-right corner (where the old fold stood),
   `minimapCloseLabel` « Fermer la mini-carte »: turns it off like its button, the focus back to that button.
+- **ADR-0188**: **the mini-map is a frame around a picture**, as `ProjectList`: the card is the reading glass tinted to
+  `bg-neutral-subtle`, and the map is on `bg-default`. There is no hairline, because the step between the two grounds is the edge.
 
 ## Architecture
 

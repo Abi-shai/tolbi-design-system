@@ -520,8 +520,15 @@ function by(d: number) {
   overflow: clip;
 }
 
+/*
+  The mini-map's card is a frame around a picture (ADR-0188), as « Derniers
+  projets » (`ProjectList`, ADR-0166): the frame recessed, the picture on white
+  — the map itself reads as the content, the card as what holds it. Still glass
+  at the reading level's 90 %, tinted to `bg-neutral-subtle`.
+*/
 .ds-map-navigator__flyout--minimap {
   padding: var(--ds-spacing-md);
+  background: color-mix(in srgb, var(--ds-bg-neutral-subtle) 90%, transparent);
 }
 
 /* 200 × 128: the ring, the points and the view's frame read at a glance. */
@@ -530,7 +537,7 @@ function by(d: number) {
   height: 8rem;
   overflow: hidden;
   border-radius: var(--ds-radius-inner);
-  background: var(--ds-bg-neutral-subtle);
+  background: var(--ds-bg-default);
 }
 
 .ds-map-navigator__minimap > :deep(*) {
@@ -547,6 +554,10 @@ function by(d: number) {
 
 /* Less transparency asked for: the same surface, opaque, nothing blurred (ADR-0172). */
 @media (prefers-reduced-transparency: reduce) {
+  .ds-map-navigator__flyout.ds-map-navigator__flyout--minimap {
+    background: var(--ds-bg-neutral-subtle);
+  }
+
   .ds-map-navigator {
     border-color: var(--ds-border-subtle);
     background: var(--ds-bg-default);
