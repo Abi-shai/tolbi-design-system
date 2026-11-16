@@ -282,12 +282,16 @@ button.ds-chart-legend__entry:focus-visible {
   color: var(--ds-text-strong);
 }
 
+/* A symbol's name is never cut (ADR-0193): it wraps, centred and balanced over
+   its lines, and the row takes the tallest column's height. A word longer than
+   its column breaks rather than run into the next one. */
 .ds-chart-legend--columns .ds-chart-legend__label {
   order: 2;
   max-width: 100%;
-  overflow: hidden;
   font: var(--ds-font-label-md);
   color: var(--ds-text-subtle);
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: break-word;
+  text-wrap: balance;
 }
 </style>

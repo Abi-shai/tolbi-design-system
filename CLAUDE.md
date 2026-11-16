@@ -1659,6 +1659,8 @@ Before working on any component, read:
   for every column of a key with a glyph); the « Symboles » chip carries them at 14. A `MapLegend` with symbols is **open
   on arrival** (`expanded` absent), stays folded while mounted; key it by project to reopen. Cockpit key: project 40,
   control 200, reserve 2 189, excluded zone 0 — no cluster, no parcel entry.
+- **ADR-0193**: **a symbol's name is never cut** — in `ChartLegend columns` the name wraps (`label-md`, centred,
+  `text-wrap: balance`, a long word breaks), no ellipsis; the row takes the tallest column (48 → 68 at 440 and 380px).
 
 ## Architecture
 
