@@ -1689,6 +1689,9 @@ Before working on any component, read:
   takes **`bg-neutral-subtle-hover`** on hover and keyboard focus, handed down by the surface as `--on-tray-hover`
   (+ `--on-tray-hover-strong` = `bg-neutral-strong` for a grey inside, e.g. the empty picture frame); `ProjectList`
   rows and `ArticleCard` read it. `ArticleCard`'s inset → `spacing-md`, a row's (picture 272 × 153, card 288 × 257).
+- **ADR-0200**: **one placeholder tone on a tray** — `ArticleCard`'s skeletons drop 0.158's `surface="tinted"` /
+  `emphasis="strong"` (set for a grey card that no longer exists) and take the default tone, `ProjectList`'s
+  (`#f2f4f7` / `#f9fafb`). The tray hands nothing down: the default is solved against `bg-default`, its surface.
 
 ## Architecture
 

@@ -65,12 +65,12 @@ const hintId = `ds-article-card-${useId()}`
 <template>
   <div v-if="loading" class="ds-article-card ds-article-card--loading" aria-hidden="true">
     <span class="ds-article-card__frame">
-      <Skeleton variant="rect" surface="tinted" emphasis="strong" width="100%" height="100%" />
+      <Skeleton variant="rect" width="100%" height="100%" />
     </span>
     <span class="ds-article-card__text">
-      <Skeleton variant="text" surface="tinted" width="92%" />
-      <Skeleton variant="text" surface="tinted" width="64%" />
-      <Skeleton variant="text" surface="tinted" width="40%" class="ds-article-card__meta-skeleton" />
+      <Skeleton variant="text" width="92%" />
+      <Skeleton variant="text" width="64%" />
+      <Skeleton variant="text" width="40%" class="ds-article-card__meta-skeleton" />
     </span>
   </div>
   <a

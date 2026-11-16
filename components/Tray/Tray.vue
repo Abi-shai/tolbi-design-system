@@ -17,6 +17,11 @@
  * (`bg-neutral-strong`, for a grey inside what is hovered) — private context
  * variables, as the map's `--on-glass-*`: whatever is clickable on a tray
  * reads them, on hover and on keyboard focus alike.
+ *
+ * **One placeholder tone** (ADR-0200): a `Skeleton` on the tray takes its
+ * default tone, the one solved against `bg-default` — the tray's surface. So
+ * the tray hands nothing down for it: what it asks of its content is to leave
+ * the tone alone (no `surface="tinted"`, no `emphasis="strong"`).
  */
 defineSlots<{
   /** What the block holds, laid on the white surface. */
