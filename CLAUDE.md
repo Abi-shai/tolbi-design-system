@@ -1648,6 +1648,11 @@ Before working on any component, read:
   tile's whole zoom). All over `process`/`easing-out`, nothing under reduced motion. `MapCanvas overObject` (arrow /
   pointer / grabbing, never an inline cursor); `MapHoverCard`/`MapTooltip` `at` (16px right of the pointer, centred,
   flipped at the edge).
+- **ADR-0191**: **lighter map glyphs** (the owner: too bold, they saturated the map) — track B of three on the basemap:
+  white edge 2, ink contour 1, pictograms at Lucide's weight 2 (small sight 2.6), and **the ink at 70 %** while the ground
+  stays whole (C, the whole glyph at 85 %, washed out the datum's colour against the legend). A chosen contour stays at
+  full ink, 3 thick. White vs ink is measured against the ink **as seen**, so `success-600` takes white too (3.91:1). Lowest
+  contrast on the ramp: 3.91:1.
 
 ## Architecture
 

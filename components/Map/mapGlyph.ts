@@ -1,11 +1,12 @@
 /**
- * The glyphs a map draws its points with (ADR-0190) — the ARR cockpit's, taken
+ * The glyphs a map draws its points with (ADR-0190; lightened by ADR-0191) — the ARR cockpit's, taken
  * into the package: two families told apart **by shape first**, a project's
  * point a disc with a parcel (`land-plot`), a control point a rounded square
- * with a sight (`crosshair`). The ground is the datum's colour; a white edge
- * and an ink contour stand it off any imagery; the pictogram is in ink, and
- * turns white only where white measures better (WCAG) — on the sequential
- * ramp, only its darkest step.
+ * with a sight (`crosshair`). The ground is the datum's colour, at full; a
+ * white edge and a light ink contour (1, at 70 %) stand it off any imagery;
+ * the pictogram is in ink at 70 % on Lucide's own weight, and turns white
+ * only where white measures better (WCAG) — on the sequential ramp, only its
+ * darkest step.
  *
  * The package draws no map (ADR-0006), so this is what an engine needs and no
  * more: the drawing as SVG markup (`mapGlyphSvg`), a stable name per drawing
@@ -91,24 +92,39 @@ function inks(root: Element) {
   }
 }
 
+/**
+ * The ink's weight (ADR-0191): many glyphs at full ink saturated the map, so
+ * the contour and an ink pictogram are drawn at 70 % — the ground keeps its
+ * full colour, which is the datum and must match the legend. Measured, the
+ * lightest pictogram on the ramp is 3.46:1 (on `success-600`), past the 3:1 a
+ * graphic needs. A chosen glyph's contour stays at full ink: it is the choice.
+ */
+const INK_ALPHA = 0.7
+const mix = (a: Rgb, b: Rgb, t: number): Rgb => [0, 1, 2].map((k) => a[k] * t + b[k] * (1 - t)) as Rgb
+
 function drawing(o: MapGlyphOptions, fill: Rgb, ink: Rgb, white: Rgb) {
-  // Ink by default; white only where it measures better on this ground.
-  const pict = hex(contrast(white, fill) > contrast(ink, fill) ? white : ink)
-  const edge = o.selected ? 3 : 1.4
+  // Ink by default — as it is seen, at its alpha over the ground; white only where it measures better.
+  const whiteWins = contrast(white, fill) > contrast(mix(ink, fill, INK_ALPHA), fill)
+  const pict = whiteWins ? hex(white) : hex(ink)
+  const pictAlpha = whiteWins ? 1 : INK_ALPHA
+  const edge = o.selected ? 3 : 1
+  const edgeAlpha = o.selected ? 1 : INK_ALPHA
   const [f, i, w] = [hex(fill), hex(ink), hex(white)]
+  // A 2 white edge outside the ground, the ink contour outside that.
+  const out = 1 + edge / 2
   if (o.family === 'project')
     return (
-      `<circle cx="16" cy="16" r="13" fill="${f}" stroke="${w}" stroke-width="2.5"/>` +
-      `<circle cx="16" cy="16" r="14.4" fill="none" stroke="${i}" stroke-width="${edge}"/>` +
-      `<g transform="translate(8.8 8.8) scale(.6)" fill="none" stroke="${pict}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">${LAND_PLOT}</g>`
+      `<circle cx="16" cy="16" r="13" fill="${f}" stroke="${w}" stroke-width="2"/>` +
+      `<circle cx="16" cy="16" r="${13 + out}" fill="none" stroke="${i}" stroke-opacity="${edgeAlpha}" stroke-width="${edge}"/>` +
+      `<g transform="translate(8.8 8.8) scale(.6)" fill="none" stroke="${pict}" stroke-opacity="${pictAlpha}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${LAND_PLOT}</g>`
     )
   const small = o.size < MAP_GLYPH_SMALL_BELOW
   const sight = small
-    ? `<g transform="translate(8.8 8.8) scale(.6)" fill="none" stroke="${pict}" stroke-width="3.4" stroke-linecap="round">${CROSSHAIR_SMALL}</g>`
-    : `<g transform="translate(9.5 9.5) scale(.54)" fill="none" stroke="${pict}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">${CROSSHAIR}</g>`
+    ? `<g transform="translate(8.8 8.8) scale(.6)" fill="none" stroke="${pict}" stroke-opacity="${pictAlpha}" stroke-width="2.6" stroke-linecap="round">${CROSSHAIR_SMALL}</g>`
+    : `<g transform="translate(9.5 9.5) scale(.54)" fill="none" stroke="${pict}" stroke-opacity="${pictAlpha}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${CROSSHAIR}</g>`
   return (
-    `<rect x="5" y="5" width="22" height="22" rx="6" fill="${f}" stroke="${w}" stroke-width="2.5"/>` +
-    `<rect x="3.6" y="3.6" width="24.8" height="24.8" rx="7" fill="none" stroke="${i}" stroke-width="${edge}"/>` +
+    `<rect x="5" y="5" width="22" height="22" rx="6" fill="${f}" stroke="${w}" stroke-width="2"/>` +
+    `<rect x="${5 - out}" y="${5 - out}" width="${22 + 2 * out}" height="${22 + 2 * out}" rx="${6 + out}" fill="none" stroke="${i}" stroke-opacity="${edgeAlpha}" stroke-width="${edge}"/>` +
     sight
   )
 }
