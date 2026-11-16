@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, useId } from 'vue'
 import { CloseButton } from '../CloseButton'
+import { usePointerPlace, type MapPointerAt } from './usePointerPlace'
 
 /** One line of the bubble: a mark, a word, a value. */
 export interface MapTooltipRow {
@@ -21,21 +22,25 @@ export interface MapTooltipRow {
  *
  * The focus goes in when it opens and back to what held it when it closes —
  * the map's canvas, the marker — only if it was still inside (ADR-0062: a
- * focus is not held hostage). Escape closes it. The engine places it, at the
- * point (ADR-0006): a point on a canvas is not an element the system can
- * anchor to. The words carry the class; the colour repeats it (ADR-0006).
+ * focus is not held hostage). Escape closes it. Given `at` — the clicked
+ * point in the map's pixels — it places itself beside it (ADR-0190): to its
+ * right, centred vertically, to the left near the edge. Without it, the
+ * product places it. The words carry the class; the colour repeats it (ADR-0006).
  */
 interface Props {
   title: string
   description?: string
   rows?: MapTooltipRow[]
   closeLabel?: string
+  /** The clicked point, in the map's pixels (`event.point`): the bubble stands beside it. */
+  at?: MapPointerAt
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   description: undefined,
   rows: () => [],
   closeLabel: 'Fermer',
+  at: undefined,
 })
 
 const emit = defineEmits<{
@@ -49,6 +54,7 @@ defineSlots<{
 }>()
 
 const root = ref<HTMLElement | null>(null)
+const placed = usePointerPlace(root, () => props.at)
 const titleId = `ds-map-tooltip-${useId()}`
 const descriptionId = `${titleId}-description`
 
@@ -72,6 +78,7 @@ function onKeydown(event: KeyboardEvent) {
   <div
     ref="root"
     class="ds-map-tooltip"
+    :style="placed"
     role="dialog"
     :aria-labelledby="titleId"
     :aria-describedby="description ? descriptionId : undefined"

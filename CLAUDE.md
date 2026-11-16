@@ -1637,6 +1637,17 @@ Before working on any component, read:
   the column and the legend), the button centred in it (6px). The button travels ~10px between head and capsule **with the
   stretch** (`considered` + `in-out`, Web Animations), never a jump: the surface stays anchored, not the button (amends
   ADR-0173/0181/0182). The swap's arrival is heard by a `MutationObserver` (one frame showed the panel bare).
+- **ADR-0190**: **what a map draws its points with** (ARR cockpit, from the product) — `mapGlyph.ts`: project = disc +
+  `land-plot`, control = rounded square + `crosshair`, told apart by shape first; ground = the datum's colour, white edge,
+  ink contour, the pictogram white **only where it measures better**; chosen = contour 3 + shadow in a **48** box, centred
+  (the product's 44 sat 2/32 high); **under 32px a small sight** (ring r 5.5, short thick ticks outside); inks are
+  primitives (no dark imagery). `loadMapGlyphs(map, …)` feeds any `hasImage`/`addImage`. **`MapCluster`**: glyph at the
+  mean colour + count badge, steps 44/56/68 and 36/44/52, a button. `mapMotion.ts`: `flyGlyphs` (ghosts, **on-screen
+  flights only**), `clusterArrive`/`clusterLeave`, `createMapRelay` + `legibleZoom` + `quarterZoom` (glyph **or**
+  shape, swap at 40px, out over the first 60 % to 0.6, in over the last 60 %; `['zoom']` with data is evaluated at the
+  tile's whole zoom). All over `process`/`easing-out`, nothing under reduced motion. `MapCanvas overObject` (arrow /
+  pointer / grabbing, never an inline cursor); `MapHoverCard`/`MapTooltip` `at` (16px right of the pointer, centred,
+  flipped at the edge).
 
 ## Architecture
 

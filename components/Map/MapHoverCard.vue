@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Badge, type BadgeTone } from '../Badge'
+import { usePointerPlace, type MapPointerAt } from './usePointerPlace'
 
 /**
  * What the pointer is over, on a map (ADR-0168) — Google Weather Lab's hover:
@@ -11,7 +13,11 @@ import { Badge, type BadgeTone } from '../Badge'
  * object's sheet (`MapPanel lg closable`), which is where a reader and a
  * keyboard get the same facts — so the card is `aria-hidden`.
  *
- * The engine places it, beside the object (ADR-0006, as `MapTooltip`). It
+ * **It places itself beside the pointer** (ADR-0190) when given `at`, the
+ * pointer's position in the map's pixels: `spacing-xl` to its right, centred
+ * on it vertically, over the map, to the left near the right edge — the
+ * product gives the point and nothing else. Without `at` it stays where the
+ * product puts it. It
  * arrives after a short wait (`duration-quick`) so a pointer crossing the map
  * does not light every parcel on its way, then fades in; under reduced motion
  * it appears at once. On a touch screen there is no hover: it shows nothing.
@@ -27,19 +33,25 @@ interface Props {
   /** One figure, and its unit. */
   value?: string
   unit?: string
+  /** The pointer, in the map's pixels (`event.point`): the card stands beside it. */
+  at?: MapPointerAt
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   status: undefined,
   statusTone: 'neutral',
   meta: undefined,
   value: undefined,
   unit: undefined,
+  at: undefined,
 })
+
+const root = ref<HTMLElement | null>(null)
+const placed = usePointerPlace(root, () => props.at)
 </script>
 
 <template>
-  <div class="ds-map-hover-card" aria-hidden="true">
+  <div ref="root" class="ds-map-hover-card" :style="placed" aria-hidden="true">
     <div class="ds-map-hover-card__head">
       <span class="ds-map-hover-card__title">{{ title }}</span>
       <Badge v-if="status" :label="status" :tone="statusTone" size="sm" class="ds-map-hover-card__status" />

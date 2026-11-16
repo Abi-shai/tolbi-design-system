@@ -3,6 +3,7 @@ import { onBeforeUnmount, ref } from 'vue'
 import MapCanvas, { type MapCanvasBasemap } from './MapCanvas.vue'
 import MapOverlay from './MapOverlay.vue'
 import MapNavigator from './MapNavigator.vue'
+import MapHoverCard from './MapHoverCard.vue'
 import { Button } from '../Button'
 
 const meta: Meta<typeof MapCanvas> = {
@@ -22,7 +23,10 @@ const meta: Meta<typeof MapCanvas> = {
           'entre **d’un seul tenant**, en fondu sur `ambient` — au lieu de se peindre par carreaux. Un fond pas fini **2 s ' +
           'après `loading`** est montré quand même (`ceiling`). Rien ne fond sous `prefers-reduced-motion`.\n\n' +
           '`basemap` : `pending` avant que le style soit résolu, `loading` quand les tuiles sont en route, `ready` au ' +
-          '`idle` du moteur.',
+          '`idle` du moteur.\n\n' +
+          '**Le curseur dit ce que fait le geste** (ADR-0190) : la flèche sur la carte, la main pointée seulement au-dessus ' +
+          'd’un objet (`overObject`, que le produit allume d’après son test de clic), la main fermée pendant un glisser. ' +
+          'Jamais de curseur posé en ligne sur le canevas : il passerait devant celui du glisser.',
       },
     },
   },
@@ -75,6 +79,58 @@ export const Ceiling: Story = {
       <MapCanvas :basemap="basemap" style="height:420px;border-radius:var(--ds-radius-surface)">
         <template #engine>${ENGINE}</template>
       </MapCanvas>
+    `,
+  }),
+}
+
+/* Mapbox's own cursor rules, as its stylesheet ships them: the canvas would otherwise say « grab » everywhere. */
+const MAPBOX_CURSOR = `<style>
+  .mapboxgl-canvas-container.mapboxgl-interactive { cursor: grab; }
+  .mapboxgl-canvas-container.mapboxgl-interactive:active { cursor: grabbing; }
+</style>`
+
+/**
+ * Le curseur et la bulle : la flèche sur la carte, la main pointée au-dessus d’un point, la main fermée en
+ * glissant ; la bulle (`MapHoverCard at`) se place d’elle-même à droite du pointeur, centrée sur lui, à gauche près
+ * du bord droit — le produit ne donne que `event.point`.
+ */
+export const Cursor: Story = {
+  name: 'Curseur et bulle de survol',
+  render: () => ({
+    components: { MapCanvas, MapHoverCard },
+    setup() {
+      const points = [
+        { x: 140, y: 120, code: 'P-2041', meta: 'Koné Affoué · 18,5 ha' },
+        { x: 420, y: 260, code: 'P-2042', meta: 'Diallo Awa · 6,2 ha' },
+        { x: 860, y: 180, code: 'P-2043', meta: 'Traoré Ibrahim · 31,0 ha' },
+      ]
+      const at = ref<{ x: number; y: number } | null>(null)
+      const over = ref<(typeof points)[number] | null>(null)
+      function move(e: MouseEvent) {
+        const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
+        const p = { x: Math.round(e.clientX - r.left), y: Math.round(e.clientY - r.top) }
+        over.value = points.find((q) => Math.hypot(q.x - p.x, q.y - p.y) <= 20) ?? null
+        at.value = over.value ? p : null
+      }
+      function leave() {
+        over.value = null
+        at.value = null
+      }
+      return { points, at, over, move, leave, MAPBOX_CURSOR }
+    },
+    template: `
+      <div>
+        <div v-html="MAPBOX_CURSOR" />
+        <MapCanvas :over-object="!!over" style="height:360px; width:960px; border-radius:var(--ds-radius-surface)">
+          <template #engine>
+            <div class="mapboxgl-canvas-container mapboxgl-interactive" data-engine
+              style="position:relative; background:url('./stories/map-loading/base.webp') center/cover" @mousemove="move" @mouseleave="leave">
+              <span v-for="p in points" :key="p.code" :style="{ position:'absolute', left: p.x - 16 + 'px', top: p.y - 16 + 'px', width:'32px', height:'32px', borderRadius:'50%', background:'var(--ds-chart-sequential-4)', boxShadow:'0 0 0 2px white, 0 0 0 3.4px var(--ds-color-gray-light-900)' }" />
+            </div>
+          </template>
+          <MapHoverCard v-if="over && at" :at="at" :title="over.code" status="Éligible" status-tone="success" :meta="over.meta" value="412" unit="tCO2e" />
+        </MapCanvas>
+      </div>
     `,
   }),
 }
