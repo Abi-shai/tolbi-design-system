@@ -1559,9 +1559,7 @@ Before working on any component, read:
   `--ds-bg-map-read` (90 %) + `--ds-backdrop-map-read`; edge `--ds-border-map-edge` (white 55 %, 12 % in dark). What it
   holds follows through private `--on-glass-*` context variables: `Card outlined`/`OptionCard` at 70 %, `Card sunk`/`Tabs`
   track at 55 %; **`--ds-text-subtlest` takes subtle's value** on glass (subtle 4.48–4.6:1 on the darkest imagery);
-  `prefers-reduced-transparency` → opaque. **Pressed = pill** (`--on-glass-control-radius`: Button, CloseButton,
-  InputField, Tabs; the column a capsule, its buttons round), **read = large curve**: `MapPanel lg` and the tool card
-  `--ds-radius-surface-xl` (24, minted), cards inside 16, rows 12, `MapHoverCard` 16.
+  `prefers-reduced-transparency` → opaque. ~~Pressed = pill, read = large curve~~ — **reversed by ADR-0177**.
 - **ADR-0173**: **glass finish** (0.144 review) — **levels by light, not grey borders**: hollow (`Card sunk`, `Tabs` track) =
   ink 4 % + a 3 % inner line, no border; relief (`Card outlined`, `OptionCard`) = white 94 % + ink 6 % edge +
   `elevation-map-raised`; chosen tab `elevation-map-selected`; icon tiles ink 5 %. **Rules in ink** (`--on-glass-rule`, 8 %;
@@ -1587,6 +1585,10 @@ Before working on any component, read:
   on **`--ds-bg-brand-subtlest`** (minted: brand/25; dark brand/dark-subtle 50 %), curve **`radius-surface-sm`** (10px — the
   step already has its role, no `inner-lg`). The **plate, not the tile, answers**: hover `bg-brand-subtle`; current
   module `bg-brand-subtle` → `-hover`, the tile `bg-default`. Drawer unchanged (plate `display: contents`).
+- **ADR-0177**: **map shapes back to 0.143** (the owner) — ADR-0172's round shapes are reversed, the glass, the finish
+  (ADR-0173) and the audit (ADR-0174/0175) stay. Column `radius-surface` with square tools, tool card and `MapPanel lg`
+  `radius-surface`, small `MapPanel` `surface-sm`, `MapHoverCard` `control`; nested controls, cards and rows keep their own
+  radius (`--on-glass-control/card/row-radius` deleted); the folded capsule `radius-surface`. `--ds-radius-surface-xl` deleted.
 
 ## Architecture
 

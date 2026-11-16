@@ -131,7 +131,7 @@ const titled = computed(() => props.closable && !!props.title && !!slots.header)
 const atEnd = ref(false)
 let pressed = false
 /* Where the head's fold stood, from the place's corner (ADR-0173): the folded
-   pill puts the same button on the same pixel. Measured on the press; folded
+   capsule puts the same button on the same pixel. Measured on the press; folded
    from the product, the head's own padding stands in. */
 const foldAt = ref<{ x: number; y: number } | null>(null)
 async function fold(next: boolean) {
@@ -210,7 +210,7 @@ onBeforeUnmount(() => {
       <!-- The transition is the wrapper's: `Button` declares its own `transition`,
            which outweighs the surface's and would make it arrive in one frame. -->
       <div v-if="collapsible && collapsed && iconFold" key="open-icon" class="ds-map-panel__unfold" :style="unfoldAt">
-        <!-- The same button as in the open head, at the same pixel, in a pill of
+        <!-- The same button as in the open head, at the same pixel, in a capsule of
              pilot glass that says what is folded (ADR-0173). -->
         <div class="ds-map-panel__capsule">
           <IconButton
@@ -326,16 +326,15 @@ onBeforeUnmount(() => {
   max-width: 20rem;
   min-width: min-content;
   padding: var(--ds-spacing-lg);
-  border-radius: var(--ds-radius-surface-lg);
+  border-radius: var(--ds-radius-surface-sm);
   /* Reading glass (ADR-0172): almost opaque — the text is long. What it holds
-     follows (`--on-glass-*`): blocks at 70 % / 55 %, what is pressed in a pill. */
+     follows (`--on-glass-*`): the levels by light (ADR-0173). */
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
   background: var(--ds-bg-map-read);
   -webkit-backdrop-filter: var(--ds-backdrop-map-read);
   backdrop-filter: var(--ds-backdrop-map-read);
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
-  --on-glass-control-radius: var(--ds-radius-pill);
   --on-glass-focus: var(--ds-focus-ring-map);
   --on-glass-field-bg: var(--ds-bg-map-raised);
   --on-glass-field-border: color-mix(in srgb, var(--ds-text-strong) 16%, transparent);
@@ -348,8 +347,6 @@ onBeforeUnmount(() => {
   --on-glass-tile: color-mix(in srgb, var(--ds-text-strong) 5%, transparent);
   --on-glass-selected-shadow: var(--ds-elevation-map-selected);
   --on-glass-rule: color-mix(in srgb, var(--ds-text-strong) 8%, transparent);
-  --on-glass-card-radius: var(--ds-radius-surface-lg);
-  --on-glass-row-radius: var(--ds-radius-surface);
   --on-glass-raised: var(--ds-bg-map-raised);
   --on-glass-sunk: var(--ds-bg-map-sunk);
   /* A rim of light on top, a wide soft shadow (ADR-0173). */
@@ -435,8 +432,7 @@ onBeforeUnmount(() => {
   max-height: 100%;
   gap: 0;
   padding: 0;
-  /* What is read takes the large curve (ADR-0172). */
-  border-radius: var(--ds-radius-surface-xl);
+  border-radius: var(--ds-radius-surface);
 }
 
 .ds-map-panel--lg .ds-map-panel__head {
@@ -578,11 +574,11 @@ onBeforeUnmount(() => {
 }
 
 /*
-  Folded (ADR-0173): a pill of pilot glass, 8px around the head's own fold
+  Folded (ADR-0173): a capsule of pilot glass (`radius-surface`, ADR-0177), 8px around the head's own fold
   button — an `IconButton sm subtle`, 36px, round, the one the open head shows.
   Placed so that button lands **on the pixel** it held in the head — measured
   on the press (centred on the tabs, it is not at the head's padding), the
-  head's padding standing in when the product folds it — less the pill's own
+  head's padding standing in when the product folds it — less the capsule's own
   8px and border. The title beside it
   says what is folded; it takes the pointer too, the button keeps the name.
 */
@@ -596,7 +592,7 @@ onBeforeUnmount(() => {
   margin-inline-start: calc(var(--map-panel-fold-x, calc(var(--ds-spacing-xl) + var(--ds-border-width-default))) - var(--ds-spacing-md) - var(--ds-border-width-default));
   padding: var(--ds-spacing-md);
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
-  border-radius: var(--ds-radius-pill);
+  border-radius: var(--ds-radius-surface);
   background: var(--ds-bg-map-control);
   -webkit-backdrop-filter: var(--ds-backdrop-map-control);
   backdrop-filter: var(--ds-backdrop-map-control);

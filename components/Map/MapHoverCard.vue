@@ -61,7 +61,7 @@ withDefaults(defineProps<Props>(), {
   width: max-content;
   max-width: 17.5rem;
   padding: var(--ds-spacing-lg);
-  border-radius: var(--ds-radius-surface-lg);
+  border-radius: var(--ds-radius-control);
   /* Pilot glass (ADR-0172): the map shows through as colour. */
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
   background: var(--ds-bg-map-control);
@@ -70,7 +70,6 @@ withDefaults(defineProps<Props>(), {
   /* On the darkest imagery behind it, text-subtlest fails (3.0–4.3:1); subtle holds (4.6). */
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
-  --on-glass-control-radius: var(--ds-radius-pill);
   --on-glass-focus: var(--ds-focus-ring-map);
   --on-glass-field-bg: var(--ds-bg-map-raised);
   --on-glass-field-border: color-mix(in srgb, var(--ds-text-strong) 16%, transparent);

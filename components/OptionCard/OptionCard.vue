@@ -592,8 +592,7 @@ const actionDescribedBy = computed(() => [titleId, describedBy.value].filter(Boo
   gap: var(--ds-spacing-md);
   min-height: 40px; /* token-lint-disable spacing-on-ramp — a row's height, the tile's 28 + its inset; not rhythm */
   padding: 0 var(--ds-spacing-lg) 0 var(--ds-spacing-sm);
-  /* Inside map glass, 12 (ADR-0172). */
-  border-radius: var(--on-glass-row-radius, var(--ds-radius-control));
+  border-radius: var(--ds-radius-control);
 }
 
 .ds-option-card--row .ds-option-card__tile {

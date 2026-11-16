@@ -120,7 +120,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
   display: flex;
   align-items: center;
   width: 100%;
-  /* On map glass a track at 55 %, and the strip a pill (ADR-0172). */
+  /* On map glass the track is a hollow (ADR-0172/0173). */
   background-color: var(--on-glass-sunk, var(--ds-bg-neutral-subtle));
   border: var(--ds-border-width-default) solid var(--on-glass-sunk-border, var(--ds-border-subtle));
   box-shadow: var(--on-glass-sunk-edge, none);
@@ -129,18 +129,18 @@ function onKeydown(e: KeyboardEvent, i: number) {
 
 .ds-tabs--md {
   padding: var(--ds-spacing-sm);
-  border-radius: var(--on-glass-control-radius, var(--ds-radius-surface));
+  border-radius: var(--ds-radius-surface);
 }
 
 .ds-tabs--sm {
   padding: var(--ds-spacing-xs);
-  border-radius: var(--on-glass-control-radius, var(--ds-radius-surface-sm));
+  border-radius: var(--ds-radius-surface-sm);
 }
 
 .ds-tabs--xs {
   gap: var(--ds-spacing-xxs);
   padding: var(--ds-spacing-xxs);
-  border-radius: var(--on-glass-control-radius, var(--ds-radius-control));
+  border-radius: var(--ds-radius-control);
 }
 
 /* ── Sliding indicator ─────────────────────────────────────────────── */
@@ -148,7 +148,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
   position: absolute;
   left: 0;
   top: 0;
-  border-radius: var(--on-glass-control-radius, var(--ds-radius-inner));
+  border-radius: var(--ds-radius-inner);
   background-color: var(--ds-bg-default);
   box-shadow: var(--on-glass-selected-shadow, var(--ds-elevation-surface));
   pointer-events: none;
@@ -179,7 +179,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
   padding: var(--ds-spacing-md) var(--ds-spacing-lg);
   background: transparent;
   border: none;
-  border-radius: var(--on-glass-control-radius, var(--ds-radius-inner));
+  border-radius: var(--ds-radius-inner);
   color: var(--ds-text-subtlest);
   cursor: pointer;
   outline: none;
@@ -197,7 +197,7 @@ function onKeydown(e: KeyboardEvent, i: number) {
 /* The radius scales with the element (ADR-0013): 4px inside a 28px tab. */
 .ds-tabs--xs .ds-tabs__tab,
 .ds-tabs--xs .ds-tabs__indicator {
-  border-radius: var(--on-glass-control-radius, var(--ds-radius-inner-sm));
+  border-radius: var(--ds-radius-inner-sm);
 }
 
 .ds-tabs--xs .ds-tabs__tab {

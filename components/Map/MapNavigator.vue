@@ -243,6 +243,7 @@ function by(d: number) {
               :icon="t.icon"
               size="xs"
               variant="subtle"
+              shape="square"
              
               :ariaLabel="t.badge ? `${t.label} (${t.badge})` : t.label"
               :selected="opens(t) ? tool === t.value : !!t.pressed"
@@ -261,18 +262,18 @@ function by(d: number) {
 
     <div class="ds-map-navigator__group">
       <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
-        <IconButton icon="plus" size="xs" variant="subtle" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
+        <IconButton icon="plus" size="xs" variant="subtle" shape="square" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
       </Tooltip>
       <MapZoomGauge ref="gauge" v-model="zoom" vertical :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" :disabled="disabled" />
       <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
-        <IconButton icon="minus" size="xs" variant="subtle" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
+        <IconButton icon="minus" size="xs" variant="subtle" shape="square" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
       </Tooltip>
     </div>
 
     <span class="ds-map-navigator__rule" aria-hidden="true" />
 
     <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
-      <IconButton icon="crosshair" size="xs" variant="subtle" :ariaLabel="recenterLabel" :disabled="disabled" @click="emit('recenter')" />
+      <IconButton icon="crosshair" size="xs" variant="subtle" shape="square" :ariaLabel="recenterLabel" :disabled="disabled" @click="emit('recenter')" />
     </Tooltip>
 
     <!-- What the open tool shows: a card to the column's left, its top on its button's. -->
@@ -312,7 +313,7 @@ function by(d: number) {
   width: 44px;
   height: fit-content;
   padding: var(--ds-spacing-xs) 0;
-  border-radius: var(--ds-radius-pill);
+  border-radius: var(--ds-radius-surface);
   /* Pilot glass (ADR-0172): the map shows through as colour. */
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
   background: var(--ds-bg-map-control);
@@ -321,7 +322,6 @@ function by(d: number) {
   /* On the darkest imagery behind it, text-subtlest fails (3.0–4.3:1); subtle holds (4.6). */
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
-  --on-glass-control-radius: var(--ds-radius-pill);
   --on-glass-focus: var(--ds-focus-ring-map);
   --on-glass-field-bg: var(--ds-bg-map-raised);
   --on-glass-field-border: color-mix(in srgb, var(--ds-text-strong) 16%, transparent);
@@ -391,16 +391,15 @@ function by(d: number) {
   width: max-content;
   max-width: 24rem;
   max-height: min(36rem, 70vh);
-  border-radius: var(--ds-radius-surface-xl);
+  border-radius: var(--ds-radius-surface);
   /* Reading glass (ADR-0172): almost opaque — the text is long. What it holds
-     follows (`--on-glass-*`): blocks at 70 % / 55 %, what is pressed in a pill. */
+     follows (`--on-glass-*`): the levels by light (ADR-0173). */
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
   background: var(--ds-bg-map-read);
   -webkit-backdrop-filter: var(--ds-backdrop-map-read);
   backdrop-filter: var(--ds-backdrop-map-read);
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
-  --on-glass-control-radius: var(--ds-radius-pill);
   --on-glass-focus: var(--ds-focus-ring-map);
   --on-glass-field-bg: var(--ds-bg-map-raised);
   --on-glass-field-border: color-mix(in srgb, var(--ds-text-strong) 16%, transparent);
@@ -413,8 +412,6 @@ function by(d: number) {
   --on-glass-tile: color-mix(in srgb, var(--ds-text-strong) 5%, transparent);
   --on-glass-selected-shadow: var(--ds-elevation-map-selected);
   --on-glass-rule: color-mix(in srgb, var(--ds-text-strong) 8%, transparent);
-  --on-glass-card-radius: var(--ds-radius-surface-lg);
-  --on-glass-row-radius: var(--ds-radius-surface);
   --on-glass-raised: var(--ds-bg-map-raised);
   --on-glass-sunk: var(--ds-bg-map-sunk);
   /* A rim of light on top, a wide soft shadow (ADR-0173). */

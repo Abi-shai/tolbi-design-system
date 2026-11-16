@@ -45,6 +45,8 @@ goes back to `border-subtle`, and the held blocks go back to their opaque ground
 
 ### 2. Round shapes: what is pressed is a pill, what is read takes a large curve
 
+> **Reversed by ADR-0177** (16 Nov.): the map's shapes are back to their 0.143 curves; the glass stays.
+
 | What | Shape |
 |---|---|
 | `MapNavigator`'s column | a capsule (`radius-pill`) |

@@ -48,8 +48,7 @@ const slots = defineSlots<{
   display: flex;
   flex-direction: column;
   min-width: 0;
-  /* Inside map glass, 16 (ADR-0172) — still the surface's own, not a prop. */
-  border-radius: var(--on-glass-card-radius, var(--ds-radius-surface));
+  border-radius: var(--ds-radius-surface);
   background-color: var(--ds-bg-default);
 }
 
