@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import MapGlyphMark from '../Map/MapGlyphMark.vue'
+
 export interface ChartLegendItem {
   /** Stable key, also emitted on toggle. */
   key: string
@@ -19,9 +22,18 @@ export interface ChartLegendItem {
  *   comparison or a threshold;
  * - `square`, `circle`, `point` the symbols a map draws — a project point, a
  *   control point, a reserve point;
- * - `zone` an area: its colour as the edge over a tint of it.
+ * - `zone` an area: its colour as the edge over a tint of it;
+ * - `glyph-project`, `glyph-control` the map's own glyphs (ADR-0190): the
+ *   legend draws **the glyph itself** (ADR-0192), so the reader finds on the
+ *   map what the key shows. Its colour is the entry's `color`, else the middle
+ *   of the legend's ramp (`--chart-legend-glyph`, which `MapLegend` sets;
+ *   `--ds-chart-sequential-3` otherwise): the colour is read on the ramp, the
+ *   mark says the shape. 20px in a row, 24 in `columns` — under 24 the
+ *   pictogram does not read.
  */
-export type ChartLegendShape = 'dot' | 'line' | 'dashed' | 'square' | 'circle' | 'point' | 'zone'
+export type ChartLegendShape =
+  | 'dot' | 'line' | 'dashed' | 'square' | 'circle' | 'point' | 'zone'
+  | 'glyph-project' | 'glyph-control'
 
 /**
  * `horizontal` wraps beside a chart. `vertical` is a list — the legend set on a
@@ -44,7 +56,7 @@ interface Props {
   orientation?: ChartLegendOrientation
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   items: () => [],
   shape: 'dot',
   interactive: false,
@@ -72,10 +84,16 @@ const CATEGORICAL_STEPS = 7
 function seriesColor(color: string | undefined, index: number): string {
   return color ?? `var(--ds-chart-categorical-${(index % CATEGORICAL_STEPS) + 1})`
 }
+
+/* A map glyph's family, or nothing: the glyph is drawn, the other shapes are CSS. */
+const familyOf = (shape: ChartLegendShape) =>
+  shape === 'glyph-project' ? 'project' : shape === 'glyph-control' ? 'control' : null
+const hasGlyphs = computed(() => props.items.some((i) => familyOf(i.shape ?? props.shape)))
+const glyphSize = computed(() => (props.orientation === 'columns' ? 24 : 20))
 </script>
 
 <template>
-  <ul class="ds-chart-legend" :class="`ds-chart-legend--${orientation}`">
+  <ul class="ds-chart-legend" :class="[`ds-chart-legend--${orientation}`, { 'ds-chart-legend--glyphs': hasGlyphs }]">
     <li v-for="(item, i) in items" :key="item.key" class="ds-chart-legend__item">
       <!--
         A real button when interactive, so toggling a series is reachable by
@@ -89,7 +107,15 @@ function seriesColor(color: string | undefined, index: number): string {
         :class="{ 'ds-chart-legend__entry--off': item.active === false }"
         @click="interactive && $emit('toggle', item.key)"
       >
+        <MapGlyphMark
+          v-if="familyOf(item.shape ?? shape)"
+          class="ds-chart-legend__glyph"
+          :family="familyOf(item.shape ?? shape)!"
+          :color="item.color ?? 'var(--chart-legend-glyph, var(--ds-chart-sequential-3))'"
+          :size="glyphSize"
+        />
         <span
+          v-else
           class="ds-chart-legend__mark"
           :class="`ds-chart-legend__mark--${item.shape ?? shape}`"
           :style="{ '--chart-legend-mark': seriesColor(item.color, i) }"
@@ -233,10 +259,14 @@ button.ds-chart-legend__entry:focus-visible {
 }
 
 /* The mark at its own size, centred in a 16px box: the shapes keep their
-   proportions, and every column starts its words on one line. */
+   proportions, and every column starts its words on one line. A key that
+   holds a map glyph takes a 24px box for every column (ADR-0192): the glyph
+   needs it, and the words must still start on one line. */
 .ds-chart-legend--columns .ds-chart-legend__mark {
-  margin-block: calc((16px - var(--chart-legend-mark-h, 8px)) / 2);
+  margin-block: calc((var(--chart-legend-box, 16px) - var(--chart-legend-mark-h, 8px)) / 2);
 }
+
+.ds-chart-legend--glyphs.ds-chart-legend--columns { --chart-legend-box: 24px; }
 
 .ds-chart-legend--columns .ds-chart-legend__mark--zone { --chart-legend-mark-h: 10px; }
 .ds-chart-legend--columns .ds-chart-legend__mark--line { --chart-legend-mark-h: 3px; }

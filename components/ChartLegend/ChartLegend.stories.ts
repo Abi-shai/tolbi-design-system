@@ -119,7 +119,8 @@ export const Interactive: Story = {
 
 /**
  * ADR-0096 — une forme **par entrée** quand les séries sont dessinées différemment : la légende d’une carte
- * (carré, rond, point, zone) et celle d’une comparaison (trait plein, trait pointillé, seuil).
+ * (les glyphes de la carte, point, zone — ADR-0192 : la marque est le glyphe lui-même) et celle d’une comparaison
+ * (trait plein, trait pointillé, seuil).
  */
 export const Shapes: Story = {
   name: 'Formes par entrée',
@@ -127,8 +128,8 @@ export const Shapes: Story = {
     components: { ChartLegend },
     setup: () => ({
       map: [
-        { key: 'project', label: 'Point du projet', shape: 'square', color: 'var(--ds-text-strong)' },
-        { key: 'control', label: 'Point de contrôle', shape: 'circle', color: 'var(--ds-chart-sequential-3)' },
+        { key: 'project', label: 'Point du projet', shape: 'glyph-project' },
+        { key: 'control', label: 'Point de contrôle', shape: 'glyph-control' },
         { key: 'reserve', label: 'Réserve', shape: 'point', color: 'var(--ds-text-subtlest)' },
         { key: 'excluded', label: 'Zone exclue', shape: 'zone', color: 'var(--ds-border-error)' },
       ],

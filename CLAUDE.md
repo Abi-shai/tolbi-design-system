@@ -1653,6 +1653,12 @@ Before working on any component, read:
   stays whole (C, the whole glyph at 85 %, washed out the datum's colour against the legend). A chosen contour stays at
   full ink, 3 thick. White vs ink is measured against the ink **as seen**, so `success-600` takes white too (3.91:1). Lowest
   contrast on the ramp: 3.91:1.
+- **ADR-0192**: **the legend shows the map's glyphs, and arrives open** — `ChartLegendShape` gains `glyph-project` /
+  `glyph-control`, drawn by `mapGlyphSvg` itself (internal `MapGlyphMark`): `color`, else the ramp's middle
+  (`--chart-legend-glyph`, set by `MapLegend`; `sequential-3` alone); 20px in a row, 24 in `columns` (the box grows to 24
+  for every column of a key with a glyph); the « Symboles » chip carries them at 14. A `MapLegend` with symbols is **open
+  on arrival** (`expanded` absent), stays folded while mounted; key it by project to reopen. Cockpit key: project 40,
+  control 200, reserve 2 189, excluded zone 0 — no cluster, no parcel entry.
 
 ## Architecture
 

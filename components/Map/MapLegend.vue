@@ -5,6 +5,7 @@ import { Divider } from '../Divider'
 import { Dropdown, DropdownItem, DropdownTrigger } from '../Dropdown'
 import { Skeleton } from '../Skeleton'
 import { SwapTransition } from '../SwapTransition'
+import MapGlyphMark from './MapGlyphMark.vue'
 
 /** One indicator the map can show (ADR-0137). */
 export interface MapLegendMetric {
@@ -115,6 +116,10 @@ const low = computed(() => ticks.value[0])
 const high = computed(() => ticks.value[ticks.value.length - 1])
 
 const gradient = computed(() => `linear-gradient(to right, ${props.colors.join(', ')})`)
+/* A map glyph in the key takes the ramp's middle when it has no colour of its own (ADR-0192). */
+const glyphColor = computed(() => props.colors[Math.floor((props.colors.length - 1) / 2)])
+const glyphFamily = (s: ChartLegendItem['shape']) =>
+  s === 'glyph-project' ? 'project' : s === 'glyph-control' ? 'control' : null
 const preview = (m: MapLegendMetric) => `linear-gradient(to right, ${(m.colors ?? SEQUENTIAL).join(', ')})`
 
 /* The chip's word: the chosen indicator, or the title when there is nothing to choose. */
@@ -261,10 +266,17 @@ watch(() => [props.legend, props.title, current.value, props.ticks, props.unit],
   moving a pixel, and stays open until its chip is pressed again or Escape.
   `v-model:expanded` lets the product keep it for the session; unbound, the
   state is the legend's own.
+
+  **Symbols arrive unfolded** (ADR-0192): a map's symbols are not guessed, so
+  a legend that carries them (`ticks` + `legend`) is open on arrival, and
+  folded only by the reader — it stays folded while the legend stays mounted
+  (a year, a chosen point). Key it by the project to open it again on the
+  next one. `expanded` given wins either way; a category key's « +N » still
+  arrives folded.
 */
-const expanded = defineModel<boolean>('expanded', { default: false })
+const expanded = defineModel<boolean | undefined>('expanded', { default: undefined })
 const foldable = computed(() => symbols.value || (categorical.value && rest.value.length > 0))
-const open = computed(() => foldable.value && expanded.value)
+const open = computed(() => foldable.value && (expanded.value ?? symbols.value))
 const foldId = `ds-map-legend-fold-${useId()}`
 const foldItems = computed(() => (symbols.value ? props.legend : rest.value))
 const foldLabel = computed(() => (symbols.value ? props.symbolsLabel : props.moreLabel))
@@ -313,6 +325,7 @@ onBeforeUnmount(() => clearTimeout(timer))
     class="ds-map-legend"
     :class="{ 'ds-map-legend--categorical': categorical, 'ds-map-legend--open': open, 'ds-map-legend--tight': tight, 'ds-map-legend--bare': bare }"
     :aria-busy="loading || undefined"
+    :style="{ '--chart-legend-glyph': glyphColor }"
     @keydown="onKeydown"
   >
     <span class="ds-map-legend__said" role="status">{{ announced }}</span>
@@ -370,7 +383,7 @@ onBeforeUnmount(() => clearTimeout(timer))
             :open="open"
             :ariaLabel="moreLabel"
             :aria-controls="foldId"
-            @click="expanded = !expanded"
+            @click="expanded = !open"
           >+{{ rest.length }}</DropdownTrigger>
         </template>
         <!-- Every key at its width, out of sight: what is measured to know what fits. -->
@@ -426,10 +439,20 @@ onBeforeUnmount(() => clearTimeout(timer))
             :open="open"
             :ariaLabel="symbolsLabel"
             :aria-controls="foldId"
-            @click="expanded = !expanded"
+            @click="expanded = !open"
           >
             <span class="ds-map-legend__dots" aria-hidden="true">
-              <span v-for="s in legend" :key="s.key" class="ds-map-legend__dot" :style="{ background: s.color }" />
+              <template v-for="s in legend" :key="s.key">
+                <!-- The map's own glyph, small (ADR-0192): the same mark as in the key. -->
+                <MapGlyphMark
+                  v-if="glyphFamily(s.shape)"
+                  class="ds-map-legend__glyph"
+                  :family="glyphFamily(s.shape)!"
+                  :color="s.color ?? glyphColor"
+                  :size="14"
+                />
+                <span v-else class="ds-map-legend__dot" :style="{ background: s.color }" />
+              </template>
             </span>
             {{ symbolsLabel }}
           </DropdownTrigger>
@@ -735,6 +758,16 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 .ds-map-legend__dot + .ds-map-legend__dot {
   margin-inline-start: calc(-1 * var(--ds-spacing-xxs));
+}
+
+/* Glyphs do not overlap: each is a shape to read, not a swatch in a stack. */
+.ds-map-legend__dots {
+  align-items: center;
+}
+
+.ds-map-legend__dots > * + .ds-map-legend__glyph,
+.ds-map-legend__glyph + * {
+  margin-inline-start: var(--ds-spacing-xxs);
 }
 
 /* ── The menu's ramp preview, 40 × 6 ──────────────────────────────── */

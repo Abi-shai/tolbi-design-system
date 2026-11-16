@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { expect, userEvent, waitFor, within } from '@storybook/test'
 import MapLegend, { type MapLegendMetric } from './MapLegend.vue'
 import MapTimeline from './MapTimeline.vue'
+import type { ChartLegendItem } from '../ChartLegend'
 
 const meta: Meta<typeof MapLegend> = {
   title: 'Données/Map/Legend',
@@ -180,23 +181,27 @@ export const ShortKey: Story = {
 }
 
 /**
- * **Symboles, replié** — le cockpit ARR : les quatre symboles ne tiennent pas dans 560 avec leurs noms (747) ; leurs
- * pastilles restent visibles dans la puce « Symboles », qui déplie le bloc sous la ligne (ADR-0138).
+ * **Symboles, ouverts à l’arrivée** (ADR-0192) — le cockpit ARR : une légende qui porte des symboles arrive
+ * **dépliée**, le lecteur ne devine pas ce qu’ils veulent dire. Il peut la replier ; elle le reste tant qu’elle reste
+ * montée (une année, un point choisi) — le produit la clé par projet pour qu’elle se rouvre au suivant. Sans
+ * `v-model:expanded`. Les marques du projet et du contrôle sont **les glyphes de la carte** (ADR-0190), à la teinte du
+ * milieu de la rampe ; la puce « Symboles » les porte en petit.
  */
 export const Symbols: Story = {
-  name: 'Symboles, replié',
+  name: 'Symboles, ouverts à l’arrivée',
   render: () => ({
     components: { MapLegend },
-    setup: () => ({
-      legend: [
-        { key: 'project', label: 'Point du projet', shape: 'square', color: 'var(--ds-text-strong)' },
-        { key: 'control', label: 'Point de contrôle', shape: 'circle', color: 'var(--ds-chart-sequential-4)' },
-        { key: 'reserve', label: 'Réserve', shape: 'point', color: 'var(--ds-chart-threshold)' },
-        { key: 'excluded', label: 'Zone exclue', shape: 'zone', color: 'var(--ds-chart-categorical-3)' },
-      ],
-    }),
-    template: ground(`<MapLegend title="Indice de stock" :ticks="['0,30', '0,45', '0,60']" :legend="legend" />`),
+    setup: () => ({ legend: SYMBOLS }),
+    template: onMap(`<MapLegend title="Indice de stock" :ticks="['0,30', '0,45', '0,60']" :legend="legend" />`),
   }),
+  play: async ({ canvasElement }) => {
+    const chip = await within(canvasElement).findByRole('button', { name: 'Symboles' })
+    await expect(chip).toHaveAttribute('aria-expanded', 'true')
+    await waitFor(() => expect(unfolded(canvasElement)).toBe(true))
+    await userEvent.click(chip)
+    await expect(chip).toHaveAttribute('aria-expanded', 'false')
+    await waitFor(() => expect(unfolded(canvasElement)).toBe(false))
+  },
 }
 
 /**
@@ -242,11 +247,12 @@ export const WithTimeline: Story = {
 
 
 
-const SYMBOLS = [
-  { key: 'project', label: 'Point du projet', shape: 'square', color: 'var(--ds-text-strong)', value: '40' },
-  { key: 'control', label: 'Point de contrôle', shape: 'circle', color: 'var(--ds-chart-sequential-4)', value: '200' },
-  { key: 'reserve', label: 'Réserve', shape: 'point', color: 'var(--ds-chart-threshold)', value: '2 180' },
-  { key: 'excluded', label: 'Zone exclue', shape: 'zone', color: 'var(--ds-chart-categorical-3)', value: '2' },
+/* The cockpit's four, in its order (ADR-0192): the map's own glyphs, no colour — the ramp's middle. */
+const SYMBOLS: ChartLegendItem[] = [
+  { key: 'project', label: 'Point du projet', shape: 'glyph-project', value: '40' },
+  { key: 'control', label: 'Point de contrôle', shape: 'glyph-control', value: '200' },
+  { key: 'reserve', label: 'Réserve', shape: 'point', color: 'var(--ds-chart-threshold)', value: '2 189' },
+  { key: 'excluded', label: 'Zone exclue', shape: 'zone', color: 'var(--ds-chart-categorical-3)', value: '0' },
 ]
 const COCKPIT = `<MapLegend v-model:expanded="expanded" title="Indice de stock" :ticks="['0,30', '0,45', '0,60']" :legend="legend" />`
 
