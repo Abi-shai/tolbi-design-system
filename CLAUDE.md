@@ -1685,6 +1685,10 @@ Before working on any component, read:
   `radius-surface`), one slot; `ProjectList` renders it (measured identical). `ArticleList` lays its cards on it, and
   `ArticleCard` **loses its ground** — picture and words on the white; hover/focus takes `bg-hover` (a `ProjectList` row's),
   the empty frame `bg-neutral-subtle` → `bg-neutral` so it does not melt.
+- **ADR-0199**: **one hover and one inset on a tray** — `bg-hover` was the tray's own grey: what is clickable on a `Tray`
+  takes **`bg-neutral-subtle-hover`** on hover and keyboard focus, handed down by the surface as `--on-tray-hover`
+  (+ `--on-tray-hover-strong` = `bg-neutral-strong` for a grey inside, e.g. the empty picture frame); `ProjectList`
+  rows and `ArticleCard` read it. `ArticleCard`'s inset → `spacing-md`, a row's (picture 272 × 153, card 288 × 257).
 
 ## Architecture
 

@@ -144,8 +144,9 @@ function onSelect(item: ProjectListItem, event: MouseEvent) {
     box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
-.ds-project-list__row--link:hover {
-  background: var(--ds-bg-hover);
+/* The tray's hover (ADR-0199), on keyboard focus as on the pointer. */
+.ds-project-list__row--link:is(:hover, :focus-visible) {
+  background: var(--on-tray-hover, var(--ds-bg-neutral-subtle-hover));
 }
 
 .ds-project-list__row--link:focus-visible {

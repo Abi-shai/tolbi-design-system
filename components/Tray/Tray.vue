@@ -10,6 +10,13 @@
  * that holds a surface, one step past it); inside, `bg-default`, `spacing-md`
  * around, `radius-surface`. It carries no title and no state: the block's
  * heading is the page's, its wait and its absence the content's.
+ *
+ * **One hover for the pattern** (ADR-0199): `bg-hover` is the tray's own grey,
+ * so on its white surface a hovered row barely showed. The surface hands down
+ * `--on-tray-hover` (`bg-neutral-subtle-hover`) and `--on-tray-hover-strong`
+ * (`bg-neutral-strong`, for a grey inside what is hovered) — private context
+ * variables, as the map's `--on-glass-*`: whatever is clickable on a tray
+ * reads them, on hover and on keyboard focus alike.
  */
 defineSlots<{
   /** What the block holds, laid on the white surface. */
@@ -39,5 +46,7 @@ defineSlots<{
   padding: var(--ds-spacing-md);
   border-radius: var(--ds-radius-surface);
   background: var(--ds-bg-default);
+  --on-tray-hover: var(--ds-bg-neutral-subtle-hover);
+  --on-tray-hover-strong: var(--ds-bg-neutral-strong);
 }
 </style>

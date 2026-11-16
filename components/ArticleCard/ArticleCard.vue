@@ -14,9 +14,10 @@ import { Skeleton } from '../Skeleton'
  * **It has no ground and no edge** (ADR-0198, track R3): the card is its
  * picture and its words, on the white surface of `ArticleList`'s `Tray` — the
  * tray groups, the card no longer has to. Under the pointer and on keyboard
- * focus it **takes a ground**, as a `ProjectList` row does (`bg-hover`,
- * `radius-surface`), and the picture's frame steps a grey darker so it does
- * not melt into it; nothing moves. The card is **18rem wide** (288px, its picture 162px high):
+ * focus it **takes a ground**, as a `ProjectList` row does — the tray's hover,
+ * `bg-neutral-subtle-hover` (ADR-0199) — and the picture's frame steps to
+ * `bg-neutral-strong` so it does not melt into it; nothing moves. Its inset is
+ * a row's, `spacing-md`, so the ground spreads around a card as around a row. The card is **18rem wide** (288px, its picture 162px high):
  * 16 made the pictures' text unreadable, 20 stood too large beside
  * `ModulesList`'s tiles. A list may widen it to its column (one column, narrow).
  *
@@ -101,7 +102,7 @@ const hintId = `ds-article-card-${useId()}`
 </template>
 
 <style scoped>
-/* No ground, no edge (ADR-0198); 6 inside, 12 between the picture and the words (ADR-0197); 18rem wide. */
+/* No ground, no edge (ADR-0198); 8 inside, a `ProjectList` row's (ADR-0199); 12 between the picture and the words (ADR-0197); 18rem wide. */
 .ds-article-card {
   position: relative;
   box-sizing: border-box;
@@ -111,7 +112,7 @@ const hintId = `ds-article-card-${useId()}`
   flex-direction: column;
   gap: var(--ds-spacing-lg);
   min-width: 0;
-  padding: var(--ds-spacing-sm);
+  padding: var(--ds-spacing-md);
   border-radius: var(--ds-radius-surface);
   background: transparent;
   color: inherit;
@@ -125,16 +126,15 @@ a.ds-article-card {
     box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
-/* A ground under the pointer, as a `ProjectList` row takes (ADR-0198). */
+/* A ground under the pointer, the tray's hover, as a `ProjectList` row takes (ADR-0199). */
 a.ds-article-card:hover,
 a.ds-article-card:focus-visible {
-  background: var(--ds-bg-hover);
+  background: var(--on-tray-hover, var(--ds-bg-neutral-subtle-hover));
 }
 
-/* `bg-hover` and `bg-neutral-subtle` are one grey: the empty frame would melt
-   into the card's new ground, so it steps a grey darker. */
+/* The empty frame steps past the card's new ground, or it would melt into it. */
 a.ds-article-card:is(:hover, :focus-visible) .ds-article-card__frame {
-  background: var(--ds-bg-neutral);
+  background: var(--on-tray-hover-strong, var(--ds-bg-neutral-strong));
 }
 
 a.ds-article-card:focus-visible {
