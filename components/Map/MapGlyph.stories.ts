@@ -5,14 +5,14 @@ import { createMapRelay, quarterZoom } from './mapMotion'
 
 /** A glyph drawn in the document, where its colours resolve. */
 const Glyph = defineComponent({
-  props: { family: { type: String, required: true }, color: { type: String, required: true }, size: { type: Number, required: true }, selected: Boolean },
+  props: { family: { type: String, required: true }, color: { type: String, required: true }, size: { type: Number, required: true }, selected: Boolean, severity: { type: String, default: undefined } },
   setup(props) {
     const el = ref<HTMLElement | null>(null)
     const draw = () => {
       if (el.value) el.value.innerHTML = mapGlyphSvg(props as unknown as MapGlyphOptions, el.value)
     }
     onMounted(draw)
-    watch(() => [props.family, props.color, props.size, props.selected], draw)
+    watch(() => [props.family, props.color, props.size, props.selected, props.severity], draw)
     return () => h('span', { ref: el, style: 'display:inline-block; line-height:0', 'data-glyph': `${props.family}-${props.size}` })
   },
 })
@@ -139,6 +139,28 @@ export const Relay: Story = {
             <Glyph family="project" color="var(--ds-chart-sequential-4)" :size="40" />
           </div>
         </div>
+      </div>`,
+  }),
+}
+
+/**
+ * **Carbone (dMRV)** (ADR-0194) — la parcelle suivie : la pastille du projet, pictogramme `leaf` (on suit le carbone de
+ * la végétation). 40, 46 au survol, choisie 56. **En alerte**, un anneau de 3 px à la teinte de la gravité
+ * (`--ds-chart-status-*`) : bloque, à surveiller, à revoir — l’anneau que porte aussi le contour de la parcelle. Un
+ * point de contrôle peut le porter aussi.
+ */
+export const Monitored: Story = {
+  name: 'Parcelle suivie et alertes',
+  render: () => ({
+    components: { Glyph },
+    setup: () => ({ RAMP, GROUND, ROW, SEV: ['blocking', 'watch', 'review'] }),
+    template: `
+      <div :style="GROUND">
+        <div :style="ROW"><span style="width:160px">Suivie · 40</span><Glyph v-for="c in RAMP" :key="c" family="monitored" :color="c" :size="40" /></div>
+        <div :style="ROW"><span style="width:160px">Survol 46 · choisie 56</span><Glyph family="monitored" :color="RAMP[2]" :size="46" /><Glyph family="monitored" :color="RAMP[3]" :size="56" selected /></div>
+        <div :style="ROW"><span style="width:160px">En alerte · 40</span><Glyph v-for="s in SEV" :key="s" family="monitored" :color="RAMP[3]" :size="40" :severity="s" /></div>
+        <div :style="ROW"><span style="width:160px">Choisie en alerte</span><Glyph family="monitored" :color="RAMP[3]" :size="56" selected severity="blocking" /></div>
+        <div :style="ROW"><span style="width:160px">Contrôle en alerte</span><Glyph v-for="s in SEV" :key="s" family="control" :color="RAMP[2]" :size="24" :severity="s" /></div>
       </div>`,
   }),
 }

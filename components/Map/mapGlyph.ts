@@ -17,9 +17,18 @@
  *
  * Like `MapPin` (ADR-0169), the inks do not follow the theme: the imagery
  * under them has no dark mode.
+ *
+ * A third family, `monitored` (ADR-0194): a Carbone (dMRV) parcel under
+ * monitoring — the project's disc, with a `leaf`, since what is followed is
+ * the vegetation's carbon. A family, not a free pictogram: a glyph names a
+ * kind of object, and the kinds are the package's vocabulary. And any glyph
+ * may carry an **alert** (`severity`): a 3px ring in the severity's hue
+ * around it, part of the image.
  */
 
-export type MapGlyphFamily = 'project' | 'control'
+export type MapGlyphFamily = 'project' | 'control' | 'monitored'
+/** An alert's severity, ADR-0143's three: « Bloque », « À surveiller », « À revoir ». */
+export type MapGlyphSeverity = 'blocking' | 'watch' | 'review'
 
 export interface MapGlyphOptions {
   family: MapGlyphFamily
@@ -33,11 +42,26 @@ export interface MapGlyphOptions {
   size: number
   /** Chosen: the contour thickens and a shadow lifts it; the image gains a margin for it. */
   selected?: boolean
+  /**
+   * In alert (ADR-0194): a 3px ring at the severity's hue (`--ds-chart-status-*`)
+   * around the glyph, centred half the size + 3px out — the ring the map's
+   * outline of the parcel carries too. The image grows to hold it.
+   */
+  severity?: MapGlyphSeverity
+}
+
+/** The severities' hues (ADR-0143). */
+export const MAP_GLYPH_SEVERITY_COLOR: Record<MapGlyphSeverity, string> = {
+  blocking: 'var(--ds-chart-status-critical)',
+  watch: 'var(--ds-chart-status-warning)',
+  review: 'var(--ds-chart-status-neutral)',
 }
 
 /** The project's and the control's pictograms, Lucide's paths on its 24 grid. */
 const LAND_PLOT =
   '<path d="m12 8 6-3-6-3v10"/><path d="m8 11.99-5.5 3.14a1 1 0 0 0 0 1.74l8.5 4.86a2 2 0 0 0 2 0l8.5-4.86a1 1 0 0 0 0-1.74L16 12"/><path d="m6.49 12.85 11.02 6.3"/><path d="M17.51 12.85 6.5 19.15"/>'
+/** A monitored parcel's: Lucide's `leaf` — what is followed is the vegetation's carbon; clear at 24px. */
+const LEAF = '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>'
 const CROSSHAIR = '<circle cx="12" cy="12" r="10"/><path d="M22 12h-4M6 12H2M12 6V2M12 22v-4"/>'
 /** The sight for small sizes: the ring at half, the ticks outside it, short and thick. */
 const CROSSHAIR_SMALL = '<circle cx="12" cy="12" r="5.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/>'
@@ -112,11 +136,11 @@ function drawing(o: MapGlyphOptions, fill: Rgb, ink: Rgb, white: Rgb) {
   const [f, i, w] = [hex(fill), hex(ink), hex(white)]
   // A 2 white edge outside the ground, the ink contour outside that.
   const out = 1 + edge / 2
-  if (o.family === 'project')
+  if (o.family !== 'control')
     return (
       `<circle cx="16" cy="16" r="13" fill="${f}" stroke="${w}" stroke-width="2"/>` +
       `<circle cx="16" cy="16" r="${13 + out}" fill="none" stroke="${i}" stroke-opacity="${edgeAlpha}" stroke-width="${edge}"/>` +
-      `<g transform="translate(8.8 8.8) scale(.6)" fill="none" stroke="${pict}" stroke-opacity="${pictAlpha}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${LAND_PLOT}</g>`
+      `<g transform="translate(8.8 8.8) scale(.6)" fill="none" stroke="${pict}" stroke-opacity="${pictAlpha}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${o.family === 'monitored' ? LEAF : LAND_PLOT}</g>`
     )
   const small = o.size < MAP_GLYPH_SMALL_BELOW
   const sight = small
@@ -129,9 +153,38 @@ function drawing(o: MapGlyphOptions, fill: Rgb, ink: Rgb, white: Rgb) {
   )
 }
 
-/** The CSS px of a glyph's image: its size, or the larger box of a chosen one. */
-export const mapGlyphBox = (o: Pick<MapGlyphOptions, 'size' | 'selected'>) =>
-  o.selected ? (o.size * SELECTED_BOX) / 32 : o.size
+/*
+  The alert ring, in units of the 32 drawing (k = 32 / size, one CSS px): 3px
+  thick, its centre 1 unit + 3px past the glyph's drawn edge — half the size +
+  3px for a disc at rest, as the product drew it. On a chosen glyph it moves
+  out with the thicker contour, so the two never touch.
+*/
+const RING = 3
+function ring(o: MapGlyphOptions, colour: string) {
+  const k = 32 / o.size
+  const out = 1 + RING * k
+  const sw = RING * k
+  if (o.family !== 'control') {
+    const edgeR = o.selected ? 17 : 15
+    return `<circle cx="16" cy="16" r="${edgeR + out}" fill="none" stroke="${colour}" stroke-width="${sw}"/>`
+  }
+  const edgeAt = o.selected ? 1 : 3
+  const at = edgeAt - out
+  const side = 32 - 2 * at
+  return `<rect x="${at}" y="${at}" width="${side}" height="${side}" rx="${7 + (3 - edgeAt) + out}" fill="none" stroke="${colour}" stroke-width="${sw}"/>`
+}
+
+/** The image's margin around the 32 drawing, in its units: the shadow's, the ring's, whichever is wider. */
+function marginOf(o: Pick<MapGlyphOptions, 'size' | 'selected' | 'severity'>) {
+  const shadow = o.selected ? (SELECTED_BOX - 32) / 2 : 0
+  const k = 32 / o.size
+  const ringOut = o.severity ? (o.selected ? 2 : 0) + 1.5 * RING * k + 0.5 : 0
+  return Math.max(shadow, ringOut)
+}
+
+/** The CSS px of a glyph's image: its size, and the margin a chosen one's shadow or an alert's ring needs. */
+export const mapGlyphBox = (o: Pick<MapGlyphOptions, 'size' | 'selected' | 'severity'>) =>
+  (o.size * (32 + 2 * marginOf(o))) / 32
 
 /**
  * The glyph as SVG markup, `size` CSS px wide (a chosen one: its larger box,
@@ -147,14 +200,14 @@ function svgAt(o: MapGlyphOptions, root: Element, box: number): string {
   const { ink, white } = inks(root)
   const fill = resolve(o.color, root) ?? [136, 136, 136]
   const body = drawing(o, fill, ink, white)
-  if (!o.selected)
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="${box}" height="${box}" viewBox="0 0 32 32">${body}</svg>`
-  const m = (SELECTED_BOX - 32) / 2
-  return (
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${box}" height="${box}" viewBox="${-m} ${-m} ${SELECTED_BOX} ${SELECTED_BOX}">` +
-    `<defs><filter id="lift" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="2.6" flood-color="${hex(ink)}" flood-opacity=".38"/></filter></defs>` +
-    `<g filter="url(#lift)">${body}</g></svg>`
-  )
+  const alert = o.severity ? ring(o, hex(resolve(MAP_GLYPH_SEVERITY_COLOR[o.severity], root) ?? ink)) : ''
+  const m = marginOf(o)
+  const view = `${-m} ${-m} ${32 + 2 * m} ${32 + 2 * m}`
+  const lifted = o.selected
+    ? `<defs><filter id="lift" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="2.6" flood-color="${hex(ink)}" flood-opacity=".38"/></filter></defs>` +
+      `<g filter="url(#lift)">${body}</g>`
+    : body
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${box}" height="${box}" viewBox="${view}">${lifted}${alert}</svg>`
 }
 
 /**
@@ -164,7 +217,7 @@ function svgAt(o: MapGlyphOptions, root: Element, box: number): string {
 export function mapGlyphName(o: MapGlyphOptions, root: Element = document.documentElement): string {
   const rgb = resolve(o.color, root)
   const colour = rgb ? hex(rgb).slice(1) : o.color.replace(/[^a-z0-9]/gi, '')
-  return `ds-glyph-${o.family}-${o.selected ? 'sel-' : ''}${o.size}-${colour}`
+  return `ds-glyph-${o.family}-${o.selected ? 'sel-' : ''}${o.severity ? `${o.severity}-` : ''}${o.size}-${colour}`
 }
 
 /** What `loadMapGlyphs` needs of an engine: Mapbox's and MapLibre's map both have it. */

@@ -63,6 +63,27 @@ export const Steps: Story = {
   }),
 }
 
+/**
+ * **Alertes** (ADR-0194) — un cluster de parcelles suivies (`monitored`) dit combien sont en alerte : une seconde
+ * pastille en bas à gauche, à la teinte de la plus grave (bloque > à surveiller > à revoir), absente sans alerte. Son
+ * chiffre est à l’encre : le blanc mesure sous 4,5:1 sur les trois teintes. Le nom le dit : « 18 parcelles, dont 3 en
+ * alerte ».
+ */
+export const Alerts: Story = {
+  name: 'Alertes',
+  render: () => ({
+    components: { MapCluster },
+    setup: () => ({ GROUND }),
+    template: `
+      <div :style="GROUND">
+        <MapCluster family="monitored" color="var(--ds-chart-sequential-3)" :count="18" :alerts="3" alert-severity="blocking" />
+        <MapCluster family="monitored" color="var(--ds-chart-sequential-4)" :count="7" :alerts="2" alert-severity="watch" />
+        <MapCluster family="monitored" color="var(--ds-chart-sequential-2)" :count="42" :alerts="12" alert-severity="review" />
+        <MapCluster family="monitored" color="var(--ds-chart-sequential-4)" :count="9" />
+      </div>`,
+  }),
+}
+
 /** A single point, drawn as the engine would: its glyph. */
 const Single = defineComponent({
   props: { color: { type: String, required: true }, x: Number, y: Number },

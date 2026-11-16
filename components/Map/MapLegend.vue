@@ -119,7 +119,7 @@ const gradient = computed(() => `linear-gradient(to right, ${props.colors.join('
 /* A map glyph in the key takes the ramp's middle when it has no colour of its own (ADR-0192). */
 const glyphColor = computed(() => props.colors[Math.floor((props.colors.length - 1) / 2)])
 const glyphFamily = (s: ChartLegendItem['shape']) =>
-  s === 'glyph-project' ? 'project' : s === 'glyph-control' ? 'control' : null
+  s === 'glyph-project' ? 'project' : s === 'glyph-control' ? 'control' : s === 'glyph-monitored' ? 'monitored' : null
 const preview = (m: MapLegendMetric) => `linear-gradient(to right, ${(m.colors ?? SEQUENTIAL).join(', ')})`
 
 /* The chip's word: the chosen indicator, or the title when there is nothing to choose. */

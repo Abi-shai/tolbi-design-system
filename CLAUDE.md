@@ -1661,6 +1661,12 @@ Before working on any component, read:
   control 200, reserve 2 189, excluded zone 0 — no cluster, no parcel entry.
 - **ADR-0193**: **a symbol's name is never cut** — in `ChartLegend columns` the name wraps (`label-md`, centred,
   `text-wrap: balance`, a long word breaks), no ellipsis; the row takes the tallest column (48 → 68 at 440 and 380px).
+- **ADR-0194**: **a monitored parcel and its alerts** (dMRV, track M2) — `MapGlyphFamily` gains **`monitored`** (the
+  project's disc + `leaf`; a family, not a free pictogram: a glyph names a kind of object), `glyph-monitored` in
+  `ChartLegend`; `severity` (`blocking/watch/review`) draws a **3px ring at the severity's hue**, centred half the size +
+  3px, part of the image and its name (40 → 50.25px box). `MapCluster` gains `alerts` + `alertSeverity`: a badge bottom
+  left at the gravest hue, **figure in ink** (white measures 3.76 / 2.35 / 2.58:1, ink 4.72 / 7.56 / 6.89), the name
+  « 18 parcelles, dont 3 en alerte ». `flyGlyphs` flies any family.
 
 ## Architecture
 

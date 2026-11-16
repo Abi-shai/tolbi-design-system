@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { mapGlyphSvg, type MapGlyphFamily } from './mapGlyph'
+import { MAP_GLYPH_SEVERITY_COLOR, mapGlyphSvg, type MapGlyphFamily, type MapGlyphSeverity } from './mapGlyph'
 
 /**
  * A cluster of points on a map (ADR-0190): the glyph of its family at the
@@ -13,6 +13,13 @@ import { mapGlyphSvg, type MapGlyphFamily } from './mapGlyph'
  * engine knows the zoom — Mapbox's `getClusterExpansionZoom`). Named by its
  * count and family, a visible focus, a 1.08 lift under the pointer.
  *
+ * **Its alerts** (ADR-0194): a second badge, bottom left, counts the points
+ * in alert and takes the hue of the gravest (`alertSeverity` — blocking >
+ * watch > review); absent without one. From afar, it says where to look. Its
+ * figure is in ink: on all three hues white measures under 4.5:1 (3.76, 2.35,
+ * 2.58) and ink over it (4.72, 7.56, 6.89). The name says it too: « 18
+ * parcelles, dont 3 en alerte ».
+ *
  * The engine places it (a Mapbox `Marker` element: `render(h(MapCluster, …),
  * el)`). Its bursts and gatherings are `clusterArrive` / `clusterLeave`, and
  * the points that fly out of it `flyGlyphs` — `mapMotion.ts`.
@@ -22,18 +29,23 @@ interface Props {
   /** The cluster's mean colour on the map's ramp — any CSS colour, a token included. */
   color: string
   count: number
-  /** Its name; by default « N points du projet » or « N points de contrôle ». */
+  /** Its name; by default « N points du projet », « N points de contrôle » or « N parcelles », and « , dont N en alerte ». */
   label?: string
   /** Another point is chosen: the cluster steps back, as the other points do. */
   muted?: boolean
+  /** How many of its points are in alert: a second badge, bottom left. 0 or absent: none. */
+  alerts?: number
+  /** The gravest of those alerts — the badge's hue. */
+  alertSeverity?: MapGlyphSeverity
 }
 
-const props = withDefaults(defineProps<Props>(), { label: undefined, muted: false })
+const props = withDefaults(defineProps<Props>(), { label: undefined, muted: false, alerts: 0, alertSeverity: 'review' })
 
 defineEmits<{ click: [event: MouseEvent] }>()
 
 const STEPS: Record<MapGlyphFamily, [number, number, number]> = {
   project: [44, 56, 68],
+  monitored: [44, 56, 68],
   control: [36, 44, 52],
 }
 const size = computed(() => {
@@ -44,9 +56,11 @@ const size = computed(() => {
 const name = computed(() => {
   if (props.label) return props.label
   const plural = props.count > 1 ? 's' : ''
-  return props.family === 'project'
-    ? `${props.count} point${plural} du projet`
+  const what =
+    props.family === 'project' ? `${props.count} point${plural} du projet`
+    : props.family === 'monitored' ? `${props.count} parcelle${plural}`
     : `${props.count} point${plural} de contrôle`
+  return props.alerts > 0 ? `${what}, dont ${props.alerts} en alerte` : what
 })
 
 /* The glyph is drawn where its colours resolve — in the document, once mounted. */
@@ -73,6 +87,12 @@ watch(() => [props.family, props.color, size.value], draw)
       <!-- eslint-disable-next-line vue/no-v-html -- the package's own drawing (mapGlyph.ts) -->
       <span class="ds-map-cluster__glyph" aria-hidden="true" v-html="svg" />
       <span class="ds-map-cluster__count" aria-hidden="true">{{ count }}</span>
+      <span
+        v-if="alerts > 0"
+        class="ds-map-cluster__alerts"
+        :style="{ background: MAP_GLYPH_SEVERITY_COLOR[alertSeverity] }"
+        aria-hidden="true"
+      >{{ alerts }}</span>
     </span>
   </button>
 </template>
@@ -154,6 +174,27 @@ watch(() => [props.family, props.color, size.value], draw)
   font: var(--ds-font-label-md-strong);
   font-variant-numeric: tabular-nums;
   color: var(--map-cluster-white);
+}
+
+/* The alerts: the count's badge mirrored to the bottom left, a step smaller, on
+   the gravest severity's hue (ADR-0194). Its figure in ink — measured, white
+   fails on all three hues. */
+.ds-map-cluster__alerts {
+  position: absolute;
+  bottom: calc(-1 * var(--ds-spacing-sm));
+  left: calc(-1 * (var(--ds-spacing-md) + var(--ds-spacing-xxs)));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 1.375rem;
+  height: 1.375rem;
+  padding: 0 var(--ds-spacing-xs);
+  border-radius: var(--ds-radius-pill);
+  box-shadow: 0 0 0 var(--ds-border-width-strong) var(--map-cluster-white);
+  font: var(--ds-font-label-md-strong);
+  font-variant-numeric: tabular-nums;
+  color: var(--map-cluster-ink);
 }
 
 @media (prefers-reduced-motion: reduce) {

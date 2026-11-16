@@ -23,7 +23,7 @@ export interface ChartLegendItem {
  * - `square`, `circle`, `point` the symbols a map draws — a project point, a
  *   control point, a reserve point;
  * - `zone` an area: its colour as the edge over a tint of it;
- * - `glyph-project`, `glyph-control` the map's own glyphs (ADR-0190): the
+ * - `glyph-project`, `glyph-control`, `glyph-monitored` the map's own glyphs (ADR-0190, ADR-0194): the
  *   legend draws **the glyph itself** (ADR-0192), so the reader finds on the
  *   map what the key shows. Its colour is the entry's `color`, else the middle
  *   of the legend's ramp (`--chart-legend-glyph`, which `MapLegend` sets;
@@ -33,7 +33,7 @@ export interface ChartLegendItem {
  */
 export type ChartLegendShape =
   | 'dot' | 'line' | 'dashed' | 'square' | 'circle' | 'point' | 'zone'
-  | 'glyph-project' | 'glyph-control'
+  | 'glyph-project' | 'glyph-control' | 'glyph-monitored'
 
 /**
  * `horizontal` wraps beside a chart. `vertical` is a list — the legend set on a
@@ -87,7 +87,7 @@ function seriesColor(color: string | undefined, index: number): string {
 
 /* A map glyph's family, or nothing: the glyph is drawn, the other shapes are CSS. */
 const familyOf = (shape: ChartLegendShape) =>
-  shape === 'glyph-project' ? 'project' : shape === 'glyph-control' ? 'control' : null
+  shape === 'glyph-project' ? 'project' : shape === 'glyph-control' ? 'control' : shape === 'glyph-monitored' ? 'monitored' : null
 const hasGlyphs = computed(() => props.items.some((i) => familyOf(i.shape ?? props.shape)))
 const glyphSize = computed(() => (props.orientation === 'columns' ? 24 : 20))
 </script>
