@@ -29,8 +29,9 @@ export type MapPanelSize = 'sm' | 'lg'
  * shape `MapControls` gives every control on a map — and the map is whole
  * again. The fold sits at the head's **start**; folded, the control stands
  * **at the overlay's corner** — 16px from the map's edges, on the grid of the
- * map's other controls (ADR-0117, the owner's frame `3691:9170`), 18px from
- * where the fold was. The focus follows the fold, to the control that
+ * map's other controls (ADR-0117, the owner's frame `3691:9170`): the capsule's
+ * corner is the open panel's corner (ADR-0188), and the button travels the few
+ * px between its two places with the surface's stretch. The focus follows the fold, to the control that
  * replaced the one pressed; the map is not re-framed — the panel floats, it
  * reserves nothing.
  *
@@ -134,10 +135,6 @@ const titled = computed(() => props.closable && !!props.title && !!slots.header)
 */
 const atEnd = ref(false)
 let pressed = false
-/* Where the head's fold stood, from the place's corner (ADR-0173): the folded
-   capsule puts the same button on the same pixel. Measured on the press; folded
-   from the product, the head's own padding stands in. */
-const foldAt = ref<{ x: number; y: number } | null>(null)
 function fold(next: boolean) {
   pressed = true
   collapsed.value = next
@@ -157,11 +154,6 @@ watch(collapsed, () => {
 async function change(next: boolean) {
   if (next === shown.value) return
   if (next) atEnd.value = !!host.value?.closest('.ds-map-overlay--end, .ds-map-overlay--top-end, .ds-map-overlay--bottom-end')
-  if (next) {
-    const button = host.value?.querySelector<HTMLElement>('[data-map-panel-fold]')?.getBoundingClientRect()
-    const place = host.value?.parentElement?.getBoundingClientRect()
-    foldAt.value = button && place ? { x: button.left - place.left, y: button.top - place.top } : null
-  }
   if (iconFold.value && !atEnd.value && host.value?.parentElement) {
     await (canMorph() ? (next ? morphFold() : morphUnfold()) : crossFade(next))
     return
@@ -189,8 +181,11 @@ async function crossFade(next: boolean) {
   **shell** — the glass alone, border, rim and shadow, no content — stands in
   the place and travels between the capsule's box and the panel's over
   `considered` + `easing-in-out`, its ground and backdrop crossing from pilot
-  glass to reading glass, while the real surfaces are bare. The button does not
-  move: it stays drawn throughout, the others' content fades.
+  glass to reading glass, while the real surfaces are bare. **The surface stays
+  anchored at the corner, not the button** (ADR-0188): the capsule's corner is
+  the panel's, so the button, 6px in from the capsule's edge and further in the
+  head, travels between its two places on the shell's own duration and curve.
+  It stays drawn throughout; the others' content fades.
   - Unfolding: the shell grows from the capsule; the panel's content fades in
     over `enter` once the shell is three quarters open.
   - Folding: the content fades out over `exit`, then the shell closes on the
@@ -237,17 +232,27 @@ function makeShell(place: HTMLElement, at: Box): HTMLElement {
   place.appendChild(el)
   return el
 }
-const capsuleBox = (b: Box): Box => {
-  /* The capsule's box, from where the button stands: 6px around a 40 square. */
-  const inset = (52 - b.width) / 2
-  return { left: b.left - inset, top: b.top - inset, width: 52, height: 52 }
+/* The capsule's box: a 52 square on the panel's own corner (ADR-0188). */
+const capsuleAt = (panel: Box): Box => ({ left: panel.left, top: panel.top, width: 52, height: 52 })
+/* Where the button stands in it: centred, 6px from the edge. */
+const buttonIn = (capsule: Box, button: Box) => ({
+  left: capsule.left + (capsule.width - button.width) / 2,
+  top: capsule.top + (capsule.height - button.height) / 2,
+})
+/* The head's button carried from one place to the other on the shell's timing. */
+function carry(button: HTMLElement, from: { left: number; top: number }, to: { left: number; top: number }, duration: number, easing: string) {
+  const at = (p: { left: number; top: number }, here: Box) => `translate(${p.left - here.left}px, ${p.top - here.top}px)`
+  const here = boxOf(button, host.value!.parentElement!)
+  return button.animate([{ transform: at(from, here) }, { transform: at(to, here) }], { duration, easing, fill: 'forwards' })
 }
 
 async function morphUnfold() {
   const place = host.value!.parentElement!
+  const capsule = host.value!.querySelector('.ds-map-panel__capsule')
   const button = host.value!.querySelector('[data-map-panel-open]')
-  if (!button) { shown.value = false; return }
-  const from = capsuleBox(boxOf(button, place))
+  if (!capsule || !button) { shown.value = false; return }
+  const from = boxOf(capsule, place)
+  const buttonFrom = boxOf(button, place)
   const shapeMs = readDuration(place, '--ds-motion-duration-considered')
   const easing = getComputedStyle(place).getPropertyValue('--ds-motion-easing-in-out').trim() || 'ease-in-out'
   const glass = glassOf(place)
@@ -258,8 +263,11 @@ async function morphUnfold() {
   const to = boxOf(panel, place)
   const shell = makeShell(place, from)
   const run = shell.animate([{ ...px(from), ...glass.control }, { ...px(to), ...glass.read }], { duration: shapeMs, easing, fill: 'forwards' })
+  const fold = panel.querySelector<HTMLElement>('[data-map-panel-fold]')
+  const ride = fold ? carry(fold, buttonFrom, boxOf(fold, place), shapeMs, easing) : null
   setTimeout(() => { if (morph.value === 'veiled') morph.value = 'reveal' }, shapeMs * 0.75)
   await run.finished.catch(() => undefined)
+  ride?.cancel()
   morph.value = 'none'
   shell.remove()
 }
@@ -267,10 +275,11 @@ async function morphUnfold() {
 async function morphFold() {
   const place = host.value!.parentElement!
   const panel = host.value!.querySelector('.ds-map-panel')
-  const button = host.value!.querySelector('[data-map-panel-fold]')
+  const button = host.value!.querySelector<HTMLElement>('[data-map-panel-fold]')
   if (!panel || !button) { shown.value = true; return }
   const from = boxOf(panel, place)
-  const to = capsuleBox(boxOf(button, place))
+  const to = capsuleAt(from)
+  const buttonTo = buttonIn(to, boxOf(button, place))
   const shapeMs = readDuration(place, '--ds-motion-duration-considered')
   const fadeMs = readDuration(place, '--ds-motion-duration-exit')
   const easing = getComputedStyle(place).getPropertyValue('--ds-motion-easing-in-out').trim() || 'ease-in-out'
@@ -280,6 +289,9 @@ async function morphFold() {
   const shell = makeShell(place, from)
   morph.value = 'veiled'
   const run = shell.animate([{ ...px(from), ...glass.read }, { ...px(to), ...glass.control }], { duration: shapeMs, easing, fill: 'forwards' })
+  /* The button rides to where the capsule will hold it, and stays there (`fill`)
+     until the swap replaces it with the capsule's own. */
+  carry(button, boxOf(button, place), buttonTo, shapeMs, easing)
   await run.finished.catch(() => undefined)
   shown.value = true
   /* The swap must happen with the transitions still off, or the panel would
@@ -293,19 +305,24 @@ async function morphFold() {
 }
 
 /* What the swap brings in, once it is in the document: out-in inserts it a few
-   frames after the leaver has gone. */
+   frames after the leaver has gone. Heard through a `MutationObserver`, whose
+   callback runs before the frame is painted — waiting for the next frame left
+   one frame of the panel with neither its shell nor its button carried
+   (ADR-0188). */
 async function arrived(selector: string): Promise<Element | null> {
-  for (let i = 0; i < 10; i++) {
-    await nextTick()
-    const el = host.value?.querySelector(selector)
-    if (el) return el
-    await new Promise((r) => requestAnimationFrame(r))
-  }
-  return null
+  await nextTick()
+  const root = host.value
+  const now = root?.querySelector(selector)
+  if (!root || now) return now ?? null
+  return new Promise((resolve) => {
+    const done = (el: Element | null) => { watcher.disconnect(); clearTimeout(timer); resolve(el) }
+    const watcher = new MutationObserver(() => { const el = root.querySelector(selector); if (el) done(el) })
+    watcher.observe(root, { childList: true, subtree: true })
+    const timer = setTimeout(() => done(root.querySelector(selector)), 500)
+  })
 }
 const unfoldAt = computed(() => ({
   transformOrigin: atEnd.value ? 'top right' : 'top left',
-  ...(foldAt.value && !atEnd.value ? { '--map-panel-fold-x': `${foldAt.value.x}px`, '--map-panel-fold-y': `${foldAt.value.y}px` } : {}),
 }))
 /* Only when the fold was pressed here: a product folding the panel through
    `v-model:collapsed` does not take the reader's focus (ADR-0062). */
@@ -741,13 +758,12 @@ onBeforeUnmount(() => {
 }
 
 /*
-  Folded (ADR-0173): a capsule of pilot glass (`radius-surface`, ADR-0177), 8px around the head's own fold
-  button — an `IconButton sm subtle`, 36px, round, the one the open head shows.
-  Placed so that button lands **on the pixel** it held in the head — measured
-  on the press (centred on the tabs, it is not at the head's padding), the
-  head's padding standing in when the product folds it — less the capsule's own
-  8px and border. The button alone (ADR-0178): the panel's name is said in its
-  label, « Déplier le panneau <titre> », not written beside it.
+  Folded (ADR-0173): a capsule of pilot glass (`radius-surface`, ADR-0177)
+  around the head's own fold button. **Its corner is the open panel's corner**
+  (ADR-0188): the same margins as every surface on the map's edges, so the
+  button, centred in it, stands ~10px from where the head held it and travels
+  there with the stretch. The button alone (ADR-0178): the panel's name is said
+  in its label, « Déplier le panneau <titre> », not written beside it.
 */
 .ds-map-panel__capsule {
   display: flex;
@@ -758,8 +774,6 @@ onBeforeUnmount(() => {
      40px button, 6px from its outer edge on every side. */
   width: 52px;
   height: 52px;
-  margin-block-start: calc(var(--map-panel-fold-y, calc(var(--ds-spacing-lg) + var(--ds-border-width-default))) - var(--ds-spacing-sm));
-  margin-inline-start: calc(var(--map-panel-fold-x, calc(var(--ds-spacing-xl) + var(--ds-border-width-default))) - var(--ds-spacing-sm));
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
   border-radius: var(--ds-radius-surface);
   background: var(--ds-bg-map-control);

@@ -1633,6 +1633,10 @@ Before working on any component, read:
   `minimapCloseLabel` « Fermer la mini-carte »: turns it off like its button, the focus back to that button.
 - **ADR-0188**: **the mini-map is a frame around a picture**, as `ProjectList`: the card is the reading glass tinted to
   `bg-neutral-subtle`, and the map is on `bg-default`. There is no hairline, because the step between the two grounds is the edge.
+- **ADR-0189**: **the folded panel keeps the map's margins** — the capsule's corner is the open panel's corner (24, 24, as
+  the column and the legend), the button centred in it (6px). The button travels ~10px between head and capsule **with the
+  stretch** (`considered` + `in-out`, Web Animations), never a jump: the surface stays anchored, not the button (amends
+  ADR-0173/0181/0182). The swap's arrival is heard by a `MutationObserver` (one frame showed the panel bare).
 
 ## Architecture
 
