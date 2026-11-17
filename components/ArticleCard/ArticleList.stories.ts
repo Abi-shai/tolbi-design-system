@@ -117,3 +117,19 @@ export const TitledLoading: Story = {
   args: { loading: true },
   render: Titled.render,
 }
+
+/**
+ * La couverture de marque pour tous (ADR-0213) : la même pour chaque article, le cadrage du motif tiré de l’id — stable
+ * pour un article, différent de son voisin. Sous chaque couverture, la date seule.
+ */
+export const Cover: Story = {
+  name: 'Couverture de marque',
+  args: { cover: true, items: ARTICLES.map(a => ({ ...a, image: undefined, meta: a.meta?.replace(/^.*· /, '') })) },
+  render: Titled.render,
+}
+
+export const CoverLoading: Story = {
+  name: 'Couverture de marque, chargement',
+  args: { cover: true, loading: true },
+  render: Titled.render,
+}

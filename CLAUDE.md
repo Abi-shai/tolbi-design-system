@@ -1755,6 +1755,12 @@ Before working on any component, read:
   its own white surface — the drawer's scroller). Visible height unchanged (276), width 270 → 276; `page` untouched.
   **`elevation-overlay` = `shadow-2xl` + `shadow-md`** (`lg`/`xl` did not stand off the page, `2xl` alone had a soft
   edge): the halo says « above », the short shadow draws the edge — every floating surface takes it, dark included.
+- **ADR-0213**: **a brand cover for the articles** (two benchmarks, 29 products; the product's `article-cover.vue`
+  workaround moves into the package) — `ArticleCard cover` + `seed` (`ArticleList cover`, seeded by `id`): in the 16:9
+  frame, `brand-700` + `BrandPattern lg` in white at **3 %**, ×1.4 and offset ≤ 14 % by the hashed seed (no rotation, no
+  empty corner), the title on it (`heading-sm`, white, bottom left, `spacing-xl`, 3 lines) — 8.76:1 at the lightest. Inks
+  are primitives (a picture, no theme). Under it the **date alone**; the title stays the link's name, the cover
+  `aria-hidden`. Hover/focus: the pattern **fades** to 45 % over `considered`, nothing moves. Card 288 × 213.
 
 ## Architecture
 

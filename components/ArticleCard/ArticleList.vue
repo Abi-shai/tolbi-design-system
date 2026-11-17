@@ -43,6 +43,8 @@ interface Props {
   newTabLabel?: string
   /** Lets the cards wrap onto more rows rather than showing the ones that fit (ADR-0201). */
   wrap?: boolean
+  /** Every card wears the brand cover with its title, framed by its id (ADR-0213). */
+  cover?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -54,6 +56,7 @@ const props = withDefaults(defineProps<Props>(), {
   newTab: true,
   newTabLabel: undefined,
   wrap: false,
+  cover: false,
 })
 
 defineSlots<{
@@ -101,7 +104,7 @@ const placeholders = computed(() => (props.wrap ? props.loadingCount : Math.min(
     <template v-if="$slots.action" #action><slot name="action" /></template>
     <ul class="ds-article-list__grid">
       <template v-if="loading">
-        <li v-for="n in placeholders" :key="`skeleton-${n}`"><ArticleCard loading /></li>
+        <li v-for="n in placeholders" :key="`skeleton-${n}`"><ArticleCard loading :cover="cover" /></li>
       </template>
       <li v-for="item in shown" v-else :key="item.id">
         <ArticleCard
@@ -110,6 +113,8 @@ const placeholders = computed(() => (props.wrap ? props.loadingCount : Math.min(
           :image="item.image"
           :image-alt="item.imageAlt"
           :meta="item.meta"
+          :cover="cover"
+          :seed="item.id"
           :new-tab="newTab"
           v-bind="newTabLabel ? { newTabLabel } : {}"
         />

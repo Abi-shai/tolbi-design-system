@@ -53,3 +53,30 @@ export const Loading: Story = {
   name: 'Chargement',
   args: { loading: true },
 }
+
+/**
+ * La couverture de marque (ADR-0213) : le vert profond, le motif de marque presque invisible (blanc à 3 %, cadré par
+ * `seed`), le titre de l’article dessus — `heading-sm` blanc, en bas à gauche, trois lignes au plus. Dessous, la date
+ * seule ; le titre reste le nom du lien. Au survol et au focus, le motif s’efface ; rien ne bouge.
+ */
+export const Cover: Story = {
+  name: 'Couverture de marque',
+  args: { cover: true, seed: 'collecte-sacs', image: undefined },
+}
+
+/** Un titre long sur la couverture : trois lignes, puis l’ellipse. */
+export const CoverLongTitle: Story = {
+  name: 'Couverture, titre long',
+  args: {
+    cover: true,
+    seed: 'kaffrine',
+    image: undefined,
+    title: 'Comment une coopérative de Kaffrine a réduit ses pertes au chargement de 18 % en une campagne grâce au suivi des sacs',
+    meta: '3 févr. 2026',
+  },
+}
+
+export const CoverLoading: Story = {
+  name: 'Couverture, chargement',
+  args: { cover: true, loading: true },
+}

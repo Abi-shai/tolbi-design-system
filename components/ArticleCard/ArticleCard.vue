@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, useId, watch } from 'vue'
+import { computed, ref, useId, watch } from 'vue'
+import { BrandPattern } from '../BrandPattern'
 import { Icon } from '../Icon'
 import { Skeleton } from '../Skeleton'
 
@@ -27,6 +28,16 @@ import { Skeleton } from '../Skeleton'
  * picture is decorative by default: the title is beside it. A missing or
  * broken picture leaves its 16:9 frame with a `file-text` in it, so the card
  * never changes size; `loading` previews the same geometry.
+ *
+ * **A brand cover** (ADR-0213): with `cover`, the frame is not a picture but the
+ * same cover for every article — the brand's deep green, the brand pattern all
+ * but invisible over it (white at 3 %, enlarged ×1.4 and offset within its
+ * bounds by `seed`, stable for one article, different from its neighbour), and
+ * the article's **title on it**, `heading-sm` in white at the bottom left, three
+ * lines at most. Nothing else on it. The title then leaves the words under the
+ * frame — they hold the date alone — and stays the link's name; the cover is
+ * `aria-hidden`. Under the pointer and the focus the pattern **fades** to 45 %
+ * of itself over `considered`: nothing moves, nothing lights up.
  */
 interface Props {
   title?: string
@@ -42,6 +53,10 @@ interface Props {
   /** What a reader hears after the title when it opens a new tab. */
   newTabLabel?: string
   loading?: boolean
+  /** The brand cover with the title on it, in place of a picture (ADR-0213). */
+  cover?: boolean
+  /** What keeps the cover's framing stable for an article — its id. */
+  seed?: string | number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -53,6 +68,8 @@ const props = withDefaults(defineProps<Props>(), {
   newTab: true,
   newTabLabel: 'S’ouvre dans un nouvel onglet',
   loading: false,
+  cover: false,
+  seed: undefined,
 })
 
 /* A frame that renders an <img> owns its failure (ADR-0040): the same frame, a glyph in it. */
@@ -60,6 +77,24 @@ const broken = ref(false)
 watch(() => props.image, () => { broken.value = false })
 
 const hintId = `ds-article-card-${useId()}`
+
+/*
+  The cover's framing (ADR-0213): the pattern enlarged ×1.4 around its centre,
+  so 20 % of it overflows each side, then offset by at most 14 % on each axis —
+  never a corner left empty, and no rotation for the same reason. The seed (the
+  article's id, else its title) picks the offset, so one article keeps its
+  framing and two neighbours rarely share one.
+*/
+function hash(value: string | number) {
+  let h = 2166136261
+  for (const c of String(value)) h = Math.imul(h ^ c.charCodeAt(0), 16777619)
+  return h >>> 0
+}
+const crop = computed(() => {
+  const h = hash(props.seed ?? props.title)
+  const offset = (bits: number) => (((bits % 15) / 14) * 2 - 1) * 14
+  return `translate(${offset(h).toFixed(1)}%, ${offset(h >>> 8).toFixed(1)}%) scale(1.4)`
+})
 </script>
 
 <template>
@@ -67,7 +102,10 @@ const hintId = `ds-article-card-${useId()}`
     <span class="ds-article-card__frame">
       <Skeleton variant="rect" width="100%" height="100%" />
     </span>
-    <span class="ds-article-card__text">
+    <span v-if="cover" class="ds-article-card__text ds-article-card__text--meta-only">
+      <Skeleton variant="text" width="40%" />
+    </span>
+    <span v-else class="ds-article-card__text">
       <Skeleton variant="text" width="92%" />
       <Skeleton variant="text" width="64%" />
       <Skeleton variant="text" width="40%" class="ds-article-card__meta-skeleton" />
@@ -83,8 +121,12 @@ const hintId = `ds-article-card-${useId()}`
     :aria-describedby="newTab ? hintId : undefined"
   >
     <span class="ds-article-card__frame">
+      <span v-if="cover" class="ds-article-card__cover" aria-hidden="true">
+        <BrandPattern surface="brand" scale="lg" class="ds-article-card__pattern" :style="{ '--article-card-crop': crop }" />
+        <span class="ds-article-card__cover-title">{{ title }}</span>
+      </span>
       <img
-        v-if="image && !broken"
+        v-else-if="image && !broken"
         class="ds-article-card__image"
         :src="image"
         :alt="imageAlt"
@@ -93,8 +135,9 @@ const hintId = `ds-article-card-${useId()}`
       />
       <Icon v-else name="file-text" :size="24" class="ds-article-card__placeholder" aria-hidden="true" />
     </span>
-    <span class="ds-article-card__text">
-      <span class="ds-article-card__title">{{ title }}</span>
+    <span class="ds-article-card__text" :class="{ 'ds-article-card__text--meta-only': cover }">
+      <!-- With a cover the title is on it; the link keeps it as its name (aria-label). -->
+      <span v-if="!cover" class="ds-article-card__title">{{ title }}</span>
       <span v-if="meta" class="ds-article-card__meta">{{ meta }}</span>
     </span>
     <span v-if="newTab" :id="hintId" class="ds-article-card__hint">{{ newTabLabel }}</span>
@@ -207,6 +250,66 @@ a.ds-article-card:focus-visible {
 
 .ds-article-card__meta-skeleton {
   margin-top: var(--ds-spacing-xxs);
+}
+
+/* The words under a cover: the date alone, its own line box. */
+.ds-article-card--loading .ds-article-card__text--meta-only {
+  min-height: 1lh;
+  font: var(--ds-font-body-sm);
+}
+
+/*
+  The brand cover (ADR-0213): a picture, so its inks do not follow the theme —
+  the brand's deep green and white, primitives (as `MapPin`'s, ADR-0169).
+  White on brand-700 at the pattern's lightest (two stamps, 3 % on 3 %) keeps
+  the title above 8.5:1.
+*/
+.ds-article-card__cover {
+  position: absolute;
+  inset: 0;
+}
+
+.ds-article-card__frame .ds-article-card__pattern {
+  /* token-lint-disable-next-line no-raw-primitive — a cover is a picture: the brand's deep green in both modes (ADR-0213) */
+  --article-card-cover-ground: var(--ds-color-brand-700);
+  /* token-lint-disable-next-line no-raw-primitive — a cover is a picture: white ink in both modes (ADR-0213) */
+  --article-card-cover-ink: var(--ds-color-base-white);
+  --brand-pattern-ink-alpha: 0.03;
+  position: absolute;
+  inset: 0;
+  background-color: var(--article-card-cover-ground);
+  color: var(--article-card-cover-ink);
+}
+
+.ds-article-card__pattern :deep(.ds-brand-pattern__art) {
+  transform: var(--article-card-crop);
+  transform-origin: center;
+  transition: opacity var(--ds-motion-duration-considered) var(--ds-motion-easing-default);
+}
+
+/* The pattern fades under the pointer and the focus — it never lights up. */
+a.ds-article-card:is(:hover, :focus-visible) .ds-article-card__pattern :deep(.ds-brand-pattern__art) {
+  opacity: 0.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-article-card__pattern :deep(.ds-brand-pattern__art) {
+    transition: none;
+  }
+}
+
+.ds-article-card__cover-title {
+  position: absolute;
+  inset-inline: var(--ds-spacing-xl);
+  bottom: var(--ds-spacing-xl);
+  display: -webkit-box;
+  overflow: hidden;
+  font: var(--ds-font-heading-sm);
+  /* token-lint-disable-next-line no-raw-primitive — a cover is a picture: white ink in both modes (ADR-0213) */
+  color: var(--ds-color-base-white);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
 /* Two lines at most; the whole title is the link's name. */
