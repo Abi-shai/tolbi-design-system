@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import { within, expect, userEvent, fn } from '@storybook/test'
 import ActionList from './ActionList.vue'
 import ActionListItem from './ActionListItem.vue'
-import { AvatarGroup } from '../AvatarGroup'
+import { Avatar } from '../Avatar'
 import { CreditCoins } from '../CreditCoins'
-import { ModuleIconStack } from '../ModuleIconStack'
+import { Icon } from '../Icon'
 
 const meta: Meta<typeof ActionList> = {
   title: 'Navigation/ActionList',
@@ -33,26 +33,27 @@ type Story = StoryObj<typeof meta>
 const COLUMN = 'width: 21.5rem'
 
 /**
- * Le bloc de la colonne de droite, tel que le produit le passe : les membres (deux silhouettes), les crédits (les
- * pièces de `CreditCost`), les guides (les logos des modules de l’utilisateur, deux au plus).
+ * Le bloc de la colonne de droite, tel que le produit le passe — une figure par plaque, centrée, environ 2rem
+ * (ADR-0209) : les membres (une silhouette, `Avatar sm`), les crédits (les pièces de `CreditCost`, 32), les guides
+ * (`book-open` à 24, à l’encre grisée de la plaque).
  */
 export const Default: Story = {
   name: 'Actions rapides',
   args: { onSelect: fn() } as never,
   render: args => ({
-    components: { ActionList, ActionListItem, AvatarGroup, CreditCoins, ModuleIconStack },
+    components: { ActionList, ActionListItem, Avatar, CreditCoins, Icon },
     setup: () => ({ args, COLUMN }),
     template: `
       <div :style="COLUMN">
         <ActionList :title="args.title">
           <ActionListItem title="Inviter des membres" description="1 membre" href="#membres" @select="args.onSelect">
-            <template #media><AvatarGroup :items="[{}, {}]" size="xs" /></template>
+            <template #media><Avatar size="sm" /></template>
           </ActionListItem>
           <ActionListItem title="Gérer les crédits" description="Solde et tarifs" href="#credits">
             <template #media><CreditCoins :size="32" /></template>
           </ActionListItem>
           <ActionListItem title="Se former" description="Guides de tes modules" href="#aide" badge="Recommandé" badge-tone="brand">
-            <template #media><ModuleIconStack :modules="['Yield', 'Scan']" /></template>
+            <template #media><Icon name="book-open" /></template>
           </ActionListItem>
         </ActionList>
       </div>`,
@@ -86,13 +87,13 @@ export const Default: Story = {
 export const LongTitle: Story = {
   name: 'Titre long',
   render: args => ({
-    components: { ActionList, ActionListItem, ModuleIconStack },
+    components: { ActionList, ActionListItem, Icon },
     setup: () => ({ args, COLUMN }),
     template: `
       <div :style="COLUMN">
         <ActionList :title="args.title">
           <ActionListItem title="Se former aux modules de ton équipe" description="Guides, vidéos et webinaires de tes modules" href="#aide" badge="Recommandé" badge-tone="brand">
-            <template #media><ModuleIconStack :modules="['Yield', 'Scan']" /></template>
+            <template #media><Icon name="book-open" /></template>
           </ActionListItem>
         </ActionList>
       </div>`,
@@ -106,16 +107,16 @@ export const LongTitle: Story = {
 export const Narrow: Story = {
   name: 'Colonne étroite',
   render: args => ({
-    components: { ActionList, ActionListItem, AvatarGroup, CreditCoins, ModuleIconStack },
+    components: { ActionList, ActionListItem, Avatar, CreditCoins, Icon },
     setup: () => ({ args }),
     template: `
       <div style="width: 18rem">
         <ActionList :title="args.title">
           <ActionListItem title="Inviter des membres de l’équipe" description="12 membres, 3 invitations en attente">
-            <template #media><AvatarGroup :items="[{}, {}]" size="xs" /></template>
+            <template #media><Avatar size="sm" /></template>
           </ActionListItem>
           <ActionListItem title="Se former aux modules" description="Guides de tes modules" badge="Recommandé" badge-tone="brand">
-            <template #media><ModuleIconStack :modules="['Yield', 'Scan', 'Source']" /></template>
+            <template #media><Icon name="book-open" /></template>
           </ActionListItem>
         </ActionList>
       </div>`,

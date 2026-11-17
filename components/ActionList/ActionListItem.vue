@@ -13,6 +13,14 @@ import { Icon } from '../Icon'
  * **one line** under it; a **chevron** at the end, which keeps its place —
  * the words give, never the chevron, and the title gives before the badge.
  *
+ * **One figure, and it breathes** (ADR-0209): the plate holds a single
+ * illustration, centred, about **2rem** at most — what `CreditCoins` at 32
+ * does — so every row keeps the same margin. One person is an `Avatar size="sm"`
+ * (its silhouette), a glyph an `Icon` at 24, which takes the plate's ink,
+ * `text-subtlest`: greyed, as the silhouette is. Two people or two logos edge
+ * to edge read as cramped beside the coins; a smaller duo was drawn and
+ * declined for one figure.
+ *
  * Hover and keyboard focus are a tray's (ADR-0199/0207): the row takes
  * `--on-tray-hover`, the plate steps to `bg-neutral`, the ring is the row's;
  * nothing moves. The plate hands its ground down as `--on-plate-ground`, so a
@@ -44,7 +52,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 defineSlots<{
-  /** The plate's illustration — decorative. */
+  /** The plate's illustration — one figure, decorative, about 2rem at most, centred (ADR-0209). */
   media?: () => unknown
 }>()
 
@@ -138,6 +146,8 @@ function onClick(event: MouseEvent) {
   height: 3rem;
   border-radius: var(--ds-radius-surface);
   background: var(--on-plate-ground);
+  /* A glyph on the plate is greyed, as an avatar's silhouette is (ADR-0209). */
+  color: var(--ds-text-subtlest);
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 

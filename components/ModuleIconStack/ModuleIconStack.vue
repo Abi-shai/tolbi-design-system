@@ -12,8 +12,8 @@ import { ModuleIcon, type ModuleName } from '../ModuleIcon'
  * A logo's tile is a 30 % tint, nearly transparent, so an overlapped logo would
  * show through the one above it. Each logo therefore stands on a **cut-out**:
  * a fill of the ground it sits on, at the tile's own corner (14.2 of 48), and a
- * 2px ring of that ground around it — the plate's edge, not a border. The
- * ground is read from `--on-plate-ground`, which a plate hands down (an
+ * ring of that ground around it, a twelfth of the size (2px at 24, 1.5 at 18)
+ * — the plate's edge, not a border. The ground is read from `--on-plate-ground`, which a plate hands down (an
  * `ActionListItem`'s, at rest and under the pointer alike); elsewhere it is
  * `bg-default`.
  *
@@ -55,7 +55,9 @@ const shown = computed(() => props.modules.slice(0, props.max))
   display: inline-flex;
   border-radius: calc(var(--module-stack-size) * 0.296);
   background: var(--on-plate-ground, var(--ds-bg-default));
-  box-shadow: 0 0 0 var(--ds-border-width-strong) var(--on-plate-ground, var(--ds-bg-default));
+  /* The ring scales with the logo, as the overlap and the corner do (ADR-0209):
+     2px at 24, 1.5 at 18 — a fixed 2px would eat a ninth of a small logo. */
+  box-shadow: 0 0 0 calc(var(--module-stack-size) / 12) var(--on-plate-ground, var(--ds-bg-default));
 }
 
 .ds-module-icon-stack__item + .ds-module-icon-stack__item {

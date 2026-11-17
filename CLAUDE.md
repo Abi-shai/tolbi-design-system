@@ -1734,6 +1734,11 @@ Before working on any component, read:
   `aria-hidden`. Tray hover and focus, the plate to `bg-neutral`; it hands down **`--on-plate-ground`**, read by
   `AvatarGroup`'s ring and **`ModuleIconStack`** (new: logos overlapped by a quarter on a cut-out of the ground, `max` 2,
   no `+N`). **`CreditCoins`** (new) is `CreditCost`'s coins on their own, `size` = height (CreditCost unchanged, 64 × 56).
+- **ADR-0209**: **one figure on the plate** (track B; A, a smaller duo with an `xxs` avatar, was drawn and declined) —
+  an `ActionListItem` plate holds a single illustration, centred, about 2rem (the coins at 32 are the reference): one
+  person = `Avatar sm`, a glyph = `Icon` at 24 in the plate's ink, **`text-subtlest`** (set on the plate, as greyed as the
+  silhouette). « Se former » takes `book-open`. No `xxs` (no consumer). `ModuleIconStack`'s ring scales with the logo
+  (a twelfth: 2px at 24, 1.5 at 18).
 
 ## Architecture
 
