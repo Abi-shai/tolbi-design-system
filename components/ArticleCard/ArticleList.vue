@@ -32,6 +32,9 @@ export interface ArticleListItem {
  * nothing loading: nothing rendered.
  */
 interface Props {
+  /** The block's title, in the tray's grey (ADR-0205) — « Quelques articles à lire ». */
+  title?: string
+  headingLevel?: 2 | 3 | 4
   items?: ArticleListItem[]
   loading?: boolean
   /** How many placeholder cards while loading — the row's three. */
@@ -43,6 +46,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  title: undefined,
+  headingLevel: 2,
   items: () => [],
   loading: false,
   loadingCount: 3,
@@ -50,6 +55,11 @@ const props = withDefaults(defineProps<Props>(), {
   newTabLabel: undefined,
   wrap: false,
 })
+
+defineSlots<{
+  /** At the end of the title's line — « Voir tout » (ADR-0205). */
+  action?: () => unknown
+}>()
 
 /*
   How many 18rem cards fit on the row (ADR-0201): the room the grid has, its
@@ -87,7 +97,8 @@ const placeholders = computed(() => (props.wrap ? props.loadingCount : Math.min(
 
 <template>
   <div v-if="loading || items.length" ref="root" class="ds-article-list" :aria-busy="loading || undefined">
-    <Tray>
+    <Tray :title="title" :heading-level="headingLevel">
+    <template v-if="$slots.action" #action><slot name="action" /></template>
     <ul class="ds-article-list__grid">
       <template v-if="loading">
         <li v-for="n in placeholders" :key="`skeleton-${n}`"><ArticleCard loading /></li>

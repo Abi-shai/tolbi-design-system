@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { within, expect, userEvent, fn } from '@storybook/test'
 import ProjectList from './ProjectList.vue'
+import { Button } from '../Button'
 import type { ProjectListItem } from './ProjectList.vue'
 
 const RECENT: ProjectListItem[] = [
@@ -74,5 +75,20 @@ export const Narrow: Story = {
     components: { ProjectList },
     setup: () => ({ args }),
     template: `<div style="max-width: 420px"><ProjectList v-bind="args" /></div>`,
+  }),
+}
+
+/**
+ * Le titre dans le plateau (ADR-0205, piste T1) : « Derniers projets » et « Voir tout » sur une ligne, dans le gris,
+ * au-dessus de la surface blanche ; la liste devient une région nommée par son titre.
+ */
+export const Titled: Story = {
+  name: 'Avec titre',
+  render: args => ({
+    components: { ProjectList, Button },
+    setup: () => ({ args }),
+    template: `<ProjectList v-bind="args" title="Derniers projets">
+      <template #action><Button variant="link" size="sm" label="Voir tout" icon-trailing="arrow-right" /></template>
+    </ProjectList>`,
   }),
 }

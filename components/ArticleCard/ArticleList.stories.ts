@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import ArticleList, { type ArticleListItem } from './ArticleList.vue'
+import { Button } from '../Button'
 
 const ARTICLES: ArticleListItem[] = [
   {
@@ -97,4 +98,22 @@ export const Wrap: Story = {
   name: 'Sur plusieurs rangées',
   args: { wrap: true },
   render: Default.render,
+}
+
+/** Le titre dans le plateau (ADR-0205) : « Quelques articles à lire » et « Voir tout », la liste les porte. */
+export const Titled: Story = {
+  name: 'Avec titre',
+  render: (args) => ({
+    components: { ArticleList, Button },
+    setup: () => ({ args }),
+    template: `<div style="max-width:1100px"><ArticleList v-bind="args" title="Quelques articles à lire">
+      <template #action><Button variant="link" size="sm" label="Voir tout" icon-trailing="arrow-right" /></template>
+    </ArticleList></div>`,
+  }),
+}
+
+export const TitledLoading: Story = {
+  name: 'Avec titre, chargement',
+  args: { loading: true },
+  render: Titled.render,
 }

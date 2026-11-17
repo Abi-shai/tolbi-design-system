@@ -1713,6 +1713,10 @@ Before working on any component, read:
 - **ADR-0204**: **the capsule's end, a column at its right edge** (replaces ADR-0203's one line) — `__end` is a column
   (`align-items: flex-end`, centred, `margin-left: auto`): the status badge on top, the date or freshness under it, both
   flush right, `spacing-xxs` apart; without a badge the information alone, flush right.
+- **ADR-0205**: **the tray carries its block's title** (track T1) — `Tray` takes `title`, `headingLevel` (2 by default) and
+  `#action` (« Voir tout »): a line in the grey above the white surface, `heading-sm` / `text-strong`, `spacing-xs` above and
+  `spacing-md` at the sides and below so the title stands on the surface's inner edge (16); with a title the tray is a
+  `<section>` named by it (a region). `ProjectList` and `ArticleList` pass them on; loading keeps the titled tray; empty = nothing.
 
 ## Architecture
 

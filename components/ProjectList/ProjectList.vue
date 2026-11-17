@@ -30,6 +30,9 @@ export interface ProjectListItem {
  * Google's Drive widget: a picture, a name, one line under it, no figures.
  */
 interface Props {
+  /** The block's title, in the tray's grey (ADR-0205) — « Derniers projets ». */
+  title?: string
+  headingLevel?: 2 | 3 | 4
   items?: ProjectListItem[]
   loading?: boolean
   /** How many placeholder rows while loading — the page size the product asks for. */
@@ -37,10 +40,17 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  title: undefined,
+  headingLevel: 2,
   items: () => [],
   loading: false,
   loadingRows: 6,
 })
+
+defineSlots<{
+  /** At the end of the title's line — « Voir tout » (ADR-0205). */
+  action?: () => unknown
+}>()
 
 const emit = defineEmits<{
   /** A plain click on a row — with the click, so a router can take a link over. Never with ⌘/Ctrl/Shift/Alt on a link. */
@@ -55,7 +65,8 @@ function onSelect(item: ProjectListItem, event: MouseEvent) {
 </script>
 
 <template>
-  <Tray v-if="loading || items.length" class="ds-project-list" :aria-busy="loading || undefined">
+  <Tray v-if="loading || items.length" class="ds-project-list" :title="title" :heading-level="headingLevel" :aria-busy="loading || undefined">
+    <template v-if="$slots.action" #action><slot name="action" /></template>
     <ul class="ds-project-list__list">
       <template v-if="loading">
         <li v-for="n in loadingRows" :key="`skeleton-${n}`" class="ds-project-list__row" aria-hidden="true">

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import Tray from './Tray.vue'
+import { Button } from '../Button'
 
 const meta: Meta<typeof Tray> = {
   title: 'Structure/Tray',
@@ -28,6 +29,24 @@ export const Default: Story = {
     components: { Tray },
     template: `
       <Tray>
+        <p style="margin:0;padding:var(--ds-spacing-md);font:var(--ds-font-body-md);color:var(--ds-text-default)">
+          Ce que le bloc porte, posé sur la surface blanche.
+        </p>
+      </Tray>`,
+  }),
+}
+
+/**
+ * Avec son titre (ADR-0205, piste T1) : le titre dans le gris, au-dessus de la surface blanche, « Voir tout » au bout de
+ * sa ligne — le gris porte le titre, le blanc le contenu. Le plateau devient une région nommée par le titre.
+ */
+export const Titled: Story = {
+  name: 'Avec titre',
+  render: () => ({
+    components: { Tray, Button },
+    template: `
+      <Tray title="Derniers projets">
+        <template #action><Button variant="link" size="sm" label="Voir tout" icon-trailing="arrow-right" /></template>
         <p style="margin:0;padding:var(--ds-spacing-md);font:var(--ds-font-body-md);color:var(--ds-text-default)">
           Ce que le bloc porte, posé sur la surface blanche.
         </p>
