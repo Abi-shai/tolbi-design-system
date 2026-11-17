@@ -1710,6 +1710,9 @@ Before working on any component, read:
   A varying width does not break the loop (the two runs are identical), but **`useMarquee` snapped 4px every lap**: it
   wrapped by half the track = a run + half the gap. The lap is now measured, `runs[1].offsetLeft − runs[0].offsetLeft`
   (filmed: 513.00 → 517.53 at a 518 lap).
+- **ADR-0204**: **the capsule's end, a column at its right edge** (replaces ADR-0203's one line) — `__end` is a column
+  (`align-items: flex-end`, centred, `margin-left: auto`): the status badge on top, the date or freshness under it, both
+  flush right, `spacing-xxs` apart; without a badge the information alone, flush right.
 
 ## Architecture
 

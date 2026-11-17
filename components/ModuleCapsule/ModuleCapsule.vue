@@ -17,8 +17,9 @@ import { ModuleIcon, type ModuleName } from '../ModuleIcon'
  *   on the baseline; under it **one** line of context, when it says something
  *   the figure does not (« 2 316 parcelles · 4 120 ha »).
  * - **Made of what** (Scan, Source): a segmented bar, 8px, and its legend.
- * - **Where it stands**: on one line, the date or the freshness then the status
- *   badge (ADR-0203); the date alone without a status.
+ * - **Where it stands**: a column at the capsule's right edge, the status badge
+ *   over the date or the freshness, both aligned right (ADR-0204); the date
+ *   alone without a status.
  *
  * **It is dark whatever the page** — the band is dark on the light home — and
  * **neutral, never green-grey**: its grounds, rules and inks are its own
@@ -201,7 +202,6 @@ const contextLine = computed(() => {
     </div>
 
     <div v-if="status || freshness" class="ds-module-capsule__end">
-      <p v-if="freshness" class="ds-module-capsule__freshness">{{ freshness }}</p>
       <Badge
         v-if="status"
         :label="status.label"
@@ -209,6 +209,7 @@ const contextLine = computed(() => {
         :variant="status.variant ?? 'pill-outline'"
         size="sm"
       />
+      <p v-if="freshness" class="ds-module-capsule__freshness">{{ freshness }}</p>
     </div>
   </article>
 </template>
@@ -365,12 +366,15 @@ const contextLine = computed(() => {
   text-overflow: ellipsis;
 }
 
-/* Where it stands, on one line (ADR-0203): the date first, the status after it. */
+/* Where it stands (ADR-0204): a column at the capsule's right edge, the status
+   over its date, both aligned right. */
 .ds-module-capsule__end {
   flex: none;
   display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-md);
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--ds-spacing-xxs);
+  margin-left: auto;
 }
 
 .ds-module-capsule__freshness {
