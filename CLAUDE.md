@@ -1739,6 +1739,10 @@ Before working on any component, read:
   person = `Avatar sm`, a glyph = `Icon` at 24 in the plate's ink, **`text-subtlest`** (set on the plate, as greyed as the
   silhouette). « Se former » takes `book-open`. No `xxs` (no consumer). `ModuleIconStack`'s ring scales with the logo
   (a twelfth: 2px at 24, 1.5 at 18).
+- **ADR-0210**: **a row without a plate** (four versions compared on the page: no plate, chevron kept) — the
+  `ActionListItem` plate renders **only when `#media` is filled**; without it the row starts at its words (60px high,
+  margins and text → chevron gap unchanged), and « Apprendre » + « Recommandé » hold whole at 21.5rem. The chevron stays:
+  the row leads somewhere. The product passes no `#media` on the home page.
 
 ## Architecture
 

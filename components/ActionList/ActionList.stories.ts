@@ -33,28 +33,21 @@ type Story = StoryObj<typeof meta>
 const COLUMN = 'width: 21.5rem'
 
 /**
- * Le bloc de la colonne de droite, tel que le produit le passe — une figure par plaque, centrée, environ 2rem
- * (ADR-0209) : les membres (une silhouette, `Avatar sm`), les crédits (les pièces de `CreditCost`, 32), les guides
- * (`book-open` à 24, à l’encre grisée de la plaque).
+ * Le bloc de la colonne de droite, tel que le produit le passe (ADR-0210) : **sans plaque** — aucun `#media`, la ligne
+ * commence au texte, et « Apprendre » tient avec son badge dans 21,5rem. Le chevron reste : la ligne mène quelque part.
  */
 export const Default: Story = {
   name: 'Actions rapides',
   args: { onSelect: fn() } as never,
   render: args => ({
-    components: { ActionList, ActionListItem, Avatar, CreditCoins, Icon },
+    components: { ActionList, ActionListItem },
     setup: () => ({ args, COLUMN }),
     template: `
       <div :style="COLUMN">
         <ActionList :title="args.title">
-          <ActionListItem title="Inviter des membres" description="1 membre" href="#membres" @select="args.onSelect">
-            <template #media><Avatar size="sm" /></template>
-          </ActionListItem>
-          <ActionListItem title="Gérer les crédits" description="Solde et tarifs" href="#credits">
-            <template #media><CreditCoins :size="32" /></template>
-          </ActionListItem>
-          <ActionListItem title="Se former" description="Guides de tes modules" href="#aide" badge="Recommandé" badge-tone="brand">
-            <template #media><Icon name="book-open" /></template>
-          </ActionListItem>
+          <ActionListItem title="Inviter des membres" description="1 membre" href="#membres" @select="args.onSelect" />
+          <ActionListItem title="Gérer les crédits" description="Solde et tarifs" href="#credits" />
+          <ActionListItem title="Apprendre" description="Guides de tes modules" href="#aide" badge="Recommandé" badge-tone="brand" />
         </ActionList>
       </div>`,
   }),
@@ -66,7 +59,8 @@ export const Default: Story = {
     await expect(links).toHaveLength(3)
     await expect(links[0]).toHaveAccessibleName('Inviter des membres')
     await expect(links[0]).toHaveAccessibleDescription('1 membre')
-    await expect(links[2]).toHaveAccessibleName('Se former')
+    await expect(links[2]).toHaveAccessibleName('Apprendre')
+    await expect(canvasElement.querySelector('.ds-action-list-item__plate')).toBeNull()
     await expect(links[2]).toHaveAccessibleDescription('Recommandé Guides de tes modules')
     const onSelect = (args as unknown as { onSelect: ReturnType<typeof fn> }).onSelect
     const first = links[0]
@@ -79,6 +73,32 @@ export const Default: Story = {
     await userEvent.click(first)
     await expect(onSelect).toHaveBeenCalledTimes(1)
   },
+}
+
+/**
+ * Avec une illustration (ADR-0209) : la plaque n’apparaît que si `#media` est rempli — une figure, centrée, environ
+ * 2rem. Elle prend 56px au titre.
+ */
+export const WithMedia: Story = {
+  name: 'Avec illustration',
+  render: args => ({
+    components: { ActionList, ActionListItem, Avatar, CreditCoins, Icon },
+    setup: () => ({ args, COLUMN }),
+    template: `
+      <div :style="COLUMN">
+        <ActionList :title="args.title">
+          <ActionListItem title="Inviter des membres" description="1 membre" href="#membres">
+            <template #media><Avatar size="sm" /></template>
+          </ActionListItem>
+          <ActionListItem title="Gérer les crédits" description="Solde et tarifs" href="#credits">
+            <template #media><CreditCoins :size="32" /></template>
+          </ActionListItem>
+          <ActionListItem title="Se former" description="Guides de tes modules" href="#aide" badge="Recommandé" badge-tone="brand">
+            <template #media><Icon name="book-open" /></template>
+          </ActionListItem>
+        </ActionList>
+      </div>`,
+  }),
 }
 
 /**

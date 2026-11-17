@@ -13,9 +13,9 @@ import { ModuleIcon, type ModuleName } from '../ModuleIcon'
  * show through the one above it. Each logo therefore stands on a **cut-out**:
  * a fill of the ground it sits on, at the tile's own corner (14.2 of 48), and a
  * ring of that ground around it, a twelfth of the size (2px at 24, 1.5 at 18)
- * — the plate's edge, not a border. The ground is read from `--on-plate-ground`, which a plate hands down (an
- * `ActionListItem`'s, at rest and under the pointer alike); elsewhere it is
- * `bg-default`.
+ * — the plate's edge, not a border. The ground is read from
+ * `--on-plate-ground`, which a plate hands down (an `ActionListItem`'s, at rest
+ * and under the pointer alike); elsewhere it is `bg-default`.
  *
  * Decorative: the logos are what the words beside them are about. No `+N` —
  * past `max`, the rest are not drawn; it is an illustration, not a count.

@@ -8,7 +8,9 @@ import { Icon } from '../Icon'
  * with `href`, a `<button>` without — never a `<div>` that emits (ADR-0014).
  *
  * From the start: a **plate** (3rem, `radius-surface`, the tray's grey,
- * ADR-0207) holding a free illustration (`#media`); the **title**, a verb in
+ * ADR-0207) holding a free illustration (`#media`) — **only when `#media` is
+ * filled** (ADR-0210): without it the row starts at its words, which then have
+ * the title's whole room; the **title**, a verb in
  * the infinitive, one line, an optional `Badge` beside it on the same line;
  * **one line** under it; a **chevron** at the end, which keeps its place —
  * the words give, never the chevron, and the title gives before the badge.
@@ -52,7 +54,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 defineSlots<{
-  /** The plate's illustration — one figure, decorative, about 2rem at most, centred (ADR-0209). */
+  /** The plate's illustration — one figure, decorative, about 2rem at most, centred (ADR-0209). Absent: no plate (ADR-0210). */
   media?: () => unknown
 }>()
 
@@ -84,7 +86,7 @@ function onClick(event: MouseEvent) {
       :aria-describedby="[badge && badgeId, description && descriptionId].filter(Boolean).join(' ') || undefined"
       @click="onClick"
     >
-      <span class="ds-action-list-item__plate" aria-hidden="true"><slot name="media" /></span>
+      <span v-if="$slots.media" class="ds-action-list-item__plate" aria-hidden="true"><slot name="media" /></span>
       <span class="ds-action-list-item__text">
         <span class="ds-action-list-item__head">
           <span :id="titleId" class="ds-action-list-item__title">{{ title }}</span>
