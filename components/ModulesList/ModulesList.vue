@@ -331,18 +331,27 @@ function current(item: ModulesListItem) {
   width: 6.5rem;
   height: 6.5rem;
   padding: var(--ds-spacing-sm);
-  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  /* No edge and no ground (ADR-0206): on its `Tray`, as a `ProjectList` row, the
+     tray groups and the tile is its plate and its name. */
+  border: none;
   border-radius: var(--ds-radius-surface);
-  background: var(--ds-bg-default);
+  background: transparent;
+}
+
+/* The tray's hover (ADR-0199, ADR-0206): the whole tile takes a ground, on the
+   pointer and on the keyboard's focus alike, with the row's ring. */
+.ds-modules-list--page .ds-modules-list__item:focus-visible {
+  box-shadow: var(--ds-focus-ring-brand-shadow-xs);
 }
 
 /*
   The plate (ADR-0176, the owner's T4): the drawing sits on a ground of its
   own, the tile's whole inner width and whatever height the name leaves, 6px
   inside the tile all round. Its curve is `surface-sm` (10), softer than the
-  concentric 12 − 6 would be. The plate, not the tile, answers the pointer:
-  `bg-brand-subtlest` at rest, `bg-brand-subtle` under the pointer; the current
-  module's plate one step up on each.
+  concentric 12 − 6 would be. **`bg-neutral`, a project's picture's grey**
+  (ADR-0206, `ProjectList`'s logic): it stays so under the pointer — the tile,
+  not the plate, answers now. The current module keeps its mark: its plate
+  `bg-brand-subtle`, one step up under the pointer, its name in the plate's ink.
 */
 .ds-modules-list--page .ds-modules-list__plate {
   display: flex;
@@ -352,17 +361,19 @@ function current(item: ModulesListItem) {
   justify-content: center;
   min-height: 0;
   border-radius: var(--ds-radius-surface-sm);
-  background: var(--ds-bg-brand-subtlest);
+  background: var(--ds-bg-neutral);
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
-.ds-modules-list--page .ds-modules-list__item:hover:not(:disabled):not([aria-disabled='true']),
-.ds-modules-list--page .ds-modules-list__item--active,
-.ds-modules-list--page .ds-modules-list__item--active:hover:not(:disabled):not([aria-disabled='true']) {
-  background: var(--ds-bg-default);
+.ds-modules-list--page .ds-modules-list__item--active {
+  background: transparent;
 }
 
-.ds-modules-list--page .ds-modules-list__item:hover:not(:disabled):not([aria-disabled='true']) .ds-modules-list__plate,
+.ds-modules-list--page .ds-modules-list__item:is(:hover, :focus-visible):not(:disabled):not([aria-disabled='true']),
+.ds-modules-list--page .ds-modules-list__item--active:is(:hover, :focus-visible):not(:disabled):not([aria-disabled='true']) {
+  background: var(--on-tray-hover, var(--ds-bg-neutral-subtle-hover));
+}
+
 .ds-modules-list--page .ds-modules-list__item--active .ds-modules-list__plate {
   background: var(--ds-bg-brand-subtle);
 }

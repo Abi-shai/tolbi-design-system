@@ -1717,6 +1717,10 @@ Before working on any component, read:
   `#action` (« Voir tout »): a line in the grey above the white surface, `heading-sm` / `text-strong`, `spacing-xs` above and
   `spacing-md` at the sides and below so the title stands on the surface's inner edge (16); with a title the tray is a
   `<section>` named by it (a region). `ProjectList` and `ArticleList` pass them on; loading keeps the titled tray; empty = nothing.
+- **ADR-0206**: **quick access on a tray, as « Derniers projets »** — `ModulesList layout="page"`: the tile loses its border
+  and ground; the plate takes a project picture's grey (`bg-neutral`) and keeps it under the pointer; the **whole tile** takes
+  the tray's hover (`--on-tray-hover`) + the row's ring on hover and focus; the current module keeps its brand plate and ink.
+  Plate and hovered tile are one grey (1.000:1), as a `ProjectList` row's picture. The drawer unchanged.
 
 ## Architecture
 

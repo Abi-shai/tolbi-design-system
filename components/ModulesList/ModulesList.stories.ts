@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
 import { within, expect, userEvent, fn } from '@storybook/test'
 import ModulesList from './ModulesList.vue'
+import { Tray } from '../Tray'
 
 // Modules du design Figma (node 518:15253) — ordre et labels exacts
 const FIGMA_MODULES = [
@@ -58,7 +59,8 @@ export const SixOrFewer: Story = {
 
 /**
  * ADR-0164 — **sur une page** (l’accueil d’etolbi) : `layout="page"`, une grille fluide qui se replie, sans hauteur
- * fixe ni ombre ; chaque module un bloc bordé, le dessin à 32 et le nom. Avec `href`, chaque entrée est un vrai lien
+ * fixe ni ombre ; posée sur un `Tray` titré comme « Derniers projets » (ADR-0206) : la tuile sans fond ni bordure, la
+ * plaque du logo dans le gris d’une vignette de projet, toute la tuile prend le survol du plateau. Avec `href`, chaque entrée est un vrai lien
  * — clic milieu, nouvel onglet — et émet toujours `select` avec le clic, qu’un routeur peut reprendre.
  */
 export const OnAPage: Story = {
@@ -69,10 +71,12 @@ export const OnAPage: Story = {
     modules: FIGMA_MODULES.map(m => ({ ...m, href: `#${m.name.toLowerCase()}`, active: m.name === 'Yield' })),
     onSelect: fn(),
   },
+  /* On its titled `Tray`, as the home page sets it (ADR-0206): the tiles carry no ground of their own, the plate a
+     project's picture's grey, the whole tile the tray's hover. */
   render: args => ({
-    components: { ModulesList },
+    components: { ModulesList, Tray },
     setup: () => ({ args }),
-    template: `<div style="max-width: 1100px"><ModulesList v-bind="args" /></div>`,
+    template: `<div style="max-width: 1100px"><Tray title="Accès rapide"><ModulesList v-bind="args" /></Tray></div>`,
   }),
   /* Guarded: the entries are links, the current one says it is the page; a modified click is the browser's
      (no `select`, ADR-0165), a plain one emits it. */
