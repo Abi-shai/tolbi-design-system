@@ -163,6 +163,18 @@ a.ds-article-card:focus-visible {
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
+/* A hairline over the picture (ADR-0201): a logo on white would otherwise melt
+   into the tray's white surface. Inset, drawn over the image, so the 16:9 box
+   does not move; it stays on hover and on an empty frame. */
+.ds-article-card__frame::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-border-subtle);
+  content: '';
+  pointer-events: none;
+}
+
 .ds-article-card__image {
   position: absolute;
   inset: 0;

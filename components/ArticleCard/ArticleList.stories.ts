@@ -18,6 +18,13 @@ const ARTICLES: ArticleListItem[] = [
   },
   {
     id: 3,
+    title: 'Partenariat avec l’IITA : la cartographie des cultures au Nigeria',
+    href: 'https://tolbi.ai',
+    image: './stories/articles/logo-on-white.jpg',
+    meta: 'Article · 28 janv. 2026',
+  },
+  {
+    id: 4,
     title: 'Ce que mesure l’indice de stock carbone',
     href: 'https://tolbi.ai',
     meta: 'Article · 12 janv. 2026',
@@ -36,7 +43,8 @@ const meta: Meta<typeof ArticleList> = {
           'La rangée « À lire » de l’accueil (ADR-0195) — l’équivalent de `ProjectList` : le paquet pose les cartes, le ' +
           'produit les remplit, **sur le même `Tray` que `ProjectList`** (ADR-0198) : le plateau regroupe, les cartes ' +
           'n’ont plus de fond. Des cartes de **18rem**, alignées au début, `spacing-lg` entre elles — la rangée ne ' +
-          'remplit plus la largeur (ADR-0196) ; à court de place elles passent à la ligne, jamais sous 18rem. **Une ' +
+          'remplit plus la largeur (ADR-0196). **Une seule rangée** (ADR-0201) : les cartes qui tiennent entières, les ' +
+          'autres ne sont pas rendues (« Voir tout » y mène) ; `wrap` les fait passer à la ligne. **Une ' +
           'colonne pleine largeur sous 40rem de sa propre largeur** (requête de conteneur — le paquet n’a pas de points de ' +
           'rupture). Le titre de section (« À lire », ' +
           '`heading-md`) et « Voir tout » sont au produit. Rien à montrer et rien en chargement : rien.',
@@ -55,7 +63,10 @@ const SECTION = (inner: string) => `
     ${inner}
   </section>`
 
-/** Trois articles ; le troisième sans image : le cadre 16:9 reste, une icône au centre. */
+/**
+ * Quatre articles sur une rangée : ceux qui tiennent entiers (trois sous ~1 190px). Le troisième est un logo sur
+ * blanc — le filet du cadre dit où l’image s’arrête ; le quatrième n’a pas d’image : le cadre reste, une icône au centre.
+ */
 export const Default: Story = {
   render: (args) => ({
     components: { ArticleList },
@@ -79,4 +90,11 @@ export const Narrow: Story = {
     setup: () => ({ args }),
     template: `<div style="width:420px">${SECTION(`<ArticleList v-bind="args" />`)}</div>`,
   }),
+}
+
+/** `wrap` : les cartes passent à la ligne plutôt que de n’afficher que celles qui tiennent. */
+export const Wrap: Story = {
+  name: 'Sur plusieurs rangées',
+  args: { wrap: true },
+  render: Default.render,
 }

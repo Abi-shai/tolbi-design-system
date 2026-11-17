@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { Tray } from '../Tray'
 import ArticleCard from './ArticleCard.vue'
 
@@ -20,7 +21,11 @@ export interface ArticleListItem {
  * fills them. The cards keep their
  * **18rem** and line up from the start, `spacing-lg` apart — the row no longer
  * fills the width (ADR-0196: shared columns grew the pictures without limit on
- * a wide screen); short of room they wrap, never narrower than 18rem. **Under
+ * a wide screen). **One row** (ADR-0201): it shows the cards that fit whole —
+ * three at 1 440px, four wider — and does not render the others (the
+ * product's « Voir tout » leads to them); a fourth card alone on a second line
+ * doubled the section for one article. `wrap` lets them wrap instead, never
+ * narrower than 18rem. Loading follows the same rule. **Under
  * 40rem of its own width, one column at full width** (a container query, as
  * `Dialog`'s: the package has no breakpoints, ADR-0020). The
  * section's title and its « Voir tout » are the product's. Nothing to show and
@@ -33,25 +38,61 @@ interface Props {
   loadingCount?: number
   newTab?: boolean
   newTabLabel?: string
+  /** Lets the cards wrap onto more rows rather than showing the ones that fit (ADR-0201). */
+  wrap?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   items: () => [],
   loading: false,
   loadingCount: 3,
   newTab: true,
   newTabLabel: undefined,
+  wrap: false,
 })
+
+/*
+  How many 18rem cards fit on the row (ADR-0201): the room the grid has, its
+  gap as rendered, the card's 18rem at the page's own rem. Under 40rem of the
+  list's width it is one column of them all, as the container query lays it.
+  Measured once mounted — before the first paint — and again on every resize.
+*/
+const root = ref<HTMLElement | null>(null)
+const fit = ref(Infinity)
+function measure() {
+  const el = root.value
+  const grid = el?.querySelector<HTMLElement>('.ds-article-list__grid')
+  if (!el || !grid) return
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+  if (el.clientWidth < 40 * rem) {
+    fit.value = Infinity
+    return
+  }
+  const gap = parseFloat(getComputedStyle(grid).columnGap) || 0
+  fit.value = Math.max(1, Math.floor((grid.clientWidth + gap) / (18 * rem + gap)))
+}
+let observer: ResizeObserver | undefined
+watch(root, (el, _, onCleanup) => {
+  if (!el || typeof ResizeObserver === 'undefined') return
+  measure()
+  observer = new ResizeObserver(measure)
+  observer.observe(el)
+  onCleanup(() => observer?.disconnect())
+}, { flush: 'post' })
+onBeforeUnmount(() => observer?.disconnect())
+
+const shown = computed(() => (props.wrap ? props.items : props.items.slice(0, fit.value)))
+const placeholders = computed(() => (props.wrap ? props.loadingCount : Math.min(props.loadingCount, fit.value)))
 </script>
 
 <template>
-  <div v-if="loading || items.length" class="ds-article-list" :aria-busy="loading || undefined">
+  <div v-if="loading || items.length" ref="root" class="ds-article-list" :aria-busy="loading || undefined">
     <Tray>
     <ul class="ds-article-list__grid">
       <template v-if="loading">
-        <li v-for="n in loadingCount" :key="`skeleton-${n}`"><ArticleCard loading /></li>
+        <li v-for="n in placeholders" :key="`skeleton-${n}`"><ArticleCard loading /></li>
       </template>
-      <li v-for="item in items" v-else :key="item.id">
+      <li v-for="item in shown" v-else :key="item.id">
         <ArticleCard
           :title="item.title"
           :href="item.href"

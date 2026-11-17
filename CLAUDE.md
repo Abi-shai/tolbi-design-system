@@ -1692,6 +1692,11 @@ Before working on any component, read:
 - **ADR-0200**: **one placeholder tone on a tray** — `ArticleCard`'s skeletons drop 0.158's `surface="tinted"` /
   `emphasis="strong"` (set for a grey card that no longer exists) and take the default tone, `ProjectList`'s
   (`#f2f4f7` / `#f9fafb`). The tray hands nothing down: the default is solved against `bg-default`, its surface.
+- **ADR-0201**: **one row of articles, and a hairline round the picture** — `ArticleList` shows the 18rem cards that fit
+  **whole on one row** (3 at 1 440, 4 wider) and renders the others not at all (hidden ones would stay in the tab order);
+  counted off the laid-out grid on mount and every resize; loading the same; `wrap` brings wrapping back; under 40rem one
+  full column as before. The picture's frame takes an inset `border-subtle` hairline as a `::after` **over** the image (an
+  inset shadow on the frame is painted under it), so a logo on white keeps its edge; 272 × 153 unchanged.
 
 ## Architecture
 
