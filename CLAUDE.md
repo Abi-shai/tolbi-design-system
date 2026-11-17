@@ -1705,6 +1705,11 @@ Before working on any component, read:
   a spread bar (8px, 8.5rem, lead `success-500`, parts `success-800`) + legend; status over date at the end. Old props read
   in: share `signals` → spread, other `signals` → context, `progress` → one-part spread; `context` / `spread` new;
   `valueBadge`, `attribute`, `unitPlacement`/`unitStyle` deprecated, not drawn. 14px floor kept (the original went to 11).
+- **ADR-0203**: **the capsule hugs its name, ends on one line, and the marquee laps exactly** — `ModuleCapsule`'s identity
+  is `width: auto`, `max-width: 15rem` (170 fixed cut 5 names of 7); its end is one line, the date then the badge, 8 apart.
+  A varying width does not break the loop (the two runs are identical), but **`useMarquee` snapped 4px every lap**: it
+  wrapped by half the track = a run + half the gap. The lap is now measured, `runs[1].offsetLeft − runs[0].offsetLeft`
+  (filmed: 513.00 → 517.53 at a 518 lap).
 
 ## Architecture
 

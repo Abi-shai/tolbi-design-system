@@ -11,14 +11,14 @@ import { ModuleIcon, type ModuleName } from '../ModuleIcon'
  * where it stands**, about 56px high.
  *
  * - **The module**: its drawing on a 40px tile, then the module's name over the
- *   row's name, in a column of a **fixed 170px** — two capsules of one module
- *   are one width, and the marquee's loop never jumps.
+ *   row's name, in a column that **hugs its words up to 15rem** (ADR-0203), past
+ *   which they are cut.
  * - **How much**: the figure (`heading-lg`, tabular) and its unit just after it
  *   on the baseline; under it **one** line of context, when it says something
  *   the figure does not (« 2 316 parcelles · 4 120 ha »).
  * - **Made of what** (Scan, Source): a segmented bar, 8px, and its legend.
- * - **Where it stands**: the status badge over the date or the freshness; the
- *   date alone without a status.
+ * - **Where it stands**: on one line, the date or the freshness then the status
+ *   badge (ADR-0203); the date alone without a status.
  *
  * **It is dark whatever the page** — the band is dark on the light home — and
  * **neutral, never green-grey**: its grounds, rules and inks are its own
@@ -201,6 +201,7 @@ const contextLine = computed(() => {
     </div>
 
     <div v-if="status || freshness" class="ds-module-capsule__end">
+      <p v-if="freshness" class="ds-module-capsule__freshness">{{ freshness }}</p>
       <Badge
         v-if="status"
         :label="status.label"
@@ -208,7 +209,6 @@ const contextLine = computed(() => {
         :variant="status.variant ?? 'pill-outline'"
         size="sm"
       />
-      <p v-if="freshness" class="ds-module-capsule__freshness">{{ freshness }}</p>
     </div>
   </article>
 </template>
@@ -258,12 +258,14 @@ const contextLine = computed(() => {
   background-color: var(--capsule-tile);
 }
 
-/* 170, fixed: two capsules of one module are one width, and the loop never jumps. */
+/* Hugs its words up to 15rem, past which they are cut (ADR-0203): a fixed 170
+   left a gap after a short name and cut five names of seven. The marquee does
+   not need one width — its two runs are the same capsules, so they match. */
 .ds-module-capsule__identity {
   flex: none;
   display: flex;
   flex-direction: column;
-  width: 170px;
+  max-width: 15rem;
   min-width: 0;
 }
 
@@ -363,13 +365,12 @@ const contextLine = computed(() => {
   text-overflow: ellipsis;
 }
 
-/* Where it stands: the status over its date. */
+/* Where it stands, on one line (ADR-0203): the date first, the status after it. */
 .ds-module-capsule__end {
   flex: none;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--ds-spacing-xxs);
+  align-items: center;
+  gap: var(--ds-spacing-md);
 }
 
 .ds-module-capsule__freshness {

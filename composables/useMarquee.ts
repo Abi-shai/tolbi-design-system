@@ -18,9 +18,9 @@ import { easing } from '../tokens/dist/index.js'
  *
  * ## The list must be doubled
  *
- * The caller renders its items **twice**, identically. The loop wraps by
- * subtracting half the content width, so the two halves have to be
- * interchangeable or the seam jumps.
+ * The caller renders its items **twice**, identically, as the content's two
+ * children. The loop wraps by subtracting one lap — where the second copy
+ * starts — so the two copies have to be interchangeable or the seam jumps.
  *
  * ## Three details that are easy to re-learn
  *
@@ -33,7 +33,7 @@ import { easing } from '../tokens/dist/index.js'
  * ceiling the first frame back applies the whole gap at once and the row jumps
  * half a cycle. 50ms is the cap — three frames at 60Hz.
  *
- * **The wrap subtracts, it does not reset.** `position -= half` rather than
+ * **The wrap subtracts, it does not reset.** `position -= lap` rather than
  * `position = 0`, because the position is fractional and dropping the remainder
  * is a visible stutter once per lap.
  *
@@ -87,12 +87,25 @@ export function useMarquee(options: MarqueeOptions = {}) {
     if (content.value) content.value.style.transform = `translateX(-${position}px)`
   }
 
+  /*
+    One lap is where the second run starts, measured (ADR-0203). Half the
+    track's width is a run plus **half** the gap between the runs, so wrapping
+    by it jumped by the other half — 4px a lap in `ModuleBanner`. Without two
+    runs to measure, half the track as before.
+  */
+  const period = () => {
+    const el = content.value
+    if (!el) return 0
+    const [a, b] = el.children as HTMLCollectionOf<HTMLElement>
+    return a && b ? b.offsetLeft - a.offsetLeft : el.scrollWidth / 2
+  }
+
   const wrap = () => {
-    const half = (content.value?.scrollWidth ?? 0) / 2
-    if (half <= 0) return
+    const lap = period()
+    if (lap <= 0) return
     // Subtract rather than reset — the position is fractional.
-    if (position >= half) position -= half
-    else if (position < 0) position += half
+    if (position >= lap) position -= lap
+    else if (position < 0) position += lap
   }
 
   const tick = (now: number) => {
