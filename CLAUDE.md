@@ -1721,6 +1721,10 @@ Before working on any component, read:
   and ground; the plate takes a project picture's grey (`bg-neutral`) and keeps it under the pointer; the **whole tile** takes
   the tray's hover (`--on-tray-hover`) + the row's ring on hover and focus; the current module keeps its brand plate and ink.
   Plate and hovered tile are one grey (1.000:1), as a `ProjectList` row's picture. The drawer unchanged.
+- **ADR-0207**: **on a tray, the plates in the softest grey** (track P2) — `ModulesList` page plates and `ProjectList`
+  pictures are `bg-neutral-subtle` at rest (the tray's grey: the eye goes to the drawings) and step to `bg-neutral` under
+  the pointer and the focus, so the area lights in one tone (P1, kept light on hover, read as a light square). The current
+  module's brand plate is excluded; dark takes the roles' dark values.
 
 ## Architecture
 

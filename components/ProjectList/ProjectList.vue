@@ -171,6 +171,9 @@ function onSelect(item: ProjectListItem, event: MouseEvent) {
   }
 }
 
+/* The picture's tile: the tray's own grey at rest (ADR-0207, track P2), the eye
+   goes to the drawing; under the pointer and the focus it steps to the row's
+   hover, and the whole row lights in one tone. */
 .ds-project-list__picture {
   display: flex;
   flex-shrink: 0;
@@ -179,7 +182,18 @@ function onSelect(item: ProjectListItem, event: MouseEvent) {
   width: 3.5rem;
   height: 3.5rem;
   border-radius: var(--ds-radius-surface);
+  background: var(--ds-bg-neutral-subtle);
+  transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+}
+
+.ds-project-list__row--link:is(:hover, :focus-visible) .ds-project-list__picture {
   background: var(--ds-bg-neutral);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-project-list__picture {
+    transition: none;
+  }
 }
 
 .ds-project-list__text {

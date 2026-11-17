@@ -348,10 +348,12 @@ function current(item: ModulesListItem) {
   The plate (ADR-0176, the owner's T4): the drawing sits on a ground of its
   own, the tile's whole inner width and whatever height the name leaves, 6px
   inside the tile all round. Its curve is `surface-sm` (10), softer than the
-  concentric 12 − 6 would be. **`bg-neutral`, a project's picture's grey**
-  (ADR-0206, `ProjectList`'s logic): it stays so under the pointer — the tile,
-  not the plate, answers now. The current module keeps its mark: its plate
-  `bg-brand-subtle`, one step up under the pointer, its name in the plate's ink.
+  concentric 12 − 6 would be. **`bg-neutral-subtle`, the tray's own grey** at
+  rest (ADR-0207, track P2): the eye goes to the drawings, not to the squares.
+  Under the pointer and the focus it steps to `bg-neutral`, the tile's hover —
+  the whole tile lights in one tone (ADR-0206's logic, a `ProjectList` row's).
+  The current module keeps its mark: its plate `bg-brand-subtle`, one step up
+  under the pointer, its name in the plate's ink.
 */
 .ds-modules-list--page .ds-modules-list__plate {
   display: flex;
@@ -361,8 +363,12 @@ function current(item: ModulesListItem) {
   justify-content: center;
   min-height: 0;
   border-radius: var(--ds-radius-surface-sm);
-  background: var(--ds-bg-neutral);
+  background: var(--ds-bg-neutral-subtle);
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+}
+
+.ds-modules-list--page .ds-modules-list__item:not(.ds-modules-list__item--active):is(:hover, :focus-visible):not(:disabled):not([aria-disabled='true']) .ds-modules-list__plate {
+  background: var(--ds-bg-neutral);
 }
 
 .ds-modules-list--page .ds-modules-list__item--active {
