@@ -1749,6 +1749,12 @@ Before working on any component, read:
   across the window, under the navigation on the left, out through the window on the right — the overflow says it
   scrolls. No fade, no mask; the marquee's window reaches through the side padding (keeping it as its own) so the cut
   falls on the band's edge, not 12px short.
+- **ADR-0212**: **the modules drawer on the tray, a firmer overlay** — `ModulesList`'s panel **renders `Tray`** (its
+  frame had drifted: no hairline, `spacing-sm`, `radius-surface`), so ground, padding `md`, `border-subtlest` and
+  `radius-surface-lg` are one style; `Tray` gains **`surface: false`** (the ground and frame alone, the content drawing
+  its own white surface — the drawer's scroller). Visible height unchanged (276), width 270 → 276; `page` untouched.
+  **`elevation-overlay` = `shadow-2xl` + `shadow-md`** (`lg`/`xl` did not stand off the page, `2xl` alone had a soft
+  edge): the halo says « above », the short shadow draws the edge — every floating surface takes it, dark included.
 
 ## Architecture
 

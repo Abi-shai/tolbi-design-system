@@ -39,9 +39,15 @@ interface Props {
   title?: string
   /** The title's level — `h2` on a page's home, `h3` under a section. */
   headingLevel?: 2 | 3 | 4
+  /**
+   * `false`: the tray is its ground and frame alone, and what it holds draws its
+   * own white surface — a surface that scrolls, as `ModulesList`'s drawer does
+   * (ADR-0212). One frame for both, so they cannot drift apart again.
+   */
+  surface?: boolean
 }
 
-withDefaults(defineProps<Props>(), { title: undefined, headingLevel: 2 })
+withDefaults(defineProps<Props>(), { title: undefined, headingLevel: 2, surface: true })
 
 defineSlots<{
   /** What the block holds, laid on the white surface. */
@@ -59,9 +65,10 @@ const titleId = `ds-tray-title-${useId()}`
       <component :is="`h${headingLevel}`" :id="titleId" class="ds-tray__title">{{ title }}</component>
       <div v-if="$slots.action" class="ds-tray__action"><slot name="action" /></div>
     </div>
-    <div class="ds-tray__surface">
+    <div v-if="surface" class="ds-tray__surface">
       <slot />
     </div>
+    <slot v-else />
   </component>
 </template>
 

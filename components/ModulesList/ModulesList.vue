@@ -2,6 +2,7 @@
 import { Icon } from '../Icon'
 import { ModuleIcon } from '../ModuleIcon'
 import { Scrollbar } from '../Scrollbar'
+import { Tray } from '../Tray'
 import type { ModuleName } from '../ModuleIcon'
 
 export interface ModulesListItem {
@@ -62,7 +63,14 @@ function current(item: ModulesListItem) {
 </script>
 
 <template>
-  <div class="ds-modules-list" :class="`ds-modules-list--${layout}`">
+  <!-- The drawer's frame is the package's tray (ADR-0212), its white surface the
+       scroller's own; a page's list sits in the product's tray and draws none. -->
+  <component
+    :is="layout === 'panel' ? Tray : 'div'"
+    class="ds-modules-list"
+    :class="`ds-modules-list--${layout}`"
+    v-bind="layout === 'panel' ? { surface: false } : {}"
+  >
     <!-- The drawer scrolls inside its box; a page scrolls itself. -->
     <component
       :is="layout === 'panel' ? Scrollbar : 'div'"
@@ -119,13 +127,13 @@ function current(item: ModulesListItem) {
         </li>
       </ul>
     </component>
-  </div>
+  </component>
 </template>
 
 <style scoped>
 /*
  * Figma node 518:15253
- * Outer  : p-sm (6px), scroll délégué à <Scrollbar>, align-items flex-start
+ * Outer  : le plateau de Tray (ADR-0212) — p-md (8px), filet subtlest, radius-surface-lg ; scroll délégué à <Scrollbar>
  *          → hauteur : deux rangées et le dessin d'une troisième (ADR-0163), 288px
  * Inner  : w-246px, p-md (8px), flex wrap, gap-xl (16px)
  *          2 rangées = 8+90+16+90+8 = 212px → la boîte s'arrête là
@@ -151,10 +159,9 @@ function current(item: ModulesListItem) {
   --modules-list-item: 90px;
   --modules-list-peek: calc(var(--ds-spacing-md) + 48px);
 
-  box-sizing: border-box;
-  background: var(--ds-bg-neutral-subtle);
-  border-radius: var(--ds-radius-surface);
-  padding: var(--ds-spacing-sm);
+  /* The ground, padding, hairline and corner are the tray's (ADR-0212). The
+     drawer hugs its columns, where a tray takes its column's width. */
+  width: auto;
   /*
     The panel carries its own elevation (ADR-0006 — a component owns its
     chrome). It used to be the bar's: `.ds-hnav__modules-dropdown` declared the
@@ -163,7 +170,9 @@ function current(item: ModulesListItem) {
     a panel that was flat everywhere else.
 
     `elevation-overlay` is what every floating surface in the catalogue takes —
-    Dropdown, InputDropdown, Toast, ChartTooltip.
+    Dropdown, InputDropdown, Toast, ChartTooltip — and since ADR-0212 it is
+    `shadow-2xl` + `shadow-md`: the wide halo says « above », the short one
+    draws the edge.
   */
   box-shadow: var(--ds-elevation-overlay);
   display: inline-flex;
