@@ -79,7 +79,8 @@ const overflow = computed(() => Math.max(0, props.items.length - props.max))
   display: inline-flex;
   border-radius: var(--ds-radius-pill);
   /* The ring separates neighbours; it is a ring on the surface, not a border. */
-  box-shadow: 0 0 0 var(--stack-ring) var(--ds-bg-default);
+  /* On a plate (an `ActionListItem`'s), the plate's ground, which it hands down (ADR-0208). */
+  box-shadow: 0 0 0 var(--stack-ring) var(--on-plate-ground, var(--ds-bg-default));
 }
 
 .ds-avatar-group__item + .ds-avatar-group__item { margin-left: var(--stack-overlap); }

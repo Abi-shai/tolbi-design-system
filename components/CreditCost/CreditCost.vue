@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { Icon } from '../Icon'
 import { Skeleton } from '../Skeleton'
 import { SwapTransition } from '../SwapTransition'
-import coinsSrc from './credit-coins.png'
+import { CreditCoins } from '../CreditCoins'
 
 /**
  * What an action is about to cost, said **before** the click — the pattern for
@@ -26,7 +26,7 @@ import coinsSrc from './credit-coins.png'
  * alone (ADR-0006). What the user can do about it is the product's: its
  * primary action becomes « Acheter des crédits » in the `#actions` slot.
  *
- * The coins are the owner's artwork (Figma `3734:2260`) — two lying, one
+ * The coins are the owner's artwork (`CreditCoins`, ADR-0208) — two lying, one
  * tilted, 64 × 56 — and decorative: the label says what the number is. Nothing
  * is written in the illustration's place (the benchmark: 0 of 78 products).
  */
@@ -70,7 +70,7 @@ const formatted = computed(() =>
     :class="{ 'ds-credit-cost--insufficient': insufficient }"
     :aria-busy="state === 'pending' || undefined"
   >
-    <img :src="coinsSrc" alt="" class="ds-credit-cost__art" width="64" height="56" />
+    <CreditCoins :size="56" class="ds-credit-cost__art" />
     <div class="ds-credit-cost__text">
       <span class="ds-credit-cost__label">{{ label }}</span>
       <SwapTransition>

@@ -1725,6 +1725,15 @@ Before working on any component, read:
   pictures are `bg-neutral-subtle` at rest (the tray's grey: the eye goes to the drawings) and step to `bg-neutral` under
   the pointer and the focus, so the area lights in one tone (P1, kept light on hover, read as a light square). The current
   module's brand plate is excluded; dark takes the roles' dark values.
+- **ADR-0208**: **quick actions** (the home page's right column) — **`ActionList`** = a titled `Tray` whose surface holds
+  `ActionListItem`s (`spacing-xs` apart, a slot, not `items`). A row is a real `<a>`/`<button>` emitting `select` (none on
+  a modified click): a 3rem **plate** (`radius-surface`, `bg-neutral-subtle`) holding `#media`, the title (a verb,
+  `label-lg-strong`, one line) + an optional `Badge sm`, one `body-sm` line, a `chevron-right` 20 `text-subtlest` that
+  never gives; `spacing-md` around and between, 64px. The title is cut first; the **badge is whole or wraps out of view**
+  (head `1lh` + `overflow: hidden`), never over the chevron, still read. Name = title, badge + line = description, plate
+  `aria-hidden`. Tray hover and focus, the plate to `bg-neutral`; it hands down **`--on-plate-ground`**, read by
+  `AvatarGroup`'s ring and **`ModuleIconStack`** (new: logos overlapped by a quarter on a cut-out of the ground, `max` 2,
+  no `+N`). **`CreditCoins`** (new) is `CreditCost`'s coins on their own, `size` = height (CreditCost unchanged, 64 × 56).
 
 ## Architecture
 
