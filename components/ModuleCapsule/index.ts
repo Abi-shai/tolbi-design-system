@@ -3,4 +3,5 @@ export type {
   CapsuleBadge,
   CapsuleSignal,
   CapsuleProgress,
+  CapsuleSpreadPart,
 } from './ModuleCapsule.vue'

@@ -1697,6 +1697,14 @@ Before working on any component, read:
   counted off the laid-out grid on mount and every resize; loading the same; `wrap` brings wrapping back; under 40rem one
   full column as before. The picture's frame takes an inset `border-subtle` hairline as a `::after` **over** the image (an
   inset shadow on the frame is painted under it), so a logo on white keeps its edge; 272 × 153 unchanged.
+- **ADR-0202**: **the band of 14 September, compact** (N2) — `ModuleBanner` / `ModuleCapsule` are **dark on any page and
+  neutral**: band `gray-light-800`, capsule `900` **hollowed into it** (reverses ADR-0048), tile 800, rules 700, inks
+  gray-light 100 / 400 (primitives, named suppressions; `data-theme="dark"` so the `Badge` takes its dark tones). Band 6 12,
+  gap 8, `radius-surface`; capsule 6 12, `radius-control`, 60 high; tile **40** (drawing 28), rules 40, identity **170 fixed**
+  (module `label-md`, name `label-lg-strong`); figure `heading-lg` + unit `label-md` on the baseline, **one** context line;
+  a spread bar (8px, 8.5rem, lead `success-500`, parts `success-800`) + legend; status over date at the end. Old props read
+  in: share `signals` → spread, other `signals` → context, `progress` → one-part spread; `context` / `spread` new;
+  `valueBadge`, `attribute`, `unitPlacement`/`unitStyle` deprecated, not drawn. 14px floor kept (the original went to 11).
 
 ## Architecture
 

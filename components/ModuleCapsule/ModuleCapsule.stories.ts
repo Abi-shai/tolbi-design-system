@@ -2,240 +2,109 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import { ModuleCapsule } from '.'
 
 /**
- * Figma *Sprint 18* `1308:5261` — `Bandeau/Capsule`.
- *
- * The capsule was drawn **in dark mode**, against the tokens ADR-0029 added, so
- * it is the first surface in the catalogue that was designed for the second mode
- * rather than ported into it. Switch the **Mode** toolbar to see it as designed.
+ * One module on the home page's dark band — **the band of 14 September, compact** (ADR-0202, variant N2), about
+ * 56px: which module (a 40px tile, the module over the name, 170px fixed), how much (the figure and its unit, one line
+ * of context), made of what (a segmented bar and its legend), where it stands (the status over the date). Dark and
+ * neutral on any page; the props of the first form still work.
  */
 const meta: Meta<typeof ModuleCapsule> = {
   title: 'Données/ModuleCapsule',
   component: ModuleCapsule,
   tags: ['stable'],
-  // Drawn in dark (ADR-0029/0031), so it opens in dark. Both modes work —
-  // flip the Mode toolbar — but light is not the design this came from.
-  globals: { theme: 'dark' },
-  // Set in the band, as Figma always draws it: `bg-default` with an 8px inset,
-  // the level below the capsule's own `bg-neutral-subtle` (ADR-0048).
+  // In its band, as the home page sets it: `gray-light-800`, the capsule hollowed into it.
   decorators: [
     () => ({
       template:
-        '<div style="background: var(--ds-bg-default); padding: var(--ds-spacing-md); border-radius: var(--ds-radius-control);">' +
+        '<div style="display:flex; padding: var(--ds-spacing-sm) var(--ds-spacing-lg); border-radius: var(--ds-radius-surface); background: var(--ds-color-gray-light-800); width: fit-content">' +
         '<story /></div>',
     }),
   ],
-  argTypes: {
-    unitPlacement: { control: 'inline-radio', options: ['inline', 'below'] },
-  },
 }
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** `1334:4300` — the reference capsule, content for content. */
+/** TOLBI ID: the figure, one line of context made from its two signals, the date alone (no status). */
 export const Default: Story = {
   args: {
-    module: 'Data',
-    title: 'Recensement ménages — Kaolack',
-    status: { label: 'Collecte en cours', tone: 'warning', variant: 'pill-color' },
-    value: 342,
-    unit: 'enregistrements',
-    valueBadge: { label: '298 validées', tone: 'success', variant: 'pill-outline' },
-    signals: [
-      { icon: 'circle-check', label: '298 validés' },
-      { icon: 'clock', label: '44 en attente' },
-    ],
-    freshness: 'Mise à jour il y a 2 h',
-  },
-}
-
-/**
- * `1334:4333` — no status badge, no second reading of the figure, and the unit
- * set **below** it. Figma carries both placements: a unit wider than its own
- * figure reads better stacked.
- */
-export const UnitBelow: Story = {
-  args: {
     module: 'ID',
-    title: 'Coopérative de Kaolack',
-    value: '1 240',
+    moduleLabel: 'TOLBI ID',
+    title: 'Cacao Démo SA',
+    value: '1 284',
     unit: 'producteurs',
-    unitPlacement: 'below',
     signals: [
-      { icon: 'land-plot', label: '312 parcelles' },
-      { icon: 'ruler', label: '847 ha' },
+      { icon: 'land-plot', label: '2 316 parcelles' },
+      { icon: 'ruler', label: '4 120 ha' },
     ],
-    freshness: 'Mise à jour hier',
+    freshness: 'Mis à jour hier',
   },
 }
 
-/**
- * `1334:4397` — one signal rather than two, and no status badge.
- *
- * Figma draws this with an `ina` illustration. `ina` is deliberately not a
- * `ModuleName` — like `Eudr` before it (ADR-0005), its artwork is not exported —
- * so `Survey`'s drawing carries the label. This is exactly what `moduleLabel` is
- * for: a capsule can name a module the system holds no artwork for.
- */
-export const SingleSignal: Story = {
+/** TOLBI Scan: signals that are shares become the spread — the bar and its legend; the status over the year. */
+export const Spread: Story = {
+  name: 'Répartition',
   args: {
-    module: 'Survey',
-    moduleLabel: 'INA',
-    title: 'Coopérative de Kaolack',
-    value: '1 024',
-    unit: 'identités',
-    valueBadge: { label: '981 vérifiées', tone: 'success', variant: 'pill-outline' },
-    signals: [{ icon: 'id-card', label: '981 vérifiées' }],
-    freshness: 'Mise à jour il y a 6 h',
+    module: 'Scan',
+    moduleLabel: 'TOLBI Scan',
+    title: 'Kaolack — campagne 2026',
+    status: { label: 'Terminé', tone: 'success', variant: 'pill-outline' },
+    value: '3 812,40',
+    unit: 'ha cartographiés',
+    signals: [
+      { icon: 'sprout', label: 'Arachide 58 %' },
+      { icon: 'wheat', label: 'Mil 27 %' },
+    ],
+    freshness: '2026',
   },
 }
 
-/**
- * `1283:3568` — the progress section, hidden in all six Figma capsules but
- * present in two of them. It opens a fourth column between the figure and the
- * composition.
- */
-export const WithProgress: Story = {
+/** TOLBI Source: its progress becomes a spread of one part, the rest grey; its signals the context line. */
+export const Progress: Story = {
+  name: 'Progression',
   args: {
     module: 'Source',
+    moduleLabel: 'TOLBI Source',
     title: 'Collecte cacao — 1er kilomètre',
-    status: { label: 'Collecte en cours', tone: 'warning', variant: 'pill-color' },
+    status: { label: 'En cours', tone: 'warning', variant: 'pill-outline' },
     value: '12,4',
     unit: 'tonnes collectées',
-    valueBadge: { label: '46 % tracé', tone: 'success', variant: 'pill-outline' },
-    progress: {
-      label: 'Progression de la traçabilité',
-      value: 46,
-      context: 'Sur l’ensemble des étapes du processus',
-      badge: { label: '46 %', tone: 'success', variant: 'pill-outline' },
-    },
+    progress: { label: 'Traçabilité', value: 46 },
     signals: [
       { icon: 'users', label: '18 agents' },
       { icon: 'rows-3', label: '6 étapes' },
     ],
-    freshness: 'Mise à jour il y a 40 min',
+    freshness: 'Dernière saisie il y a 40 min',
   },
 }
 
-/**
- * `1283:3552` — **the full banner**, and the one Figma publishes as a component
- * (`1219:3489`). Every section is on at once: the third identity line, the delta
- * under the figure, the phenology column with its own delta, and three climate
- * measures — the middle one past its threshold, which it says in its own colour.
- *
- * Figma's own description names the two axes: *Campagne* drives the status badge
- * and the wording of the figure's badge together ("Rendement prévu" while
- * running, "Rendement estimé" once closed), and *Comparaison* is the delta —
- * hausse, baisse, or aucune, the last showing only the date.
- */
-export const FullBanner: Story = {
-  args: {
-    module: 'Yield',
-    title: 'Périmètre de Podor',
-    status: { label: 'Campagne en cours', tone: 'warning', variant: 'pill-color' },
-    attribute: { label: 'Culture', badge: { label: 'Mil, contre saison froide' } },
-    value: '4,82',
-    unit: 't/ha',
-    unitStyle: 'symbol',
-    valueBadge: { label: 'Rendement prévu', icon: 'trending-up' },
-    delta: { icon: 'trending-up', value: '12 %', comparison: 'comparé au 08 septembre 2025' },
-    progress: {
-      label: 'Progression de la campagne',
-      value: 46,
-      badge: { label: '46%' },
-      delta: { icon: 'trending-up', value: '5 %', comparison: 'comparé au 08 septembre 2025' },
-    },
-    signals: [
-      { icon: 'cloud-rain', label: '12,4 mm' },
-      { icon: 'droplets', label: '18,2 %', tone: 'warning' },
-      { icon: 'thermometer', label: '31 °C' },
-    ],
-    freshness: 'Prévision du 08 septembre 2025',
-  },
-}
-
-/** Campagne closed: the status turns success and the figure's badge re-words. */
-export const CampaignClosed: Story = {
-  args: {
-    ...FullBanner.args,
-    status: { label: 'Campagne close', tone: 'success', variant: 'pill-color' },
-    valueBadge: { label: 'Rendement estimé', icon: 'trending-up' },
-  },
-}
-
-/** Comparaison = *baisse*: the delta turns and its glyph turns with it. */
-export const DeltaDown: Story = {
-  args: {
-    ...FullBanner.args,
-    delta: {
-      icon: 'trending-down',
-      value: '8 %',
-      comparison: 'comparé au 08 septembre 2025',
-      tone: 'error',
-    },
-  },
-}
-
-/** Comparaison = *aucune*: only the date, no glyph and no figure. */
-export const DeltaNone: Story = {
-  args: {
-    ...FullBanner.args,
-    delta: { comparison: 'Relevé du 08 septembre 2025' },
-    progress: { ...FullBanner.args!.progress!, delta: { comparison: 'Relevé du 08 septembre 2025' } },
-  },
-}
-
-/** The identity block alone — everything past the first rule is optional. */
-export const IdentityOnly: Story = {
+/** Said directly: `context` and `spread`, the props of the compact form. */
+export const Direct: Story = {
+  name: '`context` et `spread`',
   args: {
     module: 'Scan',
-    title: 'Périmètre de Podor',
-    status: { label: 'Analyse terminée', tone: 'success', variant: 'pill-color' },
+    moduleLabel: 'TOLBI Scan',
+    title: 'Kaffrine — campagne 2026',
+    status: { label: 'Terminé', tone: 'success', variant: 'pill-outline' },
+    value: '2 140,15',
+    unit: 'ha cartographiés',
+    context: '3 cultures',
+    spread: [
+      { label: 'Mil', value: 64 },
+      { label: 'Arachide', value: 21 },
+      { label: 'Niébé', value: 9 },
+    ],
+    freshness: '2026',
   },
 }
 
-/** The six capsules as they sit in the Figma frame, stacked. */
-export const Gallery: Story = {
-  render: () => ({
-    components: { ModuleCapsule },
-    setup: () => ({
-      rows: [
-        FullBanner.args,
-        Default.args,
-        WithProgress.args,
-        UnitBelow.args,
-        {
-          module: 'Scan',
-          title: 'Périmètre de Podor',
-          status: { label: 'Analyse terminée', tone: 'success', variant: 'pill-color' },
-          value: '2 480',
-          unit: 'hectares cartographiés',
-          unitPlacement: 'below',
-          signals: [
-            { icon: 'wheat', label: '4 cultures' },
-            { icon: 'sprout', label: '92 % couverture' },
-          ],
-          freshness: 'Mise à jour il y a 3 j',
-        },
-        SingleSignal.args,
-        {
-          module: 'Carbone',
-          title: 'Bassin arachidier — Kaffrine',
-          value: '1 860',
-          unit: 't CO₂e',
-          valueBadge: { label: 'Vérifié', tone: 'success', variant: 'pill-outline' },
-          signals: [
-            { icon: 'land-plot', label: '540 parcelles' },
-            { icon: 'globe', label: 'Scope 3' },
-          ],
-          freshness: 'Mise à jour il y a 1 j',
-        },
-      ],
-    }),
-    template: `
-      <div style="display: flex; flex-direction: column; gap: var(--ds-spacing-md); align-items: flex-start;">
-        <ModuleCapsule v-for="(row, i) in rows" :key="i" v-bind="row" />
-      </div>
-    `,
-  }),
+/** A long name is cut in its 170px; the capsule keeps its width. */
+export const LongName: Story = {
+  name: 'Nom long',
+  args: { ...Default.args, title: 'Coopérative des producteurs de cacao de Soubré — section nord' },
+}
+
+/** Identity alone: no figure, no rule. */
+export const IdentityOnly: Story = {
+  name: 'Identité seule',
+  args: { module: 'Data', moduleLabel: 'TOLBI Data', title: 'Recensement ménages — Kaolack', freshness: 'Mis à jour hier' },
 }

@@ -2,21 +2,17 @@
 import { useMarquee } from '../../composables/useMarquee'
 
 /**
- * The band that carries the module capsules — Figma *Sprint 18* `1308:5261`,
- * redrawn in `1982:59871`.
+ * The band that carries the module capsules — **the band of 14 September,
+ * compact** (ADR-0202, variant N2).
  *
- * It is the half of the design that is pure colour, and it is the bottom of a
- * ramp: the band is `bg-default`, every capsule inside it `bg-neutral-subtle`,
- * every tile inside those `bg-neutral` — one step per level (ADR-0048). In dark
- * a layer rises, so the capsules sit **above** the band (900 → 800 → 700); in
- * light each level recesses by the same step. It used to be the inverse — an
- * 800 tray with the capsules recessed into it at 900 — and a capsule had no edge
- * outside it.
+ * **Dark on any page, and neutral**: `gray-light-800`, its own primitive (a
+ * named suppression, as `MapPin`'s inks), never the app's green-grey dark mode;
+ * it carries `data-theme="dark"` so what it holds takes its dark tones. Its
+ * capsules are **darker than it** (900), hollowed into it — ADR-0048's ramp,
+ * where they rose above it, is reversed.
  *
- * Corners and an 8px inset now, where it was square and 6px: the band no longer
- * runs across the page. It sits in the page's column, whose margins it shares
- * with the bar above it (ADR-0047), so it is a surface in that column — and the
- * inset matches the 8px the capsules keep between themselves.
+ * `spacing-sm` above and below, `spacing-lg` at the sides, `spacing-md` between
+ * capsules, `radius-surface`.
  *
  * Pair it with `RevealTransition` for the entrance the product gives it: the
  * band opens its own height once the data arrives.
@@ -47,6 +43,7 @@ const { container, content, pause, resume, startDrag, drag, endDrag, isDragging,
 <template>
   <div
     :class="['ds-module-banner', `ds-module-banner--${props.motion}`]"
+    data-theme="dark"
     :role="label ? 'group' : undefined"
     :aria-label="label"
   >
@@ -79,11 +76,11 @@ const { container, content, pause, resume, startDrag, drag, endDrag, isDragging,
 .ds-module-banner {
   display: flex;
   align-items: stretch;
-  /* 8px, both — the band's only geometry. */
   gap: var(--ds-spacing-md);
-  padding: var(--ds-spacing-md);
-  background-color: var(--ds-bg-default);
-  border-radius: var(--ds-radius-control);
+  padding: var(--ds-spacing-sm) var(--ds-spacing-lg);
+  /* token-lint-disable-next-line no-raw-primitive — the band is dark on any page, its own neutral palette (ADR-0202) */
+  background-color: var(--ds-color-gray-light-800);
+  border-radius: var(--ds-radius-surface);
 }
 
 .ds-module-banner--scroll {

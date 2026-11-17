@@ -1,29 +1,37 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Badge, type BadgeTone, type BadgeVariant } from '../Badge'
-import { Icon, type IconName } from '../Icon'
+import type { IconName } from '../Icon'
 import { ModuleIcon, type ModuleName } from '../ModuleIcon'
-import { ProgressBar } from '../ProgressBar'
 
 /**
- * One module's harvested data, on one row — Figma *Sprint 18* `1308:5261`
- * (`Bandeau/Capsule`).
+ * One module's harvested data, on one row of the home page's dark band
+ * (`ModuleBanner`) — **the band of 14 September, compact** (ADR-0202, variant
+ * N2): it reads left to right as **which module · how much · made of what ·
+ * where it stands**, about 56px high.
  *
- * The capsule reads left to right as four questions: **which module**, **what is
- * this**, **how much**, and **made of what**. The rules between them are
- * separators, not borders — they divide the row, they do not enclose anything.
+ * - **The module**: its drawing on a 40px tile, then the module's name over the
+ *   row's name, in a column of a **fixed 170px** — two capsules of one module
+ *   are one width, and the marquee's loop never jumps.
+ * - **How much**: the figure (`heading-lg`, tabular) and its unit just after it
+ *   on the baseline; under it **one** line of context, when it says something
+ *   the figure does not (« 2 316 parcelles · 4 120 ha »).
+ * - **Made of what** (Scan, Source): a segmented bar, 8px, and its legend.
+ * - **Where it stands**: the status badge over the date or the freshness; the
+ *   date alone without a status.
  *
- * It is the first surface designed against the dark mode (ADR-0029) rather than
- * ported into it, which is why every value here is a semantic token and none is
- * a literal: `bg-neutral` for the tile, `text-subtle` for the labels that recede,
- * `border-default` for the rules.
+ * **It is dark whatever the page** — the band is dark on the light home — and
+ * **neutral, never green-grey**: its grounds, rules and inks are its own
+ * `gray-light` primitives (ADR-0010's categorical clause, as `MapPin`'s, named
+ * suppressions), and it carries `data-theme="dark"` so what it renders (its
+ * `Badge`) takes its dark tones. The capsule is **darker than its band**,
+ * hollowed into it (900 in 800) — the reverse of ADR-0048.
  *
- * **Each level is one step along the neutral ramp** (ADR-0048, Figma
- * `1982:59871`): the band is `bg-default`, the capsule `bg-neutral-subtle`, its
- * tile `bg-neutral`. In dark a layer rises (ADR-0029), so every surface sits
- * above the one that holds it — 900 → 800 → 700 — and none repeats its
- * container's container. It used to run the other way, the capsule recessed at
- * 900 into an 800 tray and the tile back at 800: a hole punched through to the
- * band rather than a surface on the capsule.
+ * The props of the first form still work, so a product passing them needs no
+ * change: `signals` become the context line — or the spread when they are
+ * shares (« Arachide 58 % ») — and `progress` becomes the spread. `context` and
+ * `spread` say it directly. `valueBadge`, `attribute`, the delta's glyph and the
+ * unit's placement and style are no longer drawn (ADR-0202).
  */
 export type CapsuleTone = 'success' | 'error' | 'warning' | 'neutral'
 
@@ -37,528 +45,337 @@ export interface CapsuleBadge {
 export interface CapsuleSignal {
   icon: IconName
   label: string
-  /**
-   * Colours the figure. `warning` is Figma's "sous le seuil" — a measure that
-   * has crossed its threshold says so in its own colour, not only in its value.
-   */
   tone?: CapsuleTone
 }
 
-/**
- * The reading against a previous one. Figma's `Comparaison` axis: *hausse*,
- * *baisse*, or *aucune* — the last showing only the date, which is why both the
- * glyph and the figure are optional and the comparison is not.
- */
 export interface CapsuleDelta {
-  /** `trending-up` for a rise, `trending-down` for a fall. */
   icon?: IconName
-  /** "12 %". */
   value?: string
-  /** "comparé au 08 septembre 2025". */
   comparison: string
   tone?: CapsuleTone
 }
 
-/** The second identity line — an attribute of the thing, not its status. */
 export interface CapsuleAttribute {
   label: string
   badge?: CapsuleBadge
 }
 
 export interface CapsuleProgress {
-  /** The stage this sits at — "Progression de la traçabilité". */
   label: string
   /** 0–100. */
   value: number
-  /** The line under the bar, explaining what the percentage is *of*. */
   context?: string
   badge?: CapsuleBadge
   delta?: CapsuleDelta
+}
+
+/** One part of a spread: its name and its share, 0–100. */
+export interface CapsuleSpreadPart {
+  label: string
+  value: number
 }
 
 interface Props {
   module?: ModuleName
   /** The module's name as shown. Defaults to `module`. */
   moduleLabel?: string
-  /** What this row is about — "Recensement ménages — Kaolack". */
+  /** What this row is about — « Cacao Démo SA ». */
   title: string
-  /** The badge beside the module name: where the collection has got to. */
+  /** Where it stands — « Terminé ». Drawn at the capsule's end, over the date. */
   status?: CapsuleBadge
-  /** The third identity line — "Culture · Mil, contre saison froide". */
-  attribute?: CapsuleAttribute
   /** The hero figure. */
   value?: string | number
-  /** What the figure counts — "enregistrements". */
+  /** What the figure counts — « producteurs ». */
   unit?: string
-  /**
-   * `inline` sets the unit beside the figure, `below` under it. Figma carries
-   * both: a unit wider than its own figure reads better stacked, and four of the
-   * six capsules are inline.
-   */
-  unitPlacement?: 'inline' | 'below'
-  /**
-   * `text` sets the unit in body copy (“enregistrements”), `symbol` in the
-   * compact semibold Figma gives a unit that is a symbol rather than a word
-   * (“t/ha”, “°C”).
-   */
-  unitStyle?: 'text' | 'symbol'
-  /** The badge beside the hero figure — a second reading of the same number. */
-  valueBadge?: CapsuleBadge
-  /** The line under the figure: how it moved since the last reading. */
-  delta?: CapsuleDelta
-  progress?: CapsuleProgress
-  /** A glyph over a figure — up to two in the reduced capsules, three in the full one. */
-  signals?: CapsuleSignal[]
-  /** "Mise à jour il y a 2 h". */
+  /** The one line under the figure — « 2 316 parcelles · 4 120 ha ». Absent: made from `signals` or the delta. */
+  context?: string
+  /** Made of what — the parts of a spread, biggest first. Absent: made from share `signals` or `progress`. */
+  spread?: CapsuleSpreadPart[]
+  /** « 2026 », « Mis à jour hier ». */
   freshness?: string
+  /** @deprecated Not drawn since ADR-0202. */
+  attribute?: CapsuleAttribute
+  /** @deprecated Not drawn since ADR-0202: the unit sits after the figure. */
+  unitPlacement?: 'inline' | 'below'
+  /** @deprecated Not drawn since ADR-0202. */
+  unitStyle?: 'text' | 'symbol'
+  /** @deprecated Not drawn since ADR-0202. */
+  valueBadge?: CapsuleBadge
+  /** The context line when nothing else gives one: its figure and its comparison. */
+  delta?: CapsuleDelta
+  /** Drawn as a spread of one part: its share, the rest grey. */
+  progress?: CapsuleProgress
+  /** Their labels make the context line, or the spread when they are shares. */
+  signals?: CapsuleSignal[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
   module: 'Data',
   moduleLabel: undefined,
   status: undefined,
-  attribute: undefined,
   value: undefined,
   unit: undefined,
+  context: undefined,
+  spread: undefined,
+  freshness: undefined,
+  attribute: undefined,
   unitPlacement: 'inline',
   unitStyle: 'text',
   valueBadge: undefined,
   delta: undefined,
   progress: undefined,
   signals: () => [],
-  freshness: undefined,
 })
 
-/**
- * Figma binds a delta figure to `text-on-{tone}-subtle`, not `text-{tone}`.
- * In dark the two resolve to the SAME step, so this is exact; in light it is the
- * legible one — `text-success` is 3.91:1 on `bg-default` and `text-warning`
- * 3.49:1, the pre-existing failure ADR-0030 left open.
- */
-const toneClass = (tone: CapsuleTone = 'success') => `ds-module-capsule--on-${tone}`
+/* A signal that is a share — « Arachide 58 % » — and its number. */
+const SHARE = /^(.*?)\s*(\d+(?:[.,]\d+)?)\s*%$/
+const shares = computed(() => {
+  if (!props.signals.length) return null
+  const parts = props.signals.map((s) => SHARE.exec(s.label.trim()))
+  if (parts.some((p) => !p)) return null
+  return parts.map((p, i) => ({ label: props.signals[i].label, value: Number(p![2].replace(',', '.')) }))
+})
+
+const spreadParts = computed<CapsuleSpreadPart[] | null>(() => {
+  if (props.spread?.length) return props.spread
+  if (shares.value) return shares.value
+  if (props.progress) return [{ label: `${props.progress.label} ${Math.round(props.progress.value)} %`, value: props.progress.value }]
+  return null
+})
+
+/* The legend: the spread's own words, « Arachide 58 % · Mil 27 % ». */
+const legend = computed(() =>
+  (spreadParts.value ?? [])
+    .map((p) => (SHARE.test(p.label) ? p.label : `${p.label} ${Math.round(p.value)} %`))
+    .join(' · '),
+)
+
+/* The bar's segments, in their order, and the rest of the hundred in grey. */
+const segments = computed(() => {
+  const parts = (spreadParts.value ?? []).map((p) => Math.max(0, p.value))
+  const rest = Math.max(0, 100 - parts.reduce((a, b) => a + b, 0))
+  return [...parts.map((v, i) => ({ value: v, kind: i === 0 ? 'lead' : 'part' })), ...(rest > 0.5 ? [{ value: rest, kind: 'rest' }] : [])]
+})
+
+const contextLine = computed(() => {
+  if (props.context) return props.context
+  if (props.signals.length && !shares.value) return props.signals.map((s) => s.label).join(' · ')
+  if (props.delta) return [props.delta.value, props.delta.comparison].filter(Boolean).join(' ')
+  return undefined
+})
 </script>
 
 <template>
-  <article class="ds-module-capsule" :aria-label="title">
-    <!-- ADR-0005: the illustration is the primitive — the artwork with no tile
-         of its own — and it is the right one here precisely because the capsule
-         frames it. The tile is bg-neutral, a surface of this component: one step
-         up from the capsule it sits on (ADR-0048). -->
+  <article class="ds-module-capsule" data-theme="dark" :aria-label="title">
+    <!-- The illustration, the primitive (ADR-0005): the capsule frames it, on its own tile. -->
     <div class="ds-module-capsule__tile">
-      <ModuleIcon :module="module" variant="illustration" :size="44" :aria-label="null" />
+      <ModuleIcon :module="module" variant="illustration" :size="28" :aria-label="null" />
     </div>
 
     <div class="ds-module-capsule__identity">
-      <div class="ds-module-capsule__identity-row">
-        <span class="ds-module-capsule__module">{{ moduleLabel ?? module }}</span>
-        <Badge
-          v-if="status"
-          :label="status.label"
-          :tone="status.tone ?? 'neutral'"
-          :variant="status.variant ?? 'pill-color'"
-          size="sm"
-        />
-      </div>
+      <span class="ds-module-capsule__module">{{ moduleLabel ?? module }}</span>
       <p class="ds-module-capsule__title">{{ title }}</p>
-      <div v-if="attribute" class="ds-module-capsule__attribute">
-        <span class="ds-module-capsule__attribute-label">{{ attribute.label }}</span>
-        <Badge
-          v-if="attribute.badge"
-          :label="attribute.badge.label"
-          :tone="attribute.badge.tone ?? 'neutral'"
-          :variant="attribute.badge.variant ?? 'pill-outline'"
-          size="sm"
-        />
-      </div>
     </div>
 
-    <div v-if="value !== undefined" class="ds-module-capsule__rule" aria-hidden="true" />
-
-    <div
-      v-if="value !== undefined"
-      :class="['ds-module-capsule__hero', delta && 'ds-module-capsule__hero--wide']"
-    >
-      <div class="ds-module-capsule__hero-row">
-        <div :class="['ds-module-capsule__figure', `ds-module-capsule__figure--${unitPlacement}`]">
+    <template v-if="value !== undefined">
+      <div class="ds-module-capsule__rule" aria-hidden="true" />
+      <div class="ds-module-capsule__hero">
+        <p class="ds-module-capsule__figure">
           <span class="ds-module-capsule__value">{{ value }}</span>
-          <span
-            v-if="unit"
-            :class="['ds-module-capsule__unit', `ds-module-capsule__unit--${unitStyle}`]"
-          >{{ unit }}</span>
-        </div>
-        <Badge
-          v-if="valueBadge"
-          :label="valueBadge.label"
-          :tone="valueBadge.tone ?? 'success'"
-          :variant="valueBadge.variant ?? 'pill-outline'"
-          :icon="valueBadge.icon"
-          size="sm"
-        />
+          <span v-if="unit" class="ds-module-capsule__unit">{{ unit }}</span>
+        </p>
+        <p v-if="contextLine" class="ds-module-capsule__context">{{ contextLine }}</p>
       </div>
+    </template>
 
-      <div v-if="delta" class="ds-module-capsule__delta">
-        <Icon v-if="delta.icon" :name="delta.icon" :size="16" :class="toneClass(delta.tone)" />
-        <span v-if="delta.value" :class="['ds-module-capsule__delta-value', toneClass(delta.tone)]">
-          {{ delta.value }}
-        </span>
-        <span class="ds-module-capsule__delta-comparison">{{ delta.comparison }}</span>
-      </div>
-    </div>
-
-    <div v-if="progress" class="ds-module-capsule__rule" aria-hidden="true" />
-
-    <div v-if="progress" class="ds-module-capsule__progress">
-      <div class="ds-module-capsule__stage">
-        <p class="ds-module-capsule__stage-label">{{ progress.label }}</p>
-        <Badge
-          v-if="progress.badge"
-          :label="progress.badge.label"
-          :tone="progress.badge.tone ?? 'success'"
-          :variant="progress.badge.variant ?? 'pill-outline'"
-          size="sm"
-        />
-      </div>
-      <ProgressBar :value="progress.value" label="none" />
-      <p v-if="progress.context" class="ds-module-capsule__context">{{ progress.context }}</p>
-      <div v-if="progress.delta" class="ds-module-capsule__delta">
-        <Icon
-          v-if="progress.delta.icon"
-          :name="progress.delta.icon"
-          :size="16"
-          :class="toneClass(progress.delta.tone)"
-        />
+    <div v-if="spreadParts" class="ds-module-capsule__spread">
+      <div class="ds-module-capsule__bar" aria-hidden="true">
         <span
-          v-if="progress.delta.value"
-          :class="['ds-module-capsule__delta-value', toneClass(progress.delta.tone)]"
-        >{{ progress.delta.value }}</span>
-        <span class="ds-module-capsule__delta-comparison">{{ progress.delta.comparison }}</span>
+          v-for="(s, i) in segments"
+          :key="i"
+          :class="['ds-module-capsule__segment', `ds-module-capsule__segment--${s.kind}`]"
+          :style="{ flexGrow: s.value }"
+        />
       </div>
+      <p class="ds-module-capsule__legend">{{ legend }}</p>
     </div>
 
-    <div v-if="signals.length || freshness" class="ds-module-capsule__rule" aria-hidden="true" />
-
-    <div v-if="signals.length || freshness" class="ds-module-capsule__composition">
-      <div v-if="signals.length" class="ds-module-capsule__signals">
-        <div v-for="signal in signals" :key="signal.label" class="ds-module-capsule__signal">
-          <Icon :name="signal.icon" :size="20" />
-          <span :class="['ds-module-capsule__signal-label', signal.tone && toneClass(signal.tone)]">
-            {{ signal.label }}
-          </span>
-        </div>
-      </div>
+    <div v-if="status || freshness" class="ds-module-capsule__end">
+      <Badge
+        v-if="status"
+        :label="status.label"
+        :tone="status.tone ?? 'success'"
+        :variant="status.variant ?? 'pill-outline'"
+        size="sm"
+      />
       <p v-if="freshness" class="ds-module-capsule__freshness">{{ freshness }}</p>
     </div>
   </article>
 </template>
 
 <style scoped>
-/* The capsule is 90px tall and its content band is 74px — the 90 less the 8px
-   padding twice. Every column centres inside that band and the rules span it,
-   which is why the number is named once here rather than repeated six times.
-   The tile is the band too, square: everything on the row is one height.
-   token-lint-disable no-literal-dimension-js — a derived geometry, not a scale value */
+/*
+  The band's palette (ADR-0202): neutral greys, dark on any page, its own and
+  not the app's dark mode (which is green-grey, ADR-0029).
+*/
 .ds-module-capsule {
-  --capsule-band: 74px;
+  /* token-lint-disable-next-line no-raw-primitive — the band is dark on any page, its own neutral palette (ADR-0202) */
+  --capsule-ground: var(--ds-color-gray-light-900);
+  /* token-lint-disable-next-line no-raw-primitive — the band is dark on any page, its own neutral palette (ADR-0202) */
+  --capsule-tile: var(--ds-color-gray-light-800);
+  /* token-lint-disable-next-line no-raw-primitive — the band is dark on any page, its own neutral palette (ADR-0202) */
+  --capsule-rule: var(--ds-color-gray-light-700);
+  /* token-lint-disable-next-line no-raw-primitive — the band is dark on any page, its own neutral palette (ADR-0202) */
+  --capsule-strong: var(--ds-color-gray-light-100);
+  /* token-lint-disable-next-line no-raw-primitive — the band is dark on any page, its own neutral palette (ADR-0202) */
+  --capsule-subtle: var(--ds-color-gray-light-400);
+  /* token-lint-disable-next-line no-raw-primitive — the spread's lead part, the band's own green (ADR-0202) */
+  --capsule-lead: var(--ds-color-success-500);
+  /* token-lint-disable-next-line no-raw-primitive — the spread's other parts, the band's own green (ADR-0202) */
+  --capsule-part: var(--ds-color-success-800);
 
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-lg);
-  /* Hugs, as every capsule in Figma does — the columns are fixed or content-sized,
-     so a stretched box would just trail empty ground. A full-bleed banner is a
-     caller's decision: set `width: 100%` on the instance. */
   width: fit-content;
   max-width: 100%;
-  /* `spacing-md` on all four sides: the tile is the band's height, so the inset
-     around it is the same 8px every way, where it was 12 at the sides — the
-     capsule's edge hugs its tile rather than holding it off (ADR-0048,
-     amended; Figma 1982:59956). */
-  padding: var(--ds-spacing-md);
-  /* The capsule carries its own ground now, one step above the band's
-     `bg-default` — so it has an edge on the page as well as in the band. And it
-     is a surface, so it takes the surface radius, the same 12 as its tile. */
-  background-color: var(--ds-bg-neutral-subtle);
-  border-radius: var(--ds-radius-surface);
+  box-sizing: border-box;
+  padding: var(--ds-spacing-sm) var(--ds-spacing-lg);
+  border-radius: var(--ds-radius-control);
+  background-color: var(--capsule-ground);
+  color: var(--capsule-strong);
   overflow: hidden;
 }
 
-/* ── The module ───────────────────────────────────────────────────── */
-/* 74 square — the band, where it was a 64px tile centred in it. The drawing
-   stays 44, so its margin grows from 10 to 15: the tile gives the art room,
-   the art does not grow to fill it. */
+/* A 40px tile, the drawing at 28 in it — it no longer takes the row's height. */
 .ds-module-capsule__tile {
   flex: none;
-  width: var(--capsule-band);
-  height: var(--capsule-band);
   display: grid;
   place-items: center;
-  background-color: var(--ds-bg-neutral);
-  border-radius: var(--ds-radius-surface);
-  overflow: hidden;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--ds-radius-control);
+  background-color: var(--capsule-tile);
 }
 
-/* ── Identity ─────────────────────────────────────────────────────── */
-/* Figma draws this column at a fixed 260px, and that is a CEILING here, not a
-   size. Measured across the seven capsules, a fixed width left 343px of empty
-   ground in the row — 93px of it in one capsule, whose title is "Périmètre de
-   Podor" and needs 167. The cap still has to hold: "Recensement ménages —
-   Kaolack" wants 282 and truncates at 260, which is what Figma shows too. So the
-   column hugs its content and stops at the width the design drew — scaled by
-   16/14 since ADR-0144 (260 → 296), as the type it holds was. */
+/* 170, fixed: two capsules of one module are one width, and the loop never jumps. */
 .ds-module-capsule__identity {
   flex: none;
-  max-width: 296px;
-  height: var(--capsule-band);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: var(--ds-spacing-xs);
-  overflow: hidden;
+  width: 170px;
+  min-width: 0;
 }
 
-/* Baseline-aligned rather than centred: the badge is 20px and the name's line
-   box is 20px, so `flex-end` is what puts them on the same line in Figma. */
-.ds-module-capsule__identity-row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--ds-spacing-md);
-  width: 100%;
-}
-
-/*
-  The labels that recede take `text-subtle`, not `text-subtlest`, and the ground
-  chose it. `text-subtlest` is solved against `bg-default`: on the capsule's
-  `bg-neutral-subtle` it measures 4.76:1 in light and **4.18:1 in dark** — under
-  AA for 14px copy, in the mode the band is drawn in. `text-subtle` is 7.36 and
-  6.01. `SideNavGroup` made the same call on the same kind of ground (ADR-0046).
-*/
 .ds-module-capsule__module {
-  font: var(--ds-font-body-md);
-  color: var(--ds-text-subtle);
+  overflow: hidden;
+  font: var(--ds-font-label-md);
+  color: var(--capsule-subtle);
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .ds-module-capsule__title {
   margin: 0;
-  font: var(--ds-font-label-xl-strong);
-  color: var(--ds-text-strong);
-  white-space: nowrap;
   overflow: hidden;
+  font: var(--ds-font-label-lg-strong);
+  color: var(--capsule-strong);
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-/* The third identity line. `label-lg` rather than the first line's `body-md`:
-   an attribute is stated, a module name is just named. */
-.ds-module-capsule__attribute {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-spacing-md);
-  width: 100%;
-}
-
-.ds-module-capsule__attribute-label {
-  font: var(--ds-font-label-lg);
-  color: var(--ds-text-subtle);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ── The rules between sections ───────────────────────────────────── */
+/* A rule 40px high, the tile's: it divides the row, it encloses nothing. */
 .ds-module-capsule__rule {
   flex: none;
   width: var(--ds-border-width-default);
-  height: var(--capsule-band);
-  background-color: var(--ds-border-default);
+  height: 40px;
+  background-color: var(--capsule-rule);
 }
 
-/* ── The hero figure ──────────────────────────────────────────────── */
 .ds-module-capsule__hero {
   flex: none;
-  height: var(--capsule-band);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: var(--ds-spacing-xs);
-  overflow: hidden;
 }
 
-.ds-module-capsule__hero-row {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-md);
-}
-
+/* The figure and its unit on one baseline. */
 .ds-module-capsule__figure {
   display: flex;
+  align-items: baseline;
   gap: var(--ds-spacing-xs);
+  margin: 0;
   white-space: nowrap;
-}
-
-.ds-module-capsule__figure--inline {
-  flex-direction: row;
-  align-items: center;
-}
-
-.ds-module-capsule__figure--below {
-  flex-direction: column;
-  align-items: flex-start;
 }
 
 .ds-module-capsule__value {
-  font: var(--ds-font-heading-xl);
-  letter-spacing: var(--ds-letter-spacing-heading-xl);
-  color: var(--ds-text-strong);
+  font: var(--ds-font-heading-lg);
   font-variant-numeric: tabular-nums;
+  color: var(--capsule-strong);
 }
 
 .ds-module-capsule__unit {
-  color: var(--ds-text-subtle);
-}
-
-.ds-module-capsule__unit--text {
-  font: var(--ds-font-body-md);
-}
-
-/* A unit that is a symbol rather than a word sits tighter and heavier, so it
-   reads as part of the figure instead of as a second word after it. */
-.ds-module-capsule__unit--symbol {
-  font: var(--ds-font-label-md-strong);
-}
-
-/* ── The delta, under the figure and under the bar ────────────────── */
-/* A fixed column, because the comparison ellipsizes rather than widening the
-   capsule — which is also why the figure's badge goes to the far edge. */
-/* Same rule as the identity column: a ceiling, not a size. The delta's
-   comparison still ellipsizes against it rather than widening the capsule. */
-/* 300 × 16/14 since ADR-0144. */
-.ds-module-capsule__hero--wide {
-  max-width: 344px;
-}
-
-.ds-module-capsule__hero--wide .ds-module-capsule__hero-row {
-  justify-content: space-between;
-  width: 100%;
-}
-
-.ds-module-capsule__delta {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-xs);
-  width: 100%;
-}
-
-.ds-module-capsule__delta-value {
-  font: var(--ds-font-label-lg-strong);
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-.ds-module-capsule__delta-comparison {
-  flex: 1 0 0;
-  min-width: 0;
-  font: var(--ds-font-body-md);
-  color: var(--ds-text-subtle);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-
-/* ── Progress ─────────────────────────────────────────────────────── */
-/* The one column that does NOT hug. A bar is a scale, and its length is part of
-   how it is read: let it follow its label and two capsules side by side would
-   measure the same percentage against different rulers. Figma's 300, scaled by
-   16/14 with its type since ADR-0144. */
-.ds-module-capsule__progress {
-  flex: none;
-  width: 344px;
-  height: var(--capsule-band);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--ds-spacing-md);
-}
-
-.ds-module-capsule__stage {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-md);
-  width: 100%;
-}
-
-.ds-module-capsule__stage-label {
-  flex: 1 0 0;
-  min-width: 0;
-  margin: 0;
-  font: var(--ds-font-label-xl-strong);
-  color: var(--ds-text-strong);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font: var(--ds-font-label-md);
+  color: var(--capsule-subtle);
 }
 
 .ds-module-capsule__context {
   margin: 0;
-  font: var(--ds-font-body-md);
-  color: var(--ds-text-subtle);
+  font: var(--ds-font-body-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--capsule-subtle);
   white-space: nowrap;
+}
+
+/* Made of what: an 8px bar of rounded parts, 2px apart, its legend under it. */
+.ds-module-capsule__spread {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-sm);
+}
+
+/* A scale, so one length on every capsule: two spreads read against one ruler. */
+.ds-module-capsule__bar {
+  display: flex;
+  gap: var(--ds-spacing-xxs);
+  width: 8.5rem;
+  height: 8px;
+}
+
+.ds-module-capsule__segment {
+  flex-basis: 0;
+  min-width: 4px;
+  border-radius: var(--ds-radius-pill);
+}
+
+.ds-module-capsule__segment--lead { background-color: var(--capsule-lead); }
+.ds-module-capsule__segment--part { background-color: var(--capsule-part); }
+.ds-module-capsule__segment--rest { background-color: var(--capsule-rule); }
+
+.ds-module-capsule__legend {
+  max-width: 14rem;
+  margin: 0;
   overflow: hidden;
+  font: var(--ds-font-label-md);
+  font-variant-numeric: tabular-nums;
+  color: var(--capsule-strong);
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-/* ── Composition ──────────────────────────────────────────────────── */
-.ds-module-capsule__composition {
+/* Where it stands: the status over its date. */
+.ds-module-capsule__end {
   flex: none;
-  height: var(--capsule-band);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: var(--ds-spacing-xs);
-}
-
-.ds-module-capsule__signals {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-xl);
-}
-
-.ds-module-capsule__signal {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: flex-start;
-  gap: var(--ds-spacing-sm);
-  /* Figma binds the glyph to gray-forest/200 — text-default, not the fainter
-     subtlest. A glyph that labels a strong figure is not the faintest thing on
-     the row. */
-  color: var(--ds-text-default);
-}
-
-.ds-module-capsule__signal-label {
-  font: var(--ds-font-label-xl-strong);
-  color: var(--ds-text-strong);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  gap: var(--ds-spacing-xxs);
 }
 
 .ds-module-capsule__freshness {
   margin: 0;
-  font: var(--ds-font-body-md);
-  color: var(--ds-text-subtle);
+  font: var(--ds-font-label-md);
+  color: var(--capsule-subtle);
   white-space: nowrap;
 }
-
-/* ── Tones ────────────────────────────────────────────────────────── */
-/* Last in the sheet on purpose: these override the colour the element already
-   carries — `__signal-label` is text-strong until its measure crosses a
-   threshold, and the delta figure has no colour of its own at all.
-   The on-tint partners are used here on bg-default deliberately: in dark they
-   resolve to the same step as text-{tone}, and in light they are the legible
-   one (ADR-0030's open item). */
-.ds-module-capsule--on-success { color: var(--ds-text-on-success-subtle); }
-.ds-module-capsule--on-error   { color: var(--ds-text-on-error-subtle); }
-.ds-module-capsule--on-warning { color: var(--ds-text-on-warning-subtle); }
-.ds-module-capsule--on-neutral { color: var(--ds-text-default); }
 </style>

@@ -33,7 +33,7 @@ export { RevealTransition } from './RevealTransition'
 export { ModuleBanner } from './ModuleBanner'
 
 export { ModuleCapsule } from './ModuleCapsule'
-export type { CapsuleBadge, CapsuleSignal, CapsuleProgress } from './ModuleCapsule'
+export type { CapsuleBadge, CapsuleSignal, CapsuleProgress, CapsuleSpreadPart } from './ModuleCapsule'
 
 export { ModuleIcon, moduleNames } from './ModuleIcon'
 export type { ModuleName, ModuleVariant } from './ModuleIcon'

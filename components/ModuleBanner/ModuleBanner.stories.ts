@@ -6,136 +6,84 @@ import { RevealTransition } from '../RevealTransition'
 import { Button } from '../Button'
 
 /**
- * Figma *Sprint 18* `1308:5261` — the band that carries the capsules.
+ * The home page's dark band — **the band of 14 September, compact** (ADR-0202, variant N2): dark on any page and
+ * neutral (`gray-light`, never the app's green-grey), the capsules hollowed into it (900 in 800), about 56px each.
  *
- * The band is the bottom of a ramp: it is `bg-default`, every capsule inside it
- * `bg-neutral-subtle`, every tile inside those `bg-neutral` — one step per level
- * (ADR-0048, Figma `1982:59871`). In dark a layer rises, so the capsules sit
- * above the band at `gray-forest/800` on `900`, their tiles at `700`; in light
- * each level recesses by the same step.
- *
- * Switch the **Mode** toolbar to see both.
- *
- * **If nothing moves here**, check *System Settings → Accessibility → Display →
- * Reduce motion*. The whole catalogue honours it: `motion.css` collapses every
- * transition and `useMarquee` sets its speed to nought, so the band lands at its
- * full height on the first frame and the row sits still. That is correct, and it
- * looks exactly like a bug. The row stays scrollable by hand in that case —
- * asking for less motion must not cost you the capsules past the fold.
+ * **If nothing moves here**, check *System Settings → Accessibility → Display → Reduce motion*. The whole catalogue
+ * honours it: `motion.css` collapses every transition and `useMarquee` sets its speed to nought, so the band lands at
+ * its full height on the first frame and the row sits still. The row stays scrollable by hand in that case — asking for
+ * less motion must not cost you the capsules past the fold.
  */
 const meta: Meta<typeof ModuleBanner> = {
   title: 'Données/ModuleBanner',
   component: ModuleBanner,
   tags: ['stable'],
-  // Drawn in dark (ADR-0029/0031), so it opens in dark. Both modes work —
-  // flip the Mode toolbar — but light is not the design this came from.
-  globals: { theme: 'dark' },
 }
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-const YIELD = {
-  module: 'Yield',
-  title: 'Périmètre de Podor',
-  status: { label: 'Campagne en cours', tone: 'warning', variant: 'pill-color' },
-  attribute: { label: 'Culture', badge: { label: 'Mil, contre saison froide' } },
-  value: '4,82',
-  unit: 't/ha',
-  unitStyle: 'symbol',
-  valueBadge: { label: 'Rendement prévu', icon: 'trending-up' },
-  delta: { icon: 'trending-up', value: '12 %', comparison: 'comparé au 08 septembre 2025' },
-  progress: {
-    label: 'Progression de la campagne',
-    value: 46,
-    badge: { label: '46%' },
-    delta: { icon: 'trending-up', value: '5 %', comparison: 'comparé au 08 septembre 2025' },
-  },
+/* The product's capsules, as it passes them today (`section-project-metric.vue`) — no prop changed. */
+const ID = {
+  module: 'ID',
+  moduleLabel: 'TOLBI ID',
+  title: 'Cacao Démo SA',
+  value: '1 284',
+  unit: 'producteurs',
   signals: [
-    { icon: 'cloud-rain', label: '12,4 mm' },
-    { icon: 'droplets', label: '18,2 %', tone: 'warning' },
-    { icon: 'thermometer', label: '31 °C' },
+    { icon: 'land-plot', label: '2 316 parcelles' },
+    { icon: 'ruler', label: '4 120 ha' },
   ],
-  freshness: 'Prévision du 08 septembre 2025',
+  freshness: 'Mis à jour hier',
 }
 
-/** The seven capsules of the Figma frame, in its order. */
-const ROW = [
-  YIELD,
-  {
-    module: 'Source',
-    title: 'Collecte cacao — 1er kilomètre',
-    status: { label: 'Collecte en cours', tone: 'warning', variant: 'pill-color' },
-    value: '12,4',
-    unit: 'tonnes collectées',
-    valueBadge: { label: '46 % tracé', tone: 'success', variant: 'pill-outline' },
-    signals: [
-      { icon: 'users', label: '18 agents' },
-      { icon: 'rows-3', label: '6 étapes' },
-    ],
-    freshness: 'Mise à jour il y a 40 min',
-  },
-  {
-    module: 'Data',
-    title: 'Recensement ménages — Kaolack',
-    status: { label: 'Collecte en cours', tone: 'warning', variant: 'pill-color' },
-    value: 342,
-    unit: 'enregistrements',
-    valueBadge: { label: '298 validées', tone: 'success', variant: 'pill-outline' },
-    signals: [
-      { icon: 'circle-check', label: '298 validés' },
-      { icon: 'clock', label: '44 en attente' },
-    ],
-    freshness: 'Mise à jour il y a 2 h',
-  },
-  {
-    module: 'ID',
-    title: 'Coopérative de Kaolack',
-    value: '1 240',
-    unit: 'producteurs',
-    unitPlacement: 'below',
-    signals: [
-      { icon: 'land-plot', label: '312 parcelles' },
-      { icon: 'ruler', label: '847 ha' },
-    ],
-    freshness: 'Mise à jour hier',
-  },
-  {
-    module: 'Scan',
-    title: 'Périmètre de Podor',
-    status: { label: 'Analyse terminée', tone: 'success', variant: 'pill-color' },
-    value: '2 480',
-    unit: 'hectares cartographiés',
-    unitPlacement: 'below',
-    signals: [
-      { icon: 'wheat', label: '4 cultures' },
-      { icon: 'sprout', label: '92 % couverture' },
-    ],
-    freshness: 'Mise à jour il y a 3 j',
-  },
-  {
-    module: 'Survey',
-    moduleLabel: 'INA',
-    title: 'Coopérative de Kaolack',
-    value: '1 024',
-    unit: 'identités',
-    valueBadge: { label: '981 vérifiées', tone: 'success', variant: 'pill-outline' },
-    signals: [{ icon: 'id-card', label: '981 vérifiées' }],
-    freshness: 'Mise à jour il y a 6 h',
-  },
-  {
-    module: 'Carbone',
-    title: 'Bassin arachidier — Kaffrine',
-    value: '1 860',
-    unit: 't CO₂e',
-    valueBadge: { label: 'Vérifié', tone: 'success', variant: 'pill-outline' },
-    signals: [
-      { icon: 'land-plot', label: '540 parcelles' },
-      { icon: 'globe', label: 'Scope 3' },
-    ],
-    freshness: 'Mise à jour il y a 1 j',
-  },
-]
+const SCAN = {
+  module: 'Scan',
+  moduleLabel: 'TOLBI Scan',
+  title: 'Kaolack — campagne 2026',
+  status: { label: 'Terminé', tone: 'success', variant: 'pill-outline' },
+  value: '3 812,40',
+  unit: 'ha cartographiés',
+  signals: [
+    { icon: 'sprout', label: 'Arachide 58 %' },
+    { icon: 'wheat', label: 'Mil 27 %' },
+  ],
+  freshness: '2026',
+}
+
+const DATA = {
+  module: 'Data',
+  moduleLabel: 'TOLBI Data',
+  title: 'Recensement ménages — Kaolack',
+  status: { label: 'Collecte en cours', tone: 'warning', variant: 'pill-outline' },
+  value: '342',
+  unit: 'enregistrements',
+  valueBadge: { label: '298 validées', tone: 'success' },
+  signals: [
+    { icon: 'circle-check', label: '298 validés' },
+    { icon: 'clock', label: '44 en attente' },
+  ],
+  freshness: 'Mis à jour hier',
+}
+
+const SOURCE = {
+  module: 'Source',
+  moduleLabel: 'TOLBI Source',
+  title: 'Collecte cacao — 1er kilomètre',
+  status: { label: 'En cours', tone: 'warning', variant: 'pill-outline' },
+  value: '12,4',
+  unit: 'tonnes collectées',
+  progress: { label: 'Traçabilité', value: 46, context: 'Toutes étapes', badge: { label: '46%', tone: 'success' } },
+  signals: [
+    { icon: 'users', label: '18 agents' },
+    { icon: 'rows-3', label: '6 étapes' },
+  ],
+  freshness: 'Dernière saisie il y a 40 min',
+}
+
+const SCAN_2 = { ...SCAN, title: 'Kaffrine — campagne 2026', value: '2 140,15', signals: [{ icon: 'wheat', label: 'Mil 64 %' }, { icon: 'sprout', label: 'Arachide 21 %' }] }
+
+const ROW = [ID, SCAN, DATA, SOURCE, SCAN_2]
 
 const render = (rows: unknown[], motion = 'scroll') => () => ({
   components: { ModuleBanner, ModuleCapsule },
@@ -147,11 +95,11 @@ const render = (rows: unknown[], motion = 'scroll') => () => ({
   `,
 })
 
-/** The whole frame — 6138px of capsules, which is why the band scrolls. */
+/** The home page's row, as the product fills it: ID, Scan, Data, Source, Scan. */
 export const Default: Story = { render: render(ROW) }
 
-/** One capsule in the band: the pair of surfaces with nothing else going on. */
-export const Single: Story = { render: render([YIELD]) }
+/** One capsule in the band: the capsule hollowed into it. */
+export const Single: Story = { render: render([SCAN]) }
 
 /** Three, the width a real dashboard is more likely to give it. */
 export const Three: Story = { render: render(ROW.slice(0, 3)) }
