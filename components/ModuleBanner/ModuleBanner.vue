@@ -12,7 +12,8 @@ import { useMarquee } from '../../composables/useMarquee'
  * where they rose above it, is reversed.
  *
  * `spacing-sm` above and below, `spacing-lg` at the sides, `spacing-md` between
- * capsules, `radius-surface`.
+ * capsules, `radius-surface` — or no corners with `bleed` (ADR-0211): four
+ * corners close the band and it reads as one more card.
  *
  * Pair it with `RevealTransition` for the entrance the product gives it: the
  * band opens its own height once the data arrives.
@@ -27,11 +28,19 @@ interface Props {
   motion?: 'static' | 'scroll' | 'marquee'
   /** Accessible name for the band, e.g. "Vos modules". */
   label?: string
+  /**
+   * Edge to edge (ADR-0211): no corners. The product lays the band across the
+   * whole window, under the navigation column on the left and out through the
+   * window's edge on the right — the overflow is what says it scrolls. No fade
+   * at either edge: the clean cut is what passes over it.
+   */
+  bleed?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   motion: 'scroll',
   label: undefined,
+  bleed: false,
 })
 
 // The composable owns the frame loop; the component owns only the shape it
@@ -42,7 +51,7 @@ const { container, content, pause, resume, startDrag, drag, endDrag, isDragging,
 
 <template>
   <div
-    :class="['ds-module-banner', `ds-module-banner--${props.motion}`]"
+    :class="['ds-module-banner', `ds-module-banner--${props.motion}`, { 'ds-module-banner--bleed': props.bleed }]"
     data-theme="dark"
     :role="label ? 'group' : undefined"
     :aria-label="label"
@@ -81,6 +90,19 @@ const { container, content, pause, resume, startDrag, drag, endDrag, isDragging,
   /* token-lint-disable-next-line no-raw-primitive — the band is dark on any page, its own neutral palette (ADR-0202) */
   background-color: var(--ds-color-gray-light-800);
   border-radius: var(--ds-radius-surface);
+}
+
+/* Edge to edge: the band is not a card, it passes under what bounds it (ADR-0211). */
+.ds-module-banner--bleed {
+  border-radius: 0;
+}
+
+/* …and the cut is at its edge: the marquee's window reaches through the band's
+   side padding (which it keeps as its own, so the run starts where it did), or
+   the capsules would be cut 12px short, against the band's ground. */
+.ds-module-banner--bleed .ds-module-banner__viewport {
+  margin-inline: calc(-1 * var(--ds-spacing-lg));
+  padding-inline: var(--ds-spacing-lg);
 }
 
 .ds-module-banner--scroll {

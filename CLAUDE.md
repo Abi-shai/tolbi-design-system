@@ -1743,6 +1743,12 @@ Before working on any component, read:
   `ActionListItem` plate renders **only when `#media` is filled**; without it the row starts at its words (60px high,
   margins and text → chevron gap unchanged), and « Apprendre » + « Recommandé » hold whole at 21.5rem. The chevron stays:
   the row leads somewhere. The product passes no `#media` on the home page.
+- **ADR-0211**: **a hairline round the tray, a band edge to edge** — `Tray` takes a 1px **`border-subtlest`** (five
+  edges compared on the page; the most discreet: the edge guessed, not a frame), the white surface none; in dark it is
+  the tray's own ground. **`ModuleBanner bleed`**: no corners (four corners made the band a card); the product lays it
+  across the window, under the navigation on the left, out through the window on the right — the overflow says it
+  scrolls. No fade, no mask; the marquee's window reaches through the side padding (keeping it as its own) so the cut
+  falls on the band's edge, not 12px short.
 
 ## Architecture
 

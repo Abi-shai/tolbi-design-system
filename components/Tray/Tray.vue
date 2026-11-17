@@ -9,7 +9,8 @@ import { useId } from 'vue'
  * two lists now share it rather than draw it twice (ADR-0001).
  *
  * `bg-neutral-subtle` with `spacing-md` around, `radius-surface-lg` (a surface
- * that holds a surface, one step past it); inside, `bg-default`, `spacing-md`
+ * that holds a surface, one step past it), a `border-subtlest` hairline
+ * (ADR-0211); inside, `bg-default`, `spacing-md`
  * around, `radius-surface`. It carries no title and no state: the block's
  * heading is the page's, its wait and its absence the content's.
  *
@@ -69,6 +70,9 @@ const titleId = `ds-tray-title-${useId()}`
   box-sizing: border-box;
   width: 100%;
   padding: var(--ds-spacing-md);
+  /* A hairline round the tray (ADR-0211): its grey is lost on a white page; the
+     faintest border makes the edge guessed, not a frame. */
+  border: var(--ds-border-width-default) solid var(--ds-border-subtlest);
   border-radius: var(--ds-radius-surface-lg);
   background: var(--ds-bg-neutral-subtle);
 }

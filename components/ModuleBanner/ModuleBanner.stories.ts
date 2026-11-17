@@ -116,6 +116,29 @@ export const Three: Story = { render: render(ROW.slice(0, 3)) }
 export const Marquee: Story = { render: render(ROW, 'marquee') }
 
 /**
+ * Bord à bord (ADR-0211) : `bleed` retire les coins. Sur l’accueil la bande prend toute la fenêtre — sous la colonne
+ * de navigation à gauche, hors du bord à droite — et ce débordement dit qu’elle défile. Aucun fondu aux bords.
+ */
+export const Bleed: Story = {
+  name: 'Bord à bord',
+  parameters: { layout: 'fullscreen' },
+  render: () => ({
+    components: { ModuleBanner, ModuleCapsule },
+    setup: () => ({ rows: ROW }),
+    template: `
+      <div style="display:flex; min-height: 200px; background: var(--ds-bg-default)">
+        <div style="position:relative; z-index:1; width: 68px; flex:none; background: var(--ds-bg-neutral)"></div>
+        <div style="flex:1; min-width:0; margin-left:-68px; padding-top: var(--ds-spacing-xl)">
+          <ModuleBanner motion="marquee" bleed label="Vos modules">
+            <ModuleCapsule v-for="(row, i) in rows" :key="i" v-bind="row" />
+          </ModuleBanner>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+/**
  * The entrance, with `RevealTransition` — the band opens its own height once
  * the data lands, and the content follows a step later. Toggle it.
  */
