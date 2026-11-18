@@ -1766,6 +1766,9 @@ Before working on any component, read:
   important block: the cover is now `bg-neutral-subtle` with the pattern in `text-strong` at **1.2 %** and the title in
   `text-strong` (16.2:1 at two stamps; dark 9.6:1). Semantic roles, so it follows the theme (ADR-0213's primitives
   gone). Hover/focus: the ground steps to `bg-neutral` with the card (ADR-0207) and the pattern fades. Geometry unchanged.
+- **ADR-0215**: **the cover turns white under the pointer** (track H1 of a hover board: white + 1.2 / 2.5 / 4 %) —
+  card and cover shared one grey on hover and read as one block; now the card takes the tray's grey and the cover
+  **`bg-default`**, the inverse, the pattern unchanged at 1.2 % (no fade), over `quick`. Title 16.93:1 (dark 11.92:1).
 
 ## Architecture
 

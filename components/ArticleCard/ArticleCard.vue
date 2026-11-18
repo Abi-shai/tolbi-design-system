@@ -38,9 +38,10 @@ import { Skeleton } from '../Skeleton'
  * else on it. The deep green drew the eye to what is the least important block
  * of the page; the grey leaves it to the words. The title then leaves the words
  * under the frame — they hold the date alone — and stays the link's name; the
- * cover is `aria-hidden`. Under the pointer and the focus the ground steps to
- * `bg-neutral` with the card, as a project's picture does (ADR-0207), and the
- * pattern fades to 45 % of itself over `considered`: nothing moves.
+ * cover is `aria-hidden`. Under the pointer and the focus the card takes the
+ * tray's grey and the cover **turns white** (ADR-0215): the inverse of the card,
+ * so the two never melt into one grey. The pattern keeps its 1.2 %; nothing
+ * moves.
  */
 interface Props {
   title?: string
@@ -280,26 +281,20 @@ a.ds-article-card:focus-visible {
   transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
 }
 
-/* With the card's ground, the cover steps to `bg-neutral`: the card lights in
-   one tone, as a `ProjectList` row and its picture (ADR-0207). */
+/* Under the pointer the card takes the tray's grey and the cover turns white —
+   the inverse, so card and cover stay two things (ADR-0215; the same grey for
+   both read as one grey block). The pattern keeps its ink and its 1.2 %. */
 a.ds-article-card:is(:hover, :focus-visible) .ds-article-card__frame .ds-article-card__pattern {
-  background-color: var(--ds-bg-neutral);
+  background-color: var(--ds-bg-default);
 }
 
 .ds-article-card__pattern :deep(.ds-brand-pattern__art) {
   transform: var(--article-card-crop);
   transform-origin: center;
-  transition: opacity var(--ds-motion-duration-considered) var(--ds-motion-easing-default);
-}
-
-/* The pattern fades under the pointer and the focus — it never lights up. */
-a.ds-article-card:is(:hover, :focus-visible) .ds-article-card__pattern :deep(.ds-brand-pattern__art) {
-  opacity: 0.45;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-article-card__frame .ds-article-card__pattern,
-  .ds-article-card__pattern :deep(.ds-brand-pattern__art) {
+  .ds-article-card__frame .ds-article-card__pattern {
     transition: none;
   }
 }
