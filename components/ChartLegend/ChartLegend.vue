@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import MapGlyphMark from '../Map/MapGlyphMark.vue'
+import ChartLegendMark from './ChartLegendMark.vue'
 
 export interface ChartLegendItem {
   /** Stable key, also emitted on toggle. */
@@ -23,6 +23,7 @@ export interface ChartLegendItem {
  * - `square`, `circle`, `point` the symbols a map draws — a project point, a
  *   control point, a reserve point;
  * - `zone` an area: its colour as the edge over a tint of it;
+ * - `ring` an outline without a fill — a perimeter, a buffer (ADR-0226);
  * - `glyph-project`, `glyph-control`, `glyph-monitored` the map's own glyphs (ADR-0190, ADR-0194): the
  *   legend draws **the glyph itself** (ADR-0192), so the reader finds on the
  *   map what the key shows. Its colour is the entry's `color`, else the middle
@@ -32,7 +33,7 @@ export interface ChartLegendItem {
  *   pictogram does not read.
  */
 export type ChartLegendShape =
-  | 'dot' | 'line' | 'dashed' | 'square' | 'circle' | 'point' | 'zone'
+  | 'dot' | 'line' | 'dashed' | 'square' | 'circle' | 'point' | 'zone' | 'ring'
   | 'glyph-project' | 'glyph-control' | 'glyph-monitored'
 
 /**
@@ -85,9 +86,7 @@ function seriesColor(color: string | undefined, index: number): string {
   return color ?? `var(--ds-chart-categorical-${(index % CATEGORICAL_STEPS) + 1})`
 }
 
-/* A map glyph's family, or nothing: the glyph is drawn, the other shapes are CSS. */
-const familyOf = (shape: ChartLegendShape) =>
-  shape === 'glyph-project' ? 'project' : shape === 'glyph-control' ? 'control' : shape === 'glyph-monitored' ? 'monitored' : null
+const familyOf = (shape: ChartLegendShape) => shape.startsWith('glyph-')
 const hasGlyphs = computed(() => props.items.some((i) => familyOf(i.shape ?? props.shape)))
 const glyphSize = computed(() => (props.orientation === 'columns' ? 24 : 20))
 </script>
@@ -107,19 +106,10 @@ const glyphSize = computed(() => (props.orientation === 'columns' ? 24 : 20))
         :class="{ 'ds-chart-legend__entry--off': item.active === false }"
         @click="interactive && $emit('toggle', item.key)"
       >
-        <MapGlyphMark
-          v-if="familyOf(item.shape ?? shape)"
-          class="ds-chart-legend__glyph"
-          :family="familyOf(item.shape ?? shape)!"
-          :color="item.color ?? 'var(--chart-legend-glyph, var(--ds-chart-sequential-3))'"
-          :size="glyphSize"
-        />
-        <span
-          v-else
-          class="ds-chart-legend__mark"
-          :class="`ds-chart-legend__mark--${item.shape ?? shape}`"
-          :style="{ '--chart-legend-mark': seriesColor(item.color, i) }"
-          aria-hidden="true"
+        <ChartLegendMark
+          :shape="item.shape ?? shape"
+          :color="familyOf(item.shape ?? shape) ? item.color : seriesColor(item.color, i)"
+          :glyph-size="glyphSize"
         />
         <span class="ds-chart-legend__label">{{ item.label }}</span>
         <span v-if="item.value" class="ds-chart-legend__value">{{ item.value }}</span>
@@ -165,38 +155,6 @@ button.ds-chart-legend__entry:focus-visible {
 
 /* Dim the whole entry, mark included, so "off" is unmistakable. */
 .ds-chart-legend__entry--off { opacity: 0.4; }
-
-/* The series colour is the caller's, so it can be the ground's own — a white
-   series on a white card had no edge at all. The avatar's hairline is drawn
-   for exactly that: translucent, so it darkens a light swatch's edge in light
-   mode, lightens a dark one's in dark, and leaves a saturated one as it is.
-   Inset, over the colour, so the mark keeps its size. */
-.ds-chart-legend__mark {
-  flex-shrink: 0;
-  background-color: var(--chart-legend-mark);
-  box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-border-inset);
-}
-.ds-chart-legend__mark--dot    { width: 8px; height: 8px; border-radius: var(--ds-radius-pill); }
-.ds-chart-legend__mark--line   { width: 14px; height: 3px; border-radius: var(--ds-radius-pill); }
-.ds-chart-legend__mark--square { width: 8px; height: 8px; border-radius: 1px; } /* token-lint-disable no-raw-radius — a map symbol's corner, drawn at 8px, not a surface's radius */
-/* A circle is a symbol, not a swatch: it is drawn ringed, as on the map. */
-.ds-chart-legend__mark--circle { width: 8px; height: 8px; border-radius: var(--ds-radius-pill); box-shadow: 0 0 0 var(--ds-border-width-default) var(--ds-bg-default), inset 0 0 0 var(--ds-border-width-default) var(--ds-border-inset); }
-.ds-chart-legend__mark--point  { width: 5px; height: 5px; border-radius: var(--ds-radius-pill); margin-inline: 1.5px; }
-/* Lines carry no hairline: they are the drawing itself, not a swatch of it. */
-.ds-chart-legend__mark--dashed {
-  width: 14px;
-  height: 0;
-  background: none;
-  box-shadow: none;
-  border-top: var(--ds-border-width-strong) dashed var(--chart-legend-mark);
-}
-.ds-chart-legend__mark--zone {
-  width: 14px;
-  height: 10px;
-  border-radius: 2px; /* token-lint-disable no-raw-radius — the zone symbol's corner, as drawn on the map */
-  background-color: color-mix(in srgb, var(--chart-legend-mark) 12%, transparent);
-  box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--chart-legend-mark);
-}
 
 .ds-chart-legend__label {
   /* 12px, 14 in a reading panel (ADR-0132). */
@@ -272,6 +230,7 @@ button.ds-chart-legend__entry:focus-visible {
 .ds-chart-legend--columns .ds-chart-legend__mark--line { --chart-legend-mark-h: 3px; }
 .ds-chart-legend--columns .ds-chart-legend__mark--point { --chart-legend-mark-h: 5px; }
 .ds-chart-legend--columns .ds-chart-legend__mark--dashed { --chart-legend-mark-h: 2px; }
+.ds-chart-legend--columns .ds-chart-legend__mark--ring { --chart-legend-mark-h: 10px; }
 
 .ds-chart-legend--columns .ds-chart-legend__value {
   order: 1;

@@ -1837,6 +1837,15 @@ Before working on any component, read:
   / `easing-out` from **40 %** (160ms); fold content first (`exit`), then the cut over `process` / `easing-in`, then the
   capsule's button over `quick`. The open cut ends **past** the edge (`spacing-4xl`, concentric corners) so the shadow
   comes with it. Reduced motion: a fade. The start fold keeps ADR-0182's shell.
+- **ADR-0226**: **the map's key** (Felt, the product's `legend-panel.vue` taken in) — **`MapLegendPanel`** = `MapPanel` as a
+  key (compact, `fit="content"`, no rule, fold at the end into `sliders-horizontal`, ADR-0224/0225); one `PanelBlock` per
+  family (`groups`); the first carries the indicator (`metrics`, `v-model:metric` in the chip via `#title`, « À propos »
+  `metricHelp`, eye `v-model:metric-hidden`). A row = the map's mark (internal **`ChartLegendMark`**, extracted from
+  `ChartLegend`, + new **`ring`**) + its word, no count, 28px; actions « Afficher seulement » (`focus`, `aria-pressed`
+  while alone, again = family back) and the eye (name turns, no `aria-pressed`); one model **`v-model:hidden`**. Actions
+  **show on approach** (hover / focus inside, opacity over `quick`, no row ground), stateful ones stay, always without
+  hover. **`PanelBlock #aside`** `IconButton xs` centred on the 20px title line, `spacing-xxs` apart, pulled `spacing-md`
+  into the padding so their glyphs share the rows' column.
 
 ## Architecture
 

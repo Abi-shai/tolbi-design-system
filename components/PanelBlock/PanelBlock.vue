@@ -164,6 +164,23 @@ const Nodes: FunctionalComponent<{ nodes: VNode[] }> = (p) => p.nodes
   overflow: hidden;
 }
 
+/*
+  The block's actions (ADR-0226): `IconButton xs` — a 32px box — on a 20px title
+  line. Centred on the line rather than hung from its top, so they lend 6px
+  above and below and the head keeps the title's height; `spacing-xxs` apart;
+  and pulled `spacing-md` into the block's padding, the glyph's own inset, so
+  their glyphs stand in the column of the rows' actions and the title keeps
+  the room — in an 18rem key two actions cut « Indice de stock · 2026 ».
+*/
+.ds-panel-block :deep(.ds-section-card__actions:has(.ds-icon-button)) {
+  gap: var(--ds-spacing-xxs);
+  margin-inline-end: calc(-1 * var(--ds-spacing-md));
+}
+
+.ds-panel-block :deep(.ds-section-card__actions .ds-icon-button--xs) {
+  margin-block: calc((var(--ds-line-height-label-lg-strong) - 32px) / 2);
+}
+
 .ds-panel-block__foot {
   display: flex;
   align-items: center;
