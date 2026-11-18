@@ -324,7 +324,7 @@ function by(d: number) {
               :icon="t.icon"
               size="md"
               variant="ghost"
-              shape="square"
+             
              
               :ariaLabel="t.badge ? `${t.label} (${t.badge})` : t.label"
               :selected="t.value === MINIMAP ? minimapOpen : opens(t) ? tool === t.value : !!t.pressed"
@@ -343,18 +343,18 @@ function by(d: number) {
 
     <div class="ds-map-navigator__group">
       <Tooltip :title="zoomInLabel" :placement="tooltipPlacement">
-        <IconButton icon="plus" size="md" variant="ghost" shape="square" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
+        <IconButton icon="plus" size="md" variant="ghost" :ariaLabel="zoomInLabel" :disabled="disabled || atMax" @click="by(1)" />
       </Tooltip>
       <MapZoomGauge ref="gauge" v-model="zoom" vertical :min="zoomMin" :max="zoomMax" :step="zoomStep" :label="zoomLabel" :disabled="disabled" />
       <Tooltip :title="zoomOutLabel" :placement="tooltipPlacement">
-        <IconButton icon="minus" size="md" variant="ghost" shape="square" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
+        <IconButton icon="minus" size="md" variant="ghost" :ariaLabel="zoomOutLabel" :disabled="disabled || atMin" @click="by(-1)" />
       </Tooltip>
     </div>
 
     <span class="ds-map-navigator__rule" aria-hidden="true" />
 
     <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
-      <IconButton icon="crosshair" size="md" variant="ghost" shape="square" :ariaLabel="recenterLabel" :disabled="disabled" @click="emit('recenter')" />
+      <IconButton icon="crosshair" size="md" variant="ghost" :ariaLabel="recenterLabel" :disabled="disabled" @click="emit('recenter')" />
     </Tooltip>
 
     <!-- What the open tool shows: a card to the column's left, its top on its button's. -->
@@ -411,7 +411,9 @@ function by(d: number) {
   width: 52px;
   height: fit-content;
   padding: var(--ds-spacing-sm) 0;
-  border-radius: var(--ds-radius-surface);
+  /* A control on a map is a pill, its buttons round (ADR-0224): 26 at the ends,
+     concentric with the 40px buttons 6px in. */
+  border-radius: var(--ds-radius-map-control);
   /* Pilot glass (ADR-0172): the map shows through as colour. */
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
   background: var(--ds-bg-map-control);
@@ -491,7 +493,9 @@ function by(d: number) {
   width: max-content;
   max-width: 24rem;
   max-height: min(36rem, 70vh);
-  border-radius: var(--ds-radius-surface);
+  /* A surface read on a map (ADR-0224); its blocks take `map-block`. */
+  border-radius: var(--ds-radius-map-surface);
+  --on-glass-block-radius: var(--ds-radius-map-block);
   /* Reading glass (ADR-0172): almost opaque — the text is long. What it holds
      follows (`--on-glass-*`): the levels by light (ADR-0173). */
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
@@ -540,7 +544,8 @@ function by(d: number) {
   width: 12.5rem;
   height: 8rem;
   overflow: hidden;
-  border-radius: var(--ds-radius-inner);
+  /* Concentric with the card: 24 less its 8px of padding (ADR-0224). */
+  border-radius: var(--ds-radius-map-block);
   background: var(--ds-bg-default);
 }
 

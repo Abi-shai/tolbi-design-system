@@ -47,8 +47,10 @@ const expanded = defineModel<boolean>('expanded', { default: false })
 
 const slots = defineSlots<{
   default?: () => unknown
-  /** On the title's line, at its end — a `Badge`, a count. */
+  /** On the title's line, at its end — a `Badge`, a count, or the block's actions (`IconButton xs`, several). */
   aside?: () => unknown
+  /** In place of the title on its line — the indicator's menu (ADR-0224); `title` stays the block's name. */
+  title?: () => unknown
 }>()
 
 const restId = `ds-panel-block-rest-${useId()}`
@@ -77,6 +79,7 @@ const Nodes: FunctionalComponent<{ nodes: VNode[] }> = (p) => p.nodes
 <template>
   <SectionCard :title="title" :help="help" :heading-level="headingLevel" density="compact" class="ds-panel-block">
     <template v-if="slots.aside" #actions><slot name="aside" /></template>
+    <template v-if="slots.title" #title><slot name="title" /></template>
     <slot v-if="limit === undefined" />
     <template v-else>
     <template v-for="parts in [split()]" :key="0">

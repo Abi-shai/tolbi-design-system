@@ -1823,6 +1823,14 @@ Before working on any component, read:
   every `--on-glass-*` reset to `initial` (`--ds-text-subtlest: inherit`), so the switch, the icons' hover and the basemap
   trigger fall back on their off-map values. Ground, shadow and blur fade over `enter` / `easing-out` (a named
   `focus-ring-instant` suppression: elevation, not a ring); nothing moves (filmed: 56 at y 0 every frame).
+- **ADR-0224**: **one family of curves on a map** (lot 1; the product's brief) — a control is a **pill**, its buttons round
+  (`MapNavigator` column and buttons, the folded capsule, `MapTimeline`); a surface is **24** (`MapPanel` sm/lg, the
+  tool card); its blocks **16** (`Card`s in a panel, the mini-map). Tokens **`--ds-radius-map-control/-surface/-block`**;
+  a map surface hands `Card` its radius through **`--on-glass-block-radius`** (blocks only). `MapPanel` lg: **`foldIcon`**
+  (the folded control's glyph), **`foldPlacement: 'start' | 'end'`** (`end` = a `x` closing the title's line, not
+  carried), **`fit: 'fill' | 'content'`**, **`divided`**, **`density="compact"`** (18rem, head 8/12, body 0 8 8; blocks
+  8/12, gap 4, `label-md-strong` via `--section-card-*` switches). **`PanelBlock`/`SectionCard #title`** (the line shows
+  it, the heading keeps `title` hidden). Icons `focus`, `sliders-horizontal`. Lot 2: the clip-path fold, the legend.
 
 ## Architecture
 

@@ -90,6 +90,7 @@ import Filter              from './icons/filter.vue'
 import FilterX             from './icons/filter-x.vue'
 import FingerprintPattern  from './icons/fingerprint-pattern.vue'
 import Flag                from './icons/flag.vue'
+import Focus               from './icons/focus.vue'
 import Folder              from './icons/folder.vue'
 import FolderOpen          from './icons/folder-open.vue'
 import Folders             from './icons/folders.vue'
@@ -164,6 +165,7 @@ import Share2              from './icons/share-2.vue'
 import Shield              from './icons/shield.vue'
 import ShieldCheck         from './icons/shield-check.vue'
 import ShieldOff           from './icons/shield-off.vue'
+import SlidersHorizontal   from './icons/sliders-horizontal.vue'
 import SlidersVertical     from './icons/sliders-vertical.vue'
 import Smartphone          from './icons/smartphone.vue'
 import Sparkle             from './icons/sparkle.vue'
@@ -289,6 +291,7 @@ export const icons = {
   'filter-x':               FilterX,
   'fingerprint-pattern':    FingerprintPattern,
   'flag':                   Flag,
+  'focus':                  Focus,
   'folder':                 Folder,
   'folder-open':            FolderOpen,
   'folders':                Folders,
@@ -363,6 +366,7 @@ export const icons = {
   'shield':                 Shield,
   'shield-check':           ShieldCheck,
   'shield-off':             ShieldOff,
+  'sliders-horizontal':     SlidersHorizontal,
   'sliders-vertical':       SlidersVertical,
   'smartphone':             Smartphone,
   'sparkle':                Sparkle,

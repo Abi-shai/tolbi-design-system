@@ -34,6 +34,21 @@
       "$value": "{radius.full}",
       "$type": "dimension",
       "$description": "Badges, avatars, dots, toggles — anything fully rounded"
+    },
+    "map-control": {
+      "$value": "{radius.full}",
+      "$type": "dimension",
+      "$description": "A control on a map — the tools column, a timeline, a folded panel's capsule — is a pill, its buttons round (ADR-0224). One place sets the map's family"
+    },
+    "map-surface": {
+      "$value": "{radius.4xl}",
+      "$type": "dimension",
+      "$description": "A surface read on a map — a panel, the tools column's card (ADR-0224): 24px, so it belongs to the pills around it"
+    },
+    "map-block": {
+      "$value": "{radius.2xl}",
+      "$type": "dimension",
+      "$description": "A block inside a map's surface — a panel's blocks, the mini-map (ADR-0224): 16px, concentric with the surface at 8px of padding"
     }
   }
 }

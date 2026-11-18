@@ -257,7 +257,7 @@ export type { ChartTooltipSeries } from './ChartTooltip'
 export { Sparkline } from './Sparkline'
 
 export { MapOverlay, MapPanel, MapControls, MapNavigator, MapSearch, MapFilters, MapFilterSection, MapFilterOption, MapTimeline, MapTooltip, MapHoverCard, MapPin, MapLegend, MapCanvas, MapStatus, MapCluster, MapTopBar, MapBasemapPicker, mapGlyphSvg, mapGlyphName, mapGlyphBox, loadMapGlyphs, MAP_GLYPH_SMALL_BELOW, MAP_GLYPH_SEVERITY_COLOR, flyGlyphs, clusterArrive, clusterLeave, quarterZoom, legibleZoom, createMapRelay } from './Map'
-export type { MapOverlayPosition, MapControl, MapTimelinePeriod, MapTimelineScale, MapTooltipRow, MapPanelSize, MapCanvasBasemap, MapStatusState, MapLegendMetric, MapTool, MapSearchItem, MapSearchGroup, MapGlyphFamily, MapGlyphOptions, MapGlyphSeverity, MapImageHost, MapPoint, MapGlyphFlight, MapRelay, MapRelaySwap, MapRelayWeights, MapPointerAt, MapTopBarView, MapTopBarSurface, MapBasemapOption } from './Map'
+export type { MapOverlayPosition, MapControl, MapTimelinePeriod, MapTimelineScale, MapTooltipRow, MapPanelSize, MapPanelFoldPlacement, MapPanelFit, MapPanelDensity, MapCanvasBasemap, MapStatusState, MapLegendMetric, MapTool, MapSearchItem, MapSearchGroup, MapGlyphFamily, MapGlyphOptions, MapGlyphSeverity, MapImageHost, MapPoint, MapGlyphFlight, MapRelay, MapRelaySwap, MapRelayWeights, MapPointerAt, MapTopBarView, MapTopBarSurface, MapBasemapOption } from './Map'
 
 export { ChartLegend } from './ChartLegend'
 export type { ChartLegendItem, ChartLegendShape, ChartLegendOrientation } from './ChartLegend'

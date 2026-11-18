@@ -12,6 +12,9 @@ import { StatTile } from '../StatTile'
 import { StatGroup } from '../StatGroup'
 import { InputField } from '../InputField'
 import { Icon } from '../Icon'
+import { PanelBlock } from '../PanelBlock'
+import { Dropdown, DropdownTrigger, DropdownItem } from '../Dropdown'
+import { IconButton } from '../IconButton'
 
 const meta: Meta<typeof MapPanel> = {
   title: 'Données/Map/Panel',
@@ -267,6 +270,53 @@ export const ClosableAndFolded: Story = {
           <MapPanel size="lg" title="Parcelle P-0412 · Traoré Moussa" closable style="height:220px">
             <template #header><Tabs v-model="tab" :tabs="tabs" size="sm" /></template>
             <p style="margin:0;font:var(--ds-font-body-md)">Fermable avec un #header : le titre reste sur la ligne de la croix, les onglets dessous.</p>
+          </MapPanel>
+        </MapOverlay>
+      </div>
+    `,
+  }),
+}
+
+/**
+ * Une légende (ADR-0224) : `lg` en densité `compact` (18rem), à la hauteur de son contenu (`fit="content"`), sans filet
+ * sous le titre (`:divided="false"`), le pli en fin de ligne (`fold-placement="end"`, une croix) ; replié, le contrôle
+ * porte `fold-icon="sliders-horizontal"`. Les blocs suivent la densité ; le premier porte le choix de l’indicateur à
+ * la place de son titre (`PanelBlock #title`), ses actions au bout de la ligne. Tout s’arrondit : 24 le panneau, 16
+ * ses blocs, une pilule le contrôle replié.
+ */
+export const CompactKey: Story = {
+  name: 'Légende compacte',
+  parameters: { layout: 'fullscreen' },
+  render: () => ({
+    components: { MapPanel, MapOverlay, PanelBlock, ChartLegend, Dropdown, DropdownTrigger, DropdownItem, IconButton },
+    setup: () => ({ SERIES, folded: ref(false), metric: ref('Biomasse aérienne') }),
+    template: `
+      <div style="position:relative;height:560px;background:url('./stories/map-loading/base.webp') center / cover;overflow:hidden">
+        <MapOverlay position="top-start">
+          <MapPanel
+            v-model:collapsed="folded" size="lg" density="compact" fit="content" :divided="false"
+            title="Légende" collapsible fold-placement="end" fold-icon="sliders-horizontal"
+            collapse-label="Replier" expand-label="Afficher"
+          >
+            <PanelBlock title="Indicateur">
+              <template #title>
+                <Dropdown align="start" width="16rem">
+                  <template #trigger="{ open, toggle }">
+                    <DropdownTrigger chrome="chip" chevron :open="open" @click="toggle">{{ metric }}</DropdownTrigger>
+                  </template>
+                  <DropdownItem label="Biomasse aérienne" :selected="metric === 'Biomasse aérienne'" @click="metric = 'Biomasse aérienne'" />
+                  <DropdownItem label="Carbone du sol" :selected="metric === 'Carbone du sol'" @click="metric = 'Carbone du sol'" />
+                </Dropdown>
+              </template>
+              <template #aside>
+                <IconButton icon="info" size="xs" variant="ghost" ariaLabel="À propos de l’indicateur" />
+                <IconButton icon="eye" size="xs" variant="ghost" ariaLabel="Masquer l’indicateur" />
+              </template>
+              <ChartLegend orientation="vertical" :items="SERIES" />
+            </PanelBlock>
+            <PanelBlock title="Parcelles">
+              <ChartLegend orientation="vertical" :items="SERIES.slice(0, 2)" />
+            </PanelBlock>
           </MapPanel>
         </MapOverlay>
       </div>

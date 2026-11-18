@@ -499,7 +499,8 @@ function exitCompare() {
   max-width: 100%;
   height: 48px;
   padding: 0 var(--ds-spacing-lg) 0 var(--ds-spacing-md);
-  border-radius: var(--ds-radius-pill);
+  /* A control on a map is a pill (ADR-0224). */
+  border-radius: var(--ds-radius-map-control);
   /* Pilot glass (ADR-0172): the map shows through as colour. */
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
   background: var(--ds-bg-map-control);

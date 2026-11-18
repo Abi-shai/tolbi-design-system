@@ -48,7 +48,9 @@ const slots = defineSlots<{
   display: flex;
   flex-direction: column;
   min-width: 0;
-  border-radius: var(--ds-radius-surface);
+  /* Still not a prop: a map's surface hands its blocks the map's family
+     (`--on-glass-block-radius`, ADR-0224), concentric with its own curve. */
+  border-radius: var(--on-glass-block-radius, var(--ds-radius-surface));
   background-color: var(--ds-bg-default);
 }
 

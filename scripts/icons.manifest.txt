@@ -91,6 +91,7 @@ filter
 filter-x
 fingerprint-pattern
 flag
+focus
 folder
 folder-open
 folders
@@ -164,6 +165,7 @@ share-2
 shield
 shield-check
 shield-off
+sliders-horizontal
 sliders-vertical
 smartphone
 sparkle

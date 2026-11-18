@@ -49,6 +49,12 @@ const slots = defineSlots<{
   description?: () => unknown
   /** At the head's end, on the title's line — a `Badge` (« 7× plus vite »), a `HelpIcon`, a link. */
   actions?: () => unknown
+  /**
+   * What the title's line shows in place of the title — the indicator's menu
+   * (ADR-0224, Felt). The heading keeps `title`, read and not seen: the block
+   * is still named by it.
+   */
+  title?: () => unknown
 }>()
 </script>
 
@@ -58,7 +64,8 @@ const slots = defineSlots<{
       <div class="ds-section-card__head">
         <div class="ds-section-card__heading">
           <div class="ds-section-card__title-line">
-            <component :is="`h${headingLevel}`" class="ds-section-card__title">{{ title }}</component>
+            <component :is="`h${headingLevel}`" class="ds-section-card__title" :class="{ 'ds-section-card__title--hidden': slots.title }">{{ title }}</component>
+            <slot name="title" />
             <HelpIcon v-if="help" :title="title" :supporting-text="help" />
           </div>
           <p v-if="slots.description || description" class="ds-section-card__description">
@@ -116,10 +123,29 @@ const slots = defineSlots<{
   min-width: 0;
 }
 
+/* What `#title` puts on the line gives before the actions do (ADR-0224). */
+.ds-section-card__title-line > :deep(:not(.ds-section-card__title)) {
+  min-width: 0;
+}
+
 .ds-section-card__title {
   margin: 0;
-  font: var(--ds-font-label-lg-strong);
+  /* A panel's key sets its blocks' titles a step down (ADR-0224, a variant switch). */
+  font: var(--section-card-title-font, var(--ds-font-label-lg-strong));
   color: var(--ds-text-strong);
+}
+
+/* Read, not seen: `#title` is what the line shows (ADR-0224). */
+.ds-section-card__title--hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .ds-section-card__description {
@@ -146,11 +172,11 @@ const slots = defineSlots<{
 /* Compact (ADR-0143): a panel's block — 12 around, 8 between the head and the
    body and between the body's children. */
 .ds-section-card--compact .ds-section-card__inner {
-  gap: var(--ds-spacing-md);
-  padding: var(--ds-spacing-lg);
+  gap: var(--section-card-compact-gap, var(--ds-spacing-md));
+  padding: var(--section-card-compact-padding, var(--ds-spacing-lg));
 }
 
 .ds-section-card--compact .ds-section-card__body {
-  gap: var(--ds-spacing-md);
+  gap: var(--section-card-compact-gap, var(--ds-spacing-md));
 }
 </style>

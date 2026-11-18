@@ -7,12 +7,25 @@ import { Scrollbar } from '../Scrollbar'
 import { Skeleton } from '../Skeleton'
 import { SurfaceTransition } from '../SurfaceTransition'
 import { readDuration } from '../../composables/cssTime'
+import type { IconName } from '../Icon'
 
 export type MapPanelSize = 'sm' | 'lg'
+/** Where a `lg` panel's fold stands on its head's first line (ADR-0224). */
+export type MapPanelFoldPlacement = 'start' | 'end'
+/** A `lg` panel's height: the place's (`fill`) or its content's (ADR-0224). */
+export type MapPanelFit = 'fill' | 'content'
+/** A `lg` panel's rhythm: a screen's reading panel, or a key read at a glance (ADR-0224). */
+export type MapPanelDensity = 'default' | 'compact'
 
 /**
- * A surface on a map (ADR-0087) — the owner's drawing: `bg-default`, a
- * `border-subtle` hairline, `elevation-raised`, `radius-surface-sm`.
+ * A surface on a map (ADR-0087) — reading glass, a hairline, the glass's
+ * elevation, and the map's family of curves (ADR-0224): `radius-map-surface`
+ * (24), its blocks `radius-map-block` (16), the control it folds into a pill.
+ *
+ * A `lg` panel can also be a **key** (ADR-0224): `density="compact"` (18rem),
+ * `fit="content"`, `:divided="false"`, the fold at the end of the title's line
+ * (`fold-placement="end"`, a `x`) and the folded control's own glyph
+ * (`fold-icon="sliders-horizontal"`).
  *
  * `sm` (the default) holds an instruction, a measured area, a toolbar, a
  * year, a legend; its width is its content's, capped at 20rem. With a `title`
@@ -68,6 +81,24 @@ interface Props {
   closable?: boolean
   /** The close's name — said with the title, « Fermer P-0412 ». */
   closeLabel?: string
+  /**
+   * The glyph of the control the panel folds into (ADR-0224) — `panel-left`
+   * for a reading panel, `sliders-horizontal` for a legend.
+   */
+  foldIcon?: IconName
+  /**
+   * Where the fold stands on the head's first line (ADR-0224). `start`, the
+   * fold is the folded control's own button, at the same place. `end`, it
+   * closes the line as a `x` — a key the reader puts away — and the control it
+   * becomes carries `foldIcon`.
+   */
+  foldPlacement?: MapPanelFoldPlacement
+  /** `lg`: `fill` takes the place's height; `content` hugs its content, scrolling past the place (ADR-0224). */
+  fit?: MapPanelFit
+  /** `lg`: the rule under the head. `false` where the body's first block already says where it begins. */
+  divided?: boolean
+  /** `lg`: `compact` is a key — 18rem, tighter head and body, and the blocks it holds tighter too (ADR-0224). */
+  density?: MapPanelDensity
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -79,6 +110,11 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   closable: false,
   closeLabel: 'Fermer',
+  foldIcon: 'panel-left',
+  foldPlacement: 'start',
+  fit: 'fill',
+  divided: true,
+  density: 'default',
 })
 
 const emit = defineEmits<{ close: [] }>()
@@ -123,6 +159,11 @@ const slotHead = computed(() => !!slots.header || (props.size === 'lg' && (!!pro
    comes under it (ADR-0142). Without a close, `#header` is the head, as before:
    the screen's reading panel is named by the screen. */
 const titled = computed(() => props.closable && !!props.title && !!slots.header)
+/* At the start the head's fold is the folded control's own button, carried
+   between its two places (ADR-0189). At the end it is a `x` that closes the
+   line, a different button from the control: it leaves with the content. */
+const foldsAtEnd = computed(() => props.foldPlacement === 'end')
+const headFoldIcon = computed<IconName>(() => (foldsAtEnd.value ? 'x' : props.foldIcon))
 
 /*
   The control the panel becomes stands **at the overlay's corner** (ADR-0117,
@@ -224,7 +265,7 @@ function makeShell(place: HTMLElement, at: Box): HTMLElement {
     zIndex: '-1',
     boxSizing: 'border-box',
     border: 'var(--ds-border-width-default) solid var(--ds-border-map-edge)',
-    borderRadius: 'var(--ds-radius-surface)',
+    borderRadius: 'var(--ds-radius-map-surface)',
     boxShadow: 'var(--ds-elevation-map-glass)',
     pointerEvents: 'none',
     ...px(at),
@@ -263,7 +304,7 @@ async function morphUnfold() {
   const to = boxOf(panel, place)
   const shell = makeShell(place, from)
   const run = shell.animate([{ ...px(from), ...glass.control }, { ...px(to), ...glass.read }], { duration: shapeMs, easing, fill: 'forwards' })
-  const fold = panel.querySelector<HTMLElement>('[data-map-panel-fold]')
+  const fold = panel.querySelector<HTMLElement>('[data-map-panel-rides]')
   const ride = fold ? carry(fold, buttonFrom, boxOf(fold, place), shapeMs, easing) : null
   setTimeout(() => { if (morph.value === 'veiled') morph.value = 'reveal' }, shapeMs * 0.75)
   await run.finished.catch(() => undefined)
@@ -291,7 +332,7 @@ async function morphFold() {
   const run = shell.animate([{ ...px(from), ...glass.read }, { ...px(to), ...glass.control }], { duration: shapeMs, easing, fill: 'forwards' })
   /* The button rides to where the capsule will hold it, and stays there (`fill`)
      until the swap replaces it with the capsule's own. */
-  carry(button, boxOf(button, place), buttonTo, shapeMs, easing)
+  if (!foldsAtEnd.value) carry(button, boxOf(button, place), buttonTo, shapeMs, easing)
   await run.finished.catch(() => undefined)
   shown.value = true
   /* The swap must happen with the transitions still off, or the panel would
@@ -391,10 +432,9 @@ onBeforeUnmount(() => {
         <div class="ds-map-panel__capsule" :class="{ 'ds-map-panel__capsule--bare': morphing }">
           <IconButton
             data-map-panel-open
-            icon="panel-left"
+            :icon="foldIcon"
             size="md"
             variant="subtle"
-            shape="square"
             :ariaLabel="named(expandLabel)"
             aria-expanded="false"
             :aria-controls="panelId"
@@ -422,22 +462,35 @@ onBeforeUnmount(() => {
         :id="panelId"
         key="panel"
         class="ds-map-panel"
-        :class="[`ds-map-panel--${size}`, morph !== 'none' && `ds-map-panel--morph-${morph} ds-map-panel--still`]"
+        :class="[
+          `ds-map-panel--${size}`,
+          morph !== 'none' && `ds-map-panel--morph-${morph} ds-map-panel--still`,
+          size === 'lg' && {
+            'ds-map-panel--fit-content': fit === 'content',
+            'ds-map-panel--undivided': !divided,
+            'ds-map-panel--compact': density === 'compact',
+          },
+        ]"
         :aria-label="props.title"
         :aria-busy="loading || undefined"
       >
         <div
           v-if="slotHead"
           class="ds-map-panel__head ds-map-panel__head--slot"
-          :class="{ 'ds-map-panel__head--folds': collapsible, 'ds-map-panel__head--closes': closable, 'ds-map-panel__head--titled': titled }"
+          :class="{
+            'ds-map-panel__head--folds': collapsible && !foldsAtEnd,
+            'ds-map-panel__head--folds-end': collapsible && foldsAtEnd,
+            'ds-map-panel__head--closes': closable,
+            'ds-map-panel__head--titled': titled,
+          }"
         >
           <IconButton
             v-if="collapsible"
             data-map-panel-fold
-            icon="panel-left"
+            :data-map-panel-rides="foldsAtEnd ? undefined : ''"
+            :icon="headFoldIcon"
             size="md"
             variant="subtle"
-            shape="square"
             :ariaLabel="named(collapseLabel)"
             aria-expanded="true"
             :aria-controls="panelId"
@@ -503,7 +556,9 @@ onBeforeUnmount(() => {
   max-width: 20rem;
   min-width: min-content;
   padding: var(--ds-spacing-lg);
-  border-radius: var(--ds-radius-surface-sm);
+  /* A surface read on a map (ADR-0224): the pills' family, its blocks concentric. */
+  border-radius: var(--ds-radius-map-surface);
+  --on-glass-block-radius: var(--ds-radius-map-block);
   /* Reading glass (ADR-0172): almost opaque — the text is long. What it holds
      follows (`--on-glass-*`): the levels by light (ADR-0173). */
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
@@ -611,7 +666,6 @@ onBeforeUnmount(() => {
   max-height: 100%;
   gap: 0;
   padding: 0;
-  border-radius: var(--ds-radius-surface);
 }
 
 .ds-map-panel--lg .ds-map-panel__head {
@@ -708,6 +762,65 @@ onBeforeUnmount(() => {
   display: contents;
 }
 
+/* The fold at the end (ADR-0224): the title's line, then the fold, then the close. */
+.ds-map-panel__head--folds-end {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.ds-map-panel__head--folds-end.ds-map-panel__head--closes {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.ds-map-panel__head--folds-end > [data-map-panel-fold] {
+  grid-row: 1;
+  grid-column: 2;
+}
+
+.ds-map-panel__head--folds-end > .ds-map-panel__head-title,
+.ds-map-panel__head--folds-end:not(.ds-map-panel__head--titled) .ds-map-panel__header > :deep(:first-child) {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+/* ── lg, its height, its rule, its density (ADR-0224) ─────────────────── */
+/* Its content's height — a key is as tall as what it lists — and the body
+   scrolls once the place runs out. */
+.ds-map-panel--lg.ds-map-panel--fit-content {
+  flex: 0 1 auto;
+}
+
+.ds-map-panel--undivided .ds-map-panel__head::after {
+  display: none;
+}
+
+/*
+  Compact: a key read at a glance, not a screen read through — 18rem, the head
+  8 / 12, the body 0 8 8 with 8 between its blocks, and the blocks it holds
+  12 / 8 at 4 apart with their titles at `label-md-strong` (variant switches
+  `SectionCard` reads, ADR-0010). At 8px of padding the blocks' 16 is
+  concentric with the panel's 24.
+*/
+.ds-map-panel--lg.ds-map-panel--compact {
+  width: 18rem;
+  --section-card-compact-padding: var(--ds-spacing-md) var(--ds-spacing-lg);
+  --section-card-compact-gap: var(--ds-spacing-xs);
+  --section-card-title-font: var(--ds-font-label-md-strong);
+}
+
+.ds-map-panel--compact .ds-map-panel__head {
+  padding: var(--ds-spacing-md) var(--ds-spacing-lg);
+}
+
+.ds-map-panel--compact .ds-map-panel__head::after {
+  right: var(--ds-spacing-lg);
+  left: var(--ds-spacing-lg);
+}
+
+.ds-map-panel--lg.ds-map-panel--compact .ds-map-panel__body {
+  gap: var(--ds-spacing-md);
+  padding: 0 var(--ds-spacing-md) var(--ds-spacing-md);
+}
+
 .ds-map-panel__head--folds .ds-map-panel__header > :deep(:first-child) {
   grid-column: 2;
 }
@@ -777,7 +890,8 @@ onBeforeUnmount(() => {
   width: 52px;
   height: 52px;
   border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
-  border-radius: var(--ds-radius-surface);
+  /* A control on a map: round, its button round inside it (ADR-0224). */
+  border-radius: var(--ds-radius-map-control);
   background: var(--ds-bg-map-control);
   -webkit-backdrop-filter: var(--ds-backdrop-map-control);
   backdrop-filter: var(--ds-backdrop-map-control);
@@ -810,21 +924,21 @@ onBeforeUnmount(() => {
 }
 
 .ds-map-panel[class*='--morph-'] > :not(.ds-map-panel__head),
-.ds-map-panel[class*='--morph-'] .ds-map-panel__head > :not([data-map-panel-fold]),
+.ds-map-panel[class*='--morph-'] .ds-map-panel__head > :not([data-map-panel-rides]),
 .ds-map-panel[class*='--morph-'] .ds-map-panel__header > :deep(*),
 .ds-map-panel[class*='--morph-'] .ds-map-panel__head::after {
   transition: opacity var(--ds-motion-duration-exit) var(--ds-motion-easing-in);
 }
 
 .ds-map-panel:is(.ds-map-panel--morph-veiled, .ds-map-panel--morph-leaving) > :not(.ds-map-panel__head),
-.ds-map-panel:is(.ds-map-panel--morph-veiled, .ds-map-panel--morph-leaving) .ds-map-panel__head > :not([data-map-panel-fold]),
+.ds-map-panel:is(.ds-map-panel--morph-veiled, .ds-map-panel--morph-leaving) .ds-map-panel__head > :not([data-map-panel-rides]),
 .ds-map-panel:is(.ds-map-panel--morph-veiled, .ds-map-panel--morph-leaving) .ds-map-panel__header > :deep(*),
 .ds-map-panel:is(.ds-map-panel--morph-veiled, .ds-map-panel--morph-leaving) .ds-map-panel__head::after {
   opacity: 0;
 }
 
 .ds-map-panel--morph-reveal > :not(.ds-map-panel__head),
-.ds-map-panel--morph-reveal .ds-map-panel__head > :not([data-map-panel-fold]),
+.ds-map-panel--morph-reveal .ds-map-panel__head > :not([data-map-panel-rides]),
 .ds-map-panel--morph-reveal .ds-map-panel__header > :deep(*),
 .ds-map-panel--morph-reveal .ds-map-panel__head::after {
   transition: opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-out);
