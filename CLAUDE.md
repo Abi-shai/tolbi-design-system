@@ -1831,6 +1831,12 @@ Before working on any component, read:
   carried), **`fit: 'fill' | 'content'`**, **`divided`**, **`density="compact"`** (18rem, head 8/12, body 0 8 8; blocks
   8/12, gap 4, `label-md-strong` via `--section-card-*` switches). **`PanelBlock`/`SectionCard #title`** (the line shows
   it, the heading keeps `title` hidden). Icons `focus`, `sliders-horizontal`. Lot 2: the clip-path fold, the legend.
+- **ADR-0225**: **a key cut down to its control** (filmed, validated) — a `lg` panel folding from the **end** has no button
+  to carry, so the panel itself is **cut**: `clip-path: inset(… round …)` (WAAPI) from the capsule's 52 disc at its corner
+  to the whole panel. Unfold over `considered` / `easing-default`, the content rising `spacing-md` and fading over `enter`
+  / `easing-out` from **40 %** (160ms); fold content first (`exit`), then the cut over `process` / `easing-in`, then the
+  capsule's button over `quick`. The open cut ends **past** the edge (`spacing-4xl`, concentric corners) so the shadow
+  comes with it. Reduced motion: a fade. The start fold keeps ADR-0182's shell.
 
 ## Architecture
 

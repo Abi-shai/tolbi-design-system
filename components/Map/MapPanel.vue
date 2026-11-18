@@ -195,6 +195,12 @@ watch(collapsed, () => {
 async function change(next: boolean) {
   if (next === shown.value) return
   if (next) atEnd.value = !!host.value?.closest('.ds-map-overlay--end, .ds-map-overlay--top-end, .ds-map-overlay--bottom-end')
+  /* A key folded from the end of its line is cut down to its control and
+     grows back out of it (ADR-0225), at either corner. */
+  if (iconFold.value && foldsAtEnd.value && host.value?.parentElement) {
+    await (canMorph() ? (next ? clipFold() : clipUnfold()) : crossFade(next))
+    return
+  }
   if (iconFold.value && !atEnd.value && host.value?.parentElement) {
     await (canMorph() ? (next ? morphFold() : morphUnfold()) : crossFade(next))
     return
@@ -233,7 +239,7 @@ async function crossFade(next: boolean) {
     button, and the capsule takes its place.
   Under reduced motion nothing stretches: the surfaces swap in place.
 */
-const morph = ref<'none' | 'veiled' | 'reveal' | 'leaving' | 'settling'>('none')
+const morph = ref<'none' | 'veiled' | 'reveal' | 'leaving' | 'settling' | 'clip' | 'arriving'>('none')
 const morphing = computed(() => morph.value !== 'none')
 function canMorph() {
   return typeof window !== 'undefined' && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches && !!host.value?.parentElement
@@ -345,6 +351,106 @@ async function morphFold() {
   morph.value = 'none'
 }
 
+/*
+  ── Born from the control, cut back into it (ADR-0225) ─────────────────
+  A key folded from the end of its line has no button to carry: its `x` is not
+  the control. So the panel itself is **cut**: a `clip-path: inset(… round …)`
+  that starts as the capsule's disc at the panel's corner and opens to the
+  whole panel — the panel's own glass, nothing stands in for it.
+  - Unfolding, over `considered` on `easing-default`: the cut opens, and the
+    content rises one step (`spacing-md`) and fades in over `enter` on
+    `easing-out`, from 40 % of the opening (160ms).
+  - Folding is quicker, the content first: it fades over `exit`, then the cut
+    closes on the corner over `process` on `easing-in`, and the capsule's button
+    appears over `quick` once the capsule has taken the panel's place.
+  The cut ends **past** the panel's edge (by `spacing-4xl`, its corners
+  concentric), so the glass's shadow is uncovered with it instead of popping in
+  at the end. Under reduced motion, a fade in place.
+*/
+function lengthPx(el: Element, name: string) {
+  const value = getComputedStyle(el).getPropertyValue(name).trim()
+  const n = parseFloat(value)
+  if (!Number.isFinite(n)) return 0
+  return value.endsWith('rem') ? n * parseFloat(getComputedStyle(document.documentElement).fontSize) : n
+}
+function cssValue(el: Element, name: string, fallback: string) {
+  return getComputedStyle(el).getPropertyValue(name).trim() || fallback
+}
+/* The cut, as an `inset()`: the panel's box less the capsule's, round as the capsule. */
+function cutTo(panel: DOMRect, capsule: Box) {
+  const top = capsule.top - panel.top
+  const left = capsule.left - panel.left
+  const right = panel.right - (capsule.left + capsule.width)
+  const bottom = panel.bottom - (capsule.top + capsule.height)
+  return `inset(${top}px ${right}px ${bottom}px ${left}px round ${capsule.height / 2}px)`
+}
+/* The whole panel and the room of its shadow, its corners concentric with its own. */
+function cutOpen(panel: Element) {
+  const reach = lengthPx(panel, '--ds-spacing-4xl')
+  const radius = lengthPx(panel, '--ds-radius-map-surface')
+  return `inset(${-reach}px round ${radius + reach}px)`
+}
+/* The capsule's box at the panel's corner — the end's corner on an end place. */
+function capsuleIn(panel: DOMRect, size: number): Box {
+  return { left: atEnd.value ? panel.right - size : panel.left, top: panel.top, width: size, height: size }
+}
+
+async function clipUnfold() {
+  const place = host.value!.parentElement!
+  const capsule = host.value!.querySelector('.ds-map-panel__capsule')
+  if (!capsule) { shown.value = false; return }
+  const cap = capsule.getBoundingClientRect()
+  morph.value = 'clip'
+  shown.value = false
+  const panel = (await arrived('.ds-map-panel')) as HTMLElement | null
+  if (!panel) { morph.value = 'none'; return }
+  const box = panel.getBoundingClientRect()
+  const ms = readDuration(place, '--ds-motion-duration-considered')
+  const contentMs = readDuration(place, '--ds-motion-duration-enter')
+  const step = lengthPx(panel, '--ds-spacing-md')
+  const opening = panel.animate(
+    [{ clipPath: cutTo(box, { left: cap.left, top: cap.top, width: cap.width, height: cap.height }) }, { clipPath: cutOpen(panel) }],
+    { duration: ms, easing: cssValue(place, '--ds-motion-easing-default', 'ease') },
+  )
+  const rising = [...panel.children].map((child) =>
+    child.animate([{ opacity: 0, transform: `translateY(${step}px)` }, { opacity: 1, transform: 'none' }], {
+      duration: contentMs,
+      delay: ms * 0.4,
+      easing: cssValue(place, '--ds-motion-easing-out', 'ease-out'),
+      fill: 'backwards',
+    }),
+  )
+  await Promise.all([opening, ...rising].map((a) => a.finished.catch(() => undefined)))
+  morph.value = 'none'
+}
+
+async function clipFold() {
+  const place = host.value!.parentElement!
+  const panel = host.value!.querySelector<HTMLElement>('.ds-map-panel')
+  if (!panel) { shown.value = true; return }
+  const box = panel.getBoundingClientRect()
+  morph.value = 'clip'
+  const easingIn = cssValue(place, '--ds-motion-easing-in', 'ease-in')
+  const leaving = [...panel.children].map((child) =>
+    child.animate([{ opacity: 1 }, { opacity: 0 }], { duration: readDuration(place, '--ds-motion-duration-exit'), easing: easingIn, fill: 'forwards' }),
+  )
+  await Promise.all(leaving.map((a) => a.finished.catch(() => undefined)))
+  /* The capsule's box, the tools column's gauge (ADR-0181) — `capsuleAt`'s 52. */
+  const closing = panel.animate([{ clipPath: cutOpen(panel) }, { clipPath: cutTo(box, capsuleIn(box, capsuleAt(box as unknown as Box).width)) }], {
+    duration: readDuration(place, '--ds-motion-duration-process'),
+    easing: easingIn,
+    fill: 'forwards',
+  })
+  await closing.finished.catch(() => undefined)
+  shown.value = true
+  const capsule = await arrived('.ds-map-panel__capsule')
+  const button = capsule?.querySelector('[data-map-panel-open]')
+  const quick = readDuration(place, '--ds-motion-duration-quick')
+  morph.value = 'arriving'
+  if (button && quick) await button.animate([{ opacity: 0 }, { opacity: 1 }], { duration: quick, easing: 'linear' }).finished.catch(() => undefined)
+  morph.value = 'none'
+}
+
 /* What the swap brings in, once it is in the document: out-in inserts it a few
    frames after the leaver has gone. Heard through a `MutationObserver`, whose
    callback runs before the frame is painted — waiting for the next frame left
@@ -429,7 +535,7 @@ onBeforeUnmount(() => {
         <!-- The same button as in the open head, at the same pixel, in a capsule of
              pilot glass that hugs it (ADR-0173; the title beside it removed by
              ADR-0178 — the panel's name stays in the button's). -->
-        <div class="ds-map-panel__capsule" :class="{ 'ds-map-panel__capsule--bare': morphing }">
+        <div class="ds-map-panel__capsule" :class="{ 'ds-map-panel__capsule--bare': morphing && morph !== 'clip' && morph !== 'arriving' }">
           <IconButton
             data-map-panel-open
             :icon="foldIcon"

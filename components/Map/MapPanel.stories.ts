@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import { within, expect, userEvent, waitFor } from '@storybook/test'
 import MapPanel from './MapPanel.vue'
 import { ChartLegend } from '../ChartLegend'
 import { Button } from '../Button'
@@ -282,7 +283,8 @@ export const ClosableAndFolded: Story = {
  * sous le titre (`:divided="false"`), le pli en fin de ligne (`fold-placement="end"`, une croix) ; replié, le contrôle
  * porte `fold-icon="sliders-horizontal"`. Les blocs suivent la densité ; le premier porte le choix de l’indicateur à
  * la place de son titre (`PanelBlock #title`), ses actions au bout de la ligne. Tout s’arrondit : 24 le panneau, 16
- * ses blocs, une pilule le contrôle replié.
+ * ses blocs, une pilule le contrôle replié. Replié, le panneau se resserre en disque dans son coin ; déplié, il en
+ * naît (ADR-0225).
  */
 export const CompactKey: Story = {
   name: 'Légende compacte',
@@ -322,4 +324,15 @@ export const CompactKey: Story = {
       </div>
     `,
   }),
+  /* Guarded: the key is cut down to its control and grows back out of it (ADR-0225), the focus following the press. */
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Replier Légende' }))
+    const open = await canvas.findByRole('button', { name: 'Afficher Légende' }, { timeout: 3000 })
+    await waitFor(() => expect(open).toHaveFocus(), { timeout: 3000 })
+    await userEvent.click(open)
+    const fold = await canvas.findByRole('button', { name: 'Replier Légende' }, { timeout: 3000 })
+    await waitFor(() => expect(fold).toHaveFocus(), { timeout: 3000 })
+    await waitFor(() => expect(canvasElement.querySelector('.ds-map-panel')?.getAttribute('style') ?? '').not.toContain('clip-path'), { timeout: 3000 })
+  },
 }
