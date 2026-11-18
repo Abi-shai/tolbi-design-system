@@ -6,7 +6,7 @@ import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
 import { Scrollbar } from '../Scrollbar'
 import DropdownTrigger from './DropdownTrigger.vue'
-import { DROPDOWN_SIZE_KEY, type DropdownSize } from './context'
+import { DROPDOWN_ROLE_KEY, DROPDOWN_SIZE_KEY, type DropdownSize } from './context'
 
 /**
  * Which built-in trigger `Dropdown` renders when nothing is slotted.
@@ -89,6 +89,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 provide(DROPDOWN_SIZE_KEY, () => props.size)
+provide(DROPDOWN_ROLE_KEY, () => props.role)
 
 const emit = defineEmits<{
   'update:open': [value: boolean]

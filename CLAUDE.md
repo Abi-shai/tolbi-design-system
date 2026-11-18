@@ -1800,6 +1800,16 @@ Before working on any component, read:
   `shadow-md`** (lifts the bar over the map; none/xs/sm did not separate, a long off-scale shadow read as md for one more
   token); still 56px, dark values follow. `border-default` was committed first, never published. The rim of light
   (`border-map-edge` on 90 % white glass) did not show.
+- **ADR-0221**: **the GIS bar, drawn again** (the owner's sketches) — start: the **module's mark is a menu** (drawing 48 +
+  `chevron-down` 16 in one `--on-glass-hover` zone, `Dropdown` at its start, 18rem, rows `#module-menu`, sign-out
+  `danger` last after a divider), « Retour », then **`projectName`** (`label-lg-strong`, one line, tooltip only when cut).
+  **`DropdownCredits`**: the credits at a menu's head (`#header`) — `bg-neutral-subtle` block, `CreditCoins` 32, balance
+  `heading-sm` over « crédits {module} disponibles », chevron; hover/focus `bg-neutral`; a link or button that is a
+  **menu item in a menu** (`Dropdown` now provides its `role`); `null` = on its way. End: three groups, a 20px rule
+  between two present ones — the action; **the map** (`search` emits `search`, **`MapBasemapPicker`**: the active
+  basemap as a 28px framed thumbnail, open = brand ring + halo, a panel of 72px thumbnails, current on `bg-selected`
+  ringed `border-brand-solid`, images the product's); **the file** (`#downloads`, 16rem, and Partager). ⋯ and the
+  profile are **removed** (wip, no adopter).
 
 ## Architecture
 

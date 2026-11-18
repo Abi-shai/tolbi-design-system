@@ -17,10 +17,13 @@ const VIEWS = [
   { value: 'analytics', label: 'Analytics', icon: 'chart-column' as const },
 ]
 
-const TOOLS = [
-  { value: 'search', icon: 'search' as const, label: 'Rechercher' },
-  { value: 'filters', icon: 'filter' as const, label: 'Filtres' },
+const BASEMAPS = [
+  { value: 'tolbi', label: 'TOLBI', src: './stories/map-loading/base-thumb.webp' },
+  { value: 'satellite', label: 'Satellite', src: './stories/map-loading/satellite.webp' },
 ]
+
+/* « Rechercher » has moved up into the bar (ADR-0221). */
+const TOOLS = [{ value: 'filters', icon: 'filter' as const, label: 'Filtres' }]
 
 /* The map under the bar: the whole surface, no column margins (ADR-0216). */
 const MAP =
@@ -39,13 +42,12 @@ const meta: Meta<typeof MapTopBar> = {
     docs: {
       description: {
         component:
-          'La barre d’un projet SIG (ADR-0216) : dans Carbone (Inset), la zone d’éligibilité et la Dynamic baseline, la ' +
-          'barre globale cède la place à celle du projet, posée sur la carte (Felt ; 9 produits cartographiques sur 17). ' +
-          '56 px, toute la largeur, sans coins, verre de lecture (`bg-map-read`), un filet de lumière en bas. À gauche ' +
-          'le logo du module et « Retour » ; au centre la bascule « Carte | Analytics » en pilule de verre ' +
-          '(`ButtonGroup shape="pill"`) ; à droite l’action du projet (avec un compte facultatif), ⋯, Partager, un filet ' +
-          'et le profil — le déclencheur de la barre globale. Tout en `sm`. Les outils de la carte descendent sous elle ' +
-          '(`--ds-map-overlay-top`). `BarTransition` passe d’une barre à l’autre.',
+          'La barre d’un projet SIG (ADR-0216, redessinée en ADR-0221) : dans Carbone (Inset), la zone d’éligibilité et ' +
+          'la Dynamic baseline, la barre globale cède la place à celle du projet, posée sur la carte. 56 px, toute la ' +
+          'largeur, verre de lecture, un filet et une ombre en bas. À gauche le logo du module — un menu : ses crédits ' +
+          '(`DropdownCredits`), puis les lignes du produit —, « Retour » et le nom du projet ; au centre la bascule ' +
+          '« Carte | Analytics » ; à droite trois groupes séparés d’un filet : l’action du projet, la carte (Rechercher, ' +
+          'le fond de carte), le fichier (Télécharger, Partager). Plus de profil ni de ⋯. Tout en `sm`.',
       },
     },
   },
@@ -55,19 +57,21 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /**
- * Sur la carte : la barre, puis le panneau, la légende et les outils qui descendent sous elle. « Analytics » remplace la
- * carte entière (`SwapTransition rise`) ; « Carte » la rend telle qu’on l’avait laissée. ⋯ ouvert prend le voile du
- * verre.
+ * Sur la carte : la barre, puis le panneau, la légende et les outils qui descendent sous elle. Le logo ouvre le menu du
+ * module — ses crédits en tête, l’action lourde en dernier après un séparateur ; le fond de carte se choisit par son
+ * image ; Télécharger tient ce que tenait ⋯. « Analytics » remplace la carte entière (`SwapTransition rise`).
  */
 export const OnTheMap: Story = {
   name: 'Sur la carte',
-  args: { onBack: fn(), onShare: fn() } as never,
+  args: { onBack: fn(), onShare: fn(), onCredits: fn() } as never,
   render: args => ({
     components: { MapTopBar, MapOverlay, MapPanel, MapNavigator, MapLegend, Button, DropdownItem, DropdownDivider, SwapTransition },
     setup() {
       const view = ref('map')
       const zoom = ref(9)
-      return { args, view, zoom, VIEWS, TOOLS, MAP, BAR }
+      const basemap = ref('tolbi')
+      const searchOpen = ref(false)
+      return { args, view, zoom, basemap, searchOpen, VIEWS, TOOLS, BASEMAPS, MAP, BAR }
     },
     template: `
       <div style="position:relative">
@@ -90,57 +94,84 @@ export const OnTheMap: Story = {
           </div>
         </SwapTransition>
         <div :style="BAR">
-          <MapTopBar module="Inset" :views="VIEWS" v-model:view="view" :action-count="2" user-name="Awa Diop" user-email="awa.diop@tolbi.ai" user-initials="AD" @back="args.onBack" @share="args.onShare">
+          <MapTopBar
+            module="Inset" project-name="Inset — Bassin arachidier, campagne 2026" :credits="1250"
+            :views="VIEWS" v-model:view="view" :basemaps="BASEMAPS" v-model:basemap="basemap"
+            search :search-open="searchOpen" :action-count="2"
+            @back="args.onBack" @share="args.onShare" @credits="args.onCredits" @search="searchOpen = !searchOpen"
+          >
             <template #action><Button label="Soumettre pour validation" size="sm" /></template>
-            <template #menu="{ close }">
-              <DropdownItem icon="download" label="Télécharger le rapport" @click="close" />
-              <DropdownItem icon="refresh-cw" label="Synchroniser avec Verra" @click="close" />
-              <DropdownItem icon="pencil" label="Modifier le projet" @click="close" />
+            <template #module-menu="{ close }">
+              <DropdownItem icon="house" label="Aller à l’accueil" @click="close" />
+              <DropdownItem icon="folders" label="Retour aux projets Inset" @click="close" />
               <DropdownDivider />
-              <DropdownItem icon="trash-2" label="Supprimer le projet" tone="danger" @click="close" />
+              <DropdownItem icon="book-open" label="Apprendre" @click="close" />
+              <DropdownItem icon="settings" label="Paramètres" @click="close" />
+              <DropdownItem icon="bell" label="Notifications" @click="close" />
+              <DropdownDivider />
+              <DropdownItem icon="log-out" label="Se déconnecter" tone="danger" @click="close" />
             </template>
-            <template #user-menu="{ close }">
-              <DropdownItem icon="settings" label="Paramètres du compte" @click="close" />
-              <DropdownItem icon="log-out" label="Se déconnecter" @click="close" />
+            <template #downloads="{ close }">
+              <DropdownItem icon="file-text" label="Rapport de vérification" @click="close" />
+              <DropdownItem icon="map" label="Zones (GeoJSON)" @click="close" />
+              <DropdownItem icon="table" label="Parcelles (CSV)" @click="close" />
             </template>
           </MapTopBar>
         </div>
       </div>`,
   }),
-  /* Guarded: the views switch, ⋯ opens its menu and wears the open state by itself (aria-expanded), « Retour » emits. */
+  /* Guarded: the mark opens the module's menu on its credits (a menu item the arrows reach), the basemap is chosen
+     by its picture, « Télécharger » opens its rows, « Retour » emits. */
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole('img', { name: 'Inset' })).toBeTruthy()
-    const more = canvas.getByRole('button', { name: 'Plus d’actions' })
-    await userEvent.click(more)
-    await expect(more).toHaveAttribute('aria-expanded', 'true')
-    await expect(within(document.body).getByRole('menuitem', { name: 'Synchroniser avec Verra' })).toBeTruthy()
+    const page = within(document.body)
+    const a = args as unknown as Record<'onBack' | 'onCredits', ReturnType<typeof fn>>
+    const mark = canvas.getByRole('button', { name: 'Menu Inset' })
+    await userEvent.click(mark)
+    await expect(mark).toHaveAttribute('aria-expanded', 'true')
+    const credits = await page.findByRole('menuitem', { name: /1\s250 crédits Inset disponibles/ })
+    await expect(page.getByRole('menuitem', { name: 'Se déconnecter' })).toBeTruthy()
+    await userEvent.click(credits)
+    await expect(a.onCredits).toHaveBeenCalledTimes(1)
+    await expect(mark).toHaveAttribute('aria-expanded', 'false')
+
+    const basemap = canvas.getByRole('button', { name: 'Fond de carte : TOLBI' })
+    await userEvent.click(basemap)
+    await userEvent.click(await page.findByRole('menuitemradio', { name: 'Satellite' }))
+    await expect(canvas.getByRole('button', { name: 'Fond de carte : Satellite' })).toBeTruthy()
+
+    const download = canvas.getByRole('button', { name: 'Télécharger' })
+    await userEvent.click(download)
+    await expect(await page.findByRole('menuitem', { name: 'Zones (GeoJSON)' })).toBeTruthy()
     await userEvent.keyboard('{Escape}')
+
     await userEvent.click(canvas.getByRole('button', { name: 'Retour' }))
-    await expect((args as unknown as { onBack: ReturnType<typeof fn> }).onBack).toHaveBeenCalledTimes(1)
+    await expect(a.onBack).toHaveBeenCalledTimes(1)
   },
 }
 
-/** Les actions selon l’état du projet : faire avancer (`primary`), ou télécharger (`secondary-gray` + glyphe). */
+/**
+ * Les actions selon l’état du projet : faire avancer (`primary`), ou télécharger (`secondary-gray` + glyphe). Un filet
+ * ne sépare que deux groupes présents : sans Rechercher ni fond de carte, l’action et le fichier.
+ */
 export const Actions: Story = {
   name: 'L’action du projet',
   render: () => ({
     components: { MapTopBar, Button, DropdownItem },
-    setup: () => ({ VIEWS, MAP }),
+    setup: () => ({ VIEWS, MAP, BASEMAPS }),
     template: `
       <div :style="MAP.replace('height:720px', 'height:320px')">
         <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-xl)">
-          <MapTopBar module="Redd+" :views="VIEWS" view="map" user-initials="AD">
+          <MapTopBar module="Redd+" project-name="Forêt classée de Mbao" :views="VIEWS" view="map" search :basemaps="BASEMAPS" basemap="tolbi">
             <template #action><Button label="Lancer une baseline" size="sm" /></template>
-            <template #menu><DropdownItem label="Modifier" /></template>
+            <template #downloads><DropdownItem label="Rapport" /></template>
           </MapTopBar>
-          <MapTopBar module="Inset" :views="VIEWS" view="map" :action-count="3" user-initials="AD">
+          <MapTopBar module="Inset" project-name="Bassin arachidier" :views="VIEWS" view="map" :action-count="3" search :basemaps="BASEMAPS" basemap="satellite">
             <template #action><Button label="Renvoyer le rapport" size="sm" /></template>
-            <template #menu><DropdownItem label="Modifier" /></template>
+            <template #downloads><DropdownItem label="Rapport" /></template>
           </MapTopBar>
-          <MapTopBar module="Carbone" :views="VIEWS" view="analytics" user-initials="AD">
+          <MapTopBar module="Carbone" project-name="Kaffrine Nord" :views="VIEWS" view="analytics" :share="false">
             <template #action><Button label="Télécharger le rapport" size="sm" variant="secondary-gray" icon-leading="download" /></template>
-            <template #menu><DropdownItem label="Modifier" /></template>
           </MapTopBar>
         </div>
       </div>`,
@@ -158,7 +189,7 @@ export const EnterAndLeave: Story = {
     components: { MapTopBar, HorizontalNavigation, BarTransition, Button },
     setup() {
       const inProject = ref(false)
-      return { inProject, VIEWS }
+      return { inProject, VIEWS, BASEMAPS }
     },
     template: `
       <div :style="{
@@ -171,7 +202,7 @@ export const EnterAndLeave: Story = {
               <HorizontalNavigation module="Inset" :breadcrumbs="[{ label: 'Projets' }]" user-initials="AD" />
             </div>
             <div v-else key="project" style="grid-area:1 / 1">
-              <MapTopBar module="Inset" :views="VIEWS" view="map" user-initials="AD" @back="inProject = false">
+              <MapTopBar module="Inset" project-name="Bassin arachidier" :views="VIEWS" view="map" search :basemaps="BASEMAPS" basemap="tolbi" @back="inProject = false">
                 <template #action><Button label="Soumettre pour validation" size="sm" /></template>
               </MapTopBar>
             </div>

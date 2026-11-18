@@ -9,3 +9,11 @@ import type { InjectionKey } from 'vue'
 export type DropdownSize = 'sm' | 'md'
 
 export const DROPDOWN_SIZE_KEY: InjectionKey<() => DropdownSize> = Symbol('ds-dropdown-size')
+
+/**
+ * What the panel is — a `menu` or a `dialog` (ADR-0072). Read by a piece that
+ * sits in the panel outside its rows (`DropdownCredits`, ADR-0221): in a menu
+ * it must be a menu item too, or the arrows cannot reach it and the menu holds
+ * something a menu may not.
+ */
+export const DROPDOWN_ROLE_KEY: InjectionKey<() => 'menu' | 'dialog'> = Symbol('ds-dropdown-role')

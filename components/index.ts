@@ -118,7 +118,7 @@ export type { ProjectGlyphKind, ProjectGlyphStatus } from './ProjectGlyph'
 export { Tag } from './Tag'
 export type { TagSize, TagAction } from './Tag'
 
-export { Dropdown, DropdownTrigger, DropdownItem, DropdownDivider, DropdownGroup, DropdownSelectItem, InputDropdown } from './Dropdown'
+export { Dropdown, DropdownTrigger, DropdownItem, DropdownDivider, DropdownGroup, DropdownSelectItem, DropdownCredits, InputDropdown } from './Dropdown'
 export type {
   DropdownTriggerVariant, DropdownAlign, DropdownSide, DropdownSize, DropdownTriggerSize, DropdownTriggerChrome,
   DropdownSelectItemType, InputDropdownType, InputDropdownOption, InputDropdownSize, InputDropdownChrome,
@@ -256,8 +256,8 @@ export { ChartTooltip } from './ChartTooltip'
 export type { ChartTooltipSeries } from './ChartTooltip'
 export { Sparkline } from './Sparkline'
 
-export { MapOverlay, MapPanel, MapControls, MapNavigator, MapSearch, MapFilters, MapFilterSection, MapFilterOption, MapTimeline, MapTooltip, MapHoverCard, MapPin, MapLegend, MapCanvas, MapStatus, MapCluster, MapTopBar, mapGlyphSvg, mapGlyphName, mapGlyphBox, loadMapGlyphs, MAP_GLYPH_SMALL_BELOW, MAP_GLYPH_SEVERITY_COLOR, flyGlyphs, clusterArrive, clusterLeave, quarterZoom, legibleZoom, createMapRelay } from './Map'
-export type { MapOverlayPosition, MapControl, MapTimelinePeriod, MapTimelineScale, MapTooltipRow, MapPanelSize, MapCanvasBasemap, MapStatusState, MapLegendMetric, MapTool, MapSearchItem, MapSearchGroup, MapGlyphFamily, MapGlyphOptions, MapGlyphSeverity, MapImageHost, MapPoint, MapGlyphFlight, MapRelay, MapRelaySwap, MapRelayWeights, MapPointerAt, MapTopBarView } from './Map'
+export { MapOverlay, MapPanel, MapControls, MapNavigator, MapSearch, MapFilters, MapFilterSection, MapFilterOption, MapTimeline, MapTooltip, MapHoverCard, MapPin, MapLegend, MapCanvas, MapStatus, MapCluster, MapTopBar, MapBasemapPicker, mapGlyphSvg, mapGlyphName, mapGlyphBox, loadMapGlyphs, MAP_GLYPH_SMALL_BELOW, MAP_GLYPH_SEVERITY_COLOR, flyGlyphs, clusterArrive, clusterLeave, quarterZoom, legibleZoom, createMapRelay } from './Map'
+export type { MapOverlayPosition, MapControl, MapTimelinePeriod, MapTimelineScale, MapTooltipRow, MapPanelSize, MapCanvasBasemap, MapStatusState, MapLegendMetric, MapTool, MapSearchItem, MapSearchGroup, MapGlyphFamily, MapGlyphOptions, MapGlyphSeverity, MapImageHost, MapPoint, MapGlyphFlight, MapRelay, MapRelaySwap, MapRelayWeights, MapPointerAt, MapTopBarView, MapBasemapOption } from './Map'
 
 export { ChartLegend } from './ChartLegend'
 export type { ChartLegendItem, ChartLegendShape, ChartLegendOrientation } from './ChartLegend'

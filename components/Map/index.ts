@@ -31,3 +31,5 @@ export type { MapPoint, MapGlyphFlight, MapRelay, MapRelaySwap, MapRelayWeights 
 export type { MapPointerAt } from './usePointerPlace'
 export { default as MapTopBar } from './MapTopBar.vue'
 export type { MapTopBarView } from './MapTopBar.vue'
+export { default as MapBasemapPicker } from './MapBasemapPicker.vue'
+export type { MapBasemapOption } from './MapBasemapPicker.vue'
