@@ -28,9 +28,9 @@ export interface MapBasemapOption {
  * `radius-surface`. Hover takes `bg-neutral-subtle`, the keyboard the
  * package's ring.
  *
- * **The active basemap is marked on its picture**, not on its row: no ground,
- * the picture ringed in `border-brand-solid` at `border-width-strong`, the
- * name `label-lg-strong` / `text-brand`. No check, no description.
+ * **The active basemap is seen by its row** (ADR-0230): the row on
+ * `bg-brand-subtle` (`-hover` under the pointer), the name `label-lg-strong` /
+ * `text-on-brand-subtle`, the picture as at rest. No check, no description.
  *
  * A dialog holding a radio group: Tab reaches the active basemap, the arrows
  * move the choice (and the map with it), Enter, Space or a click chooses and
@@ -239,14 +239,19 @@ function step(e: KeyboardEvent) {
   text-overflow: ellipsis;
 }
 
-/* The current basemap (ADR-0229): no ground on the row — the picture ringed
-   in the brand, the name in the brand's ink at the strong weight. */
-.ds-map-basemap-picker__choice--current .ds-map-basemap-picker__thumb {
-  box-shadow: 0 0 0 var(--ds-border-width-strong) var(--ds-border-brand-solid);
+/* The current basemap (ADR-0230): its row on the brand's tint, the name in
+   that tint's exact ink at the strong weight; the picture as at rest. Not the
+   solid brand — it would read as the project's action beside it in the bar. */
+.ds-map-basemap-picker__choice--current {
+  background: var(--ds-bg-brand-subtle);
+}
+
+.ds-map-basemap-picker__choice--current:hover {
+  background: var(--ds-bg-brand-subtle-hover);
 }
 
 .ds-map-basemap-picker__choice--current .ds-map-basemap-picker__name {
   font: var(--ds-font-label-lg-strong);
-  color: var(--ds-text-brand);
+  color: var(--ds-text-on-brand-subtle);
 }
 </style>

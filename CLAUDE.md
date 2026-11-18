@@ -1861,6 +1861,10 @@ Before working on any component, read:
   row `spacing-sm`, `radius-surface`, hover `bg-neutral-subtle`, the ring on focus. **The current one is marked on its
   picture, not its row** — no ground, the picture ringed `border-brand-solid` 2px, the name `label-lg-strong` `text-brand`;
   no description. The tray and the trigger unchanged; the title stays the product's (`basemap-label`).
+- **ADR-0230**: **the chosen basemap is seen by its row** (four states tried in the product; amends ADR-0229's mark) —
+  `MapBasemapPicker`'s current row on **`bg-brand-subtle`** (`-hover` under the pointer), the name `label-lg-strong`
+  `text-on-brand-subtle`, the picture **without** its brand ring. Not the solid brand: it would read as the project's
+  action beside it in the bar. The other rows, the ring on focus and the geometry unchanged.
 
 ## Architecture
 
