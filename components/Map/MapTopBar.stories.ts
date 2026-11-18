@@ -148,10 +148,9 @@ export const Actions: Story = {
 }
 
 /**
- * L’entrée et la sortie (`BarTransition`) : la barre globale remonte et s’efface, la surface s’étend aux bords ; la
- * carte reste seule 800 ms, puis la barre du projet s’ouvre en hauteur et son contenu arrive après (`variant="reveal"`,
- * ADR-0217). En sortant, la barre du projet remonte et celle de l’app monte de 8 px en apparaissant (`rise`, ADR-0218). Les deux barres partagent
- * une même case.
+ * L’entrée et la sortie (`BarTransition`) : depuis la liste, on découvre le système SIG d’un coup — la carte, ses
+ * instruments et la barre du projet ensemble, sans animation (`variant="none"`, ADR-0219). En sortant, la barre du projet
+ * remonte et celle de l’app monte de 8 px en apparaissant (`rise`, ADR-0218). Les deux barres partagent une même case.
  */
 export const EnterAndLeave: Story = {
   name: 'Entrer dans un projet SIG',
@@ -165,10 +164,9 @@ export const EnterAndLeave: Story = {
       <div :style="{
         display: 'grid', gridTemplateRows: 'auto 1fr', height: '560px', background: 'var(--ds-bg-neutral)',
         padding: inProject ? '0' : 'var(--ds-spacing-lg)',
-        transition: 'padding var(--ds-motion-duration-considered) var(--ds-motion-easing-in-out)',
       }">
         <div style="display:grid; position:relative; z-index:2">
-          <BarTransition :variant="inProject ? 'reveal' : 'rise'">
+          <BarTransition :variant="inProject ? 'none' : 'rise'">
             <div v-if="!inProject" key="app" style="grid-area:1 / 1">
               <HorizontalNavigation module="Inset" :breadcrumbs="[{ label: 'Projets' }]" user-initials="AD" />
             </div>
@@ -182,7 +180,6 @@ export const EnterAndLeave: Story = {
         <div :style="{
           position: 'relative', marginTop: inProject ? '-3.5rem' : 'var(--ds-spacing-lg)',
           borderRadius: inProject ? '0' : 'var(--ds-radius-surface)', overflow: 'hidden',
-          transition: 'margin var(--ds-motion-duration-considered) var(--ds-motion-easing-in-out), border-radius var(--ds-motion-duration-considered) var(--ds-motion-easing-in-out)',
           background: 'url(./stories/map-loading/parcels.webp) center / cover no-repeat, url(./stories/map-loading/base.webp) center / cover no-repeat',
         }">
           <div v-if="!inProject" style="position:absolute; left:var(--ds-spacing-xl); top:var(--ds-spacing-xl)">

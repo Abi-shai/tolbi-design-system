@@ -1791,6 +1791,10 @@ Before working on any component, read:
   movements against each other: `BarTransition`'s default arrival is now **`rise`** — up `spacing-md` and in over
   `process` / `out`, one `quick` after the leaver starts (`SwapTransition rise`'s mechanism). `slide` (0.167) is read
   as `rise`. Filmed: both translations only decrease; the app's bar settles at 404ms.
+- **ADR-0219**: **entering a GIS project, without a transition** (`reveal` tried and set aside) — `BarTransition
+  variant="none"`: a cut both ways, the leaver `display: none` from `leave-active` (hidden only, it held 48px for a
+  frame), the arriver there at once. The variant at the swap decides leave and arrival: the product passes
+  `inProject ? 'none' : 'rise'`. `reveal` / `hold` stay. Filmed: first frame after the click, the project's bar 56 at 0.
 
 ## Architecture
 

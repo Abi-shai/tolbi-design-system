@@ -26,8 +26,15 @@ import { computed } from 'vue'
  *   the one-row grid, the bar its row, the bar's own children the content.
  *   It clips only while it opens, so a menu overflows normally afterwards.
  *
- * Bind the variant to where the user is going — `reveal` into a project,
- * `rise` back out. The two bars are in the
+ * - **`none`** (ADR-0219) — a cut, both ways: the leaver is gone at once
+ *   (`display: none` from the first frame — hidden only, it still held its
+ *   48px and pushed the map down for a frame) and the arriver is simply there.
+ *   Entering a GIS project from the list, the map, its instruments and the
+ *   project's bar are discovered **together**; `reveal` was tried and set aside.
+ *
+ * Bind the variant to where the user is going — `none` into a project, `rise`
+ * back out. The variant in force when the bars swap decides both the leave and
+ * the arrival. The two bars are in the
  * document together while one leaves, so the product lays them in one cell.
  *
  * Under reduced motion, nothing travels and nothing waits: `motion.css` cuts the
@@ -38,17 +45,19 @@ import { computed } from 'vue'
  */
 interface Props {
   /**
-   * How the arriving bar comes — `rise` 8px into place (ADR-0218), or `reveal`
-   * its height after a hold (ADR-0217). `slide` is 0.167's name for `rise`.
+   * How the arriving bar comes — `rise` 8px into place (ADR-0218), `reveal`
+   * its height after a hold (ADR-0217), or `none`: a cut, the leaver gone at
+   * once too (ADR-0219). `slide` is 0.167's name for `rise`.
    */
-  variant?: 'rise' | 'reveal' | 'slide'
+  variant?: 'rise' | 'reveal' | 'none' | 'slide'
   /** `reveal` only: how long the map stays alone before the bar opens, in ms. */
   hold?: number
 }
 
 const props = withDefaults(defineProps<Props>(), { variant: 'rise', hold: 800 })
 
-const enter = computed(() => (props.variant === 'reveal' ? 'ds-bar-reveal' : 'ds-bar'))
+const enter = computed(() => (props.variant === 'reveal' ? 'ds-bar-reveal' : props.variant === 'none' ? 'ds-bar-cut' : 'ds-bar'))
+const leave = computed(() => (props.variant === 'none' ? 'ds-bar-cut' : 'ds-bar'))
 
 function beforeEnter(el: Element) {
   if (props.variant === 'reveal') (el as HTMLElement).style.setProperty('--bar-hold', `${props.hold}ms`)
@@ -65,6 +74,9 @@ function afterEnter(el: Element) {
     :enter-from-class="`${enter}-enter-from`"
     :enter-active-class="`${enter}-enter-active`"
     :enter-to-class="`${enter}-enter-to`"
+    :leave-from-class="`${leave}-leave-from`"
+    :leave-active-class="`${leave}-leave-active`"
+    :leave-to-class="`${leave}-leave-to`"
     @before-enter="beforeEnter"
     @after-enter="afterEnter"
     @enter-cancelled="afterEnter"
@@ -135,6 +147,12 @@ function afterEnter(el: Element) {
 .ds-bar-reveal-enter-from > * > * {
   opacity: 0;
   transform: translateY(var(--ds-spacing-sm));
+}
+
+/* None (ADR-0219): the leaver takes no room and is not seen for the frame Vue
+   keeps it; the arriver's classes carry nothing, so it is there at once. */
+.ds-bar-cut-leave-active {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
