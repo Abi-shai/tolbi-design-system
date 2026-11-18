@@ -133,3 +133,19 @@ export const CoverLoading: Story = {
   args: { cover: true, loading: true },
   render: Titled.render,
 }
+
+/**
+ * La rangée partagée (ADR-0228) : `columns` en colonnes égales, chaque carte à la largeur de sa colonne, toutes rendues —
+ * plus de vide au bout du plateau. Sous 60rem deux colonnes, sous 40rem une ; jamais plus de colonnes que d’articles.
+ */
+export const Columns: Story = {
+  name: 'Colonnes partagées',
+  args: { cover: true, columns: 3, items: ARTICLES.slice(0, 3).map(a => ({ ...a, image: undefined, meta: a.meta?.replace(/^.*· /, '') })) },
+  render: Titled.render,
+}
+
+export const ColumnsLoading: Story = {
+  name: 'Colonnes partagées, chargement',
+  args: { cover: true, columns: 3, loading: true },
+  render: Titled.render,
+}

@@ -30,6 +30,14 @@ export interface ArticleListItem {
  * `Dialog`'s: the package has no breakpoints, ADR-0020). The
  * section's title and its « Voir tout » are the product's. Nothing to show and
  * nothing loading: nothing rendered.
+ *
+ * **`columns`** (ADR-0228) shares the row instead: that many equal columns
+ * (`repeat(n, minmax(0, 1fr))`), each card at its column's whole width, every
+ * card rendered — no cut to what fits — and never more columns than cards, so
+ * no cell stands empty. Under 60rem of the list's width two columns, under 40rem
+ * one. ADR-0196 had refused shared columns because the pictures grew without
+ * limit; the brand cover (`cover`) has no picture to grow, and three 18rem cards
+ * left a hole at the tray's end.
  */
 interface Props {
   /** The block's title, in the tray's grey (ADR-0205) — « Quelques articles à lire ». */
@@ -37,8 +45,10 @@ interface Props {
   headingLevel?: 2 | 3 | 4
   items?: ArticleListItem[]
   loading?: boolean
-  /** How many placeholder cards while loading — the row's three. */
+  /** How many placeholder cards while loading — `columns`, or the row's three. */
   loadingCount?: number
+  /** Shares the row in that many equal columns, every card rendered (ADR-0228). Absent: 18rem cards that fit. */
+  columns?: number
   newTab?: boolean
   newTabLabel?: string
   /** Lets the cards wrap onto more rows rather than showing the ones that fit (ADR-0201). */
@@ -52,7 +62,8 @@ const props = withDefaults(defineProps<Props>(), {
   headingLevel: 2,
   items: () => [],
   loading: false,
-  loadingCount: 3,
+  loadingCount: undefined,
+  columns: undefined,
   newTab: true,
   newTabLabel: undefined,
   wrap: false,
@@ -94,15 +105,24 @@ watch(root, (el, _, onCleanup) => {
 }, { flush: 'post' })
 onBeforeUnmount(() => observer?.disconnect())
 
-const shown = computed(() => (props.wrap ? props.items : props.items.slice(0, fit.value)))
-const placeholders = computed(() => (props.wrap ? props.loadingCount : Math.min(props.loadingCount, fit.value)))
+const shared = computed(() => !!props.columns && props.columns > 0)
+const loadingCount = computed(() => props.loadingCount ?? props.columns ?? 3)
+const shown = computed(() => (props.wrap || shared.value ? props.items : props.items.slice(0, fit.value)))
+const placeholders = computed(() => (props.wrap || shared.value ? loadingCount.value : Math.min(loadingCount.value, fit.value)))
+/* Never more columns than cards: no empty cell at the row's end. */
+const columnStyle = computed(() => {
+  if (!shared.value) return undefined
+  const count = props.loading ? placeholders.value : shown.value.length
+  const n = Math.max(1, Math.min(props.columns!, count))
+  return { '--article-list-columns': n, '--article-list-columns-narrow': Math.min(2, n) }
+})
 </script>
 
 <template>
   <div v-if="loading || items.length" ref="root" class="ds-article-list" :aria-busy="loading || undefined">
     <Tray :title="title" :heading-level="headingLevel">
     <template v-if="$slots.action" #action><slot name="action" /></template>
-    <ul class="ds-article-list__grid">
+    <ul class="ds-article-list__grid" :class="{ 'ds-article-list__grid--columns': shared }" :style="columnStyle">
       <template v-if="loading">
         <li v-for="n in placeholders" :key="`skeleton-${n}`"><ArticleCard loading :cover="cover" /></li>
       </template>
@@ -145,8 +165,24 @@ const placeholders = computed(() => (props.wrap ? props.loadingCount : Math.min(
   min-width: 0;
 }
 
+/* Shared columns (ADR-0228): the row in equal parts, each card its column's width. */
+.ds-article-list__grid--columns {
+  grid-template-columns: repeat(var(--article-list-columns), minmax(0, 1fr));
+}
+
+.ds-article-list__grid--columns > li > :deep(.ds-article-card) {
+  width: 100%;
+}
+
+@container (width < 60rem) {
+  .ds-article-list__grid--columns {
+    grid-template-columns: repeat(var(--article-list-columns-narrow), minmax(0, 1fr));
+  }
+}
+
 @container (width < 40rem) {
-  .ds-article-list__grid {
+  .ds-article-list__grid,
+  .ds-article-list__grid--columns {
     grid-template-columns: minmax(0, 1fr);
   }
 

@@ -1852,6 +1852,10 @@ Before working on any component, read:
   **`density="comfortable"`** (22rem, titles `label-lg-strong`, blocks 12/16 gap 6) is **`MapLegendPanel`'s default**:
   rows **36**, words `label-lg`, marks in a 24 box a step up (`ChartLegendMark size="md"`: fill/ring 14, point 8, zone
   18×14, glyph 24). `compact` stays ADR-0226's 18rem key.
+- **ADR-0228**: **a row that takes the width** — with `cover` three 18rem cards left a hole at the tray's end, and the cover
+  has no picture to grow (ADR-0196's reason): `ArticleList` **`columns`** shares the row (`repeat(n, minmax(0, 1fr))`, each
+  card its column's width), **every card rendered** (no ADR-0201 cut), never more columns than cards; under **60rem** two,
+  under 40rem one (container queries); `loadingCount` defaults to `columns`. Without it, unchanged.
 
 ## Architecture
 
