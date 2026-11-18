@@ -1795,6 +1795,10 @@ Before working on any component, read:
   variant="none"`: a cut both ways, the leaver `display: none` from `leave-active` (hidden only, it held 48px for a
   frame), the arriver there at once. The variant at the swap decides leave and arrival: the product passes
   `inProject ? 'none' : 'rise'`. `reveal` / `hold` stay. Filmed: first frame after the click, the project's bar 56 at 0.
+- **ADR-0220**: **a visible rule under the GIS bar** — `MapTopBar`'s foot rule is **`border-default`** (the four border
+  tokens compared on Carbone: subtlest/subtle vanish on the beige, `inset` barely shows; default reads as Felt's line, the
+  product's field-outline grey), still an inset 1px shadow, the bar 56; dark `gray-forest-600`. The rim of light
+  (`border-map-edge` on 90 % white glass) did not show.
 
 ## Architecture
 

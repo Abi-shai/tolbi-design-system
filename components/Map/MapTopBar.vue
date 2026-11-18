@@ -25,8 +25,8 @@ export interface MapTopBarView {
  *
  * **The bar.** 56px, the whole width, no corners; the map passes under it.
  * Reading glass — `bg-map-read` (90 %) under `backdrop-map-read`, the map
- * panel's (72 % and opaque were compared) — with a `border-map-edge` rule along
- * its foot and nothing else. `spacing-xl` in from both sides: the edges of the
+ * panel's (72 % and opaque were compared) — with a `border-default` rule along
+ * its foot and nothing else (ADR-0220: the rim of light did not show). `spacing-xl` in from both sides: the edges of the
  * panel and of the map's tools under it. Three zones: the start and the end
  * share what is left, the centre sits in the bar's middle.
  *
@@ -230,7 +230,10 @@ const userMenuOpen = ref(false)
      a floor too, and held 1px of glass over the map while it waited. */
   grid-template-rows: 3.5rem;
   padding-inline: var(--ds-spacing-xl);
-  box-shadow: inset 0 calc(-1 * var(--ds-border-width-default)) 0 var(--ds-border-map-edge);
+  /* A clean line, not a rim of light (ADR-0220): `border-map-edge` (white 55 %)
+     on 90 % white glass did not show, on the basemap's beige nor on the panel
+     under it. Felt parts its bar from its map with a plain line. */
+  box-shadow: inset 0 calc(-1 * var(--ds-border-width-default)) 0 var(--ds-border-default);
   background: var(--ds-bg-map-read);
   -webkit-backdrop-filter: var(--ds-backdrop-map-read);
   backdrop-filter: var(--ds-backdrop-map-read);
