@@ -1781,6 +1781,12 @@ Before working on any component, read:
   (`measure-module-art.mjs` → `centre.json`, the `viewBox` shifts; ±0.02, `--check` fails past ±0.5; logos untouched;
   the generator had been unparseable). **`BarTransition`**: leaver rises over `enter` (`in`), arriver comes down over
   `process` (`out`) one `enter` later (260/320/200 → the scale's 200/300/200); **`SwapTransition rise`** for a view.
+- **ADR-0217**: **the map alone, then the bar opens** — `BarTransition variant="reveal"` (+ `hold`, 800ms; a prop, not
+  a token): after the app's bar leaves, the map stays alone, then the wrapper of the entering bar opens `0fr → 1fr` over
+  `ambient` / `in-out` (`RevealTransition`'s mechanism), clipped only while it opens, and the bar's children come up 6px
+  and in over `considered` / `out`, one `enter` later. The product binds `reveal` into a project, `slide` out. `MapTopBar`
+  says its 56 as a **row** and draws its rule as an **inset shadow** (a height and a border were floors: 1px held over
+  the map). Filmed: 0px during the hold, open 1000 → 1600ms, `overflow` visible after.
 
 ## Architecture
 

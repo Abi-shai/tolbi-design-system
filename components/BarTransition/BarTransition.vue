@@ -1,32 +1,68 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 /**
  * One bar giving way to another at the top of the page (ADR-0216): entering a
  * GIS project, the app's bar (`HorizontalNavigation`) rises out through the top
- * and the project's (`MapTopBar`) comes down into its place — and back the other
- * way on leaving. Wrap each bar in it; the product's `v-if` / `v-else` does the
- * rest.
+ * and the project's (`MapTopBar`) takes its place — and back the other way on
+ * leaving. Wrap the bars in it; the product's `v-if` / `v-else` does the rest.
  *
- * The leaver **rises and fades** over `enter`, accelerating (`easing-in`); the
- * arriver **comes down and fades in** over `process`, decelerating
- * (`easing-out`), **one `enter` later** — an arrival waits for its place to be
- * free (ADR-0049). The owner's drawing said 260 / 320 / 200ms; the scale's
- * nearest steps are 200 / 300 / 200, and the order (the leave shorter than the
- * arrival, ADR-0021) is kept. No bounce.
+ * The leaver **rises and fades** over `enter`, accelerating (`easing-in`).
+ * How the arriver comes is the `variant`, read when it enters:
  *
- * The two are in the document together for one `enter`, so the product lays
- * them in one cell (a grid area or absolute positions) — two bars stacked in the
- * flow would push the page down for the length of the swap.
+ * - **`slide`** — it comes down and fades in over `process`, decelerating
+ *   (`easing-out`), **one `enter` later**: an arrival waits for its place to be
+ *   free (ADR-0049). The owner's 260 / 320 / 200ms on the scale's 200 / 300 / 200.
+ * - **`reveal`** (ADR-0217) — the project's bar on entering a map: the map alone
+ *   for **`hold`** (800ms), then the bar **opens its height** from the top edge,
+ *   `RevealTransition`'s mechanism (`0fr → 1fr` over `ambient`, `easing-in-out`)
+ *   rather than a slide — the glass and its rule grow — and its content arrives
+ *   **one `enter` later**, coming up 6px and fading in over `considered`
+ *   (`easing-out`). The offset is what draws the eye to the bar. The element
+ *   that enters must **wrap** the bar (`<div><MapTopBar/></div>`): it becomes
+ *   the one-row grid, the bar its row, the bar's own children the content.
+ *   It clips only while it opens, so a menu overflows normally afterwards.
+ *
+ * Bind the variant to where the user is going — `reveal` into a project,
+ * `slide` back out — so leaving plays as before. The two bars are in the
+ * document together while one leaves, so the product lays them in one cell.
  *
  * Under reduced motion, nothing travels and nothing waits: `motion.css` cuts the
- * durations, and the delay is cut here, or the new bar would appear 200ms late.
+ * durations, and the delays (the hold included) are cut here.
  *
  * Its `<style>` is unscoped on purpose (ADR-0021): Vue puts the classes on the
  * slotted element, which carries the parent's scope id.
  */
+interface Props {
+  /** How the arriving bar comes — `slide` down, or `reveal` its height after a hold (ADR-0217). */
+  variant?: 'slide' | 'reveal'
+  /** `reveal` only: how long the map stays alone before the bar opens, in ms. */
+  hold?: number
+}
+
+const props = withDefaults(defineProps<Props>(), { variant: 'slide', hold: 800 })
+
+const enter = computed(() => (props.variant === 'reveal' ? 'ds-bar-reveal' : 'ds-bar'))
+
+function beforeEnter(el: Element) {
+  if (props.variant === 'reveal') (el as HTMLElement).style.setProperty('--bar-hold', `${props.hold}ms`)
+}
+
+function afterEnter(el: Element) {
+  (el as HTMLElement).style.removeProperty('--bar-hold')
+}
 </script>
 
 <template>
-  <Transition name="ds-bar">
+  <Transition
+    name="ds-bar"
+    :enter-from-class="`${enter}-enter-from`"
+    :enter-active-class="`${enter}-enter-active`"
+    :enter-to-class="`${enter}-enter-to`"
+    @before-enter="beforeEnter"
+    @after-enter="afterEnter"
+    @enter-cancelled="afterEnter"
+  >
     <slot />
   </Transition>
 </template>
@@ -50,8 +86,49 @@
   opacity: 0;
 }
 
+/*
+  Reveal (ADR-0217): after the leaver's `enter` and the hold, the row opens over
+  `ambient` — the element is the grid, the bar its row, clipped while it grows.
+  `min-height: 0` lets the row reach 0: a grid item's automatic minimum is its
+  content's height, and the bar's is 56.
+*/
+.ds-bar-reveal-enter-active {
+  display: grid;
+  overflow: hidden;
+  transition: grid-template-rows var(--ds-motion-duration-ambient) var(--ds-motion-easing-in-out)
+    calc(var(--ds-motion-duration-enter) + var(--bar-hold, 0ms));
+}
+
+.ds-bar-reveal-enter-active > * {
+  min-height: 0;
+}
+
+.ds-bar-reveal-enter-from {
+  grid-template-rows: 0fr;
+}
+
+.ds-bar-reveal-enter-to {
+  grid-template-rows: 1fr;
+}
+
+/* The content, one `enter` after the opening starts: up 6px (`spacing-sm`) and in. */
+.ds-bar-reveal-enter-active > * > * {
+  transition:
+    opacity var(--ds-motion-duration-considered) var(--ds-motion-easing-out)
+      calc(2 * var(--ds-motion-duration-enter) + var(--bar-hold, 0ms)),
+    transform var(--ds-motion-duration-considered) var(--ds-motion-easing-out)
+      calc(2 * var(--ds-motion-duration-enter) + var(--bar-hold, 0ms));
+}
+
+.ds-bar-reveal-enter-from > * > * {
+  opacity: 0;
+  transform: translateY(var(--ds-spacing-sm));
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .ds-bar-enter-active {
+  .ds-bar-enter-active,
+  .ds-bar-reveal-enter-active,
+  .ds-bar-reveal-enter-active > * > * {
     transition-delay: 0s;
   }
 }

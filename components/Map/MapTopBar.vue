@@ -224,9 +224,13 @@ const userMenuOpen = ref(false)
   align-items: center;
   gap: var(--ds-spacing-lg);
   width: 100%;
-  height: 3.5rem;
+  /* 56, said as the row rather than as a height, so a wrapper can open it from
+     0 (`BarTransition variant="reveal"`, ADR-0217): a declared height would be
+     the row's floor. And the rule is drawn inside, not a border — a border is
+     a floor too, and held 1px of glass over the map while it waited. */
+  grid-template-rows: 3.5rem;
   padding-inline: var(--ds-spacing-xl);
-  border-bottom: var(--ds-border-width-default) solid var(--ds-border-map-edge);
+  box-shadow: inset 0 calc(-1 * var(--ds-border-width-default)) 0 var(--ds-border-map-edge);
   background: var(--ds-bg-map-read);
   -webkit-backdrop-filter: var(--ds-backdrop-map-read);
   backdrop-filter: var(--ds-backdrop-map-read);
