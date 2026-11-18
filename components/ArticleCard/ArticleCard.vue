@@ -29,15 +29,18 @@ import { Skeleton } from '../Skeleton'
  * broken picture leaves its 16:9 frame with a `file-text` in it, so the card
  * never changes size; `loading` previews the same geometry.
  *
- * **A brand cover** (ADR-0213): with `cover`, the frame is not a picture but the
- * same cover for every article — the brand's deep green, the brand pattern all
- * but invisible over it (white at 3 %, enlarged ×1.4 and offset within its
- * bounds by `seed`, stable for one article, different from its neighbour), and
- * the article's **title on it**, `heading-sm` in white at the bottom left, three
- * lines at most. Nothing else on it. The title then leaves the words under the
- * frame — they hold the date alone — and stays the link's name; the cover is
- * `aria-hidden`. Under the pointer and the focus the pattern **fades** to 45 %
- * of itself over `considered`: nothing moves, nothing lights up.
+ * **A brand cover** (ADR-0213, amended by ADR-0214): with `cover`, the frame is
+ * not a picture but the same cover for every article — the tray's softest grey
+ * (`bg-neutral-subtle`), the brand pattern barely guessed over it (`text-strong`
+ * at 1.2 %, enlarged ×1.4 and offset within its bounds by `seed`, stable for one
+ * article, different from its neighbour), and the article's **title on it**,
+ * `heading-sm` in `text-strong` at the bottom left, three lines at most. Nothing
+ * else on it. The deep green drew the eye to what is the least important block
+ * of the page; the grey leaves it to the words. The title then leaves the words
+ * under the frame — they hold the date alone — and stays the link's name; the
+ * cover is `aria-hidden`. Under the pointer and the focus the ground steps to
+ * `bg-neutral` with the card, as a project's picture does (ADR-0207), and the
+ * pattern fades to 45 % of itself over `considered`: nothing moves.
  */
 interface Props {
   title?: string
@@ -259,10 +262,9 @@ a.ds-article-card:focus-visible {
 }
 
 /*
-  The brand cover (ADR-0213): a picture, so its inks do not follow the theme —
-  the brand's deep green and white, primitives (as `MapPin`'s, ADR-0169).
-  White on brand-700 at the pattern's lightest (two stamps, 3 % on 3 %) keeps
-  the title above 8.5:1.
+  The brand cover (ADR-0213, quieted by ADR-0214): the tray's softest grey and
+  the pattern in ink at 1.2 % — semantic roles, so it follows the theme. The
+  title in `text-strong` stays above 15:1 where two stamps overlap.
 */
 .ds-article-card__cover {
   position: absolute;
@@ -270,15 +272,18 @@ a.ds-article-card:focus-visible {
 }
 
 .ds-article-card__frame .ds-article-card__pattern {
-  /* token-lint-disable-next-line no-raw-primitive — a cover is a picture: the brand's deep green in both modes (ADR-0213) */
-  --article-card-cover-ground: var(--ds-color-brand-700);
-  /* token-lint-disable-next-line no-raw-primitive — a cover is a picture: white ink in both modes (ADR-0213) */
-  --article-card-cover-ink: var(--ds-color-base-white);
-  --brand-pattern-ink-alpha: 0.03;
+  --brand-pattern-ink-alpha: 0.012;
   position: absolute;
   inset: 0;
-  background-color: var(--article-card-cover-ground);
-  color: var(--article-card-cover-ink);
+  background-color: var(--ds-bg-neutral-subtle);
+  color: var(--ds-text-strong);
+  transition: background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default);
+}
+
+/* With the card's ground, the cover steps to `bg-neutral`: the card lights in
+   one tone, as a `ProjectList` row and its picture (ADR-0207). */
+a.ds-article-card:is(:hover, :focus-visible) .ds-article-card__frame .ds-article-card__pattern {
+  background-color: var(--ds-bg-neutral);
 }
 
 .ds-article-card__pattern :deep(.ds-brand-pattern__art) {
@@ -293,6 +298,7 @@ a.ds-article-card:is(:hover, :focus-visible) .ds-article-card__pattern :deep(.ds
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .ds-article-card__frame .ds-article-card__pattern,
   .ds-article-card__pattern :deep(.ds-brand-pattern__art) {
     transition: none;
   }
@@ -305,8 +311,7 @@ a.ds-article-card:is(:hover, :focus-visible) .ds-article-card__pattern :deep(.ds
   display: -webkit-box;
   overflow: hidden;
   font: var(--ds-font-heading-sm);
-  /* token-lint-disable-next-line no-raw-primitive — a cover is a picture: white ink in both modes (ADR-0213) */
-  color: var(--ds-color-base-white);
+  color: var(--ds-text-strong);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   line-clamp: 3;

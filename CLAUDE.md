@@ -1761,6 +1761,11 @@ Before working on any component, read:
   empty corner), the title on it (`heading-sm`, white, bottom left, `spacing-xl`, 3 lines) — 8.76:1 at the lightest. Inks
   are primitives (a picture, no theme). Under it the **date alone**; the title stays the link's name, the cover
   `aria-hidden`. Hover/focus: the pattern **fades** to 45 % over `considered`, nothing moves. Card 288 × 213.
+- **ADR-0214**: **a quieter article cover** (track B2 of a board explored in the session: tint, grey, white, low
+  format, band, thumbnail; then B at 3.5 / 2 / 1.2 % and faded) — the deep green drew the eye to the page's least
+  important block: the cover is now `bg-neutral-subtle` with the pattern in `text-strong` at **1.2 %** and the title in
+  `text-strong` (16.2:1 at two stamps; dark 9.6:1). Semantic roles, so it follows the theme (ADR-0213's primitives
+  gone). Hover/focus: the ground steps to `bg-neutral` with the card (ADR-0207) and the pattern fades. Geometry unchanged.
 
 ## Architecture
 

@@ -55,9 +55,10 @@ export const Loading: Story = {
 }
 
 /**
- * La couverture de marque (ADR-0213) : le vert profond, le motif de marque presque invisible (blanc à 3 %, cadré par
- * `seed`), le titre de l’article dessus — `heading-sm` blanc, en bas à gauche, trois lignes au plus. Dessous, la date
- * seule ; le titre reste le nom du lien. Au survol et au focus, le motif s’efface ; rien ne bouge.
+ * La couverture de marque (ADR-0213, adoucie par ADR-0214) : le gris le plus doux du plateau, le motif de marque à peine
+ * deviné (encre à 1,2 %, cadré par `seed`), le titre de l’article dessus — `heading-sm` `text-strong`, en bas à gauche,
+ * trois lignes au plus. Dessous, la date
+ * seule ; le titre reste le nom du lien. Au survol et au focus, le fond passe à `bg-neutral` et le motif s’efface ; rien ne bouge.
  */
 export const Cover: Story = {
   name: 'Couverture de marque',
