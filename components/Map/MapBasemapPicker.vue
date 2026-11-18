@@ -13,7 +13,7 @@ export interface MapBasemapOption {
 
 /**
  * The basemap, chosen by its picture (ADR-0221, its panel drawn again in
- * ADR-0222). The trigger **is** the active basemap — a 28px thumbnail in a 2px
+ * ADR-0222 and ADR-0229). The trigger **is** the active basemap — a 28px thumbnail in a 2px
  * white frame, `radius-inner`, a `border-subtle` hairline and
  * `elevation-control`, the basemap alone with no project data; open, it takes
  * the brand ring (`border-brand-solid`, 2px) and a light halo.
@@ -22,15 +22,15 @@ export interface MapBasemapOption {
  * the grey ground, its hairline and `radius-surface-lg`, titled with `label`
  * (« Fond de carte », `heading-sm`, as « Derniers projets »), under
  * `elevation-overlay` because it floats over the map. On its white surface the
- * basemaps sit in a row, `spacing-sm` apart: a tile each, 7.5rem — the picture
- * in **4:3**, `radius-control`, an inset `border-subtle` hairline, the name
- * under it, centred, `label-md` / `text-strong`; `spacing-xs` in,
- * `radius-surface-sm`. Hover is the tray's (`--on-tray-hover`).
+ * basemaps are **a list** (ADR-0229, Felt): a row each, `spacing-xxs` apart —
+ * a 3.5rem square picture (`radius-surface`, an inset `border-subtle`
+ * hairline, `cover`), then the name in `label-lg`; `spacing-sm` in,
+ * `radius-surface`. Hover takes `bg-neutral-subtle`, the keyboard the
+ * package's ring.
  *
- * **The active basemap keeps the package's mark** (ADR-0050), on the whole
- * tile: `bg-selected`, its picture ringed in `border-brand-solid` at
- * `border-width-strong`, its name `label-md-strong` / `text-on-brand-subtle`.
- * No check.
+ * **The active basemap is marked on its picture**, not on its row: no ground,
+ * the picture ringed in `border-brand-solid` at `border-width-strong`, the
+ * name `label-lg-strong` / `text-brand`. No check, no description.
  *
  * A dialog holding a radio group: Tab reaches the active basemap, the arrows
  * move the choice (and the map with it), Enter, Space or a click chooses and
@@ -178,33 +178,34 @@ function step(e: KeyboardEvent) {
   object-fit: cover;
 }
 
-/* ── The tray's surface: the basemaps in a row ───────────────────── */
+/* ── The tray's surface: the basemaps in a list (ADR-0229, Felt) ──── */
 .ds-map-basemap-picker__choices {
   display: flex;
-  gap: var(--ds-spacing-sm);
+  flex-direction: column;
+  gap: var(--ds-spacing-xxs);
 }
 
+/* A row: the picture, then the name, read as the basemap itself. */
 .ds-map-basemap-picker__choice {
   box-sizing: border-box;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--ds-spacing-xs);
-  width: 7.5rem;
-  padding: var(--ds-spacing-xs);
+  align-items: center;
+  gap: var(--ds-spacing-lg);
+  width: 100%;
+  padding: var(--ds-spacing-sm);
   border: 0;
-  border-radius: var(--ds-radius-surface-sm);
+  border-radius: var(--ds-radius-surface);
   background: transparent;
   color: var(--ds-text-strong);
+  text-align: start;
   cursor: pointer;
   transition:
     background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),
     box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
-/* The tray's hover (ADR-0199), on keyboard focus as on the pointer. */
-.ds-map-basemap-picker__choice:is(:hover, :focus-visible) {
-  background: var(--on-tray-hover, var(--ds-bg-hover));
+.ds-map-basemap-picker__choice:hover {
+  background: var(--ds-bg-neutral-subtle);
 }
 
 .ds-map-basemap-picker__choice:focus-visible {
@@ -213,9 +214,10 @@ function step(e: KeyboardEvent) {
 }
 
 .ds-map-basemap-picker__thumb {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  border-radius: var(--ds-radius-control);
+  flex: none;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--ds-radius-surface);
 }
 
 /* The hairline over the picture — an inset shadow on the frame is painted
@@ -230,29 +232,21 @@ function step(e: KeyboardEvent) {
 }
 
 .ds-map-basemap-picker__name {
+  min-width: 0;
   overflow: hidden;
-  font: var(--ds-font-label-md);
-  text-align: center;
+  font: var(--ds-font-label-lg);
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-/* The current basemap (ADR-0050), on the whole tile: its ground, its ink, the
-   strong weight — and its picture ringed in the brand. No check. */
-.ds-map-basemap-picker__choice--current {
-  background: var(--ds-bg-selected);
-}
-
-.ds-map-basemap-picker__choice--current:is(:hover, :focus-visible) {
-  background: var(--ds-bg-selected-hover);
-}
-
+/* The current basemap (ADR-0229): no ground on the row — the picture ringed
+   in the brand, the name in the brand's ink at the strong weight. */
 .ds-map-basemap-picker__choice--current .ds-map-basemap-picker__thumb {
   box-shadow: 0 0 0 var(--ds-border-width-strong) var(--ds-border-brand-solid);
 }
 
 .ds-map-basemap-picker__choice--current .ds-map-basemap-picker__name {
-  font: var(--ds-font-label-md-strong);
-  color: var(--ds-text-on-brand-subtle);
+  font: var(--ds-font-label-lg-strong);
+  color: var(--ds-text-brand);
 }
 </style>

@@ -1856,6 +1856,11 @@ Before working on any component, read:
   has no picture to grow (ADR-0196's reason): `ArticleList` **`columns`** shares the row (`repeat(n, minmax(0, 1fr))`, each
   card its column's width), **every card rendered** (no ADR-0201 cut), never more columns than cards; under **60rem** two,
   under 40rem one (container queries); `loadingCount` defaults to `columns`. Without it, unchanged.
+- **ADR-0229**: **the basemaps as a list** (Felt, the owner's reference) — `MapBasemapPicker`'s body is a vertical list
+  (`spacing-xxs`): a 3.5rem square picture (`radius-surface`, inset hairline, `cover`), the name `label-lg` to its right;
+  row `spacing-sm`, `radius-surface`, hover `bg-neutral-subtle`, the ring on focus. **The current one is marked on its
+  picture, not its row** — no ground, the picture ringed `border-brand-solid` 2px, the name `label-lg-strong` `text-brand`;
+  no description. The tray and the trigger unchanged; the title stays the product's (`basemap-label`).
 
 ## Architecture
 

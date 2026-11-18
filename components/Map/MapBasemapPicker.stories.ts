@@ -17,10 +17,11 @@ const meta: Meta<typeof MapBasemapPicker> = {
     docs: {
       description: {
         component:
-          'Le fond de carte choisi par son image (ADR-0221/0222). Le déclencheur est le fond actif, 28 px dans un cadre ' +
-          'blanc de 2 px ; ouvert, l’anneau de la marque et un halo. Le panneau est le plateau de l’accueil, titré ' +
-          '« Fond de carte » : sur sa surface blanche, une tuile de 7,5 rem par fond, l’image en 4:3 et son nom ; ' +
-          'l’actif sur `bg-selected`, son image cerclée de `border-brand-solid`. Les images sont au produit.',
+          'Le fond de carte choisi par son image (ADR-0221/0222/0229). Le déclencheur est le fond actif, 28 px dans un ' +
+          'cadre blanc de 2 px ; ouvert, l’anneau de la marque et un halo. Le panneau est le plateau de l’accueil, titré ' +
+          'par le produit : sur sa surface blanche, une liste comme chez Felt — une vignette carrée de 3,5 rem et le nom à ' +
+          'droite ; l’actif sans aplat, sa vignette cerclée de `border-brand-solid` et son nom en `text-brand`. Les images ' +
+          'sont au produit.',
       },
     },
   },
