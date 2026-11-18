@@ -15,9 +15,15 @@ interface Props {
   color?: string
   /** A glyph's box: 20 in a row, 24 in `columns`. */
   glyphSize?: number
+  /**
+   * `md` — the marks a step up, for a key read from a distance (ADR-0227):
+   * a fill and a ring 14, a point 8, a zone 18 × 14, a dot and a circle 12,
+   * a line 20.
+   */
+  size?: 'sm' | 'md'
 }
 
-const props = withDefaults(defineProps<Props>(), { color: undefined, glyphSize: 20 })
+const props = withDefaults(defineProps<Props>(), { color: undefined, glyphSize: 20, size: 'sm' })
 
 /* A map glyph's family, or nothing: the glyph is drawn, the other shapes are CSS. */
 const family = computed(() =>
@@ -36,7 +42,7 @@ const family = computed(() =>
   <span
     v-else
     class="ds-chart-legend__mark"
-    :class="`ds-chart-legend__mark--${shape}`"
+    :class="[`ds-chart-legend__mark--${shape}`, { 'ds-chart-legend__mark--md': size === 'md' }]"
     :style="{ '--chart-legend-mark': color }"
     aria-hidden="true"
   />
@@ -83,4 +89,13 @@ const family = computed(() =>
   box-shadow: inset 0 0 0 var(--ds-border-width-strong) var(--chart-legend-mark);
 }
 
+
+/* A step up (ADR-0227): the same shapes, drawn for a key read from a distance. */
+.ds-chart-legend__mark--md.ds-chart-legend__mark--dot,
+.ds-chart-legend__mark--md.ds-chart-legend__mark--circle { width: 12px; height: 12px; }
+.ds-chart-legend__mark--md.ds-chart-legend__mark--square { width: 14px; height: 14px; border-radius: 2px; } /* token-lint-disable no-raw-radius — a map symbol's corner, drawn at 14px */
+.ds-chart-legend__mark--md.ds-chart-legend__mark--ring { width: 14px; height: 14px; }
+.ds-chart-legend__mark--md.ds-chart-legend__mark--point { width: 8px; height: 8px; margin-inline: 3px; }
+.ds-chart-legend__mark--md.ds-chart-legend__mark--zone { width: 18px; height: 14px; border-radius: 3px; } /* token-lint-disable no-raw-radius — the zone symbol's corner, as drawn on the map */
+.ds-chart-legend__mark--md:is(.ds-chart-legend__mark--line, .ds-chart-legend__mark--dashed) { width: 20px; }
 </style>

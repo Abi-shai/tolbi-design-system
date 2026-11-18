@@ -82,6 +82,12 @@ interface Props {
   aboutLabel?: string
   collapseLabel?: string
   expandLabel?: string
+  /**
+   * `comfortable` (default, ADR-0227) — a key read from a distance and pointed
+   * at: 22rem, 16px titles and words, 36px rows, the marks a step up.
+   * `compact` — ADR-0226's 18rem key: 14px, 28px rows.
+   */
+  density?: 'comfortable' | 'compact'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -98,6 +104,7 @@ const props = withDefaults(defineProps<Props>(), {
   aboutLabel: 'À propos de',
   collapseLabel: 'Replier',
   expandLabel: 'Afficher',
+  density: 'comfortable',
 })
 
 const emit = defineEmits<{
@@ -131,8 +138,9 @@ function toggle(item: MapLegendPanelItem) {
 <template>
   <MapPanel
     class="ds-map-legend-panel"
+    :class="`ds-map-legend-panel--${density}`"
     size="lg"
-    density="compact"
+    :density="density"
     fit="content"
     :divided="false"
     :title="title"
@@ -191,7 +199,12 @@ function toggle(item: MapLegendPanelItem) {
           class="ds-map-legend-panel__row"
           :class="{ 'ds-map-legend-panel__row--hidden': isHidden(item) }"
         >
-          <span class="ds-map-legend-panel__mark"><ChartLegendMark :shape="item.mark" :color="item.color" /></span>
+          <span class="ds-map-legend-panel__mark"><ChartLegendMark
+            :shape="item.mark"
+            :color="item.color"
+            :size="density === 'comfortable' ? 'md' : 'sm'"
+            :glyph-size="density === 'comfortable' ? 24 : 20"
+          /></span>
           <span class="ds-map-legend-panel__label">{{ item.label }}</span>
           <span class="ds-map-legend-panel__actions">
             <Tooltip v-if="group.items.length > 1" :title="soloLabel" placement="top">
@@ -224,6 +237,31 @@ function toggle(item: MapLegendPanelItem) {
 </template>
 
 <style scoped>
+/*
+  Comfortable (ADR-0227): rows of 36 — 32px actions fit without pushing — the
+  word at `label-lg` (16), the mark in a 24px box (a glyph a step up), the
+  indicator's chip at the blocks' titles' 16.
+*/
+.ds-map-legend-panel--comfortable .ds-map-legend-panel__row {
+  min-height: 2.25rem;
+}
+
+.ds-map-legend-panel--comfortable .ds-map-legend-panel__mark {
+  width: 1.5rem;
+}
+
+.ds-map-legend-panel--comfortable .ds-map-legend-panel__label {
+  font: var(--ds-font-label-lg);
+}
+
+.ds-map-legend-panel--comfortable .ds-map-legend-panel__actions {
+  margin-block: calc((2.25rem - 32px) / 2);
+}
+
+.ds-map-legend-panel--comfortable .ds-map-legend-panel__metric :deep(.ds-dropdown-trigger) {
+  font: var(--ds-font-label-lg-strong);
+}
+
 /* The indicator's chip: its word on the blocks' titles' edge, its ground
    lent to the padding — the chip's own inline start (`control-padding-xs`, 10). */
 .ds-map-legend-panel__metric {

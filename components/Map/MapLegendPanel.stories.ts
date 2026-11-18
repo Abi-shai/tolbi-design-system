@@ -52,7 +52,8 @@ const meta: Meta<typeof MapLegendPanel> = {
           'La légende d’une carte (ADR-0226, Felt) : `MapPanel` en clé — compact, à la hauteur de son contenu, le pli ' +
           'en fin de ligne (ADR-0224/0225). Un bloc par famille ; le premier porte l’indicateur (son menu, « À propos », ' +
           'l’œil). Une ligne : le repère de la carte et son nom, pas de compte ; au survol, « Afficher seulement » et ' +
-          'l’œil. Ce qui est masqué tient dans `v-model:hidden`.',
+          'l’œil. Ce qui est masqué tient dans `v-model:hidden`. Par défaut en densité « confort » (22rem, 16 px, lignes de 36 ; ' +
+          'ADR-0227), `density="compact"` pour la clé de 18rem.',
       },
     },
   },
@@ -110,6 +111,27 @@ export const WithoutMenu: Story = {
         </MapOverlay>
         <MapOverlay position="top-end">
           <MapLegendPanel :groups="GROUPS.slice(1)" v-model:hidden="hidden" />
+        </MapOverlay>
+      </div>`,
+  }),
+}
+
+/**
+ * Les deux densités (ADR-0227) : `comfortable` par défaut — 22rem, titres et libellés à 16 px, lignes de 36, repères un
+ * cran au-dessus — pour une carte lue de loin et des cibles pointées ; `compact` — la clé de 18rem de l’ADR-0226.
+ */
+export const Densities: Story = {
+  name: 'Densités',
+  render: () => ({
+    components: { MapLegendPanel, MapOverlay },
+    setup: () => ({ GROUPS, METRICS, metric: ref('stock') }),
+    template: `
+      <div style="position:relative;height:680px;background:url('./stories/map-loading/base.webp') center / cover;overflow:hidden">
+        <MapOverlay position="top-start">
+          <MapLegendPanel :groups="GROUPS" :metrics="METRICS" v-model:metric="metric" />
+        </MapOverlay>
+        <MapOverlay position="top-end">
+          <MapLegendPanel :groups="GROUPS" :metrics="METRICS" v-model:metric="metric" density="compact" />
         </MapOverlay>
       </div>`,
   }),

@@ -1846,6 +1846,12 @@ Before working on any component, read:
   **show on approach** (hover / focus inside, opacity over `quick`, no row ground), stateful ones stay, always without
   hover. **`PanelBlock #aside`** `IconButton xs` centred on the 20px title line, `spacing-xxs` apart, pulled `spacing-md`
   into the padding so their glyphs share the rows' column.
+- **ADR-0227**: **a key read from a distance** — the legend's `x` looked pressed: not `subtle` but ADR-0216's open veil on
+  `aria-expanded="true"`, which a fold **inside the panel it controls** must not wear — both folds are bare at rest now
+  (veil on hover, press, focus); at the end the fold is **`ghost xs`**, the actions' size (head 48). `MapPanel`
+  **`density="comfortable"`** (22rem, titles `label-lg-strong`, blocks 12/16 gap 6) is **`MapLegendPanel`'s default**:
+  rows **36**, words `label-lg`, marks in a 24 box a step up (`ChartLegendMark size="md"`: fill/ring 14, point 8, zone
+  18×14, glyph 24). `compact` stays ADR-0226's 18rem key.
 
 ## Architecture
 

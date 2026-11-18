@@ -15,7 +15,7 @@ export type MapPanelFoldPlacement = 'start' | 'end'
 /** A `lg` panel's height: the place's (`fill`) or its content's (ADR-0224). */
 export type MapPanelFit = 'fill' | 'content'
 /** A `lg` panel's rhythm: a screen's reading panel, or a key read at a glance (ADR-0224). */
-export type MapPanelDensity = 'default' | 'compact'
+export type MapPanelDensity = 'default' | 'compact' | 'comfortable'
 
 /**
  * A surface on a map (ADR-0087) — reading glass, a hairline, the glass's
@@ -97,7 +97,11 @@ interface Props {
   fit?: MapPanelFit
   /** `lg`: the rule under the head. `false` where the body's first block already says where it begins. */
   divided?: boolean
-  /** `lg`: `compact` is a key — 18rem, tighter head and body, and the blocks it holds tighter too (ADR-0224). */
+  /**
+   * `lg`: `compact` is a key — 18rem, tighter head and body, and the blocks it
+   * holds tighter too (ADR-0224). `comfortable` is a key read from a distance
+   * and pointed at (ADR-0227): 22rem, the titles at 16px, the blocks 12 / 16.
+   */
   density?: MapPanelDensity
 }
 
@@ -574,7 +578,8 @@ onBeforeUnmount(() => {
           size === 'lg' && {
             'ds-map-panel--fit-content': fit === 'content',
             'ds-map-panel--undivided': !divided,
-            'ds-map-panel--compact': density === 'compact',
+            'ds-map-panel--compact': density === 'compact' || density === 'comfortable',
+            'ds-map-panel--comfortable': density === 'comfortable',
           },
         ]"
         :aria-label="props.title"
@@ -595,8 +600,8 @@ onBeforeUnmount(() => {
             data-map-panel-fold
             :data-map-panel-rides="foldsAtEnd ? undefined : ''"
             :icon="headFoldIcon"
-            size="md"
-            variant="subtle"
+            :size="foldsAtEnd ? 'xs' : 'md'"
+            :variant="foldsAtEnd ? 'ghost' : 'subtle'"
             :ariaLabel="named(collapseLabel)"
             aria-expanded="true"
             :aria-controls="panelId"
@@ -829,7 +834,7 @@ onBeforeUnmount(() => {
 /* The fold is the tools column's 40px button (ADR-0181), and the head keeps the
    height its 36px one gave it: the box lends 2px above and below, so a head
    with only a title stays 60 tall; beside the tabs (44) it changes nothing. */
-.ds-map-panel__head--slot > [data-map-panel-fold] {
+.ds-map-panel__head--slot > [data-map-panel-fold].ds-icon-button--md {
   margin-block: calc(-1 * var(--ds-spacing-xxs));
 }
 
@@ -868,7 +873,21 @@ onBeforeUnmount(() => {
   display: contents;
 }
 
-/* The fold at the end (ADR-0224): the title's line, then the fold, then the close. */
+/*
+  The fold is a disclosure **inside** the panel it controls: it says
+  `aria-expanded="true"` for a reader, but it is not a menu standing open, so it
+  does not wear ADR-0216's open veil — at rest it is bare, the veil comes with
+  the pointer, the press and the focus (ADR-0227). The legend's `x` looked
+  pressed before anyone touched it; the reading panel's square carried the
+  same grey disc.
+*/
+.ds-map-panel__head > [data-map-panel-fold][aria-expanded='true']:not(:hover, :active, .ds-icon-button--active) {
+  background: transparent;
+}
+
+/* The fold at the end (ADR-0224): the title's line, then the fold, then the
+   close — a `ghost` `xs`, the size of the blocks' and the rows' actions
+   (ADR-0227). */
 .ds-map-panel__head--folds-end {
   grid-template-columns: minmax(0, 1fr) auto;
 }
@@ -925,6 +944,23 @@ onBeforeUnmount(() => {
 .ds-map-panel--lg.ds-map-panel--compact .ds-map-panel__body {
   gap: var(--ds-spacing-md);
   padding: 0 var(--ds-spacing-md) var(--ds-spacing-md);
+}
+
+/*
+  Comfortable (ADR-0227): the compact key, read from a distance — 22rem, the
+  panel's title and the blocks' at `label-lg-strong` (16), the blocks 12 / 16
+  with 6 between head and rows. The head and the body keep the compact rhythm,
+  so the blocks' 16 stays concentric with the panel's 24.
+*/
+.ds-map-panel--lg.ds-map-panel--comfortable {
+  width: 22rem;
+  --section-card-compact-padding: var(--ds-spacing-lg) var(--ds-spacing-xl);
+  --section-card-compact-gap: var(--ds-spacing-sm);
+  --section-card-title-font: var(--ds-font-label-lg-strong);
+}
+
+.ds-map-panel--comfortable .ds-map-panel__head {
+  font: var(--ds-font-label-lg-strong);
 }
 
 .ds-map-panel__head--folds .ds-map-panel__header > :deep(:first-child) {
