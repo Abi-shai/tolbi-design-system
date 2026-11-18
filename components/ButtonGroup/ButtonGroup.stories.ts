@@ -207,3 +207,31 @@ export const InAFilterBar: Story = {
     `,
   }),
 }
+
+/**
+ * `shape="pill"` (ADR-0216) : la bascule posée sur une carte — « Carte | Analytics » dans `MapTopBar`. Le rail,
+ * l’indicateur et les segments sont ronds, la forme de la légende et de la frise. Sur le verre de la carte, le groupe
+ * prend les niveaux du verre : rail en creux (`bg-map-sunk`, filet de lumière), pilule en relief (`bg-map-raised`).
+ */
+export const Pill: Story = {
+  name: 'Pilule (sur une carte)',
+  render: () => ({
+    components: { ButtonGroup, ButtonGroupItem },
+    setup: () => ({ view: ref('map') }),
+    template: `
+      <div style="display:flex; gap:var(--ds-spacing-3xl); align-items:center">
+        <ButtonGroup v-model="view" shape="pill" aria-label="Vue">
+          <ButtonGroupItem value="map" label="Carte" icon="map" />
+          <ButtonGroupItem value="analytics" label="Analytics" icon="chart-column" />
+        </ButtonGroup>
+        <div style="padding:var(--ds-spacing-xl); border-radius:var(--ds-radius-surface); background:url('./stories/map-loading/base.webp') center / cover">
+          <div style="padding:var(--ds-spacing-sm) var(--ds-spacing-xl); background:var(--ds-bg-map-read); backdrop-filter:var(--ds-backdrop-map-read); --on-glass-sunk:var(--ds-bg-map-sunk); --on-glass-sunk-border:var(--ds-border-map-edge); --on-glass-raised:var(--ds-bg-map-raised); --on-glass-raised-shadow:var(--ds-elevation-map-raised)">
+            <ButtonGroup v-model="view" shape="pill" aria-label="Vue">
+              <ButtonGroupItem value="map" label="Carte" icon="map" />
+              <ButtonGroupItem value="analytics" label="Analytics" icon="chart-column" />
+            </ButtonGroup>
+          </div>
+        </div>
+      </div>`,
+  }),
+}

@@ -1,5 +1,5 @@
 <template>
-  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0.02 1.6 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g id="Module=Data">
     <g id="surface1">
     <path id="Vector" d="M33.3476 39.3789C33.3476 39.3789 29.2461 37.2188 24.1875 37.2188C19.1289 37.2188 15.0273 39.3789 15.0273 39.3789" stroke="#066938" stroke-width="1.77602" stroke-linecap="round" stroke-linejoin="round"/>

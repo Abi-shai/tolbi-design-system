@@ -29,3 +29,5 @@ export type { MapGlyphFamily, MapGlyphOptions, MapGlyphSeverity, MapImageHost } 
 export { flyGlyphs, clusterArrive, clusterLeave, quarterZoom, legibleZoom, createMapRelay } from './mapMotion'
 export type { MapPoint, MapGlyphFlight, MapRelay, MapRelaySwap, MapRelayWeights } from './mapMotion'
 export type { MapPointerAt } from './usePointerPlace'
+export { default as MapTopBar } from './MapTopBar.vue'
+export type { MapTopBarView } from './MapTopBar.vue'

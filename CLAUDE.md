@@ -1769,6 +1769,18 @@ Before working on any component, read:
 - **ADR-0215**: **the cover turns white under the pointer** (track H1 of a hover board: white + 1.2 / 2.5 / 4 %) —
   card and cover shared one grey on hover and read as one block; now the card takes the tray's grey and the cover
   **`bg-default`**, the inverse, the pattern unchanged at 1.2 % (no fade), over `quick`. Title 16.93:1 (dark 11.92:1).
+- **ADR-0216**: **the bar of a GIS project** (9 of 17 map products swap the global bar for the document's) —
+  **`MapTopBar`**: 56px, whole width, no corners, reading glass + a `border-map-edge` foot, `spacing-xl` sides, three
+  zones (`1fr auto 1fr`). Start: the module's mark (illustration 48, named) + `spacing-lg` + « Retour » (`Button sm
+  secondary-gray`, `arrow-left`, `back`). Centre: `views` + `v-model:view` → **`ButtonGroup shape="pill"`** (rail, pill
+  and segments round; on glass any group reads `--on-glass-sunk*` / `--on-glass-raised*`). End, `spacing-sm` apart:
+  `#action` (+ `actionCount`), ⋯ (`#menu`, `Dropdown` 18rem at its end), Partager, a 20px rule, the avatar trigger
+  (`#user-menu`). All `sm`. Map instruments go under it via public **`--ds-map-overlay-top`**. **`IconButton` ghost/subtle
+  read `aria-expanded="true"` as active**, and on glass hover/open take **`--on-glass-hover`** (`text-strong` 7 %), set
+  by every map surface (also `DropdownTrigger ghost`). **Module illustrations centred on their ink**
+  (`measure-module-art.mjs` → `centre.json`, the `viewBox` shifts; ±0.02, `--check` fails past ±0.5; logos untouched;
+  the generator had been unparseable). **`BarTransition`**: leaver rises over `enter` (`in`), arriver comes down over
+  `process` (`out`) one `enter` later (260/320/200 → the scale's 200/300/200); **`SwapTransition rise`** for a view.
 
 ## Architecture
 

@@ -43,6 +43,7 @@ onBeforeUnmount(() => group?.unregister(key.value))
 const selected = computed(() => group?.isSelected(key.value) ?? false)
 const iconOnly = computed(() => !!props.icon && !props.label)
 const size = computed(() => group?.size.value ?? 'md')
+const shape = computed(() => group?.shape.value ?? 'rail')
 
 function handleClick(event: MouseEvent) {
   if (props.disabled) return
@@ -63,6 +64,7 @@ function handleClick(event: MouseEvent) {
       iconOnly && 'ds-button-group-item--icon-only',
       icon && label && 'ds-button-group-item--leading-icon',
       selected && 'ds-button-group-item--active',
+      shape === 'pill' && 'ds-button-group-item--pill',
     ]"
     @click="handleClick"
   >
@@ -135,6 +137,12 @@ function handleClick(event: MouseEvent) {
   padding: var(--ds-spacing-xxs) var(--ds-spacing-md) var(--ds-spacing-xxs) var(--ds-spacing-sm);
 }
 
+/* Pill (ADR-0216): the segment takes the group's round corners, so its hover
+   and its focus ring follow the pill's shape. */
+.ds-button-group-item--pill {
+  border-radius: var(--ds-radius-pill);
+}
+
 /* ── States ───────────────────────────────────────────────────────── */
 /* Hover is half a surface and the ink steps forward — Tabs' own, clearly
    lighter than the pill. */
@@ -144,7 +152,7 @@ function handleClick(event: MouseEvent) {
 }
 
 .ds-button-group-item:focus-visible:not(:disabled) {
-  box-shadow: var(--ds-focus-ring-gray);
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-gray));
 }
 
 /* The pill is the group's sliding indicator (ADR-0024); the item carries the

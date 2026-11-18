@@ -1,5 +1,5 @@
 <template>
-  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0.18 -0.02 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g id="Module=Survey">
     <g id="surface1">
     <path id="Vector" d="M24.9805 14.5703L38.543 17.7344" stroke="#FAC720" stroke-width="2.36803" stroke-linecap="round"/>

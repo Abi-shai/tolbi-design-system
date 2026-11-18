@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
    down from the top, the last one free to take what is left. */
 .ds-map-overlay--start,
 .ds-map-overlay--end {
-  top: var(--ds-spacing-xl);
+  top: var(--ds-map-overlay-top, var(--ds-spacing-xl));
   bottom: var(--ds-spacing-xl);
 }
 
@@ -161,11 +161,13 @@ onBeforeUnmount(() => {
   justify-self: center;
 }
 
-/* Top: the first child against the edge, the next under it. */
+/* Top: the first child against the edge, the next under it. Under a bar laid
+   on the map (`MapTopBar`, ADR-0216) the product moves every top down with one
+   public property: `--ds-map-overlay-top: calc(3.5rem + var(--ds-spacing-lg))`. */
 .ds-map-overlay--top-start,
 .ds-map-overlay--top,
 .ds-map-overlay--top-end {
-  top: var(--ds-spacing-xl);
+  top: var(--ds-map-overlay-top, var(--ds-spacing-xl));
 }
 
 /* Bottom: the first child against the edge, the next above it. */

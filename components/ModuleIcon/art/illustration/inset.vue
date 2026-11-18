@@ -1,5 +1,5 @@
 <template>
-  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="-1.5 4.43 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g id="Module=Inset">
     <g id="surface1">
     <path id="Vector" d="M33.25 9.45703L33.1758 16.4141" stroke="#066938" stroke-width="1.13665" stroke-linecap="round" stroke-linejoin="round"/>

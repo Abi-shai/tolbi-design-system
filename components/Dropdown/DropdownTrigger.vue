@@ -241,9 +241,10 @@ withDefaults(defineProps<Props>(), {
   box-shadow: none;
 }
 
+/* On map glass, the glass's veil (ADR-0216): `bg-hover` is its own white. */
 .ds-dropdown-trigger--ghost:hover:not(:disabled),
 .ds-dropdown-trigger--ghost.ds-dropdown-trigger--open {
-  background-color: var(--ds-bg-hover);
+  background-color: var(--on-glass-hover, var(--ds-bg-hover));
 }
 
 .ds-dropdown-trigger--ghost:disabled {

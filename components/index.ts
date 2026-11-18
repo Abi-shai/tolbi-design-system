@@ -20,7 +20,7 @@ export { CloseButton } from './CloseButton'
 export type { CloseButtonSize } from './CloseButton'
 
 export { ButtonGroup, ButtonGroupItem } from './ButtonGroup'
-export type { ButtonGroupSize } from './ButtonGroup'
+export type { ButtonGroupShape, ButtonGroupSize } from './ButtonGroup'
 
 export { Badge } from './Badge'
 export type { BadgeTone, BadgeColor, BadgeVariant, BadgeSize } from './Badge'
@@ -88,6 +88,7 @@ export type { HelpPlacement } from './HelpIcon'
 export { SurfaceTransition } from './SurfaceTransition'
 export { MarkTransition } from './MarkTransition'
 export { SwapTransition } from './SwapTransition'
+export { BarTransition } from './BarTransition'
 
 export { FormField, useFormField, FORM_FIELD_KEY } from './FormField'
 export type { FormFieldContext } from './FormField'
@@ -255,8 +256,8 @@ export { ChartTooltip } from './ChartTooltip'
 export type { ChartTooltipSeries } from './ChartTooltip'
 export { Sparkline } from './Sparkline'
 
-export { MapOverlay, MapPanel, MapControls, MapNavigator, MapSearch, MapFilters, MapFilterSection, MapFilterOption, MapTimeline, MapTooltip, MapHoverCard, MapPin, MapLegend, MapCanvas, MapStatus, MapCluster, mapGlyphSvg, mapGlyphName, mapGlyphBox, loadMapGlyphs, MAP_GLYPH_SMALL_BELOW, MAP_GLYPH_SEVERITY_COLOR, flyGlyphs, clusterArrive, clusterLeave, quarterZoom, legibleZoom, createMapRelay } from './Map'
-export type { MapOverlayPosition, MapControl, MapTimelinePeriod, MapTimelineScale, MapTooltipRow, MapPanelSize, MapCanvasBasemap, MapStatusState, MapLegendMetric, MapTool, MapSearchItem, MapSearchGroup, MapGlyphFamily, MapGlyphOptions, MapGlyphSeverity, MapImageHost, MapPoint, MapGlyphFlight, MapRelay, MapRelaySwap, MapRelayWeights, MapPointerAt } from './Map'
+export { MapOverlay, MapPanel, MapControls, MapNavigator, MapSearch, MapFilters, MapFilterSection, MapFilterOption, MapTimeline, MapTooltip, MapHoverCard, MapPin, MapLegend, MapCanvas, MapStatus, MapCluster, MapTopBar, mapGlyphSvg, mapGlyphName, mapGlyphBox, loadMapGlyphs, MAP_GLYPH_SMALL_BELOW, MAP_GLYPH_SEVERITY_COLOR, flyGlyphs, clusterArrive, clusterLeave, quarterZoom, legibleZoom, createMapRelay } from './Map'
+export type { MapOverlayPosition, MapControl, MapTimelinePeriod, MapTimelineScale, MapTooltipRow, MapPanelSize, MapCanvasBasemap, MapStatusState, MapLegendMetric, MapTool, MapSearchItem, MapSearchGroup, MapGlyphFamily, MapGlyphOptions, MapGlyphSeverity, MapImageHost, MapPoint, MapGlyphFlight, MapRelay, MapRelaySwap, MapRelayWeights, MapPointerAt, MapTopBarView } from './Map'
 
 export { ChartLegend } from './ChartLegend'
 export type { ChartLegendItem, ChartLegendShape, ChartLegendOrientation } from './ChartLegend'

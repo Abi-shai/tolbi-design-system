@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, provide, ref, toRef, watch, nextTick } from 'vue'
 import { useSlidingIndicator } from '../../composables/useSlidingIndicator'
-import { BUTTON_GROUP_KEY, type ButtonGroupContext, type ButtonGroupSize } from './context'
+import { BUTTON_GROUP_KEY, type ButtonGroupContext, type ButtonGroupShape, type ButtonGroupSize } from './context'
 
 /**
  * ADR-0024: the parent owns the selection.
@@ -17,6 +17,13 @@ import { BUTTON_GROUP_KEY, type ButtonGroupContext, type ButtonGroupSize } from 
  * `size` follows the fields it sits beside in a toolbar: `md` (42px) next to
  * `md` controls, `sm` (38px) next to `InputField` / `InputDropdown` `sm` — the
  * rail's 4px inset and border stay, the segments go 32 → 28.
+ *
+ * `shape="pill"` (ADR-0216) rounds the rail, the indicator and the segments: a
+ * switch laid on a map (« Carte | Analytics » in `MapTopBar`), in the legend's
+ * and the timeline's shape. On map glass the group takes the glass's levels
+ * (ADR-0173) from the surface it sits on — the rail recessed (`--on-glass-sunk`,
+ * its edge `--on-glass-sunk-border`), the chosen pill raised (`--on-glass-raised`
+ * + `--on-glass-raised-shadow`) — in either shape.
  */
 interface Props {
   /** The selected item's value. */
@@ -24,12 +31,15 @@ interface Props {
   ariaLabel?: string
   /** `md` 42px, `sm` 38px — the height of the fields beside it. */
   size?: ButtonGroupSize
+  /** `rail` (default) or `pill` — every corner round, for a switch on a map (ADR-0216). */
+  shape?: ButtonGroupShape
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: undefined,
   ariaLabel: undefined,
   size: 'md',
+  shape: 'rail',
 })
 
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
@@ -56,6 +66,7 @@ const context: ButtonGroupContext = {
   select(value) { emit('update:modelValue', value) },
   isSelected: (value) => value === props.modelValue,
   size: toRef(props, 'size'),
+  shape: toRef(props, 'shape'),
 }
 provide(BUTTON_GROUP_KEY, context)
 
@@ -63,7 +74,7 @@ watch(values, async () => { await nextTick(); measure() }, { deep: true })
 </script>
 
 <template>
-  <div ref="containerRef" class="ds-button-group" :class="`ds-button-group--${size}`" role="group" :aria-label="ariaLabel">
+  <div ref="containerRef" class="ds-button-group" :class="[`ds-button-group--${size}`, `ds-button-group--${shape}`]" role="group" :aria-label="ariaLabel">
     <!-- Sliding selection — behind the items, like Tabs' indicator -->
     <div
       v-if="activeIndex !== -1"
@@ -92,23 +103,25 @@ watch(values, async () => { await nextTick(); measure() }, { deep: true })
   align-items: stretch;
   gap: var(--ds-spacing-xs);
   padding: var(--ds-spacing-xs);
-  border: var(--ds-border-width-default) solid var(--ds-border-subtle);
+  /* On map glass the rail is the glass recessed (ADR-0173): the surface hands its levels down. */
+  border: var(--ds-border-width-default) solid var(--on-glass-sunk-border, var(--ds-border-subtle));
   border-radius: var(--ds-radius-surface-sm);
-  background-color: var(--ds-bg-neutral-subtle);
+  background-color: var(--on-glass-sunk, var(--ds-bg-neutral-subtle));
+  box-shadow: var(--on-glass-sunk-edge, none);
   isolation: isolate;
 }
 
 /* Component token (ADR-0010): the chosen segment is a neutral surface that
    rises — never bg-selected, which is a list's current item. */
 .ds-button-group__indicator {
-  --segment-selected-bg: var(--ds-bg-default);
+  --segment-selected-bg: var(--on-glass-raised, var(--ds-bg-default));
 
   position: absolute;
   left: 0;
   top: 0;
   border-radius: var(--ds-radius-inner);
   background-color: var(--segment-selected-bg);
-  box-shadow: var(--ds-elevation-surface);
+  box-shadow: var(--on-glass-raised-shadow, var(--ds-elevation-surface));
   pointer-events: none;
   z-index: 0;
   /* No transition until after the first paint, or it flies in from 0 */
@@ -122,6 +135,12 @@ watch(values, async () => { await nextTick(); measure() }, { deep: true })
 
 .ds-button-group--sm .ds-button-group__indicator {
   border-radius: var(--ds-radius-inner-sm);
+}
+
+/* Pill (ADR-0216): every corner round — the rail, the pill, and (in the item) the segments. */
+.ds-button-group--pill,
+.ds-button-group--pill .ds-button-group__indicator {
+  border-radius: var(--ds-radius-pill);
 }
 
 .ds-button-group__indicator--animated {

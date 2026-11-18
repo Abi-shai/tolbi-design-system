@@ -1,5 +1,5 @@
 <template>
-  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 1.23 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g id="Module=Forest">
     <g id="Mask group">
     <mask id="ds-mod-illustration-forest-mask0_1083_118533" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="7" y="7" width="34" height="34">

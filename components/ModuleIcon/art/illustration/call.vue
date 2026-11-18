@@ -1,5 +1,5 @@
 <template>
-  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="-0.6 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g id="Module=Call">
     <g id="surface1">
     <path id="Vector" d="M28.8359 33.9882C42.9648 30.6172 35.3125 12.5703 24.3164 18.6406" stroke="#FAC720" stroke-width="1.91783" stroke-linecap="round"/>

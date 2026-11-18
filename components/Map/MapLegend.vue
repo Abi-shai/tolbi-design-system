@@ -501,6 +501,8 @@ onBeforeUnmount(() => clearTimeout(timer))
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
   --on-glass-focus: var(--ds-focus-ring-map);
+  /* Hover and an open menu on glass (ADR-0216): an ink veil, `bg-hover` being the glass's white. */
+  --on-glass-hover: color-mix(in srgb, var(--ds-text-strong) 7%, transparent);
   --on-glass-field-bg: var(--ds-bg-map-raised);
   --on-glass-field-border: color-mix(in srgb, var(--ds-text-strong) 16%, transparent);
   --on-glass-field-shadow: var(--ds-elevation-map-raised);

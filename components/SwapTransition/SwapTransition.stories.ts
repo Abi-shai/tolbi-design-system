@@ -57,3 +57,20 @@ export const Default: Story = {
     `,
   }),
 }
+
+/** `rise` (ADR-0216) : une vue qui en remplace une autre — la carte et son analyse ; l’arrivante monte de 8 px en apparaissant. */
+export const Rise: Story = {
+  name: 'Une vue qui monte',
+  render: () => ({
+    components: { SwapTransition },
+    setup: () => ({ view: ref('map') }),
+    template: `
+      <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-xl)">
+        <button type="button" @click="view = view === 'map' ? 'analytics' : 'map'">Basculer</button>
+        <SwapTransition rise>
+          <div v-if="view === 'map'" key="map" style="height:160px; border-radius:var(--ds-radius-surface); background:url('./stories/map-loading/base.webp') center / cover"></div>
+          <div v-else key="analytics" style="height:160px; border-radius:var(--ds-radius-surface); background:var(--ds-bg-neutral-subtle); padding:var(--ds-spacing-xl); font:var(--ds-font-body-md)">Toutes les données</div>
+        </SwapTransition>
+      </div>`,
+  }),
+}

@@ -156,9 +156,17 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 .ds-icon-button--md { width: 40px; height: 40px; }
 .ds-icon-button--xs { width: 32px; height: 32px; }
 
+/*
+  Hover, and the open state of the menu it opens (ADR-0216): `active` set by
+  hand, or `aria-expanded="true"` on its own — a trigger already says it is
+  open, it should not have to say it twice. On map glass, `bg-hover` is the
+  glass's own white and the open menu did not show: a surface there hands
+  down `--on-glass-hover`, an ink veil that reads on any glass.
+*/
 .ds-icon-button:hover:not(:disabled),
-.ds-icon-button--active {
-  background: var(--ds-bg-hover);
+.ds-icon-button--active,
+.ds-icon-button:is(.ds-icon-button--ghost, .ds-icon-button--subtle)[aria-expanded='true'] {
+  background: var(--on-glass-hover, var(--ds-bg-hover));
 }
 
 /* Pressed (ADR-0121): the press is seen before what it causes arrives — a map
@@ -188,7 +196,8 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 }
 
 .ds-icon-button--subtle:hover:not(:disabled),
-.ds-icon-button--subtle.ds-icon-button--active {
+.ds-icon-button--subtle.ds-icon-button--active,
+.ds-icon-button--subtle[aria-expanded='true'] {
   color: var(--ds-text-default);
 }
 
