@@ -1817,6 +1817,12 @@ Before working on any component, read:
   the active one keeps ADR-0050 on the whole tile (`bg-selected`, picture ringed `border-brand-solid` 2px,
   `label-md-strong` `text-on-brand-subtle`, no check); hover `--on-tray-hover`. A `radiogroup`: arrows move the choice
   and stay open, a press chooses and closes.
+- **ADR-0223**: **the GIS bar off the map** — on Analytics a glass bar casting a shadow on a page of data read wrong:
+  `MapTopBar surface: 'glass' | 'solid'`, **derived from `view`** when unset (the first view is the map, any other
+  `solid`). `solid` = `bg-default`, no blur, **no shadow**, the `border-inset` rule alone, and the controls leave the glass:
+  every `--on-glass-*` reset to `initial` (`--ds-text-subtlest: inherit`), so the switch, the icons' hover and the basemap
+  trigger fall back on their off-map values. Ground, shadow and blur fade over `enter` / `easing-out` (a named
+  `focus-ring-instant` suppression: elevation, not a ring); nothing moves (filmed: 56 at y 0 every frame).
 
 ## Architecture
 

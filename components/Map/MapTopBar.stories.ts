@@ -59,7 +59,8 @@ type Story = StoryObj<typeof meta>
 /**
  * Sur la carte : la barre, puis le panneau, la légende et les outils qui descendent sous elle. Le logo ouvre le menu du
  * module — ses crédits en tête, l’action lourde en dernier après un séparateur ; le fond de carte se choisit par son
- * image ; Télécharger tient ce que tenait ⋯. « Analytics » remplace la carte entière (`SwapTransition rise`).
+ * image ; Télécharger tient ce que tenait ⋯. « Analytics » remplace la carte entière (`SwapTransition rise`) et la barre
+ * devient opaque, sans ombre, ses contrôles hors du verre (ADR-0223) ; « Carte » rend le verre.
  */
 export const OnTheMap: Story = {
   name: 'Sur la carte',
@@ -147,6 +148,13 @@ export const OnTheMap: Story = {
 
     await userEvent.click(canvas.getByRole('button', { name: 'Retour' }))
     await expect(a.onBack).toHaveBeenCalledTimes(1)
+
+    /* Off the map the bar is opaque, with no shadow (ADR-0223), derived from the view. */
+    const bar = canvasElement.querySelector('.ds-map-top-bar') as HTMLElement
+    await userEvent.click(canvas.getByRole('button', { name: /Analytics/ }))
+    await expect(bar).toHaveClass('ds-map-top-bar--solid')
+    await userEvent.click(canvas.getByRole('button', { name: /^Carte/ }))
+    await expect(bar).not.toHaveClass('ds-map-top-bar--solid')
   },
 }
 

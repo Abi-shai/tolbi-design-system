@@ -54,9 +54,21 @@ export interface MapTopBarView {
  * what « Télécharger » holds, and the account is in the module's menu.
  * Every control is `sm`.
  *
+ * **Off the map, the bar is opaque** (ADR-0223). On a view that replaces the
+ * map — Analytics — a glass bar casting a shadow on a page of data reads wrong:
+ * `surface="solid"` is `bg-default`, nothing blurred, **no shadow**, the
+ * `border-inset` rule alone, and its controls leave the glass too — the
+ * `--on-glass-*` it hands down are reset, so the switch, the icons' hover and
+ * open state and the basemap's trigger fall back on their values off the map.
+ * Unset, the surface is **derived from `view`**: the first view is the map
+ * (« Carte | Analytics »), any other is `solid`. The ground and the shadow fade
+ * over `enter`, `easing-out`; nothing moves.
+ *
  * The map's instruments move down under it: on the map's container, the product
  * sets `--ds-map-overlay-top: calc(3.5rem + var(--ds-spacing-lg))`.
  */
+export type MapTopBarSurface = 'glass' | 'solid'
+
 interface Props {
   /** The module the project belongs to — its mark at the start. */
   module?: ModuleName
@@ -99,6 +111,11 @@ interface Props {
   /** « Partager »: shown, it emits `share`. */
   share?: boolean
   shareLabel?: string
+  /**
+   * `glass` over the map, `solid` over a view that replaces it (ADR-0223).
+   * Unset: derived from `view` — the first view is the map, any other `solid`.
+   */
+  surface?: MapTopBarSurface
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -123,6 +140,7 @@ const props = withDefaults(defineProps<Props>(), {
   downloadLabel: 'Télécharger',
   share: true,
   shareLabel: 'Partager',
+  surface: undefined,
 })
 
 const emit = defineEmits<{
@@ -149,6 +167,11 @@ const slots = defineSlots<{
 
 const moduleOpen = ref(false)
 const downloadsOpen = ref(false)
+
+/* The first view is the map: off it, the bar leaves the glass (ADR-0223). */
+const solid = computed(() =>
+  props.surface ? props.surface === 'solid' : props.views.length > 0 && props.view !== undefined && props.view !== props.views[0].value,
+)
 
 const moduleName = computed(() => props.moduleLabel ?? props.module)
 
@@ -181,7 +204,7 @@ onBeforeUnmount(() => observer?.disconnect())
 </script>
 
 <template>
-  <header class="ds-map-top-bar">
+  <header class="ds-map-top-bar" :class="{ 'ds-map-top-bar--solid': solid }">
     <div class="ds-map-top-bar__start">
       <Dropdown
         v-if="module && $slots['module-menu']"
@@ -315,6 +338,13 @@ onBeforeUnmount(() => observer?.disconnect())
   background: var(--ds-bg-map-read);
   -webkit-backdrop-filter: var(--ds-backdrop-map-read);
   backdrop-filter: var(--ds-backdrop-map-read);
+  /* Glass ↔ solid (ADR-0223): the ground and the shadow fade, nothing moves.
+     The shadow is the bar's elevation, not a focus ring. */
+  /* token-lint-disable-next-line focus-ring-instant — the bar's elevation fading with its ground, not a focus ring (ADR-0223) */
+  transition:
+    background-color var(--ds-motion-duration-enter) var(--ds-motion-easing-out),
+    box-shadow var(--ds-motion-duration-enter) var(--ds-motion-easing-out),
+    backdrop-filter var(--ds-motion-duration-enter) var(--ds-motion-easing-out);
   /* What it holds takes the glass's levels (ADR-0172/0173): the switch's
      recessed rail and raised pill, the focus ring, and the veil an open menu
      wears — `bg-hover` is the glass's own white (ADR-0216). */
@@ -329,6 +359,28 @@ onBeforeUnmount(() => observer?.disconnect())
   --on-glass-field-bg: var(--ds-bg-map-raised);
   --on-glass-field-border: color-mix(in srgb, var(--ds-text-strong) 16%, transparent);
   --on-glass-field-shadow: var(--ds-elevation-map-raised);
+}
+
+/* Off the map (ADR-0223): opaque, nothing blurred, no shadow — the rule alone.
+   What it holds leaves the glass too: the context it hands down is reset, so
+   each control falls back on its value off the map (rail `bg-neutral-subtle`,
+   pill `bg-default` + `elevation-surface`, hover `bg-hover`). */
+.ds-map-top-bar--solid {
+  box-shadow: inset 0 calc(-1 * var(--ds-border-width-default)) 0 var(--ds-border-inset);
+  background: var(--ds-bg-default);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  /* token-lint-disable-next-line no-shadowing-var — back to the role's own value off the glass (ADR-0223) */
+  --ds-text-subtlest: inherit;
+  --on-glass-focus: initial;
+  --on-glass-hover: initial;
+  --on-glass-sunk: initial;
+  --on-glass-sunk-border: initial;
+  --on-glass-raised: initial;
+  --on-glass-raised-shadow: initial;
+  --on-glass-field-bg: initial;
+  --on-glass-field-border: initial;
+  --on-glass-field-shadow: initial;
 }
 
 /* Less transparency asked for: the same bar, opaque, nothing blurred (ADR-0172). */

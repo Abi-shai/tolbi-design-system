@@ -30,6 +30,6 @@ export { flyGlyphs, clusterArrive, clusterLeave, quarterZoom, legibleZoom, creat
 export type { MapPoint, MapGlyphFlight, MapRelay, MapRelaySwap, MapRelayWeights } from './mapMotion'
 export type { MapPointerAt } from './usePointerPlace'
 export { default as MapTopBar } from './MapTopBar.vue'
-export type { MapTopBarView } from './MapTopBar.vue'
+export type { MapTopBarView, MapTopBarSurface } from './MapTopBar.vue'
 export { default as MapBasemapPicker } from './MapBasemapPicker.vue'
 export type { MapBasemapOption } from './MapBasemapPicker.vue'
