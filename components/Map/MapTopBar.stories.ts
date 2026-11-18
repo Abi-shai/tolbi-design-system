@@ -150,7 +150,7 @@ export const Actions: Story = {
 /**
  * L’entrée et la sortie (`BarTransition`) : la barre globale remonte et s’efface, la surface s’étend aux bords ; la
  * carte reste seule 800 ms, puis la barre du projet s’ouvre en hauteur et son contenu arrive après (`variant="reveal"`,
- * ADR-0217). En sortant, la barre du projet remonte et celle de l’app redescend (`slide`). Les deux barres partagent
+ * ADR-0217). En sortant, la barre du projet remonte et celle de l’app monte de 8 px en apparaissant (`rise`, ADR-0218). Les deux barres partagent
  * une même case.
  */
 export const EnterAndLeave: Story = {
@@ -168,7 +168,7 @@ export const EnterAndLeave: Story = {
         transition: 'padding var(--ds-motion-duration-considered) var(--ds-motion-easing-in-out)',
       }">
         <div style="display:grid; position:relative; z-index:2">
-          <BarTransition :variant="inProject ? 'reveal' : 'slide'">
+          <BarTransition :variant="inProject ? 'reveal' : 'rise'">
             <div v-if="!inProject" key="app" style="grid-area:1 / 1">
               <HorizontalNavigation module="Inset" :breadcrumbs="[{ label: 'Projets' }]" user-initials="AD" />
             </div>

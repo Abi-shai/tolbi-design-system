@@ -12,9 +12,10 @@ const meta: Meta<typeof BarTransition> = {
       description: {
         component:
           'Une barre qui cède le haut de la page à une autre (ADR-0216) : en entrant dans un projet SIG, la barre de ' +
-          'l’application remonte et s’efface (`enter`, accélération), la barre du projet descend à sa place (`process`, ' +
-          'décélération) un `enter` plus tard ; à l’inverse en sortant. Les deux barres partagent une même case. Sous ' +
-          'mouvement réduit, rien ne voyage ni n’attend.',
+          'l’application remonte et s’efface (`enter`, accélération) ; la carte reste seule, puis la barre du projet ' +
+          's’ouvre en hauteur (`variant="reveal"`, ADR-0217). En sortant, la barre du projet remonte et celle de ' +
+          'l’application monte de 8 px en apparaissant (`rise`, par défaut, ADR-0218) : un seul mouvement vers le haut. ' +
+          'Les deux barres partagent une même case. Sous mouvement réduit, rien ne voyage ni n’attend.',
       },
     },
   },

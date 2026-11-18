@@ -10,9 +10,12 @@ import { computed } from 'vue'
  * The leaver **rises and fades** over `enter`, accelerating (`easing-in`).
  * How the arriver comes is the `variant`, read when it enters:
  *
- * - **`slide`** — it comes down and fades in over `process`, decelerating
- *   (`easing-out`), **one `enter` later**: an arrival waits for its place to be
- *   free (ADR-0049). The owner's 260 / 320 / 200ms on the scale's 200 / 300 / 200.
+ * - **`rise`** (default, ADR-0218) — it **comes up 8px** (`spacing-md`) and
+ *   fades in over `process`, decelerating (`easing-out`), **one `quick`
+ *   later**: the app's bar coming back as the project's leaves. Both move up —
+ *   one way, one gesture; 0.167's bar coming *down* while the other rose read
+ *   as two movements against each other. `SwapTransition rise`'s mechanism.
+ *   (`slide`, its 0.167 name, is read as `rise`.)
  * - **`reveal`** (ADR-0217) — the project's bar on entering a map: the map alone
  *   for **`hold`** (800ms), then the bar **opens its height** from the top edge,
  *   `RevealTransition`'s mechanism (`0fr → 1fr` over `ambient`, `easing-in-out`)
@@ -24,7 +27,7 @@ import { computed } from 'vue'
  *   It clips only while it opens, so a menu overflows normally afterwards.
  *
  * Bind the variant to where the user is going — `reveal` into a project,
- * `slide` back out — so leaving plays as before. The two bars are in the
+ * `rise` back out. The two bars are in the
  * document together while one leaves, so the product lays them in one cell.
  *
  * Under reduced motion, nothing travels and nothing waits: `motion.css` cuts the
@@ -34,13 +37,16 @@ import { computed } from 'vue'
  * slotted element, which carries the parent's scope id.
  */
 interface Props {
-  /** How the arriving bar comes — `slide` down, or `reveal` its height after a hold (ADR-0217). */
-  variant?: 'slide' | 'reveal'
+  /**
+   * How the arriving bar comes — `rise` 8px into place (ADR-0218), or `reveal`
+   * its height after a hold (ADR-0217). `slide` is 0.167's name for `rise`.
+   */
+  variant?: 'rise' | 'reveal' | 'slide'
   /** `reveal` only: how long the map stays alone before the bar opens, in ms. */
   hold?: number
 }
 
-const props = withDefaults(defineProps<Props>(), { variant: 'slide', hold: 800 })
+const props = withDefaults(defineProps<Props>(), { variant: 'rise', hold: 800 })
 
 const enter = computed(() => (props.variant === 'reveal' ? 'ds-bar-reveal' : 'ds-bar'))
 
@@ -68,10 +74,12 @@ function afterEnter(el: Element) {
 </template>
 
 <style>
+/* Rise (ADR-0218): up 8px and in, one `quick` after the leaver starts — both
+   bars move up, the leaver out through the top, the arriver into its place. */
 .ds-bar-enter-active {
   transition:
-    transform var(--ds-motion-duration-process) var(--ds-motion-easing-out) var(--ds-motion-duration-enter),
-    opacity var(--ds-motion-duration-process) var(--ds-motion-easing-out) var(--ds-motion-duration-enter);
+    transform var(--ds-motion-duration-process) var(--ds-motion-easing-out) var(--ds-motion-duration-quick),
+    opacity var(--ds-motion-duration-process) var(--ds-motion-easing-out) var(--ds-motion-duration-quick);
 }
 
 .ds-bar-leave-active {
@@ -80,9 +88,13 @@ function afterEnter(el: Element) {
     opacity var(--ds-motion-duration-enter) var(--ds-motion-easing-in);
 }
 
-.ds-bar-enter-from,
 .ds-bar-leave-to {
   transform: translateY(-100%);
+  opacity: 0;
+}
+
+.ds-bar-enter-from {
+  transform: translateY(var(--ds-spacing-md));
   opacity: 0;
 }
 

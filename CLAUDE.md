@@ -1787,6 +1787,10 @@ Before working on any component, read:
   and in over `considered` / `out`, one `enter` later. The product binds `reveal` into a project, `slide` out. `MapTopBar`
   says its 56 as a **row** and draws its rule as an **inset shadow** (a height and a border were floors: 1px held over
   the map). Filmed: 0px during the hold, open 1000 → 1600ms, `overflow` visible after.
+- **ADR-0218**: **leaving, both bars move up** — 0.167's app bar coming *down* while the project's rose read as two
+  movements against each other: `BarTransition`'s default arrival is now **`rise`** — up `spacing-md` and in over
+  `process` / `out`, one `quick` after the leaver starts (`SwapTransition rise`'s mechanism). `slide` (0.167) is read
+  as `rise`. Filmed: both translations only decrease; the app's bar settles at 404ms.
 
 ## Architecture
 
