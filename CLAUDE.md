@@ -1810,6 +1810,13 @@ Before working on any component, read:
   basemap as a 28px framed thumbnail, open = brand ring + halo, a panel of 72px thumbnails, current on `bg-selected`
   ringed `border-brand-solid`, images the product's); **the file** (`#downloads`, 16rem, and Partager). ⋯ and the
   profile are **removed** (wip, no adopter).
+- **ADR-0222**: **the basemap on a tray** (track B4) — `MapBasemapPicker`'s panel is the home page's `Tray`, floating:
+  `Dropdown` gains **`surface: 'menu' | 'tray'`** (a `Tray` titled with `label`, the panel keeping only `elevation-overlay`
+  and the curve; a tray is a `dialog`, no header/footer). Tiles of **7.5rem** in a row (`spacing-sm`), picture **4:3**
+  `radius-control` with an inset hairline, name `label-md` `text-strong` centred, `spacing-xs` in, `radius-surface-sm`;
+  the active one keeps ADR-0050 on the whole tile (`bg-selected`, picture ringed `border-brand-solid` 2px,
+  `label-md-strong` `text-on-brand-subtle`, no check); hover `--on-tray-hover`. A `radiogroup`: arrows move the choice
+  and stay open, a press chooses and closes.
 
 ## Architecture
 

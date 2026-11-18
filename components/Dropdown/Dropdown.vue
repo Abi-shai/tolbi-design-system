@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { SurfaceTransition } from '../SurfaceTransition'
-import { nextTick, ref, onMounted, onUnmounted, provide } from 'vue'
+import { computed, nextTick, ref, onMounted, onUnmounted, provide } from 'vue'
 import { useAnchoredSurface } from '../../composables/useAnchoredSurface'
 import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
 import { Scrollbar } from '../Scrollbar'
+import { Tray } from '../Tray'
 import DropdownTrigger from './DropdownTrigger.vue'
 import { DROPDOWN_ROLE_KEY, DROPDOWN_SIZE_KEY, type DropdownSize } from './context'
 
@@ -74,6 +75,15 @@ interface Props {
    * a calendar) says how wide it needs to be (ADR-0110).
    */
   width?:      string
+  /**
+   * What the panel is drawn as (ADR-0222). `menu`, the catalogue's white panel.
+   * `tray`, the home page's tray (`Tray`) floating over the page: its grey
+   * ground, its hairline and `radius-surface-lg`, **titled with `label`**, the
+   * content on its white surface, under `elevation-overlay` — for a choice laid
+   * out as tiles rather than rows (`MapBasemapPicker`). A tray holds no
+   * `#header`, `#footer` or user header, and is a `dialog`.
+   */
+  surface?:    'menu' | 'tray'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -86,10 +96,13 @@ const props = withDefaults(defineProps<Props>(), {
   side:        'below',
   size:        'md',
   width:       undefined,
+  surface:     'menu',
 })
 
 provide(DROPDOWN_SIZE_KEY, () => props.size)
-provide(DROPDOWN_ROLE_KEY, () => props.role)
+/* A tray is a dialog whatever `role` says: it holds a title, which a menu may not. */
+const panelRole = computed(() => (props.surface === 'tray' ? 'dialog' : props.role))
+provide(DROPDOWN_ROLE_KEY, () => panelRole.value)
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -157,12 +170,12 @@ function onKeyDown(e: KeyboardEvent) {
   into the dialog's `cancel` either.
 */
 function onRootKeyDown(e: KeyboardEvent) {
-  if (props.role === 'menu' && ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) {
+  if (panelRole.value === 'menu' && ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) {
     arrows(e)
     return
   }
   /* A panel that is not a menu has no rows to walk: ↓ on its trigger opens it. */
-  if (props.role === 'dialog' && e.key === 'ArrowDown' && !props.open
+  if (panelRole.value === 'dialog' && e.key === 'ArrowDown' && !props.open
     && !panelEl.value?.contains(document.activeElement)) {
     e.preventDefault()
     emit('update:open', true)
@@ -275,11 +288,15 @@ onUnmounted(() => {
       ref="panelEl"
       popover="manual"
       class="ds-dropdown__panel"
-      :class="{ 'ds-dropdown__panel--sm': size === 'sm' }"
+      :class="{ 'ds-dropdown__panel--sm': size === 'sm', 'ds-dropdown__panel--tray': surface === 'tray' }"
       :style="width ? { '--dropdown-panel-width': width } : undefined"
-      :role="role"
+      :role="panelRole"
       :aria-label="label"
     >
+      <Tray v-if="surface === 'tray'" :title="label" :heading-level="2">
+        <slot />
+      </Tray>
+      <template v-else>
       <!--
         User header. The avatar is decorative — the name beside it names the
         person (ADR-0041) — and it carries no status: it used to say « En ligne »
@@ -320,6 +337,7 @@ onUnmounted(() => {
       <div v-if="$slots.footer" class="ds-dropdown__footer">
         <slot name="footer" />
       </div>
+      </template>
     </div>
     </SurfaceTransition>
   </div>
@@ -399,6 +417,15 @@ onUnmounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+/* A tray (ADR-0222): the Tray draws the ground, the hairline and the corners;
+   the panel keeps only the elevation and clips to the tray's curve. */
+.ds-dropdown__panel--tray {
+  width: var(--dropdown-panel-width, fit-content);
+  background-color: transparent;
+  border: 0;
+  border-radius: var(--ds-radius-surface-lg);
 }
 
 /* ── User ─────────────────────────────────────────────────────────── */

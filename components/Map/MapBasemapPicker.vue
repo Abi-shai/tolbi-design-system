@@ -12,26 +12,38 @@ export interface MapBasemapOption {
 }
 
 /**
- * The basemap, chosen by its picture (ADR-0221). The trigger **is** the active
- * basemap — a 28px thumbnail in a 2px white frame, `radius-inner`, a
- * `border-subtle` hairline and `elevation-control`, the basemap alone with no
- * project data; open, it takes the brand ring (`border-brand-solid`, 2px) and
- * a light halo.
+ * The basemap, chosen by its picture (ADR-0221, its panel drawn again in
+ * ADR-0222). The trigger **is** the active basemap — a 28px thumbnail in a 2px
+ * white frame, `radius-inner`, a `border-subtle` hairline and
+ * `elevation-control`, the basemap alone with no project data; open, it takes
+ * the brand ring (`border-brand-solid`, 2px) and a light halo.
  *
- * The panel, at the trigger's end, lays the basemaps side by side: a 72px
- * thumbnail each, its name under it. The active one is marked as every list in
- * the catalogue marks its current item (ADR-0050) — `bg-selected`, its ink and
- * the strong weight — and its picture ringed in `border-brand-solid` 2px.
+ * **The panel is the home page's tray** (`Dropdown surface="tray"`, track B4):
+ * the grey ground, its hairline and `radius-surface-lg`, titled with `label`
+ * (« Fond de carte », `heading-sm`, as « Derniers projets »), under
+ * `elevation-overlay` because it floats over the map. On its white surface the
+ * basemaps sit in a row, `spacing-sm` apart: a tile each, 7.5rem — the picture
+ * in **4:3**, `radius-control`, an inset `border-subtle` hairline, the name
+ * under it, centred, `label-md` / `text-strong`; `spacing-xs` in,
+ * `radius-surface-sm`. Hover is the tray's (`--on-tray-hover`).
+ *
+ * **The active basemap keeps the package's mark** (ADR-0050), on the whole
+ * tile: `bg-selected`, its picture ringed in `border-brand-solid` at
+ * `border-width-strong`, its name `label-md-strong` / `text-on-brand-subtle`.
+ * No check.
+ *
+ * A dialog holding a radio group: Tab reaches the active basemap, the arrows
+ * move the choice (and the map with it), Enter, Space or a click chooses and
+ * closes, Escape closes and hands the focus back to the trigger.
  *
  * The images are the product's (`src`, or `#thumbnail` for an element of its
- * own); the package draws the frame, the selection and the panel. A menu of
- * radio items: the arrows walk them, Enter chooses, the panel closes.
+ * own); the package draws the frame, the selection and the panel.
  */
 interface Props {
   basemaps: MapBasemapOption[]
   /** The active basemap's `value` — `v-model`. */
   modelValue?: string
-  /** What the control chooses — its name, with the active basemap after it. */
+  /** What the control chooses — the trigger's name (with the active basemap after it) and the tray's title. */
   label?: string
 }
 
@@ -56,10 +68,23 @@ function choose(value: string) {
   emit('update:modelValue', value)
   open.value = false
 }
+
+/* The radio group's arrows (APG): they move the choice and the focus with it,
+   and the panel stays open — only a press closes it. */
+const choicesEl = ref<HTMLElement | null>(null)
+function step(e: KeyboardEvent) {
+  const delta = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key]
+  if (!delta || !props.basemaps.length) return
+  e.preventDefault()
+  const at = props.basemaps.findIndex((b) => b.value === current.value?.value)
+  const to = (at + delta + props.basemaps.length) % props.basemaps.length
+  emit('update:modelValue', props.basemaps[to].value)
+  choicesEl.value?.querySelectorAll<HTMLElement>('[role="radio"]')[to]?.focus()
+}
 </script>
 
 <template>
-  <Dropdown v-if="current" v-model:open="open" align="end" width="fit-content" :label="label">
+  <Dropdown v-if="current" v-model:open="open" align="end" surface="tray" :label="label">
     <template #trigger="{ open: isOpen, toggle }">
       <Tooltip :title="label" placement="bottom-end" :disabled="isOpen">
         <button
@@ -78,15 +103,16 @@ function choose(value: string) {
       </Tooltip>
     </template>
 
-    <div class="ds-map-basemap-picker__choices">
+    <div ref="choicesEl" class="ds-map-basemap-picker__choices" role="radiogroup" :aria-label="label" @keydown="step">
       <button
         v-for="b in basemaps"
         :key="b.value"
         type="button"
-        role="menuitemradio"
+        role="radio"
         class="ds-map-basemap-picker__choice"
         :class="{ 'ds-map-basemap-picker__choice--current': b.value === current.value }"
         :aria-checked="b.value === current.value"
+        :tabindex="b.value === current.value ? 0 : -1"
         @click="choose(b.value)"
       >
         <span class="ds-map-basemap-picker__thumb" aria-hidden="true">
@@ -152,31 +178,33 @@ function choose(value: string) {
   object-fit: cover;
 }
 
-/* ── The panel: the basemaps side by side ─────────────────────────── */
+/* ── The tray's surface: the basemaps in a row ───────────────────── */
 .ds-map-basemap-picker__choices {
   display: flex;
-  gap: var(--ds-spacing-xs);
-  padding: 0 var(--ds-spacing-xs);
+  gap: var(--ds-spacing-sm);
 }
 
 .ds-map-basemap-picker__choice {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--ds-spacing-sm);
-  padding: var(--ds-spacing-sm);
+  align-items: stretch;
+  gap: var(--ds-spacing-xs);
+  width: 7.5rem;
+  padding: var(--ds-spacing-xs);
   border: 0;
-  border-radius: var(--ds-radius-control);
+  border-radius: var(--ds-radius-surface-sm);
   background: transparent;
-  color: var(--ds-text-default);
+  color: var(--ds-text-strong);
   cursor: pointer;
   transition:
     background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),
     box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
 }
 
+/* The tray's hover (ADR-0199), on keyboard focus as on the pointer. */
 .ds-map-basemap-picker__choice:is(:hover, :focus-visible) {
-  background: var(--ds-bg-hover);
+  background: var(--on-tray-hover, var(--ds-bg-hover));
 }
 
 .ds-map-basemap-picker__choice:focus-visible {
@@ -185,9 +213,9 @@ function choose(value: string) {
 }
 
 .ds-map-basemap-picker__thumb {
-  width: 72px;
-  height: 72px;
-  border-radius: var(--ds-radius-inner);
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--ds-radius-control);
 }
 
 /* The hairline over the picture — an inset shadow on the frame is painted
@@ -202,11 +230,15 @@ function choose(value: string) {
 }
 
 .ds-map-basemap-picker__name {
+  overflow: hidden;
   font: var(--ds-font-label-md);
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-/* The current basemap (ADR-0050): its ground, its ink, the strong weight — and
-   its picture ringed in the brand. */
+/* The current basemap (ADR-0050), on the whole tile: its ground, its ink, the
+   strong weight — and its picture ringed in the brand. No check. */
 .ds-map-basemap-picker__choice--current {
   background: var(--ds-bg-selected);
 }

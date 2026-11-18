@@ -137,7 +137,7 @@ export const OnTheMap: Story = {
 
     const basemap = canvas.getByRole('button', { name: 'Fond de carte : TOLBI' })
     await userEvent.click(basemap)
-    await userEvent.click(await page.findByRole('menuitemradio', { name: 'Satellite' }))
+    await userEvent.click(await page.findByRole('radio', { name: 'Satellite' }))
     await expect(canvas.getByRole('button', { name: 'Fond de carte : Satellite' })).toBeTruthy()
 
     const download = canvas.getByRole('button', { name: 'Télécharger' })
