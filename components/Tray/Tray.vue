@@ -75,6 +75,10 @@ const titleId = `ds-tray-title-${useId()}`
 <style scoped>
 .ds-tray {
   box-sizing: border-box;
+  /* A column, so what it holds can take the height it is given (a door's
+     aside, ADR-0231) — the head, then the rest. */
+  display: flex;
+  flex-direction: column;
   width: 100%;
   padding: var(--ds-spacing-md);
   /* A hairline round the tray (ADR-0211): its grey is lost on a white page; the

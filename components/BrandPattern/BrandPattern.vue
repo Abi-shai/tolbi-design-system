@@ -9,8 +9,13 @@ import { marks, placements, stamp, tile } from './tile'
  *
  * `inverse` is the brand sheet — white ink on the dark ground — and it flips
  * with the colour mode, because that is what `inverse` means here (ADR-0029).
+ *
+ * `accent` is a door's ground on the home page (ADR-0231): `bg-accent`, the
+ * yellow a step deeper than the credits' tint, the content in `text-default`,
+ * and the pattern in the brand's ink at **1.2 %** — a ground to be read on, not
+ * the brand sheet, so the pattern is barely there (ADR-0214's value).
  */
-export type BrandPatternSurface = 'inverse' | 'brand' | 'neutral'
+export type BrandPatternSurface = 'inverse' | 'brand' | 'neutral' | 'accent'
 
 /**
  * How big the mark is drawn. Each step doubles it, and `lg` is the brand
@@ -121,6 +126,8 @@ const placement = (x: number, y: number, rotation: number) =>
 }
 
 .ds-brand-pattern__art {
+  /* The ink is the content's colour unless the surface names its own. */
+  color: var(--brand-pattern-ink, currentColor);
   position: absolute;
   inset: 0;
   width: 100%;
@@ -150,6 +157,14 @@ const placement = (x: number, y: number, rotation: number) =>
 
 .ds-brand-pattern--neutral {
   background-color: var(--ds-bg-neutral);
+  color: var(--ds-text-default);
+}
+
+.ds-brand-pattern--accent {
+  --brand-pattern-ink: var(--ds-text-brand);
+  --brand-pattern-ink-alpha: 0.012;
+
+  background-color: var(--ds-bg-accent);
   color: var(--ds-text-default);
 }
 

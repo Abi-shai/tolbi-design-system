@@ -247,6 +247,11 @@
       "$type": "color",
       "$description": "ground — pairs with text-on-accent-subtle. Mirrors Figma bg/accent-subtle. The credits tint: accent is the secondary brand colour, not a status tone"
     },
+    "accent": {
+      "$value": "{color.accent.100}",
+      "$type": "color",
+      "$description": "ground — the accent tint a step deeper than bg-accent-subtle, as bg-neutral is to bg-neutral-subtle: a door's ground on the home page (ADR-0231). Read with text-default / text-strong"
+    },
     "error-solid": {
       "$value": "{color.error.600}",
       "$type": "color",

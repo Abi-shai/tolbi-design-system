@@ -33,9 +33,18 @@ export interface ScrollbarProps {
    * pointer is always there, and a standing bar is noise.
    */
   persistent?: boolean
+  /**
+   * How far the **trailing** edge fades (ADR-0231). `short`, 24px, both ends.
+   * `long`, 64px at the end — `Dialog`'s side panel's foot fade (ADR-0079) —
+   * for a list that runs off its block and must be seen to go on: a door's
+   * list of modules. The leading edge keeps its 24px. A real blur was asked for
+   * and declined: a backdrop filter over moving content is costly, and blur is
+   * the map's glass (ADR-0172), not a page's.
+   */
+  fade?: 'short' | 'long'
 }
 
-const props = withDefaults(defineProps<ScrollbarProps>(), { horizontal: false, shadows: false, persistent: false, mask: false })
+const props = withDefaults(defineProps<ScrollbarProps>(), { horizontal: false, shadows: false, persistent: false, mask: false, fade: 'short' })
 
 /**
  * The native scrollbar is hidden and replaced by an absolutely positioned thumb.
@@ -196,6 +205,7 @@ defineExpose({ viewport })
       'ds-scrollbar--horizontal': horizontal,
       'ds-scrollbar--shadows': shadows && scrollable && !mask,
       'ds-scrollbar--mask': shadows && scrollable && mask,
+      'ds-scrollbar--fade-long': fade === 'long',
       'ds-scrollbar--at-start': atStart,
       'ds-scrollbar--at-end': atEnd,
     }"
@@ -353,6 +363,10 @@ defineExpose({ viewport })
 
 .ds-scrollbar--mask.ds-scrollbar--at-start .ds-scrollbar__viewport { --mask-start: 0px; }
 .ds-scrollbar--mask.ds-scrollbar--at-end .ds-scrollbar__viewport { --mask-end: 0px; }
+
+/* A long trailing fade (ADR-0231): 64px at the end, painted or masked. */
+.ds-scrollbar--fade-long .ds-scrollbar__fade--end { --fade-size: 64px; }
+.ds-scrollbar--mask.ds-scrollbar--fade-long:not(.ds-scrollbar--at-end) .ds-scrollbar__viewport { --mask-end: 64px; }
 
 /* Hide the fade on the edge that has nothing left to reveal. */
 .ds-scrollbar--at-start .ds-scrollbar__fade--start,

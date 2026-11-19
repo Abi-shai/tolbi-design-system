@@ -7,6 +7,7 @@ export { Logo } from './Logo'
 export type { LogoVariant } from './Logo'
 
 export { BrandPattern } from './BrandPattern'
+export { Door } from './Door'
 export type {
   BrandPatternSurface,
   BrandPatternScale,
@@ -109,7 +110,7 @@ export { CreditCoins } from './CreditCoins'
 export { ProjectGlyph } from './ProjectGlyph'
 export { ProjectList } from './ProjectList'
 export type { ProjectListItem } from './ProjectList'
-export { Tray } from './Tray'
+export { Tray, TrayGrid, TrayCell } from './Tray'
 export { ActionList, ActionListItem } from './ActionList'
 export { ArticleCard, ArticleList } from './ArticleCard'
 export type { ArticleListItem } from './ArticleCard'

@@ -247,6 +247,11 @@
       "$type": "color",
       "$description": "ground — 1.15:1 on bg-default — pairs with text-on-accent-subtle"
     },
+    "accent": {
+      "$value": "{color.accent.dark-border}",
+      "$type": "color",
+      "$description": "ground — accent/400 blended into gray-forest/900 to 1.55:1, a step deeper than bg-accent-subtle (ADR-0231). Read with text-default / text-strong"
+    },
     "error-solid": {
       "$value": "{color.error.600}",
       "$type": "color",

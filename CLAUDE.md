@@ -1865,6 +1865,16 @@ Before working on any component, read:
   `MapBasemapPicker`'s current row on **`bg-brand-subtle`** (`-hover` under the pointer), the name `label-lg-strong`
   `text-on-brand-subtle`, the picture **without** its brand ring. Not the solid brand: it would read as the project's
   action beside it in the bar. The other rows, the ring on focus and the geometry unchanged.
+- **ADR-0231**: **the home page's doors** (the credits door, built in the product) — **`Door`** (Structure): `#lead` (its
+  own width, 24rem at most, `spacing-md` further in) and `#aside` (the rest), on **`BrandPattern surface="accent"`**
+  (new: **`bg-accent`** = accent/100, dark accent/dark-border, a step deeper than `bg-accent-subtle`; content
+  `text-default`; ink `text-brand` at 1.2 % via `--brand-pattern-ink`); side by side from **48rem of its own width**
+  (container query), `spacing-4xl` apart, the aside `contain: size` (the statement's height, it scrolls); stacked below,
+  the aside capped at 22rem. **`MetricValue size="xl"`**: figure in **`metric-2xl`** (new, 48/56 semibold; mobile 40/48),
+  unit on the baseline `label-xl` `text-default` `spacing-sm` away, **`caption`** under (`body-md` `text-subtle`), and
+  **`loading`**. **`CreditCoins trim`**: the drawing's box, the scale unchanged (128 → 100 × 59). **`TrayGrid`** + **`TrayCell`**:
+  a white cell per thing on a `Tray :surface="false"` (14rem columns, a value at the cell's end, a `Badge sm dot`);
+  `Tray` is a flex column. **`Scrollbar fade="long"`**: 64px at the end (Dialog side's foot fade) — a blur declined.
 
 ## Architecture
 

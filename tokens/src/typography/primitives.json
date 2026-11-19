@@ -82,6 +82,11 @@
         "$value": "2.5rem",
         "$type": "dimension",
         "$description": "40px — MetricValue lg. Added by ADR-0011"
+      },
+      "48": {
+        "$value": "3rem",
+        "$type": "dimension",
+        "$description": "48px — metric-2xl, the one figure a block is about. Added by ADR-0231"
       }
     },
     "line-height": {
@@ -124,6 +129,11 @@
         "$value": "3rem",
         "$type": "dimension",
         "$description": "48px — pairs with font-size 40"
+      },
+      "56": {
+        "$value": "3.5rem",
+        "$type": "dimension",
+        "$description": "56px — pairs with font-size 48"
       }
     },
     "font-weight": {
