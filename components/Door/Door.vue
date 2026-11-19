@@ -14,8 +14,9 @@ import { BrandPattern } from '../BrandPattern'
  * yellow a step deeper than the credits' tint, the pattern in the brand's ink
  * at 1.2 %, `radius-surface`, `spacing-xl` in.
  *
- * **Side by side** when the door has the room (a container query, 48rem of its
- * own width — the package has no breakpoints), `spacing-4xl` apart: the
+ * **Side by side** when the door has the room (a container query, **40rem** of
+ * its own width — the package has no breakpoints; 48 stacked the home page's
+ * door at 1 440 beside « Actions rapides », 47.25rem, ADR-0233), `spacing-4xl` apart: the
  * statement and its detail answer each other from a distance. **The aside does
  * not grow the row** (`contain: size`): it takes the statement's height and what
  * it holds scrolls inside it. Narrower, the two are stacked, and the aside is
@@ -75,7 +76,7 @@ defineSlots<{
   min-height: 0;
 }
 
-@container (width >= 48rem) {
+@container (width >= 40rem) {
   .ds-door__row {
     flex-direction: row;
     align-items: stretch;

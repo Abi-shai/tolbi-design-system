@@ -31,7 +31,7 @@ const meta: Meta<typeof Door> = {
           'Une porte de l’accueil (ADR-0231) : le bloc qui mène quelque part. Deux zones — `#lead`, le propos (une ' +
           'illustration, un chiffre ou un titre, l’action), à sa largeur, 24rem au plus ; `#aside`, la surface d’à ' +
           'côté, qui prend le reste. Le sol est `BrandPattern surface="accent"`. Côte à côte quand la porte a la place ' +
-          '(48rem, une requête de conteneur), 32 entre eux ; l’aside prend la hauteur du propos et défile dedans. ' +
+          '(40rem, une requête de conteneur), 32 entre eux ; l’aside prend la hauteur du propos et défile dedans. ' +
           'Empilés en dessous.',
       },
     },
@@ -94,7 +94,7 @@ export const Loading: Story = {
   }),
 }
 
-/** Étroite (moins de 48rem) : le propos puis le plateau, empilés ; le plateau plafonné à 22rem. */
+/** Étroite (moins de 40rem) : le propos puis le plateau, empilés ; le plateau plafonné à 22rem. */
 export const Narrow: Story = {
   name: 'Étroite',
   render: () => ({

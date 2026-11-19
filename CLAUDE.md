@@ -1879,6 +1879,9 @@ Before working on any component, read:
   draws its modules at **52** (was 40) in the same 104 square (plate 92 × 66), six a line still; `TrayCell`'s mark is a
   `ModuleIcon logo` at **40** (was 32), its padding `spacing-sm` above and below, so the cell grows 48 → 52. The drawer
   (48), `ProjectList`'s 16 (a label beside the name) and `ProjectCard`'s 32 are checked and left.
+- **ADR-0233**: **a door side by side from 40rem** (amends ADR-0231's 48) — at 1 440 beside « Actions rapides » the home
+  page's door is 47.25rem and stacked; from 40rem of its own width the statement (≤ 24rem) + 32 leave the tray ~14rem, one
+  column of `TrayCell`s. No `stackBelow` prop: the threshold is the door's own decision.
 
 ## Architecture
 
