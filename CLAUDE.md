@@ -1881,7 +1881,8 @@ Before working on any component, read:
   (48), `ProjectList`'s 16 (a label beside the name) and `ProjectCard`'s 32 are checked and left.
 - **ADR-0233**: **a door side by side from 40rem** (amends ADR-0231's 48) — at 1 440 beside « Actions rapides » the home
   page's door is 47.25rem and stacked; from 40rem of its own width the statement (≤ 24rem) + 32 leave the tray ~14rem, one
-  column of `TrayCell`s. No `stackBelow` prop: the threshold is the door's own decision.
+  column of `TrayCell`s. No `stackBelow` prop: the threshold is the door's own decision. `TrayCell`'s badge
+  (« Bas ») has **no dot** (the owner): the word and its tint say it.
 
 ## Architecture
 

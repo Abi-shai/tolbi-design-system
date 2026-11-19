@@ -4,7 +4,7 @@ import { Badge, type BadgeTone } from '../Badge'
 /**
  * One thing on a tray, in its own white cell (ADR-0231): a mark (`#media` — a
  * `ModuleIcon logo` at **40**, ADR-0232), the name in `label-lg-strong`, an optional `Badge`
- * after it (« Bas », a dot), and a **value at the cell's end** in
+ * after it (« Bas » — the word and its tone, **no dot**: the owner, ADR-0233), and a **value at the cell's end** in
  * `label-lg-strong` with tabular figures — a balance, a count. `bg-default`,
  * `radius-surface`, `spacing-sm` / `spacing-lg` in — the mark grew to 40 and the
  * padding gave, so the cell stays near its 48 (52). In a `TrayGrid`.
@@ -33,7 +33,7 @@ defineSlots<{
   <li class="ds-tray-cell">
     <span v-if="$slots.media" class="ds-tray-cell__media" aria-hidden="true"><slot name="media" /></span>
     <span class="ds-tray-cell__label">{{ label }}</span>
-    <Badge v-if="badge" :label="badge" :tone="badgeTone" size="sm" dot class="ds-tray-cell__badge" />
+    <Badge v-if="badge" :label="badge" :tone="badgeTone" size="sm" class="ds-tray-cell__badge" />
     <span v-if="value" class="ds-tray-cell__value">{{ value }}</span>
   </li>
 </template>

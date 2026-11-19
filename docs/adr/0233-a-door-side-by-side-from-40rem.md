@@ -19,6 +19,14 @@ two zones. That leaves the tray about 14rem: one column of `TrayCell`s. `TrayGri
 A `stackBelow` prop was offered and not taken. The threshold is the door's own layout decision, and one door already
 showed that a fixed number was wrong — a prop would hand the next door the same guess.
 
+### No dot in the cell's badge
+
+`TrayCell`'s badge (« Bas ») is drawn **without its dot** (the owner, the same day). The cell had hard-coded `dot`, so
+the product could not remove it.
+
+The word and its error tint say it alone. ADR-0006's rule — tone never carries meaning alone — holds, because the word
+is there.
+
 ## Measured
 
 Storybook, Chromium, the credits door at three widths:
