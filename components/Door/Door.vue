@@ -7,8 +7,14 @@ import { BrandPattern } from '../BrandPattern'
  * component with two zones:
  *
  * - **`#lead`**, the statement: an illustration, a figure or a title, and the
- *   action. It keeps **its own width**, 24rem at most;
+ *   action. It keeps **its own width**, 24rem at most. Its scale is a
+ *   **landmark, not the subject** (ADR-0234, track 3 of four): an illustration
+ *   at 64 (`CreditCoins trim :size="64"`), the figure in `MetricValue lg`, the
+ *   action a `Button md` — ADR-0231's 128 / `xl` / `lg` dominated the door;
  * - **`#aside`**, the surface beside it — a `Tray` — which takes **the rest**.
+ *   The tray there keeps `bg-neutral-subtle` (`--on-door-tray-ground`): on the
+ *   yellow, the lighter grey is the one the door was drawn with, where every
+ *   other tray took `bg-neutral` (ADR-0234).
  *
  * The ground is `BrandPattern surface="accent"` at the sheet's scale: the
  * yellow a step deeper than the credits' tint, the pattern in the brand's ink
@@ -65,6 +71,7 @@ defineSlots<{
 
 /* The surface beside it is a column, so a tray in it can take its height. */
 .ds-door__aside {
+  --on-door-tray-ground: var(--ds-bg-neutral-subtle);
   display: flex;
   flex-direction: column;
   min-width: 0;

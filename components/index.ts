@@ -8,6 +8,7 @@ export type { LogoVariant } from './Logo'
 
 export { BrandPattern } from './BrandPattern'
 export { Door } from './Door'
+export { FileTile } from './FileTile'
 export type {
   BrandPatternSurface,
   BrandPatternScale,
@@ -158,6 +159,7 @@ export { Tabs, TabPanel } from './Tabs'
 export type { TabsSize, TabsItem } from './Tabs'
 
 export { Pagination } from './Pagination'
+export { PageThumbs } from './PageThumbs'
 
 export { PageHeader } from './PageHeader'
 

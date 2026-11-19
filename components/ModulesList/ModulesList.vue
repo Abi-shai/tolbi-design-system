@@ -181,6 +181,9 @@ function current(item: ModulesListItem) {
 }
 
 .ds-modules-list__viewport {
+  /* The white surface is the list's own, not the tray's grey: the fade paints
+     toward it (ADR-0234). */
+  --surface-ground: var(--ds-bg-default);
   /* The inner's top padding, two rows and their gaps, then the peek. */
   max-height: calc(var(--ds-spacing-md) + 2 * var(--modules-list-item) + 2 * var(--ds-spacing-xl) + var(--modules-list-peek));
   /* The cut follows the inner panel's corners rather than slicing it flat. */
@@ -377,7 +380,7 @@ function current(item: ModulesListItem) {
 }
 
 .ds-modules-list--page .ds-modules-list__item:not(.ds-modules-list__item--active):is(:hover, :focus-visible):not(:disabled):not([aria-disabled='true']) .ds-modules-list__plate {
-  background: var(--ds-bg-neutral);
+  background: var(--on-tray-hover, var(--ds-bg-neutral));
 }
 
 .ds-modules-list--page .ds-modules-list__item--active {

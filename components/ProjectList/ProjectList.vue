@@ -187,7 +187,7 @@ function onSelect(item: ProjectListItem, event: MouseEvent) {
 }
 
 .ds-project-list__row--link:is(:hover, :focus-visible) .ds-project-list__picture {
-  background: var(--ds-bg-neutral);
+  background: var(--on-tray-hover, var(--ds-bg-neutral));
 }
 
 @media (prefers-reduced-motion: reduce) {

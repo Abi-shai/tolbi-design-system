@@ -5,13 +5,11 @@ import { Skeleton } from '../Skeleton'
 
 export type MetricTrend = 'up' | 'down' | 'flat'
 /**
- * `xl` is the one figure a block is about (ADR-0231) — a door's total: the
- * figure in `metric-2xl` (48), its unit beside it on the baseline in
- * `label-xl` / `text-default`, `spacing-sm` apart, and what it counts under it
- * (`caption`) in `body-md` / `text-subtle`. No label above it: the unit and
- * the caption say what the figure is.
+ * `lg` is also the one figure a door is about (ADR-0234): ADR-0231's `xl`
+ * (`metric-2xl`, 48) was withdrawn the same day — the figure dominated its
+ * block, and the product went the other way.
  */
-export type MetricSize = 'sm' | 'md' | 'lg' | 'xl'
+export type MetricSize = 'sm' | 'md' | 'lg'
 
 interface Props {
   /** Omitted when the block it sits in already names it — a `SectionCard`'s title (ADR-0097). */
@@ -136,33 +134,9 @@ const arrow = computed(() =>
    16px, held by a role a step down since ADR-0144 (body-lg went to 18). */
 .ds-metric--lg .ds-metric__unit { font: var(--ds-font-body-md); line-height: 1; }
 
-/* xl (ADR-0231): the one figure a block is about. The unit sits on the figure's
-   baseline `spacing-sm` away, in the reading ink a step down; what the figure
-   counts goes under it, 2px below — one statement, three sizes. */
-.ds-metric--xl {
-  gap: var(--ds-spacing-xxs);
-}
-
-.ds-metric--xl .ds-metric__value {
-  font: var(--ds-font-metric-2xl);
-  letter-spacing: var(--ds-letter-spacing-metric-2xl);
-  font-variant-numeric: tabular-nums;
-}
-
-.ds-metric--xl .ds-metric__unit {
-  margin-left: var(--ds-spacing-sm);
-  font: var(--ds-font-label-xl);
-  letter-spacing: normal;
-  color: var(--ds-text-default);
-}
-
 .ds-metric__caption {
   font: var(--ds-font-body-sm);
   color: var(--ds-text-subtle);
-}
-
-.ds-metric--xl .ds-metric__caption {
-  font: var(--ds-font-body-md);
 }
 
 /* The placeholder sits on the figure's line, as wide as a few digits. */

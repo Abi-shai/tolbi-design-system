@@ -42,9 +42,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /**
- * La porte des crédits : à gauche les pièces (`CreditCoins trim` à 128), le total en `MetricValue size="xl"` — le
- * chiffre et son unité, la portée dessous — et « Recharger » ; à droite le plateau « Par module », une case blanche par
- * module (`TrayGrid`, `TrayCell`), les bas d’abord. La liste défile dans le plateau, son bout s’efface sur 64px.
+ * La porte des crédits, à l’échelle d’un repère (ADR-0234, piste 3) : à gauche les pièces (`CreditCoins trim` à 64)
+ * et le total en `MetricValue lg`, serrés, puis « Ajouter des crédits » (`Button md`) ; à droite le plateau « Crédits
+ * par module », une case blanche par module (`TrayGrid`, `TrayCell`) sur deux colonnes, les bas d’abord. La liste
+ * défile dans le plateau, son bout s’efface sur 64px.
  */
 export const Credits: Story = {
   name: 'La porte des crédits',
@@ -54,12 +55,14 @@ export const Credits: Story = {
     template: `
       <Door>
         <template #lead>
-          <CreditCoins :size="128" trim />
-          <MetricValue size="xl" value="874 314" unit="crédits" caption="pour tous les modules" />
-          <Button label="Recharger" size="lg" href="#recharger" />
+          <div style="display:flex;flex-direction:column;gap:var(--ds-spacing-lg)">
+            <CreditCoins :size="64" trim />
+            <MetricValue size="lg" value="874 314" unit="crédits" />
+          </div>
+          <Button label="Ajouter des crédits" size="md" href="#recharger" />
         </template>
         <template #aside>
-          <Tray title="Par module" :heading-level="3" :surface="false">
+          <Tray title="Crédits par module" :heading-level="3" :surface="false">
             <template #action><Button label="Voir les détails" variant="link" size="sm" icon-trailing="arrow-right" href="#details" /></template>
             <TrayGrid label="Crédits par module">
               <TrayCell v-for="m in MODULES" :key="m.module" :label="m.label" :value="m.credits" :badge="m.low ? 'Bas' : undefined" badge-tone="error">
@@ -73,8 +76,7 @@ export const Credits: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole('list', { name: 'Crédits par module' })).toBeTruthy()
-    await expect(canvas.getByText('pour tous les modules')).toBeTruthy()
-    await expect(canvas.getByRole('heading', { name: 'Par module' })).toBeTruthy()
+    await expect(canvas.getByRole('heading', { name: 'Crédits par module' })).toBeTruthy()
   },
 }
 
@@ -86,9 +88,11 @@ export const Loading: Story = {
     template: `
       <Door>
         <template #lead>
-          <CreditCoins :size="128" trim />
-          <MetricValue size="xl" value="" loading unit="crédits" caption="pour tous les modules" />
-          <Button label="Recharger" size="lg" />
+          <div style="display:flex;flex-direction:column;gap:var(--ds-spacing-lg)">
+            <CreditCoins :size="64" trim />
+            <MetricValue size="lg" value="" loading unit="crédits" />
+          </div>
+          <Button label="Ajouter des crédits" size="md" />
         </template>
       </Door>`,
   }),
@@ -104,12 +108,14 @@ export const Narrow: Story = {
       <div style="max-width:30rem">
         <Door>
           <template #lead>
-            <CreditCoins :size="128" trim />
-            <MetricValue size="xl" value="874 314" unit="crédits" caption="pour tous les modules" />
-            <Button label="Recharger" size="lg" />
+            <div style="display:flex;flex-direction:column;gap:var(--ds-spacing-lg)">
+              <CreditCoins :size="64" trim />
+              <MetricValue size="lg" value="874 314" unit="crédits" />
+            </div>
+            <Button label="Ajouter des crédits" size="md" />
           </template>
           <template #aside>
-            <Tray title="Par module" :heading-level="3" :surface="false">
+            <Tray title="Crédits par module" :heading-level="3" :surface="false">
               <TrayGrid label="Crédits par module">
                 <TrayCell v-for="m in MODULES" :key="m.module" :label="m.label" :value="m.credits" :badge="m.low ? 'Bas' : undefined" badge-tone="error">
                   <template #media><ModuleIcon :module="m.module" variant="logo" :size="40" :aria-label="null" /></template>

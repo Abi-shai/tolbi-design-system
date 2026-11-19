@@ -60,11 +60,6 @@
       "$type": "dimension",
       "$description": "Dashboard hero KPI. Needs tabular-nums"
     },
-    "metric-2xl": {
-      "$value": "{typography.font-size.48}",
-      "$type": "dimension",
-      "$description": "The one figure a block is about — a door's total (ADR-0231). Needs tabular-nums"
-    },
     "body-lg-emphasis": {
       "$value": "{typography.font-size.18}",
       "$type": "dimension",
@@ -150,10 +145,6 @@
       "$value": "{typography.line-height.48}",
       "$type": "dimension"
     },
-    "metric-2xl": {
-      "$value": "{typography.line-height.56}",
-      "$type": "dimension"
-    },
     "body-lg-emphasis": {
       "$value": "{typography.line-height.28}",
       "$type": "dimension"
@@ -235,11 +226,6 @@
       "$type": "dimension",
       "$description": "40px → -1%"
     },
-    "metric-2xl": {
-      "$value": "{typography.letter-spacing.tighter}",
-      "$type": "dimension",
-      "$description": "48px → -1%"
-    },
     "body-lg-emphasis": {
       "$value": "{typography.letter-spacing.none}",
       "$type": "dimension"
@@ -319,11 +305,6 @@
     "metric-xl": {
       "$value": "{typography.font-weight.semibold}",
       "$type": "fontWeight"
-    },
-    "metric-2xl": {
-      "$value": "{typography.font-weight.semibold}",
-      "$type": "fontWeight",
-      "$description": "600, not 700: 700 at 40 was tried and read too heavy (ADR-0231); and there is no Bold (ADR-0003)"
     },
     "body-lg-emphasis": {
       "$value": "{typography.font-weight.medium}",

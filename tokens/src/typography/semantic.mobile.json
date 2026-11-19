@@ -50,10 +50,6 @@
       "$value": "{typography.font-size.32}",
       "$type": "dimension"
     },
-    "metric-2xl": {
-      "$value": "{typography.font-size.40}",
-      "$type": "dimension"
-    },
     "body-lg-emphasis": {
       "$value": "{typography.font-size.17}",
       "$type": "dimension"
@@ -130,10 +126,6 @@
     },
     "metric-xl": {
       "$value": "{typography.line-height.40}",
-      "$type": "dimension"
-    },
-    "metric-2xl": {
-      "$value": "{typography.line-height.48}",
       "$type": "dimension"
     },
     "body-lg-emphasis": {

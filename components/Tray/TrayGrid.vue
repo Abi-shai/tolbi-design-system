@@ -8,8 +8,9 @@ import { Scrollbar } from '../Scrollbar'
  *
  * The cells run in columns of **at least `minColumn`** (14rem), one, two or
  * three as the room allows, `spacing-sm` apart. The list scrolls in the
- * package's `Scrollbar` — the content fading under a mask, the trailing fade
- * **long** (64px) so a list cut by its block reads as going on — and the bar
+ * package's `Scrollbar` — the content fading under a mask, 24px at each end
+ * (ADR-0234: ADR-0231's 64px washed out a whole 52px row once the door's
+ * list ran on two columns, four modules showing and the second two greyed) — and the bar
  * runs in a gutter of its own, never over the figures. Given a height (a
  * door's aside), it takes it; otherwise it is as tall as its cells, capped by
  * `maxHeight`.
@@ -33,7 +34,7 @@ defineSlots<{
 </script>
 
 <template>
-  <Scrollbar shadows mask fade="long" :max-height="maxHeight" class="ds-tray-grid">
+  <Scrollbar shadows mask :max-height="maxHeight" class="ds-tray-grid">
     <ul class="ds-tray-grid__cells" :aria-label="label" :style="{ '--tray-grid-column': minColumn }">
       <slot />
     </ul>

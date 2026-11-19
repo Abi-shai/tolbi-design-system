@@ -1870,7 +1870,7 @@ Before working on any component, read:
   (new: **`bg-accent`** = accent/100, dark accent/dark-border, a step deeper than `bg-accent-subtle`; content
   `text-default`; ink `text-brand` at 1.2 % via `--brand-pattern-ink`); side by side from **48rem of its own width**
   (container query), `spacing-4xl` apart, the aside `contain: size` (the statement's height, it scrolls); stacked below,
-  the aside capped at 22rem. **`MetricValue size="xl"`**: figure in **`metric-2xl`** (new, 48/56 semibold; mobile 40/48),
+  the aside capped at 22rem. **`MetricValue size="xl"`** (withdrawn by ADR-0234): figure in **`metric-2xl`** (new, 48/56 semibold; mobile 40/48),
   unit on the baseline `label-xl` `text-default` `spacing-sm` away, **`caption`** under (`body-md` `text-subtle`), and
   **`loading`**. **`CreditCoins trim`**: the drawing's box, the scale unchanged (128 → 100 × 59). **`TrayGrid`** + **`TrayCell`**:
   a white cell per thing on a `Tray :surface="false"` (14rem columns, a value at the cell's end, a `Badge sm dot`);
@@ -1883,6 +1883,17 @@ Before working on any component, read:
   page's door is 47.25rem and stacked; from 40rem of its own width the statement (≤ 24rem) + 32 leave the tray ~14rem, one
   column of `TrayCell`s. No `stackBelow` prop: the threshold is the door's own decision. `TrayCell`'s badge
   (« Bas ») has **no dot** (the owner): the word and its tint say it.
+- **ADR-0234**: **a darker tray, a smaller door, what « Rapporter » drew alone** — `Tray` on **`bg-neutral`** (grey 50
+  barely left the page); `--on-tray-hover` → new **`bg-neutral-hover`** (gray-light 200 / gray-forest 600; at the ground's
+  grey a hovered row was a hole), the plates' hover reads it; `Door` keeps its tray on `bg-neutral-subtle`
+  (`--on-door-tray-ground`). The door's lead is a landmark: coins 64, `MetricValue lg`, `Button md` — two columns, four
+  modules; **`MetricValue xl` and `metric-2xl` deleted** (no consumer); `TrayGrid`'s fade back to 24px (64 washed a whole
+  row). `Tray` gains **`bleed="bottom"`** (top corners, no bottom edge or padding, the surface open), **`badge`/`badgeTone`**
+  and **`#footer`** (`Dialog`'s foot: inset rule, full-width action, the content in `Scrollbar fade="long"`). Fades read
+  **`--surface-ground`** (Tray, Dialog, Scrollbar; MapPanel masks). **`FileTile`** (picture 16/10 in the basemap frame,
+  name, format; the whole tile chooses, `aria-current`; download `IconButton xs surface` on hover/focus-visible/touch;
+  active = brand tint + raised + ringed picture) and **`PageThumbs`** (`v-model` from 1, `#page`, A4, the page on screen
+  in the same mark, `aria-current="page"`, kept in view), both `Navigation`.
 
 ## Architecture
 

@@ -167,6 +167,11 @@
       "$type": "color",
       "$description": "ground — deeper recess"
     },
+    "neutral-hover": {
+      "$value": "{color.gray-light.200}",
+      "$type": "color",
+      "$description": "state — hover on bg-neutral: what is clickable on a tray's white surface (ADR-0234). At bg-neutral itself a hovered row read as a hole through the surface, once the tray took bg-neutral"
+    },
     "neutral-strong": {
       "$value": "{color.gray-light.300}",
       "$type": "color",

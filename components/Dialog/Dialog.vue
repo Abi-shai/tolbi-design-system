@@ -564,7 +564,10 @@ function onClick(event: MouseEvent) {
   overflow: hidden;
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-surface);
-  background: var(--ds-bg-default);
+  /* The ground its fades paint toward (ADR-0234), handed down — a dialog
+     opened inside a tray must not inherit the tray's grey. */
+  --surface-ground: var(--ds-bg-default);
+  background: var(--surface-ground);
   box-shadow: var(--ds-elevation-overlay);
   outline: none;
 }
@@ -1018,11 +1021,13 @@ function onClick(event: MouseEvent) {
   bottom: 100%;
   left: var(--ds-spacing-2xl);
   height: var(--ds-spacing-7xl);
+  /* Toward the surface's ground, never a literal white (ADR-0234): a foot on
+     a grey drew a white band. */
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--ds-bg-default) 0%, transparent),
-    color-mix(in srgb, var(--ds-bg-default) 70%, transparent) 45%,
-    var(--ds-bg-default)
+    color-mix(in srgb, var(--surface-ground, var(--ds-bg-default)) 0%, transparent),
+    color-mix(in srgb, var(--surface-ground, var(--ds-bg-default)) 70%, transparent) 45%,
+    var(--surface-ground, var(--ds-bg-default))
   );
   opacity: 0;
   pointer-events: none;

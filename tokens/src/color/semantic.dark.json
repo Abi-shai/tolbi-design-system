@@ -167,6 +167,11 @@
       "$type": "color",
       "$description": "ground — deeper recess"
     },
+    "neutral-hover": {
+      "$value": "{color.gray-forest.600}",
+      "$type": "color",
+      "$description": "state — hover on bg-neutral (ADR-0234): one step past the tray's ground"
+    },
     "neutral-strong": {
       "$value": "{color.gray-forest.600}",
       "$type": "color",

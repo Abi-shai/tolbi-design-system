@@ -36,8 +36,9 @@ export interface ScrollbarProps {
   /**
    * How far the **trailing** edge fades (ADR-0231). `short`, 24px, both ends.
    * `long`, 64px at the end — `Dialog`'s side panel's foot fade (ADR-0079) —
-   * for a list that runs off its block and must be seen to go on: a door's
-   * list of modules. The leading edge keeps its 24px. A real blur was asked for
+   * for content that runs off its block above a foot: a `Tray`'s `#footer`
+   * (ADR-0234; a door's list took it first and gave it back — 64px washed out
+   * a whole row). The leading edge keeps its 24px. A real blur was asked for
    * and declined: a backdrop filter over moving content is costly, and blur is
    * the map's glass (ADR-0172), not a page's.
    */
@@ -338,7 +339,7 @@ defineExpose({ viewport })
   opacity: 1;
   transition: opacity var(--ds-motion-duration-moderate) var(--ds-motion-easing-default);
   /* Fades to the surface behind, which the consumer can override. */
-  --fade-color: var(--ds-bg-default);
+  --fade-color: var(--surface-ground, var(--ds-bg-default));
   --fade-size: 24px;
 }
 

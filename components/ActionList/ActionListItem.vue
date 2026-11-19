@@ -154,7 +154,7 @@ function onClick(event: MouseEvent) {
 }
 
 .ds-action-list-item__row:is(:hover, :focus-visible) .ds-action-list-item__plate {
-  --on-plate-ground: var(--ds-bg-neutral);
+  --on-plate-ground: var(--on-tray-hover, var(--ds-bg-neutral));
 }
 
 @media (prefers-reduced-motion: reduce) {
