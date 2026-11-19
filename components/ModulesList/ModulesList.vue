@@ -110,7 +110,7 @@ function current(item: ModulesListItem) {
               <ModuleIcon
                 :module="mod.name"
                 variant="illustration"
-                :size="layout === 'page' ? 40 : 48"
+                :size="layout === 'page' ? 52 : 48"
                 :aria-label="null"
               />
             </span>
@@ -304,7 +304,7 @@ function current(item: ModulesListItem) {
 
   Amended (ADR-0167): a **launcher**, not a row. The 56px rows with their
   drawings at 32 read small on the home page, so each module is a block, its
-  drawing (40) over its name, centred. **A fixed square of 104** (amended
+  drawing (52 since ADR-0232, was 40) over its name, centred. **A fixed square of 104** (amended
   again): stretched to fill the line, the blocks were out of proportion
   (176 × 96 at 1 440px, wider still on a large screen), so the block keeps
   its size and the line takes as many as fit, from the start — no ceiling. Six a line at most,

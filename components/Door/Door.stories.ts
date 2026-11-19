@@ -63,7 +63,7 @@ export const Credits: Story = {
             <template #action><Button label="Voir les détails" variant="link" size="sm" icon-trailing="arrow-right" href="#details" /></template>
             <TrayGrid label="Crédits par module">
               <TrayCell v-for="m in MODULES" :key="m.module" :label="m.label" :value="m.credits" :badge="m.low ? 'Bas' : undefined" badge-tone="error">
-                <template #media><ModuleIcon :module="m.module" variant="logo" :size="32" :aria-label="null" /></template>
+                <template #media><ModuleIcon :module="m.module" variant="logo" :size="40" :aria-label="null" /></template>
               </TrayCell>
             </TrayGrid>
           </Tray>
@@ -112,7 +112,7 @@ export const Narrow: Story = {
             <Tray title="Par module" :heading-level="3" :surface="false">
               <TrayGrid label="Crédits par module">
                 <TrayCell v-for="m in MODULES" :key="m.module" :label="m.label" :value="m.credits" :badge="m.low ? 'Bas' : undefined" badge-tone="error">
-                  <template #media><ModuleIcon :module="m.module" variant="logo" :size="32" :aria-label="null" /></template>
+                  <template #media><ModuleIcon :module="m.module" variant="logo" :size="40" :aria-label="null" /></template>
                 </TrayCell>
               </TrayGrid>
             </Tray>

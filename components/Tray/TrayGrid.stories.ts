@@ -41,7 +41,7 @@ export const Default: Story = {
         <Tray title="Par module" :heading-level="3" :surface="false">
           <TrayGrid label="Crédits par module" max-height="13rem">
             <TrayCell v-for="[m, v, low] in ITEMS" :key="m" :label="m" :value="v" :badge="low ? 'Bas' : undefined" badge-tone="error">
-              <template #media><ModuleIcon :module="m" variant="logo" :size="32" :aria-label="null" /></template>
+              <template #media><ModuleIcon :module="m" variant="logo" :size="40" :aria-label="null" /></template>
             </TrayCell>
           </TrayGrid>
         </Tray>

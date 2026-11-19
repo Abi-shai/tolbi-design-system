@@ -1875,6 +1875,10 @@ Before working on any component, read:
   **`loading`**. **`CreditCoins trim`**: the drawing's box, the scale unchanged (128 → 100 × 59). **`TrayGrid`** + **`TrayCell`**:
   a white cell per thing on a `Tray :surface="false"` (14rem columns, a value at the cell's end, a `Badge sm dot`);
   `Tray` is a flex column. **`Scrollbar fade="long"`**: 64px at the end (Dialog side's foot fade) — a blur declined.
+- **ADR-0232**: **larger module marks, in the same cells** (the PM: « trop petit »; track S4) — `ModulesList layout="page"`
+  draws its modules at **52** (was 40) in the same 104 square (plate 92 × 66), six a line still; `TrayCell`'s mark is a
+  `ModuleIcon logo` at **40** (was 32), its padding `spacing-sm` above and below, so the cell grows 48 → 52. The drawer
+  (48), `ProjectList`'s 16 (a label beside the name) and `ProjectCard`'s 32 are checked and left.
 
 ## Architecture
 
