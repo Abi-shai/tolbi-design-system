@@ -264,7 +264,8 @@ const COCKPIT = `<MapLegend v-model:expanded="expanded" title="Indice de stock" 
 */
 const unfolded = (el: HTMLElement) => {
   const region = el.querySelector<HTMLElement>('[role="region"]')
-  return !!region && getComputedStyle(region.parentElement!).visibility === 'visible'
+  /* The fold is laid out only while shown (ADR-0240). */
+  return !!region && getComputedStyle(region.parentElement!).display !== 'none'
 }
 
 async function unfoldsAndStays(canvasElement: HTMLElement, chipName: string) {

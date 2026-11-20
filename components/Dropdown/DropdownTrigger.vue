@@ -125,7 +125,7 @@ withDefaults(defineProps<Props>(), {
     <slot />
     <Icon
       v-if="chevron"
-      :name="open ? 'chevron-up' : 'chevron-down'"
+      :name="open && popup ? 'chevron-up' : 'chevron-down'"
       :size="chrome === 'ghost' || chrome === 'chip' ? 16 : 20"
       class="ds-dropdown-trigger__chevron"
       aria-hidden="true"
@@ -292,6 +292,16 @@ withDefaults(defineProps<Props>(), {
 .ds-dropdown-trigger--chip.ds-dropdown-trigger--disclosure:hover:not(:disabled),
 .ds-dropdown-trigger--chip.ds-dropdown-trigger--disclosure.ds-dropdown-trigger--open {
   background-color: var(--on-glass-hover, var(--ds-bg-hover));
+}
+
+/* A disclosure's chevron turns with what it unfolds (ADR-0240): 180° over the
+   fold's own `process`, `easing-in-out`, instead of swapping its glyph. */
+.ds-dropdown-trigger--disclosure .ds-dropdown-trigger__chevron {
+  transition: rotate var(--ds-motion-duration-process) var(--ds-motion-easing-in-out);
+}
+
+.ds-dropdown-trigger--disclosure.ds-dropdown-trigger--open .ds-dropdown-trigger__chevron {
+  rotate: 180deg;
 }
 
 /* ── Shared states ────────────────────────────────────────────────── */

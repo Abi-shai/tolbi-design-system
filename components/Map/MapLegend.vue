@@ -6,6 +6,7 @@ import { Dropdown, DropdownItem, DropdownTrigger } from '../Dropdown'
 import { Skeleton } from '../Skeleton'
 import { SwapTransition } from '../SwapTransition'
 import MapGlyphMark from './MapGlyphMark.vue'
+import { readDuration } from '../../composables/cssTime'
 
 /** One indicator the map can show (ADR-0137). */
 export interface MapLegendMetric {
@@ -285,6 +286,80 @@ const foldItems = computed(() => (symbols.value ? props.legend : rest.value))
 const foldCounted = computed(() => foldItems.value.some((i) => i.value != null && i.value !== ''))
 const foldLabel = computed(() => (symbols.value ? props.symbolsLabel : props.moreLabel))
 
+/*
+  The fold travels as the panel folds (ADR-0240): one curve both ways —
+  `process`, `easing-in-out` — and the content follows the shape in, leaves
+  first out. Not `0fr → 1fr` under a backdrop filter, which laid the whole
+  legend out every frame: the legend takes its open height at once, and what
+  moves is its **shell** — the glass, its edge and its shadow, an absolute
+  layer under the content — whose foot travels, while the fold's content is cut
+  at the same line. The shell keeps its true corners and shadow every frame.
+  Reduced motion: no travel, the content in a short fade.
+*/
+const shellEl = ref<HTMLElement | null>(null)
+const foldEl = ref<HTMLElement | null>(null)
+const regionEl = ref<HTMLElement | null>(null)
+const foldShown = ref(open.value)
+let folding: Animation[] = []
+let foldTurn = 0
+const cssValue = (el: Element, name: string, fallback: string) => getComputedStyle(el).getPropertyValue(name).trim() || fallback
+watch(open, async (now) => {
+  const turn = ++foldTurn
+  folding.forEach((a) => a.cancel())
+  folding = []
+  const el = root.value
+  if (!el || typeof window === 'undefined' || !('animate' in el)) { foldShown.value = now; return }
+  const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  const travel = readDuration(el, '--ds-motion-duration-process')
+  const inOut = cssValue(el, '--ds-motion-easing-in-out', 'ease-in-out')
+  if (now) foldShown.value = true
+  await nextTick()
+  const shell = shellEl.value
+  const fold = foldEl.value
+  const region = regionEl.value
+  if (turn !== foldTurn || !shell || !fold || !region) { foldShown.value = now; return }
+  const cut = fold.offsetHeight
+  const base = parseFloat(getComputedStyle(shell).bottom) || 0
+  const shut = [{ bottom: `${base + cut}px` }, { clipPath: `inset(0 0 ${cut}px 0)` }]
+  const wide = [{ bottom: `${base}px` }, { clipPath: 'inset(0 0 0px 0)' }]
+  if (now) {
+    if (reduce) {
+      folding = [region.animate([{ opacity: 0 }, { opacity: 1 }], { duration: readDuration(el, '--ds-motion-duration-quick'), easing: 'linear' })]
+      return
+    }
+    const timing = { duration: travel, easing: inOut }
+    folding = [
+      shell.animate([shut[0], wide[0]], timing),
+      fold.animate([shut[1], wide[1]], timing),
+      region.animate([{ opacity: 0 }, { opacity: 1 }], {
+        duration: readDuration(el, '--ds-motion-duration-enter'),
+        delay: readDuration(el, '--ds-motion-duration-quick'),
+        easing: cssValue(el, '--ds-motion-easing-out', 'ease-out'),
+        fill: 'backwards',
+      }),
+    ]
+    return
+  }
+  const leave = region.animate([{ opacity: 1 }, { opacity: 0 }], {
+    duration: readDuration(el, reduce ? '--ds-motion-duration-quick' : '--ds-motion-duration-exit'),
+    easing: reduce ? 'linear' : cssValue(el, '--ds-motion-easing-in', 'ease-in'),
+    fill: 'forwards',
+  })
+  folding = [leave]
+  if (!reduce) {
+    const timing = { duration: travel, easing: inOut, fill: 'forwards' as const }
+    folding.push(shell.animate([wide[0], shut[0]], timing), fold.animate([wide[1], shut[1]], timing))
+  }
+  await Promise.all(folding.map((a) => a.finished.catch(() => undefined)))
+  if (turn !== foldTurn) return
+  foldShown.value = false
+  await nextTick()
+  if (turn !== foldTurn) return
+  folding.forEach((a) => a.cancel())
+  folding = []
+})
+onBeforeUnmount(() => folding.forEach((a) => a.cancel()))
+
 function onKeydown(e: KeyboardEvent) {
   if (e.key !== 'Escape' || !open.value) return
   e.preventDefault()
@@ -332,6 +407,8 @@ onBeforeUnmount(() => clearTimeout(timer))
     :style="{ '--chart-legend-glyph': glyphColor }"
     @keydown="onKeydown"
   >
+    <!-- The glass, its edge and its shadow: the shell whose foot travels when the key unfolds (ADR-0240). -->
+    <span ref="shellEl" class="ds-map-legend__shell" aria-hidden="true" />
     <span class="ds-map-legend__said" role="status">{{ announced }}</span>
 
     <div class="ds-map-legend__line">
@@ -467,8 +544,8 @@ onBeforeUnmount(() => clearTimeout(timer))
     <!-- What did not fit, unfolded under the line (ADR-0138): a rule, then the
          key — in columns with figures (mark, figure, name), in a line without
          (mark then name, wrapping; ADR-0238). -->
-    <div v-if="foldable" class="ds-map-legend__fold">
-      <div :id="foldId" class="ds-map-legend__region" role="region" :aria-label="foldLabel">
+    <div v-if="foldable" ref="foldEl" class="ds-map-legend__fold" :class="{ 'ds-map-legend__fold--shown': foldShown }">
+      <div :id="foldId" ref="regionEl" class="ds-map-legend__region" role="region" :aria-label="foldLabel">
         <ChartLegend
           :items="foldItems"
           :shape="symbols ? 'dot' : 'zone'"
@@ -503,11 +580,8 @@ onBeforeUnmount(() => clearTimeout(timer))
   width: var(--ds-width-md);
   max-width: 100%;
   border-radius: calc(var(--map-legend-row) / 2);
-  /* Pilot glass (ADR-0172): the map shows through as colour. */
-  border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
-  background: var(--ds-bg-map-control);
-  -webkit-backdrop-filter: var(--ds-backdrop-map-control);
-  backdrop-filter: var(--ds-backdrop-map-control);
+  /* The edge's room; the shell paints it (ADR-0240). */
+  border: var(--ds-border-width-default) solid transparent;
   /* On the darkest imagery behind it, text-subtlest fails (3.0–4.3:1); subtle holds (4.6). */
   /* token-lint-disable-next-line no-shadowing-var — on map glass the role's value changes, not its name (ADR-0172) */
   --ds-text-subtlest: var(--ds-text-subtle);
@@ -521,9 +595,23 @@ onBeforeUnmount(() => clearTimeout(timer))
   /* Brand text at 72 % over near-black imagery: brand-600 measured 4.08:1, brand-700 holds (ADR-0175). */
   --on-glass-brand: var(--ds-text-brand-hover);
   --on-glass-rule: color-mix(in srgb, var(--ds-text-strong) 8%, transparent);
-  /* A rim of light on top, a wide soft shadow (ADR-0173). */
-  box-shadow: var(--ds-elevation-map-glass);
   font-family: var(--ds-typography-font-family-poppins);
+}
+
+/* The legend's surface, a layer under its content (ADR-0240): pilot glass
+   (ADR-0172), its edge, a rim of light on top and a wide soft shadow
+   (ADR-0173). Its foot is what travels when the key unfolds, so its corners and
+   its shadow stay true every frame. */
+.ds-map-legend__shell {
+  position: absolute;
+  inset: calc(-1 * var(--ds-border-width-default));
+  border: var(--ds-border-width-default) solid var(--ds-border-map-edge);
+  border-radius: inherit;
+  background: var(--ds-bg-map-control);
+  -webkit-backdrop-filter: var(--ds-backdrop-map-control);
+  backdrop-filter: var(--ds-backdrop-map-control);
+  box-shadow: var(--ds-elevation-map-glass);
+  pointer-events: none;
 }
 
 .ds-map-legend--categorical {
@@ -532,6 +620,8 @@ onBeforeUnmount(() => clearTimeout(timer))
 }
 
 .ds-map-legend__line {
+  /* Above the shell, painted in order. */
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-sm);
@@ -540,55 +630,27 @@ onBeforeUnmount(() => clearTimeout(timer))
   padding: 0 var(--ds-spacing-lg) 0 var(--ds-spacing-md);
 }
 
-/* ── Unfolded (ADR-0138) ──────────────────────────────────────────── */
+/* ── Unfolded (ADR-0138, travelling since ADR-0240) ─────────────────── */
 /*
-  ADR-0025's `0fr → 1fr`, on the element that transitions. It takes the
-  legend's width and asks for none (`contain: inline-size`), so a key by
-  category is as wide as its line, folded or not.
-
-  In: the height over `enter` on `easing-out` — the block makes room — and its
-  content fades in over the second half. Out, faster, the other way round: the
-  content first (`instant`), then the height over `exit`; the block is hidden
-  from a reader once closed.
+  Laid out only while shown; it takes the legend's width and asks for none
+  (`contain: inline-size`), so a key by category is as wide as its line, folded
+  or not. The travel is the script's (Web Animations): the shell's foot and
+  this block's cut move together over `process` on `easing-in-out`, the content
+  fades in after `quick` over `enter`, and out first over `exit`.
 */
 .ds-map-legend__fold {
-  display: grid;
-  grid-template-rows: 0fr;
+  position: relative;
+  display: none;
   contain: inline-size;
-  visibility: hidden;
-  transition:
-    grid-template-rows var(--ds-motion-duration-exit) var(--ds-motion-easing-in) var(--ds-motion-duration-instant),
-    visibility 0s linear calc(var(--ds-motion-duration-instant) + var(--ds-motion-duration-exit));
 }
 
-.ds-map-legend--open .ds-map-legend__fold {
-  grid-template-rows: 1fr;
-  visibility: visible;
-  transition:
-    grid-template-rows var(--ds-motion-duration-enter) var(--ds-motion-easing-out),
-    visibility 0s;
+.ds-map-legend__fold--shown {
+  display: block;
 }
 
 .ds-map-legend__region {
   min-height: 0;
   overflow: hidden;
-  opacity: 0;
-  transition: opacity var(--ds-motion-duration-instant) var(--ds-motion-easing-in);
-}
-
-.ds-map-legend--open .ds-map-legend__region {
-  opacity: 1;
-  transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-out) var(--ds-motion-duration-quick);
-}
-
-/* Reduced motion: the package's rule cuts every transition (`motion.css`); the
-   delays stay unless removed, and the block would stand empty for 100ms. */
-@media (prefers-reduced-motion: reduce) {
-  .ds-map-legend__fold,
-  .ds-map-legend--open .ds-map-legend__fold,
-  .ds-map-legend--open .ds-map-legend__region {
-    transition-delay: 0s;
-  }
 }
 
 /* A rule inset 16 under the line, then the key: 12 above it, 16 below and at the sides. */
@@ -811,11 +873,14 @@ onBeforeUnmount(() => clearTimeout(timer))
 
 /* Less transparency asked for: the same surface, opaque, nothing blurred (ADR-0172). */
 @media (prefers-reduced-transparency: reduce) {
-  .ds-map-legend {
+  .ds-map-legend__shell {
     border-color: var(--ds-border-subtle);
     background: var(--ds-bg-default);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
+  }
+
+  .ds-map-legend {
     --on-glass-raised: var(--ds-bg-default);
     --on-glass-sunk: var(--ds-bg-neutral-subtle);
   }

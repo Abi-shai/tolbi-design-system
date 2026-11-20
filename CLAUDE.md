@@ -1930,6 +1930,12 @@ Before working on any component, read:
   it; the current item of a sequence is a brand tint, ADR-0230), weight unchanged; years at rest **`text-subtle`**
   (`text-default` on hover), hover **`--on-glass-hover`**; data dots solid **`text-subtle`** (a status), the empty ring
   kept. Compare and dense follow. A raised tile (C) lost the shown year on 72 % glass.
+- **ADR-0240**: **the legend unfolds as the panel folds** — `MapLegend`'s fold on the panel's grammar: **`process`,
+  `easing-in-out`, symmetric**; in, the content follows (`enter`/`out` after `quick`), out, it leaves first (`exit`/`in`),
+  no wait. Mechanism: **a shell** (`.ds-map-legend__shell`, absolute, under the content: glass, edge, rim, shadow) whose
+  `bottom` travels in Web Animations while the fold's content is cut at the same line — the legend takes its open height
+  at once; no `0fr → 1fr` under a backdrop (9 long frames of ~50 → 0 of 64). A disclosure chip's chevron **turns 180°**
+  over `process` instead of swapping glyphs. Reduced motion: a short fade, asked by the component.
 
 ## Architecture
 
