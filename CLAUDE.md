@@ -1921,6 +1921,10 @@ Before working on any component, read:
   the pointer and open — open is an interaction state; `bg-neutral-strong` made it the legend's heaviest thing and knew
   neither glass nor dark. Raised tile and hollow tried and refused (opening is not choosing, a chip is not a container).
   A chip that opens a popup (a setting) keeps its tinted pill. Derived from `popup`, no new prop.
+- **ADR-0238**: **a legend is a key, not data** — `MapLegend`'s unfolded key is **derived**: no entry with a `value` = a
+  line (`ChartLegend` horizontal: mark 20 then name, wrapping, `spacing-md` / `2xl`, names `label-md` via
+  `--reading-secondary-font`), so « Point du / projet » no longer breaks for nothing; any `value` = the columns (mark,
+  figure, name) as before. Width unchanged (560). Dropping the columns was set aside: the data decides.
 
 ## Architecture
 

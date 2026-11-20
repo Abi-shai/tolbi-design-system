@@ -279,6 +279,10 @@ const foldable = computed(() => symbols.value || (categorical.value && rest.valu
 const open = computed(() => foldable.value && (expanded.value ?? symbols.value))
 const foldId = `ds-map-legend-fold-${useId()}`
 const foldItems = computed(() => (symbols.value ? props.legend : rest.value))
+/* A legend says what each mark stands for; it does not give the data (ADR-0238).
+   Columns (mark, figure, name) only when an entry carries a figure; otherwise
+   the key reads in a line — mark then name — and wraps. */
+const foldCounted = computed(() => foldItems.value.some((i) => i.value != null && i.value !== ''))
 const foldLabel = computed(() => (symbols.value ? props.symbolsLabel : props.moreLabel))
 
 function onKeydown(e: KeyboardEvent) {
@@ -461,10 +465,17 @@ onBeforeUnmount(() => clearTimeout(timer))
     </div>
 
     <!-- What did not fit, unfolded under the line (ADR-0138): a rule, then the
-         key in columns — its mark, its figure, its name. -->
+         key — in columns with figures (mark, figure, name), in a line without
+         (mark then name, wrapping; ADR-0238). -->
     <div v-if="foldable" class="ds-map-legend__fold">
       <div :id="foldId" class="ds-map-legend__region" role="region" :aria-label="foldLabel">
-        <ChartLegend :items="foldItems" :shape="symbols ? 'dot' : 'zone'" orientation="columns" class="ds-map-legend__columns" />
+        <ChartLegend
+          :items="foldItems"
+          :shape="symbols ? 'dot' : 'zone'"
+          :orientation="foldCounted ? 'columns' : 'horizontal'"
+          class="ds-map-legend__columns"
+          :class="{ 'ds-map-legend__inline': !foldCounted }"
+        />
       </div>
     </div>
   </div>
@@ -585,6 +596,14 @@ onBeforeUnmount(() => clearTimeout(timer))
   margin: 0 var(--ds-spacing-xl);
   padding: var(--ds-spacing-lg) 0 var(--ds-spacing-xl);
   border-top: var(--ds-border-width-default) solid var(--ds-border-subtle);
+}
+
+/* The key without figures (ADR-0238): in a line, mark (20) then name, wrapping
+   when room runs out, `spacing-md` between lines and `spacing-2xl` between
+   entries; the names in `label-md`, the size of every block on the map. */
+.ds-map-legend__inline {
+  --reading-secondary-font: var(--ds-font-label-md);
+  gap: var(--ds-spacing-md) var(--ds-spacing-2xl);
 }
 
 /* ── The chip ─────────────────────────────────────────────────────── */

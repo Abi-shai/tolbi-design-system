@@ -307,7 +307,11 @@ export const SymbolsUnfolded: Story = {
   },
 }
 
-/** **Symboles, sans nombres** — sans `value`, chaque colonne montre la forme et le nom seulement. */
+/**
+ * **Symboles, sans nombres** (ADR-0238) — une légende dit à quoi renvoie chaque symbole, elle ne donne pas la donnée :
+ * sans `value`, la clé se lit en ligne — le glyphe (20) puis le nom en `label-md`, retour à la ligne quand la place
+ * manque. Les colonnes restent pour des symboles chiffrés.
+ */
 export const SymbolsWithoutFigures: Story = {
   name: 'Symboles, sans nombres',
   render: () => ({
