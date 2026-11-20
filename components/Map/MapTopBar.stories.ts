@@ -163,7 +163,7 @@ export const Actions: Story = {
     template: `
       <div :style="MAP.replace('height:720px', 'height:320px')">
         <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-xl)">
-          <MapTopBar module="Redd+" project-name="Forêt classée de Mbao" :views="VIEWS" view="map" back-label="Quitter" user-initials="AD">
+          <MapTopBar module="Redd+" project-name="Forêt classée de Mbao" :views="VIEWS" view="map" back-label="Quitter" user-initials="AD" :basemaps="BASEMAPS" basemap="tolbi">
             <template #action><Button label="Lancer une baseline" size="sm" /></template>
             <template #downloads><DropdownItem label="Rapport" /></template>
           </MapTopBar>
@@ -174,6 +174,8 @@ export const Actions: Story = {
           <MapTopBar module="Carbone" project-name="Kaffrine Nord" :views="VIEWS" view="analytics" back-label="Quitter" user-initials="AD">
             <template #action><Button label="Télécharger le rapport" size="sm" variant="secondary-gray" icon-leading="download" /></template>
           </MapTopBar>
+          <!-- Sans action (ADR-0243) : le fond de carte et l’avatar, un groupe, sans aucun filet. -->
+          <MapTopBar module="Redd+" project-name="Dynamic baseline — Mbao" :views="VIEWS" view="map" back-label="Quitter" user-initials="AD" :basemaps="BASEMAPS" basemap="tolbi" class="mtb-no-action" />
         </div>
       </div>`,
   }),

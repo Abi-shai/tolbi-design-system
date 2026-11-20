@@ -1948,6 +1948,9 @@ Before working on any component, read:
   as a second avatar, opening under it at its end), then **the avatar = `HorizontalNavigation`'s**: `Dropdown
   trigger="avatar"` (40), **`userName` / `userEmail`** header, `#account-menu` rows (« Se déconnecter »), « Profil {name} »;
   credits only when passed. `MapNavigator` keeps its round basemap, optional.
+- **ADR-0243**: **the basemap and the avatar are one group** — `MapTopBar`'s end is two groups: the page's (`#action`,
+  « Télécharger », « Partager ») │ the map's and the person's (`__mine`: basemap · avatar, `spacing-sm`); **one rule
+  between them, only when the first is there**, none inside. No action = the pair alone, no rule.
 
 ## Architecture
 

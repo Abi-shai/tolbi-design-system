@@ -55,8 +55,10 @@ export interface MapTopBarView {
  * and `bg-default`. A view just chosen plays its glyph's arrival — never on
  * load, never on choosing the shown view again. Or the product's own `#center`.
  *
- * **End** — the page's action, then the person (ADR-0241). Groups `spacing-sm`
- * apart inside, a 20px rule between two that are there:
+ * **End** — two groups (ADR-0243): the page's (`#action`, « Télécharger »,
+ * « Partager »), then the map's and the person's (the basemap and the avatar,
+ * `spacing-sm` apart). One 20px rule between them, only when the first is
+ * there; none inside either. In order:
  * 1. **the project's action** (`#action`, one `Button sm`), with an optional
  *    count (`actionCount`);
  * 2. **the basemap** (`basemaps` + `v-model:basemap`, ADR-0242 — back from the
@@ -331,23 +333,13 @@ onBeforeUnmount(() => observer?.disconnect())
     </div>
 
     <div class="ds-map-top-bar__end">
+      <!-- Two groups (ADR-0243): the page's — its action, « Télécharger » — then
+           the map's and the person's — the basemap and the avatar — with one
+           rule between them, and none inside. -->
       <div v-if="hasAction" class="ds-map-top-bar__action">
         <slot name="action" />
         <span v-if="actionCount" class="ds-map-top-bar__count" aria-hidden="true">{{ actionCount }}</span>
       </div>
-
-      <span v-if="hasAction && hasBasemap" class="ds-map-top-bar__rule" aria-hidden="true" />
-
-      <!-- The basemap, back in the bar (ADR-0242): square, opening under it at its end. -->
-      <MapBasemapPicker
-        v-if="hasBasemap"
-        :basemaps="basemaps"
-        :model-value="basemap"
-        :label="basemapLabel"
-        @update:model-value="emit('update:basemap', $event)"
-      />
-
-      <span v-if="(hasAction || hasBasemap) && hasFile" class="ds-map-top-bar__rule" aria-hidden="true" />
 
       <Dropdown v-if="$slots.downloads" v-model:open="downloadsOpen" align="end" width="16rem">
         <template #trigger="{ open, toggle }">
@@ -369,27 +361,38 @@ onBeforeUnmount(() => observer?.disconnect())
         <IconButton icon="share-2" size="sm" :ariaLabel="shareLabel" @click="emit('share')" />
       </Tooltip>
 
-      <span v-if="(hasAction || hasBasemap || hasFile) && hasAccount" class="ds-map-top-bar__rule" aria-hidden="true" />
+      <span v-if="(hasAction || hasFile) && (hasBasemap || hasAccount)" class="ds-map-top-bar__rule" aria-hidden="true" />
 
-      <!-- The person, last: the app's own avatar and menu (ADR-0242) — the same
-           `Dropdown trigger="avatar"` as `HorizontalNavigation`, the same header. -->
-      <Dropdown
-        v-if="$slots['account-menu']"
-        v-model:open="accountOpen"
-        trigger="avatar"
-        class="ds-map-top-bar__account"
-        :button-label="accountName"
-        :avatar-initials="userInitials"
-        :avatar-src="userSrc"
-        :user-name="userName"
-        :user-email="userEmail"
-      >
-        <template v-if="credits !== undefined" #header>
-          <DropdownCredits :balance="credits" :module="moduleName" :href="creditsHref" @select="onCredits" />
-        </template>
-        <slot name="account-menu" :close="() => (accountOpen = false)" />
-      </Dropdown>
-      <Avatar v-else-if="hasAccount" :src="userSrc" :initials="userInitials" size="md" class="ds-map-top-bar__avatar" />
+      <div v-if="hasBasemap || hasAccount" class="ds-map-top-bar__mine">
+        <!-- The basemap (ADR-0242), square, opening under it at its end. -->
+        <MapBasemapPicker
+          v-if="hasBasemap"
+          :basemaps="basemaps"
+          :model-value="basemap"
+          :label="basemapLabel"
+          @update:model-value="emit('update:basemap', $event)"
+        />
+
+        <!-- The person, last: the app's own avatar and menu (ADR-0242) — the same
+             `Dropdown trigger="avatar"` as `HorizontalNavigation`, the same header. -->
+        <Dropdown
+          v-if="$slots['account-menu']"
+          v-model:open="accountOpen"
+          trigger="avatar"
+          class="ds-map-top-bar__account"
+          :button-label="accountName"
+          :avatar-initials="userInitials"
+          :avatar-src="userSrc"
+          :user-name="userName"
+          :user-email="userEmail"
+        >
+          <template v-if="credits !== undefined" #header>
+            <DropdownCredits :balance="credits" :module="moduleName" :href="creditsHref" @select="onCredits" />
+          </template>
+          <slot name="account-menu" :close="() => (accountOpen = false)" />
+        </Dropdown>
+        <Avatar v-else-if="hasAccount" :src="userSrc" :initials="userInitials" size="md" class="ds-map-top-bar__avatar" />
+      </div>
     </div>
   </header>
 </template>
@@ -567,6 +570,13 @@ onBeforeUnmount(() => observer?.disconnect())
 }
 
 /* The action's count, at its top right — the tools column's count (ADR-0171). */
+/* The basemap and the avatar, one group (ADR-0243): no rule between them. */
+.ds-map-top-bar__mine {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-sm);
+}
+
 .ds-map-top-bar__action {
   position: relative;
   display: inline-flex;
