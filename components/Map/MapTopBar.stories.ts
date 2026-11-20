@@ -46,9 +46,9 @@ const meta: Meta<typeof MapTopBar> = {
           'La barre d’un projet SIG (ADR-0216, décomplexifiée en ADR-0241) : elle dit où l’on est et laisse en sortir ; ' +
           'la carte porte les outils de la carte. 60 px (`--ds-map-top-bar-height`), toute la largeur, le verre des ' +
           'contrôles de carte, un filet en bas. À gauche le logo du module, seul, « Quitter » et le nom du projet ; au ' +
-          'centre la bascule Explorer · Analyser · Rapporter (ADR-0236) ; à droite l’action de la page puis l’avatar, ' +
-          'dont le menu porte les crédits du module en tête (`#account-menu`). La recherche et le fond de carte sont dans ' +
-          'la colonne d’outils (`MapNavigator`). Tout en `sm`.',
+          'centre la bascule Explorer · Analyser · Rapporter (ADR-0236) ; à droite l’action de la page, ' +
+          'le fond de carte, puis l’avatar de l’app (ADR-0242). La recherche est dans la colonne d’outils ' +
+          '(`MapNavigator`). Tout en `sm`.',
       },
     },
   },
@@ -59,14 +59,14 @@ type Story = StoryObj<typeof meta>
 
 /**
  * Sur la carte : la barre, puis le panneau, la légende et les outils qui descendent sous elle. Le logo n’est plus un
- * menu ; l’avatar ouvre le menu du compte — les crédits du module en tête, la déconnexion en dernier. La recherche est
- * en tête de la colonne d’outils, le fond de carte à son pied, en vignette ronde (ADR-0241). « Analyser » remplace la carte entière (`SwapTransition rise`) et la barre
+ * menu. À droite, l’action, le fond de carte (vignette carrée) puis l’avatar — celui de l’app : son menu dit qui est
+ * connecté et propose « Se déconnecter » (ADR-0242). La recherche est en tête de la colonne d’outils (ADR-0241). « Analyser » remplace la carte entière (`SwapTransition rise`) et la barre
  * devient opaque, sans ombre, ses contrôles hors du verre (ADR-0223) ; « Explorer » rend le verre. Le glyphe de la vue
  * choisie joue son arrivée (ADR-0236).
  */
 export const OnTheMap: Story = {
   name: 'Sur la carte',
-  args: { onBack: fn(), onCredits: fn() } as never,
+  args: { onBack: fn() } as never,
   render: args => ({
     components: { MapTopBar, MapOverlay, MapPanel, MapNavigator, MapLegend, Button, DropdownItem, DropdownDivider, SwapTransition },
     setup() {
@@ -92,7 +92,6 @@ export const OnTheMap: Story = {
               <MapNavigator
                 v-model:zoom="zoom" :tools="TOOLS"
                 search :search-open="searchOpen" @search="searchOpen = !searchOpen"
-                :basemaps="BASEMAPS" v-model:basemap="basemap"
               />
             </MapOverlay>
           </div>
@@ -102,37 +101,35 @@ export const OnTheMap: Story = {
         </SwapTransition>
         <div :style="BAR">
           <MapTopBar
-            module="Inset" project-name="Inset — Bassin arachidier, campagne 2026" :credits="1250"
-            :views="VIEWS" v-model:view="view" back-label="Quitter" :action-count="2" user-initials="AD"
-            @back="args.onBack" @credits="args.onCredits"
+            module="Inset" project-name="Inset — Bassin arachidier, campagne 2026"
+            :views="VIEWS" v-model:view="view" back-label="Quitter" :action-count="2"
+            :basemaps="BASEMAPS" v-model:basemap="basemap"
+            user-initials="AD" user-name="Awa Diop" user-email="awa.diop@tolbi.ai"
+            @back="args.onBack"
           >
             <template #action><Button label="Lancer une baseline sur cette zone" size="sm" /></template>
             <template #account-menu="{ close }">
-              <DropdownItem icon="house" label="Accueil" @click="close" />
-              <DropdownDivider />
-              <DropdownItem icon="settings" label="Paramètres" @click="close" />
-              <DropdownItem icon="bell" label="Notifications" @click="close" />
-              <DropdownDivider />
               <DropdownItem icon="log-out" label="Se déconnecter" tone="danger" @click="close" />
             </template>
           </MapTopBar>
         </div>
       </div>`,
   }),
-  /* Guarded (ADR-0241): the mark is not a menu; the avatar opens the account's menu on the credits; the basemap is
-     chosen by its round picture at the column's foot; « Rechercher » sits at the column's head; « Quitter » emits. */
+  /* Guarded (ADR-0241/0242): the mark is not a menu; the avatar is the app's — its menu opens on who is signed in and
+     « Se déconnecter », no credits; the basemap is chosen in the bar by its square picture; « Rechercher » sits at the
+     column's head; « Quitter » emits. */
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const page = within(document.body)
-    const a = args as unknown as Record<'onBack' | 'onCredits', ReturnType<typeof fn>>
+    const a = args as unknown as Record<'onBack', ReturnType<typeof fn>>
     await expect(canvas.queryByRole('button', { name: 'Menu Inset' })).toBeNull()
-    const avatar = canvas.getByRole('button', { name: 'Compte' })
+    const avatar = canvas.getByRole('button', { name: 'Profil Awa Diop' })
     await userEvent.click(avatar)
     await expect(avatar).toHaveAttribute('aria-expanded', 'true')
-    const credits = await page.findByRole('menuitem', { name: /1\s250 crédits Inset disponibles/ })
+    await expect(await page.findByText('awa.diop@tolbi.ai')).toBeTruthy()
     await expect(page.getByRole('menuitem', { name: 'Se déconnecter' })).toBeTruthy()
-    await userEvent.click(credits)
-    await expect(a.onCredits).toHaveBeenCalledTimes(1)
+    await expect(page.queryByRole('menuitem', { name: /crédits/ })).toBeNull()
+    await userEvent.keyboard('{Escape}')
     await expect(avatar).toHaveAttribute('aria-expanded', 'false')
 
     await expect(canvas.getByRole('button', { name: 'Rechercher' })).toBeTruthy()

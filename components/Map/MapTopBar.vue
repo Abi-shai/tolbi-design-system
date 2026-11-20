@@ -11,6 +11,7 @@ import { ModuleIcon, type ModuleName } from '../ModuleIcon'
 import { Tooltip } from '../Tooltip'
 import { ViewGlyph, type ViewGlyphView } from '../ViewGlyph'
 import { Avatar } from '../Avatar'
+import MapBasemapPicker, { type MapBasemapOption } from './MapBasemapPicker.vue'
 
 /** One view the bar switches between — « Carte », « Analytics ». */
 export interface MapTopBarView {
@@ -58,16 +59,18 @@ export interface MapTopBarView {
  * apart inside, a 20px rule between two that are there:
  * 1. **the project's action** (`#action`, one `Button sm`), with an optional
  *    count (`actionCount`);
- * 2. **the file**, when asked: « Télécharger » (`#downloads`) and « Partager »
+ * 2. **the basemap** (`basemaps` + `v-model:basemap`, ADR-0242 — back from the
+ *    tools column): `MapBasemapPicker`'s square thumbnail, opening under it at
+ *    its end; square so it never reads as a second avatar beside the round one;
+ * 3. **the file**, when asked: « Télécharger » (`#downloads`) and « Partager »
  *    (`share`, off by default);
- * 3. **the avatar** (`userInitials` / `userSrc`), last: with `#account-menu`
- *    it opens a `Dropdown` at its end, 18rem — the module's credits at its head
- *    (`credits`, `DropdownCredits`), then the product's rows (Accueil,
- *    Paramètres, Notifications, Se déconnecter `danger`).
+ * 4. **the avatar**, last: **the app's own** (ADR-0242) — `HorizontalNavigation`'s
+ *    `Dropdown trigger="avatar"`, the same header (`userName`, `userEmail`) and
+ *    the product's rows (`#account-menu` — « Se déconnecter »). The module's
+ *    credits head it only when the product passes `credits`.
  *
- * **The bar says where one is and lets one leave; the map carries the map's
- * tools** (ADR-0241): search and the basemap left for `MapNavigator`'s column.
- * Every control is `sm`.
+ * **The bar says where one is and lets one leave** (ADR-0241); search stays in
+ * `MapNavigator`'s column. Every control is `sm`.
  *
  * **Off the map, the bar is opaque** (ADR-0223). On a view that replaces the
  * map — Analytics — a glass bar casting a shadow on a page of data reads wrong:
@@ -127,8 +130,16 @@ interface Props {
   userInitials?: string
   /** The person's picture on the avatar. */
   userSrc?: string
-  /** The avatar's name as a menu — « Compte » by default. */
+  /** Who is signed in — the account menu's header, as in the app's bar (ADR-0242). */
+  userName?: string
+  userEmail?: string
+  /** The avatar's name — « Profil {userName} » by default, as in the app's bar. */
   accountLabel?: string
+  /** The basemaps, between the action and the avatar (ADR-0242). Fewer than two: no picker. */
+  basemaps?: MapBasemapOption[]
+  /** The chosen basemap — `v-model:basemap`. */
+  basemap?: string
+  basemapLabel?: string
   /** « Télécharger »'s name — shown when `#downloads` is filled. */
   downloadLabel?: string
   /** « Partager »: shown, it emits `share`. */
@@ -162,7 +173,12 @@ const props = withDefaults(defineProps<Props>(), {
   actionCount: undefined,
   userInitials: undefined,
   userSrc: undefined,
-  accountLabel: 'Compte',
+  userName: undefined,
+  userEmail: undefined,
+  accountLabel: undefined,
+  basemaps: () => [],
+  basemap: undefined,
+  basemapLabel: 'Fond de carte',
   downloadLabel: 'Télécharger',
   share: false,
   shareLabel: 'Partager',
@@ -177,6 +193,7 @@ const emit = defineEmits<{
   /** The credits at the head of the module's menu — the menu closes. */
   credits: [event: MouseEvent]
   share: []
+  'update:basemap': [value: string]
 }>()
 
 const slots = defineSlots<{
@@ -216,6 +233,8 @@ watch(() => props.view, (value) => { if (glyphsReady.value) arrived.value = valu
 const hasAction = computed(() => !!slots.action)
 const hasFile = computed(() => !!slots.downloads || props.share)
 const hasAccount = computed(() => !!slots['account-menu'] || !!props.userInitials || !!props.userSrc)
+const hasBasemap = computed(() => props.basemaps.length > 1)
+const accountName = computed(() => props.accountLabel ?? `Profil ${props.userName ?? props.userInitials ?? ''}`.trim())
 
 function onCredits(event: MouseEvent) {
   moduleOpen.value = false
@@ -317,7 +336,18 @@ onBeforeUnmount(() => observer?.disconnect())
         <span v-if="actionCount" class="ds-map-top-bar__count" aria-hidden="true">{{ actionCount }}</span>
       </div>
 
-      <span v-if="hasAction && hasFile" class="ds-map-top-bar__rule" aria-hidden="true" />
+      <span v-if="hasAction && hasBasemap" class="ds-map-top-bar__rule" aria-hidden="true" />
+
+      <!-- The basemap, back in the bar (ADR-0242): square, opening under it at its end. -->
+      <MapBasemapPicker
+        v-if="hasBasemap"
+        :basemaps="basemaps"
+        :model-value="basemap"
+        :label="basemapLabel"
+        @update:model-value="emit('update:basemap', $event)"
+      />
+
+      <span v-if="(hasAction || hasBasemap) && hasFile" class="ds-map-top-bar__rule" aria-hidden="true" />
 
       <Dropdown v-if="$slots.downloads" v-model:open="downloadsOpen" align="end" width="16rem">
         <template #trigger="{ open, toggle }">
@@ -339,31 +369,27 @@ onBeforeUnmount(() => observer?.disconnect())
         <IconButton icon="share-2" size="sm" :ariaLabel="shareLabel" @click="emit('share')" />
       </Tooltip>
 
-      <span v-if="(hasAction || hasFile) && hasAccount" class="ds-map-top-bar__rule" aria-hidden="true" />
+      <span v-if="(hasAction || hasBasemap || hasFile) && hasAccount" class="ds-map-top-bar__rule" aria-hidden="true" />
 
-      <!-- The person, last (ADR-0241): the account's menu, the module's credits at its head. -->
-      <Dropdown v-if="$slots['account-menu']" v-model:open="accountOpen" align="end" width="18rem" class="ds-map-top-bar__account">
-        <template #trigger="{ open, toggle }">
-          <button
-            type="button"
-            class="ds-map-top-bar__avatar"
-            :class="{ 'ds-map-top-bar__avatar--open': open }"
-            :aria-label="accountLabel"
-            :aria-expanded="open"
-            aria-haspopup="true"
-            @click="toggle"
-          >
-            <Avatar :src="userSrc" :initials="userInitials" size="sm" />
-          </button>
-        </template>
+      <!-- The person, last: the app's own avatar and menu (ADR-0242) — the same
+           `Dropdown trigger="avatar"` as `HorizontalNavigation`, the same header. -->
+      <Dropdown
+        v-if="$slots['account-menu']"
+        v-model:open="accountOpen"
+        trigger="avatar"
+        class="ds-map-top-bar__account"
+        :button-label="accountName"
+        :avatar-initials="userInitials"
+        :avatar-src="userSrc"
+        :user-name="userName"
+        :user-email="userEmail"
+      >
         <template v-if="credits !== undefined" #header>
           <DropdownCredits :balance="credits" :module="moduleName" :href="creditsHref" @select="onCredits" />
         </template>
         <slot name="account-menu" :close="() => (accountOpen = false)" />
       </Dropdown>
-      <span v-else-if="hasAccount" class="ds-map-top-bar__avatar ds-map-top-bar__avatar--still">
-        <Avatar :src="userSrc" :initials="userInitials" size="sm" />
-      </span>
+      <Avatar v-else-if="hasAccount" :src="userSrc" :initials="userInitials" size="md" class="ds-map-top-bar__avatar" />
     </div>
   </header>
 </template>
@@ -479,37 +505,10 @@ onBeforeUnmount(() => observer?.disconnect())
 
 /* The mark as a menu (ADR-0221): the drawing and its chevron in one hover
    zone — the glass's veil, under the pointer and while the menu is open. */
-/* The avatar, last (ADR-0241): a 32px avatar in a 36px round target — the
-   bar's icon buttons' size, the 2px around it a remainder (ADR-0044). The
-   glass's veil under the pointer and while its menu is out, the ring on focus. */
+/* The avatar, last (ADR-0242): the app's own, `Dropdown`'s avatar trigger —
+   40px, its ring when open. Nothing of the bar's own. */
 .ds-map-top-bar__avatar {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border: 0;
-  border-radius: var(--ds-radius-pill);
-  background: transparent;
-  cursor: pointer;
-  transition:
-    background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),
-    box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
-}
-
-.ds-map-top-bar__avatar:not(.ds-map-top-bar__avatar--still):is(:hover, .ds-map-top-bar__avatar--open) {
-  background: var(--on-glass-hover, var(--ds-bg-hover));
-}
-
-.ds-map-top-bar__avatar:focus-visible {
-  outline: none;
-  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-brand-shadow-xs));
-}
-
-.ds-map-top-bar__avatar--still {
-  cursor: default;
+  flex: none;
 }
 
 .ds-map-top-bar__mark-menu {

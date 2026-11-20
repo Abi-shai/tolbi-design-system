@@ -1943,6 +1943,11 @@ Before working on any component, read:
   the head; `#tool-search` card or `@search`) and **`basemaps` + `v-model:basemap`** at the foot after « Recentrer »: a
   **round 36px** picture (3px margin) opening the tray to the column's left — `MapBasemapPicker shape="round" side="left"`,
   `Dropdown side` gains `left | right` (beside: inline `spacing-md`, centred).
+- **ADR-0242**: **the basemap back in the bar; the app's own avatar** (amends ADR-0241) — `MapTopBar`'s end is `#action`,
+  **the basemap** (`basemaps` / `v-model:basemap` / `basemapLabel` again, the **square** 28px thumbnail so it never reads
+  as a second avatar, opening under it at its end), then **the avatar = `HorizontalNavigation`'s**: `Dropdown
+  trigger="avatar"` (40), **`userName` / `userEmail`** header, `#account-menu` rows (« Se déconnecter »), « Profil {name} »;
+  credits only when passed. `MapNavigator` keeps its round basemap, optional.
 
 ## Architecture
 
