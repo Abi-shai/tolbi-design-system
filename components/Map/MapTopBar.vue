@@ -10,7 +10,7 @@ import type { IconName } from '../Icon'
 import { ModuleIcon, type ModuleName } from '../ModuleIcon'
 import { Tooltip } from '../Tooltip'
 import { ViewGlyph, type ViewGlyphView } from '../ViewGlyph'
-import MapBasemapPicker, { type MapBasemapOption } from './MapBasemapPicker.vue'
+import { Avatar } from '../Avatar'
 
 /** One view the bar switches between — « Carte », « Analytics ». */
 export interface MapTopBarView {
@@ -37,13 +37,12 @@ export interface MapTopBarView {
  * both sides. Three zones: the start and the end share what is left, the
  * centre sits in the bar's middle.
  *
- * **Start** (ADR-0221) — the module's **mark is a menu**: the drawing (48,
- * `variant="illustration"`) and a `chevron-down` in one hover zone, opening
- * the package's `Dropdown` at its start, 18rem — the module's credits at its
- * head (`credits`, `DropdownCredits`), then the product's rows
- * (`#module-menu`). Then **« Retour »** (`Button sm secondary-gray`,
- * `arrow-left`) and **the project's name** (`label-lg-strong`, one line, cut
- * — given whole in a tooltip only when cut).
+ * **Start** — **the module's mark alone** (ADR-0241): the drawing (48,
+ * `variant="illustration"`), named, not interactive — it says which module one
+ * is in. (`#module-menu` still makes it ADR-0221's menu, for a product that
+ * keeps one.) Then the way out (`backLabel` — « Quitter » in the product;
+ * `Button sm secondary-gray`, `arrow-left`) and **the project's name**
+ * (`label-lg-strong`, one line, cut — given whole in a tooltip only when cut).
  *
  * **Centre** — the views (`views` + `v-model:view`), **the bar's central
  * element** (ADR-0236): the SIG has three modes — Explorer, Analyser,
@@ -55,17 +54,19 @@ export interface MapTopBarView {
  * and `bg-default`. A view just chosen plays its glyph's arrival — never on
  * load, never on choosing the shown view again. Or the product's own `#center`.
  *
- * **End** — three groups, `spacing-sm` apart inside, a 20px rule between them:
+ * **End** — the page's action, then the person (ADR-0241). Groups `spacing-sm`
+ * apart inside, a 20px rule between two that are there:
  * 1. **the project's action** (`#action`, one `Button sm`), with an optional
  *    count (`actionCount`);
- * 2. **the map**: « Rechercher » (`search`, emits `search` — the map's search
- *    leaves the tools column for the bar) and **the basemap**
- *    (`basemaps` + `v-model:basemap`, `MapBasemapPicker`);
- * 3. **the file**: « Télécharger » (`#downloads`, a `Dropdown` at its end,
- *    16rem, the product's rows) and « Partager » (`share`).
+ * 2. **the file**, when asked: « Télécharger » (`#downloads`) and « Partager »
+ *    (`share`, off by default);
+ * 3. **the avatar** (`userInitials` / `userSrc`), last: with `#account-menu`
+ *    it opens a `Dropdown` at its end, 18rem — the module's credits at its head
+ *    (`credits`, `DropdownCredits`), then the product's rows (Accueil,
+ *    Paramètres, Notifications, Se déconnecter `danger`).
  *
- * The profile is gone from the project's bar, and so is ⋯: what it held is
- * what « Télécharger » holds, and the account is in the module's menu.
+ * **The bar says where one is and lets one leave; the map carries the map's
+ * tools** (ADR-0241): search and the basemap left for `MapNavigator`'s column.
  * Every control is `sm`.
  *
  * **Off the map, the bar is opaque** (ADR-0223). On a view that replaces the
@@ -122,16 +123,12 @@ interface Props {
   viewsLabel?: string
   /** A count on the project's action — the auditor's open requests. Absent or 0: none. */
   actionCount?: number
-  /** « Rechercher »: shown, it emits `search`. */
-  search?: boolean
-  searchLabel?: string
-  /** The map's search is open — the button wears the open state. */
-  searchOpen?: boolean
-  /** The basemaps to choose from. Fewer than two: no picker. */
-  basemaps?: MapBasemapOption[]
-  /** The active basemap — `v-model:basemap`. */
-  basemap?: string
-  basemapLabel?: string
+  /** The person's initials on the avatar, at the bar's end (ADR-0241). */
+  userInitials?: string
+  /** The person's picture on the avatar. */
+  userSrc?: string
+  /** The avatar's name as a menu — « Compte » by default. */
+  accountLabel?: string
   /** « Télécharger »'s name — shown when `#downloads` is filled. */
   downloadLabel?: string
   /** « Partager »: shown, it emits `share`. */
@@ -163,14 +160,11 @@ const props = withDefaults(defineProps<Props>(), {
   view: undefined,
   viewsLabel: 'Vue',
   actionCount: undefined,
-  search: false,
-  searchLabel: 'Rechercher',
-  searchOpen: false,
-  basemaps: () => [],
-  basemap: undefined,
-  basemapLabel: 'Fond de carte',
+  userInitials: undefined,
+  userSrc: undefined,
+  accountLabel: 'Compte',
   downloadLabel: 'Télécharger',
-  share: true,
+  share: false,
   shareLabel: 'Partager',
   surface: undefined,
   viewsSize: 'md',
@@ -180,10 +174,8 @@ const emit = defineEmits<{
   /** « Retour » — with the click, so a router can take a link over. */
   back: [event: MouseEvent]
   'update:view': [value: string]
-  'update:basemap': [value: string]
   /** The credits at the head of the module's menu — the menu closes. */
   credits: [event: MouseEvent]
-  search: []
   share: []
 }>()
 
@@ -194,12 +186,15 @@ const slots = defineSlots<{
   action?: () => unknown
   /** The module's menu rows — `DropdownItem`s, the heavy action last after a divider. Absent: the mark alone. */
   'module-menu'?: (props: { close: () => void }) => unknown
+  /** The account's rows, under the credits — `DropdownItem`s, sign-out last after a divider (ADR-0241). */
+  'account-menu'?: (props: { close: () => void }) => unknown
   /** « Télécharger »'s rows — `DropdownItem`s. Absent: no « Télécharger ». */
   downloads?: (props: { close: () => void }) => unknown
 }>()
 
 const moduleOpen = ref(false)
 const downloadsOpen = ref(false)
+const accountOpen = ref(false)
 
 /* The first view is the map: off it, the bar leaves the glass (ADR-0223). */
 const solid = computed(() =>
@@ -219,11 +214,12 @@ watch(() => props.view, (value) => { if (glyphsReady.value) arrived.value = valu
 
 /* The groups at the end, and a rule only between two that are there. */
 const hasAction = computed(() => !!slots.action)
-const hasMap = computed(() => props.search || props.basemaps.length > 1)
 const hasFile = computed(() => !!slots.downloads || props.share)
+const hasAccount = computed(() => !!slots['account-menu'] || !!props.userInitials || !!props.userSrc)
 
 function onCredits(event: MouseEvent) {
   moduleOpen.value = false
+  accountOpen.value = false
   emit('credits', event)
 }
 
@@ -269,7 +265,7 @@ onBeforeUnmount(() => observer?.disconnect())
             <Icon name="chevron-down" :size="16" class="ds-map-top-bar__chevron" aria-hidden="true" />
           </button>
         </template>
-        <template v-if="credits !== undefined" #header>
+        <template v-if="credits !== undefined && !$slots['account-menu']" #header>
           <DropdownCredits :balance="credits" :module="moduleName" :href="creditsHref" @select="onCredits" />
         </template>
         <slot name="module-menu" :close="() => (moduleOpen = false)" />
@@ -321,22 +317,7 @@ onBeforeUnmount(() => observer?.disconnect())
         <span v-if="actionCount" class="ds-map-top-bar__count" aria-hidden="true">{{ actionCount }}</span>
       </div>
 
-      <span v-if="hasAction && hasMap" class="ds-map-top-bar__rule" aria-hidden="true" />
-
-      <template v-if="hasMap">
-        <Tooltip v-if="search" :title="searchLabel" placement="bottom-end" :disabled="searchOpen">
-          <IconButton icon="search" size="sm" :ariaLabel="searchLabel" :aria-expanded="searchOpen" @click="emit('search')" />
-        </Tooltip>
-        <MapBasemapPicker
-          v-if="basemaps.length > 1"
-          :basemaps="basemaps"
-          :model-value="basemap"
-          :label="basemapLabel"
-          @update:model-value="emit('update:basemap', $event)"
-        />
-      </template>
-
-      <span v-if="(hasAction || hasMap) && hasFile" class="ds-map-top-bar__rule" aria-hidden="true" />
+      <span v-if="hasAction && hasFile" class="ds-map-top-bar__rule" aria-hidden="true" />
 
       <Dropdown v-if="$slots.downloads" v-model:open="downloadsOpen" align="end" width="16rem">
         <template #trigger="{ open, toggle }">
@@ -357,6 +338,32 @@ onBeforeUnmount(() => observer?.disconnect())
       <Tooltip v-if="share" :title="shareLabel" placement="bottom-end">
         <IconButton icon="share-2" size="sm" :ariaLabel="shareLabel" @click="emit('share')" />
       </Tooltip>
+
+      <span v-if="(hasAction || hasFile) && hasAccount" class="ds-map-top-bar__rule" aria-hidden="true" />
+
+      <!-- The person, last (ADR-0241): the account's menu, the module's credits at its head. -->
+      <Dropdown v-if="$slots['account-menu']" v-model:open="accountOpen" align="end" width="18rem" class="ds-map-top-bar__account">
+        <template #trigger="{ open, toggle }">
+          <button
+            type="button"
+            class="ds-map-top-bar__avatar"
+            :class="{ 'ds-map-top-bar__avatar--open': open }"
+            :aria-label="accountLabel"
+            :aria-expanded="open"
+            aria-haspopup="true"
+            @click="toggle"
+          >
+            <Avatar :src="userSrc" :initials="userInitials" size="sm" />
+          </button>
+        </template>
+        <template v-if="credits !== undefined" #header>
+          <DropdownCredits :balance="credits" :module="moduleName" :href="creditsHref" @select="onCredits" />
+        </template>
+        <slot name="account-menu" :close="() => (accountOpen = false)" />
+      </Dropdown>
+      <span v-else-if="hasAccount" class="ds-map-top-bar__avatar ds-map-top-bar__avatar--still">
+        <Avatar :src="userSrc" :initials="userInitials" size="sm" />
+      </span>
     </div>
   </header>
 </template>
@@ -472,6 +479,39 @@ onBeforeUnmount(() => observer?.disconnect())
 
 /* The mark as a menu (ADR-0221): the drawing and its chevron in one hover
    zone — the glass's veil, under the pointer and while the menu is open. */
+/* The avatar, last (ADR-0241): a 32px avatar in a 36px round target — the
+   bar's icon buttons' size, the 2px around it a remainder (ADR-0044). The
+   glass's veil under the pointer and while its menu is out, the ring on focus. */
+.ds-map-top-bar__avatar {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ds-radius-pill);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-default),
+    box-shadow var(--ds-motion-duration-instant) var(--ds-motion-easing-default);
+}
+
+.ds-map-top-bar__avatar:not(.ds-map-top-bar__avatar--still):is(:hover, .ds-map-top-bar__avatar--open) {
+  background: var(--on-glass-hover, var(--ds-bg-hover));
+}
+
+.ds-map-top-bar__avatar:focus-visible {
+  outline: none;
+  box-shadow: var(--on-glass-focus, var(--ds-focus-ring-brand-shadow-xs));
+}
+
+.ds-map-top-bar__avatar--still {
+  cursor: default;
+}
+
 .ds-map-top-bar__mark-menu {
   display: inline-flex;
   align-items: center;

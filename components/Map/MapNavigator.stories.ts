@@ -237,3 +237,34 @@ export const Disabled: Story = {
     `,
   }),
 }
+
+/**
+ * **La recherche en tête, le fond de carte au pied** (ADR-0241) : la barre du projet ne porte plus les outils de la
+ * carte. « Rechercher » a son groupe en tête de colonne (`search`, `searchOpen`, `@search` — ou une carte à gauche avec
+ * `#tool-search`) ; le fond de carte choisi, en vignette ronde de 36 px, ferme la colonne après « Recentrer », et ouvre
+ * le plateau des fonds à gauche de la colonne.
+ */
+export const SearchAndBasemap: Story = {
+  name: 'Recherche et fond de carte',
+  render: () => ({
+    components: { MapNavigator, MapOverlay },
+    setup: () => ({
+      GROUND,
+      open: ref(false),
+      basemap: ref('tolbi'),
+      zoom: ref(9),
+      tools: [{ value: 'info', icon: 'info', label: 'Informations' }],
+      basemaps: [
+        { value: 'tolbi', label: 'TOLBI', src: './stories/map-loading/base-thumb.webp' },
+        { value: 'satellite', label: 'Satellite', src: './stories/map-loading/satellite.webp' },
+      ],
+    }),
+    template: `
+      <div :style="GROUND">
+        <MapOverlay position="end">
+          <MapNavigator v-model:zoom="zoom" :tools="tools" search :search-open="open" @search="open = !open" :basemaps="basemaps" v-model:basemap="basemap" />
+        </MapOverlay>
+      </div>
+    `,
+  }),
+}

@@ -30,7 +30,7 @@ export type DropdownAlign = 'start' | 'end'
  * foot of a map or of a table. Either way the panel still turns to the other
  * side when its own has not the room and the other has more (ADR-0078).
  */
-export type DropdownSide = 'below' | 'above'
+export type DropdownSide = 'below' | 'above' | 'left' | 'right'
 
 interface Props {
   trigger?:    DropdownTriggerVariant
@@ -288,7 +288,7 @@ onUnmounted(() => {
       ref="panelEl"
       popover="manual"
       class="ds-dropdown__panel"
-      :class="{ 'ds-dropdown__panel--sm': size === 'sm', 'ds-dropdown__panel--tray': surface === 'tray' }"
+      :class="{ 'ds-dropdown__panel--sm': size === 'sm', 'ds-dropdown__panel--tray': surface === 'tray', 'ds-dropdown__panel--beside': side === 'left' || side === 'right' }"
       :style="width ? { '--dropdown-panel-width': width } : undefined"
       :role="panelRole"
       :aria-label="label"
@@ -417,6 +417,12 @@ onUnmounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+/* Beside its trigger (ADR-0241 — a map's basemap, opened from the tools
+   column): the gap is the inline margin, and it centres on the trigger. */
+.ds-dropdown__panel--beside {
+  margin: 0 var(--ds-spacing-md);
 }
 
 /* A tray (ADR-0222): the Tray draws the ground, the hairline and the corners;

@@ -43,12 +43,12 @@ const meta: Meta<typeof MapTopBar> = {
     docs: {
       description: {
         component:
-          'La barre d’un projet SIG (ADR-0216, redessinée en ADR-0221) : dans Carbone (Inset), la zone d’éligibilité et ' +
-          'la Dynamic baseline, la barre globale cède la place à celle du projet, posée sur la carte. 60 px ' +
-          '(`--ds-map-top-bar-height`), toute la largeur, le verre des contrôles de carte, un filet et une ombre en bas. À gauche le logo du module — un menu : ses crédits ' +
-          '(`DropdownCredits`), puis les lignes du produit —, « Retour » et le nom du projet ; au centre la bascule ' +
-          'Explorer · Analyser · Rapporter, son élément central (ADR-0236 : `ButtonGroup lg`, un `ViewGlyph` par mode) ; à droite trois groupes séparés d’un filet : l’action du projet, la carte (Rechercher, ' +
-          'le fond de carte), le fichier (Télécharger, Partager). Plus de profil ni de ⋯. Tout en `sm`.',
+          'La barre d’un projet SIG (ADR-0216, décomplexifiée en ADR-0241) : elle dit où l’on est et laisse en sortir ; ' +
+          'la carte porte les outils de la carte. 60 px (`--ds-map-top-bar-height`), toute la largeur, le verre des ' +
+          'contrôles de carte, un filet en bas. À gauche le logo du module, seul, « Quitter » et le nom du projet ; au ' +
+          'centre la bascule Explorer · Analyser · Rapporter (ADR-0236) ; à droite l’action de la page puis l’avatar, ' +
+          'dont le menu porte les crédits du module en tête (`#account-menu`). La recherche et le fond de carte sont dans ' +
+          'la colonne d’outils (`MapNavigator`). Tout en `sm`.',
       },
     },
   },
@@ -58,15 +58,15 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /**
- * Sur la carte : la barre, puis le panneau, la légende et les outils qui descendent sous elle. Le logo ouvre le menu du
- * module — ses crédits en tête, l’action lourde en dernier après un séparateur ; le fond de carte se choisit par son
- * image ; Télécharger tient ce que tenait ⋯. « Analyser » remplace la carte entière (`SwapTransition rise`) et la barre
+ * Sur la carte : la barre, puis le panneau, la légende et les outils qui descendent sous elle. Le logo n’est plus un
+ * menu ; l’avatar ouvre le menu du compte — les crédits du module en tête, la déconnexion en dernier. La recherche est
+ * en tête de la colonne d’outils, le fond de carte à son pied, en vignette ronde (ADR-0241). « Analyser » remplace la carte entière (`SwapTransition rise`) et la barre
  * devient opaque, sans ombre, ses contrôles hors du verre (ADR-0223) ; « Explorer » rend le verre. Le glyphe de la vue
  * choisie joue son arrivée (ADR-0236).
  */
 export const OnTheMap: Story = {
   name: 'Sur la carte',
-  args: { onBack: fn(), onShare: fn(), onCredits: fn() } as never,
+  args: { onBack: fn(), onCredits: fn() } as never,
   render: args => ({
     components: { MapTopBar, MapOverlay, MapPanel, MapNavigator, MapLegend, Button, DropdownItem, DropdownDivider, SwapTransition },
     setup() {
@@ -89,7 +89,11 @@ export const OnTheMap: Story = {
               <MapLegend title="Éligibilité" :legend="[{ label: 'Éligibles', color: 'var(--ds-chart-sequential-4)' }, { label: 'Non éligibles', color: 'var(--ds-chart-sequential-1)' }]" />
             </MapOverlay>
             <MapOverlay position="end">
-              <MapNavigator v-model:zoom="zoom" :tools="TOOLS" />
+              <MapNavigator
+                v-model:zoom="zoom" :tools="TOOLS"
+                search :search-open="searchOpen" @search="searchOpen = !searchOpen"
+                :basemaps="BASEMAPS" v-model:basemap="basemap"
+              />
             </MapOverlay>
           </div>
           <div v-else :key="view" style="height:720px; box-sizing:border-box; padding:calc(var(--ds-map-top-bar-height) + var(--ds-spacing-3xl)) var(--ds-spacing-xl) 0; background:var(--ds-bg-neutral); font:var(--ds-font-body-md); color:var(--ds-text-default)">
@@ -99,56 +103,45 @@ export const OnTheMap: Story = {
         <div :style="BAR">
           <MapTopBar
             module="Inset" project-name="Inset — Bassin arachidier, campagne 2026" :credits="1250"
-            :views="VIEWS" v-model:view="view" :basemaps="BASEMAPS" v-model:basemap="basemap"
-            search :search-open="searchOpen" :action-count="2"
-            @back="args.onBack" @share="args.onShare" @credits="args.onCredits" @search="searchOpen = !searchOpen"
+            :views="VIEWS" v-model:view="view" back-label="Quitter" :action-count="2" user-initials="AD"
+            @back="args.onBack" @credits="args.onCredits"
           >
-            <template #action><Button label="Soumettre pour validation" size="sm" /></template>
-            <template #module-menu="{ close }">
-              <DropdownItem icon="house" label="Aller à l’accueil" @click="close" />
-              <DropdownItem icon="folders" label="Retour aux projets Inset" @click="close" />
+            <template #action><Button label="Lancer une baseline sur cette zone" size="sm" /></template>
+            <template #account-menu="{ close }">
+              <DropdownItem icon="house" label="Accueil" @click="close" />
               <DropdownDivider />
-              <DropdownItem icon="book-open" label="Apprendre" @click="close" />
               <DropdownItem icon="settings" label="Paramètres" @click="close" />
               <DropdownItem icon="bell" label="Notifications" @click="close" />
               <DropdownDivider />
               <DropdownItem icon="log-out" label="Se déconnecter" tone="danger" @click="close" />
             </template>
-            <template #downloads="{ close }">
-              <DropdownItem icon="file-text" label="Rapport de vérification" @click="close" />
-              <DropdownItem icon="map" label="Zones (GeoJSON)" @click="close" />
-              <DropdownItem icon="table" label="Parcelles (CSV)" @click="close" />
-            </template>
           </MapTopBar>
         </div>
       </div>`,
   }),
-  /* Guarded: the mark opens the module's menu on its credits (a menu item the arrows reach), the basemap is chosen
-     by its picture, « Télécharger » opens its rows, « Retour » emits. */
+  /* Guarded (ADR-0241): the mark is not a menu; the avatar opens the account's menu on the credits; the basemap is
+     chosen by its round picture at the column's foot; « Rechercher » sits at the column's head; « Quitter » emits. */
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const page = within(document.body)
     const a = args as unknown as Record<'onBack' | 'onCredits', ReturnType<typeof fn>>
-    const mark = canvas.getByRole('button', { name: 'Menu Inset' })
-    await userEvent.click(mark)
-    await expect(mark).toHaveAttribute('aria-expanded', 'true')
+    await expect(canvas.queryByRole('button', { name: 'Menu Inset' })).toBeNull()
+    const avatar = canvas.getByRole('button', { name: 'Compte' })
+    await userEvent.click(avatar)
+    await expect(avatar).toHaveAttribute('aria-expanded', 'true')
     const credits = await page.findByRole('menuitem', { name: /1\s250 crédits Inset disponibles/ })
     await expect(page.getByRole('menuitem', { name: 'Se déconnecter' })).toBeTruthy()
     await userEvent.click(credits)
     await expect(a.onCredits).toHaveBeenCalledTimes(1)
-    await expect(mark).toHaveAttribute('aria-expanded', 'false')
+    await expect(avatar).toHaveAttribute('aria-expanded', 'false')
 
+    await expect(canvas.getByRole('button', { name: 'Rechercher' })).toBeTruthy()
     const basemap = canvas.getByRole('button', { name: 'Fond de carte : TOLBI' })
     await userEvent.click(basemap)
     await userEvent.click(await page.findByRole('radio', { name: 'Satellite' }))
     await expect(canvas.getByRole('button', { name: 'Fond de carte : Satellite' })).toBeTruthy()
 
-    const download = canvas.getByRole('button', { name: 'Télécharger' })
-    await userEvent.click(download)
-    await expect(await page.findByRole('menuitem', { name: 'Zones (GeoJSON)' })).toBeTruthy()
-    await userEvent.keyboard('{Escape}')
-
-    await userEvent.click(canvas.getByRole('button', { name: 'Retour' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Quitter' }))
     await expect(a.onBack).toHaveBeenCalledTimes(1)
 
     /* Off the map the bar is opaque, with no shadow (ADR-0223), derived from the view. */
@@ -173,15 +166,15 @@ export const Actions: Story = {
     template: `
       <div :style="MAP.replace('height:720px', 'height:320px')">
         <div style="display:flex; flex-direction:column; gap:var(--ds-spacing-xl)">
-          <MapTopBar module="Redd+" project-name="Forêt classée de Mbao" :views="VIEWS" view="map" search :basemaps="BASEMAPS" basemap="tolbi">
+          <MapTopBar module="Redd+" project-name="Forêt classée de Mbao" :views="VIEWS" view="map" back-label="Quitter" user-initials="AD">
             <template #action><Button label="Lancer une baseline" size="sm" /></template>
             <template #downloads><DropdownItem label="Rapport" /></template>
           </MapTopBar>
-          <MapTopBar module="Inset" project-name="Bassin arachidier" :views="VIEWS" view="map" :action-count="3" search :basemaps="BASEMAPS" basemap="satellite">
+          <MapTopBar module="Inset" project-name="Bassin arachidier" :views="VIEWS" view="map" :action-count="3" back-label="Quitter" user-initials="AD">
             <template #action><Button label="Renvoyer le rapport" size="sm" /></template>
             <template #downloads><DropdownItem label="Rapport" /></template>
           </MapTopBar>
-          <MapTopBar module="Carbone" project-name="Kaffrine Nord" :views="VIEWS" view="analytics" :share="false">
+          <MapTopBar module="Carbone" project-name="Kaffrine Nord" :views="VIEWS" view="analytics" back-label="Quitter" user-initials="AD">
             <template #action><Button label="Télécharger le rapport" size="sm" variant="secondary-gray" icon-leading="download" /></template>
           </MapTopBar>
         </div>
@@ -213,7 +206,7 @@ export const EnterAndLeave: Story = {
               <HorizontalNavigation module="Inset" :breadcrumbs="[{ label: 'Projets' }]" user-initials="AD" />
             </div>
             <div v-else key="project" style="grid-area:1 / 1">
-              <MapTopBar module="Inset" project-name="Bassin arachidier" :views="VIEWS" view="map" search :basemaps="BASEMAPS" basemap="tolbi" @back="inProject = false">
+              <MapTopBar module="Inset" project-name="Bassin arachidier" :views="VIEWS" view="map" back-label="Quitter" user-initials="AD" @back="inProject = false">
                 <template #action><Button label="Soumettre pour validation" size="sm" /></template>
               </MapTopBar>
             </div>
@@ -244,7 +237,7 @@ export const ViewsSizes: Story = {
     setup: () => ({ VIEWS, view: ref('map'), SIZES: ['sm', 'md', 'lg'] as const }),
     template: `
       <div style="display:flex;flex-direction:column;gap:var(--ds-spacing-xl);padding:var(--ds-spacing-xl) 0;background:url(./stories/map-loading/base.webp) center / cover">
-        <MapTopBar v-for="s in SIZES" :key="s" :views-size="s" module="Inset" project-name="Bassin arachidier" :views="VIEWS" v-model:view="view" :share="false" />
+        <MapTopBar v-for="s in SIZES" :key="s" :views-size="s" module="Inset" project-name="Bassin arachidier" :views="VIEWS" v-model:view="view" back-label="Quitter" user-initials="AD" />
       </div>`,
   }),
 }

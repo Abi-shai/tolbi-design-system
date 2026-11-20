@@ -5,6 +5,7 @@ import { IconButton } from '../IconButton'
 import { SurfaceTransition } from '../SurfaceTransition'
 import { Tooltip, type TooltipPlacement } from '../Tooltip'
 import MapZoomGauge from './MapZoomGauge.vue'
+import MapBasemapPicker, { type MapBasemapOption } from './MapBasemapPicker.vue'
 
 /**
  * The map's tools column (ADR-0171, after ADR-0100 / ADR-0120): one upright
@@ -80,6 +81,23 @@ interface Props {
    * the column keeps its shape and nothing moves when the map arrives.
    */
   disabled?: boolean
+  /**
+   * « Rechercher » at the column's head, in a group of its own (ADR-0241 — it
+   * left `MapTopBar`). With a `#tool-search` slot it opens its card to the
+   * column's left, as the tools do; without, it emits `search` and wears
+   * `searchOpen`.
+   */
+  search?: boolean
+  searchLabel?: string
+  /** The product's search is open — the button wears the open state. */
+  searchOpen?: boolean
+  /**
+   * The basemaps, at the column's foot after « Recentrer » (ADR-0241): the
+   * chosen one's picture in a round 36px frame, opening `MapBasemapPicker` to
+   * the column's left. Fewer than two: nothing.
+   */
+  basemaps?: MapBasemapOption[]
+  basemapLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -98,6 +116,11 @@ const props = withDefaults(defineProps<Props>(), {
   collapseLabel: undefined,
   tooltipPlacement: 'left',
   disabled: false,
+  search: false,
+  searchLabel: 'Rechercher',
+  searchOpen: false,
+  basemaps: () => [],
+  basemapLabel: 'Fond de carte',
 })
 
 const emit = defineEmits<{
@@ -108,6 +131,8 @@ const emit = defineEmits<{
    * opened. One thing at a time — a sheet there should close.
    */
   claim: [value: string]
+  /** « Rechercher » pressed, when no `#tool-search` card answers it (ADR-0241). */
+  search: []
 }>()
 
 defineSlots<{
@@ -132,6 +157,8 @@ const minimapOpen = defineModel<boolean>('minimapOpen', { default: true })
 /** @deprecated The mini-map is a tool now (ADR-0171): `v-model:minimap-open`. Ignored. */
 defineModel<boolean>('collapsed', { default: true })
 const zoom = defineModel<number>('zoom', { default: 10 })
+/** The chosen basemap — `v-model:basemap` (ADR-0241). */
+const basemap = defineModel<string | undefined>('basemap', { default: undefined })
 
 const slots = useSlots() as Record<string, unknown>
 const MINIMAP = 'minimap'
@@ -146,12 +173,18 @@ const KNOWN = ['search', 'filters', 'info']
 const allTools = computed<MapTool[]>(() => {
   const known = KNOWN.map((v) => props.tools.find((t) => t.value === v)).filter((t): t is MapTool => !!t)
   const other = props.tools.filter((t) => !KNOWN.includes(t.value) && t.value !== MINIMAP)
-  const list = [...known, ...other]
+  /* « Rechercher » given as a prop has its own group at the head (ADR-0241). */
+  const list = [...known, ...other].filter((t) => !(props.search && t.value === 'search'))
   if (slots.default) list.push({ value: MINIMAP, icon: 'map', label: props.expandLabel ?? props.minimapLabel })
   return list
 })
 const opens = (t: MapTool) => t.value !== MINIMAP && !!slots[`tool-${t.value}`]
-const current = computed(() => allTools.value.find((t) => t.value === tool.value && opens(t)) ?? null)
+/* « Rechercher », a group of its own at the column's head (ADR-0241). */
+const searchTool = computed<MapTool[]>(() =>
+  props.search ? [{ value: 'search', icon: 'search', label: props.searchLabel, pressed: props.searchOpen }] : [],
+)
+const groups = computed(() => [searchTool.value, allTools.value].filter((g) => g.length))
+const current = computed(() => [...searchTool.value, ...allTools.value].find((t) => t.value === tool.value && opens(t)) ?? null)
 const tipOf = (t: MapTool) => (t.disabled && t.disabledHint ? `${t.label} — ${t.disabledHint}` : t.label)
 
 /* A sheet on the right (a `MapPanel` beside the column) hides the mini-map
@@ -184,7 +217,8 @@ function onTool(t: MapTool) {
     return
   }
   if (!opens(t)) {
-    emit('press', t.value)
+    if (t.value === 'search' && props.search) emit('search')
+    else emit('press', t.value)
     return
   }
   if (tool.value === t.value) {
@@ -316,21 +350,19 @@ function by(d: number) {
 
 <template>
   <div ref="column" class="ds-map-navigator ds-map-navigator--column" role="group" :aria-label="label" @keydown="onKey">
-    <template v-if="allTools.length">
+    <template v-for="group in groups" :key="group[0].value">
       <div class="ds-map-navigator__group">
-        <span v-for="t in allTools" :key="t.value" class="ds-map-navigator__tool" :data-map-tool="t.value">
+        <span v-for="t in group" :key="t.value" class="ds-map-navigator__tool" :data-map-tool="t.value">
           <Tooltip :title="tipOf(t)" :placement="tooltipPlacement">
             <IconButton
               :icon="t.icon"
               size="md"
               variant="ghost"
-             
-             
               :ariaLabel="t.badge ? `${t.label} (${t.badge})` : t.label"
               :selected="t.value === MINIMAP ? minimapOpen : opens(t) ? tool === t.value : !!t.pressed"
-              :aria-expanded="opens(t) ? tool === t.value : undefined"
+              :aria-expanded="opens(t) ? tool === t.value : t.value === 'search' && search ? searchOpen : undefined"
               :aria-controls="opens(t) && tool === t.value ? flyoutId : t.value === MINIMAP && minimapShown ? minimapId : undefined"
-              :aria-pressed="t.value === MINIMAP ? minimapOpen : opens(t) ? undefined : !!t.pressed"
+              :aria-pressed="t.value === MINIMAP ? minimapOpen : opens(t) || (t.value === 'search' && search) ? undefined : !!t.pressed"
               :disabled="disabled || t.disabled"
               @click="onTool(t)"
             />
@@ -356,6 +388,21 @@ function by(d: number) {
     <Tooltip :title="recenterLabel" :placement="tooltipPlacement">
       <IconButton icon="crosshair" size="md" variant="ghost" :ariaLabel="recenterLabel" :disabled="disabled" @click="emit('recenter')" />
     </Tooltip>
+
+    <!-- The basemap at the foot (ADR-0241): the chosen one's picture, round, the tray to the column's left. -->
+    <template v-if="basemaps.length > 1">
+      <span class="ds-map-navigator__rule" aria-hidden="true" />
+      <span class="ds-map-navigator__basemap">
+        <MapBasemapPicker
+          v-model="basemap"
+          :basemaps="basemaps"
+          :label="basemapLabel"
+          shape="round"
+          side="left"
+          :tooltip-placement="tooltipPlacement"
+        />
+      </span>
+    </template>
 
     <!-- What the open tool shows: a card to the column's left, its top on its button's. -->
     <SurfaceTransition @enter="focusArrived">
@@ -469,6 +516,12 @@ function by(d: number) {
   justify-content: center;
   box-shadow: 0 0 0 var(--ds-border-width-strong) var(--ds-bg-default);
   pointer-events: none;
+}
+
+/* The basemap's round frame, centred on the column's axis (ADR-0241). */
+.ds-map-navigator__basemap {
+  display: flex;
+  justify-content: center;
 }
 
 .ds-map-navigator__rule {

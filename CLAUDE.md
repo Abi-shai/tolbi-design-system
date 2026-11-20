@@ -1936,6 +1936,13 @@ Before working on any component, read:
   `bottom` travels in Web Animations while the fold's content is cut at the same line — the legend takes its open height
   at once; no `0fr → 1fr` under a backdrop (9 long frames of ~50 → 0 of 64). A disclosure chip's chevron **turns 180°**
   over `process` instead of swapping glyphs. Reduced motion: a short fade, asked by the component.
+- **ADR-0241**: **the GIS bar says where one is; the map carries its tools** — `MapTopBar`: the **mark alone** (no menu
+  without `#module-menu`), « Quitter » (`backLabel`), the name; the end = `#action` then **the avatar** (`userInitials` /
+  `userSrc`, 32 in a 36 target) whose **`#account-menu`** opens a `Dropdown` at its end with **`DropdownCredits` at its
+  head**; `search*` and `basemap*` **removed**, `share` off by default. **`MapNavigator`** gains **`search`** (own group at
+  the head; `#tool-search` card or `@search`) and **`basemaps` + `v-model:basemap`** at the foot after « Recentrer »: a
+  **round 36px** picture (3px margin) opening the tray to the column's left — `MapBasemapPicker shape="round" side="left"`,
+  `Dropdown side` gains `left | right` (beside: inline `spacing-md`, centred).
 
 ## Architecture
 

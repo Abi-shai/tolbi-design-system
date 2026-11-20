@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Dropdown } from '../Dropdown'
-import { Tooltip } from '../Tooltip'
+import { Dropdown, type DropdownSide } from '../Dropdown'
+import { Tooltip, type TooltipPlacement } from '../Tooltip'
 
 /** One basemap the map can be drawn on — « TOLBI », « Satellite ». */
 export interface MapBasemapOption {
@@ -38,6 +38,11 @@ export interface MapBasemapOption {
  *
  * The images are the product's (`src`, or `#thumbnail` for an element of its
  * own); the package draws the frame, the selection and the panel.
+ *
+ * **`shape="round"`** (ADR-0241) is the trigger at the foot of `MapNavigator`'s
+ * column, among its round buttons: 36px, the picture in a circle inside a 3px
+ * white margin — a square there was the « disunion » the owner pointed at. With
+ * `side="left"` the tray opens to the column's left, as the tools' cards do.
  */
 interface Props {
   basemaps: MapBasemapOption[]
@@ -45,11 +50,20 @@ interface Props {
   modelValue?: string
   /** What the control chooses — the trigger's name (with the active basemap after it) and the tray's title. */
   label?: string
+  /** `square` (the bar's, 28px) or `round` (the tools column's, 36px — ADR-0241). */
+  shape?: 'square' | 'round'
+  /** Where the tray opens: `below` the trigger, or `left` of the tools column. */
+  side?: DropdownSide
+  /** The trigger's tooltip side. */
+  tooltipPlacement?: TooltipPlacement
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: undefined,
   label: 'Fond de carte',
+  shape: 'square',
+  side: 'below',
+  tooltipPlacement: 'bottom-end',
 })
 
 const emit = defineEmits<{
@@ -84,13 +98,13 @@ function step(e: KeyboardEvent) {
 </script>
 
 <template>
-  <Dropdown v-if="current" v-model:open="open" align="end" surface="tray" :label="label">
+  <Dropdown v-if="current" v-model:open="open" align="end" :side="side" surface="tray" :label="label">
     <template #trigger="{ open: isOpen, toggle }">
-      <Tooltip :title="label" placement="bottom-end" :disabled="isOpen">
+      <Tooltip :title="label" :placement="tooltipPlacement" :disabled="isOpen">
         <button
           type="button"
           class="ds-map-basemap-picker__trigger"
-          :class="{ 'ds-map-basemap-picker__trigger--open': isOpen }"
+          :class="{ 'ds-map-basemap-picker__trigger--open': isOpen, 'ds-map-basemap-picker__trigger--round': shape === 'round' }"
           :aria-label="`${label} : ${current.label}`"
           :aria-expanded="isOpen"
           aria-haspopup="true"
@@ -168,6 +182,19 @@ function step(e: KeyboardEvent) {
   width: 100%;
   height: 100%;
   border-radius: var(--ds-radius-inner-sm);
+}
+
+/* Round (ADR-0241): among the tools column's round buttons — 36px, the picture
+   in a circle inside a 3px white margin. */
+.ds-map-basemap-picker__trigger--round {
+  width: 36px;
+  height: 36px;
+  padding: 3px;
+  border-radius: var(--ds-radius-pill);
+}
+
+.ds-map-basemap-picker__trigger--round .ds-map-basemap-picker__picture {
+  border-radius: var(--ds-radius-pill);
 }
 
 .ds-map-basemap-picker__picture :deep(img),
