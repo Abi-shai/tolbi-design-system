@@ -88,7 +88,11 @@ interface Props {
   /**
    * `false`: the chip unfolds something in place rather than opening a popup —
    * a disclosure, `aria-expanded` without `aria-haspopup` (ADR-0138, the map
-   * legend's « Symboles »). Same chrome, another control.
+   * legend's « Symboles »). Same chrome, another control — and **another
+   * ground** (ADR-0237): a disclosure's open state is an interaction state, not
+   * a fill, so the chip is groundless at rest and takes the glass's veil
+   * (`--on-glass-hover`, else `bg-hover`) under the pointer and while open, as
+   * `ghost` and `IconButton` do. Its marks, word and chevron are unchanged.
    */
   popup?:     boolean
 }
@@ -111,7 +115,7 @@ withDefaults(defineProps<Props>(), {
     :class="[
       `ds-dropdown-trigger--${size}`,
       `ds-dropdown-trigger--${chrome}`,
-      { 'ds-dropdown-trigger--open': open },
+      { 'ds-dropdown-trigger--open': open, 'ds-dropdown-trigger--disclosure': !popup },
     ]"
     :aria-expanded="open"
     :aria-label="ariaLabel"
@@ -274,6 +278,20 @@ withDefaults(defineProps<Props>(), {
 .ds-dropdown-trigger--chip:hover:not(:disabled),
 .ds-dropdown-trigger--chip.ds-dropdown-trigger--open {
   background-color: var(--ds-bg-neutral-strong);
+}
+
+/* A chip that unfolds in place (ADR-0237): a disclosure, not a setting. Open is
+   an interaction state, not a fill — `bg-neutral-strong` made the legend's
+   « Symboles » the heaviest thing on its glass, and it knows neither the glass
+   nor the dark theme. So `ghost`'s ground: nothing at rest, the glass's veil
+   under the pointer and while open. */
+.ds-dropdown-trigger--chip.ds-dropdown-trigger--disclosure {
+  background-color: transparent;
+}
+
+.ds-dropdown-trigger--chip.ds-dropdown-trigger--disclosure:hover:not(:disabled),
+.ds-dropdown-trigger--chip.ds-dropdown-trigger--disclosure.ds-dropdown-trigger--open {
+  background-color: var(--on-glass-hover, var(--ds-bg-hover));
 }
 
 /* ── Shared states ────────────────────────────────────────────────── */

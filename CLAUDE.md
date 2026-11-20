@@ -1916,6 +1916,11 @@ Before working on any component, read:
   **amended**: **`viewsSize`** `sm | md | lg` = switch 44 / 48 / 52 (`ButtonGroup lg-compact | lg | xl`) in a row of
   3.5 / 3.75 / 4rem, `md` retained; `xl` uses minted **`label-2xl`** / `-strong` (20/28); the end column
   `minmax(min-content, 1fr)` so it never runs under the switch.
+- **ADR-0237**: **a disclosure chip is not a fill** — a `DropdownTrigger chip` with `popup: false` (it unfolds in place:
+  the legend's « Symboles », « +N ») takes `ghost`'s ground: nothing at rest, `--on-glass-hover` (else `bg-hover`) under
+  the pointer and open — open is an interaction state; `bg-neutral-strong` made it the legend's heaviest thing and knew
+  neither glass nor dark. Raised tile and hollow tried and refused (opening is not choosing, a chip is not a container).
+  A chip that opens a popup (a setting) keeps its tinted pill. Derived from `popup`, no new prop.
 
 ## Architecture
 
