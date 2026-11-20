@@ -12,7 +12,7 @@ import { BrandPattern } from '../BrandPattern'
  *   at 64 (`CreditCoins trim :size="64"`), the figure in `MetricValue lg`, the
  *   action a `Button md` — ADR-0231's 128 / `xl` / `lg` dominated the door;
  * - **`#aside`**, the surface beside it — a `Tray` — which takes **the rest**.
- *   The tray there keeps `bg-neutral-subtle` (`--on-door-tray-ground`): on the
+ *   The tray there keeps `bg-neutral-subtle` (`--tray-ground`): on the
  *   yellow, the lighter grey is the one the door was drawn with, where every
  *   other tray took `bg-neutral` (ADR-0234).
  *
@@ -71,7 +71,7 @@ defineSlots<{
 
 /* The surface beside it is a column, so a tray in it can take its height. */
 .ds-door__aside {
-  --on-door-tray-ground: var(--ds-bg-neutral-subtle);
+  --tray-ground: var(--ds-bg-neutral-subtle);
   display: flex;
   flex-direction: column;
   min-width: 0;

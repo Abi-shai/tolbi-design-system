@@ -26,8 +26,10 @@ import { Scrollbar } from '../Scrollbar'
  * (`bg-neutral-hover`, ADR-0234): at the ground's own grey a hovered row read
  * as a hole through the surface.
  *
- * A door keeps its tray on the lighter grey: `Door` hands down
- * `--on-door-tray-ground`, read here before `bg-neutral`.
+ * **A container may set the tray's ground** through `--tray-ground`, read
+ * here before `bg-neutral`: a door keeps the lighter grey it was drawn with
+ * (ADR-0234), the modules' panel takes one step past the page (ADR-0244).
+ * The surface resets it, so a tray inside a tray does not inherit it.
  *
  * **Open at the bottom** (`bleed="bottom"`, ADR-0234): a block that runs to the
  * page's lower edge — top corners only, no hairline and no padding at the
@@ -133,7 +135,7 @@ const titleId = `ds-tray-title-${useId()}`
   border: var(--ds-border-width-default) solid var(--ds-border-subtlest);
   border-radius: var(--ds-radius-surface-lg);
   /* `bg-neutral` (ADR-0234); a door keeps the lighter grey it was drawn on. */
-  --surface-ground: var(--on-door-tray-ground, var(--ds-bg-neutral));
+  --surface-ground: var(--tray-ground, var(--ds-bg-neutral));
   background: var(--surface-ground);
 }
 
@@ -194,8 +196,8 @@ const titleId = `ds-tray-title-${useId()}`
      read as a hole through the white. */
   --on-tray-hover: var(--ds-bg-neutral-hover);
   --on-tray-hover-strong: var(--ds-bg-neutral-strong);
-  /* A tray inside this one does not inherit the door's ground. */
-  --on-door-tray-ground: initial;
+  /* A tray inside this one does not inherit the container's ground. */
+  --tray-ground: initial;
 }
 
 .ds-tray--bleed-bottom > .ds-tray__surface {

@@ -88,6 +88,8 @@ interface Props {
    * `Breadcrumbs`, qui garde son état profondeur 0, doit rester sur un lieu.
    */
   homeLabel?:       string
+  /** The modules' panel's title (ADR-0244) — « Modules » by default. */
+  modulesTitle?:    string
   /**
    * Le glyphe du bouton de retour — `house` quand il mène à l'accueil,
    * `arrow-left` quand il ramène à la page quittée (Paramètres). Le mot et le
@@ -131,6 +133,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   lockup:          true,
   homeLabel:       'Retourner sur l\u2019accueil',
+  modulesTitle:    'Modules',
   homeIcon:        'house',
   userInitials:    'TD',
   hasNotification: false,
@@ -528,6 +531,7 @@ onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
               v-if="modulesOpen && modules.length"
               class="ds-hnav__modules-dropdown"
               :modules="modulesWithCurrent"
+              :title="modulesTitle"
               @select="selectModule"
             />
           </SurfaceTransition>

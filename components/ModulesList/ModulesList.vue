@@ -30,11 +30,18 @@ export type ModulesListLayout = 'panel' | 'page'
 interface Props {
   modules?: ModulesListItem[]
   layout?:  ModulesListLayout
+  /**
+   * The panel's title, in its tray above the white surface (ADR-0244) — a
+   * `Tray` title, as the home page's « Accès rapide ». Panel only; the page's
+   * list sits in the product's own titled tray.
+   */
+  title?:   string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modules: () => [],
   layout:  'panel',
+  title:   undefined,
 })
 
 const emit = defineEmits<{
@@ -69,7 +76,7 @@ function current(item: ModulesListItem) {
     :is="layout === 'panel' ? Tray : 'div'"
     class="ds-modules-list"
     :class="`ds-modules-list--${layout}`"
-    v-bind="layout === 'panel' ? { surface: false } : {}"
+    v-bind="layout === 'panel' ? { surface: false, title, headingLevel: 2 } : {}"
   >
     <!-- The drawer scrolls inside its box; a page scrolls itself. -->
     <component
@@ -178,6 +185,12 @@ function current(item: ModulesListItem) {
   display: inline-flex;
   align-items: flex-start;
   flex-shrink: 0;
+}
+
+/* The panel's tray, one step past the page's grey (ADR-0244): on `bg-neutral`,
+   the tray's own ground, it melted into the page it opens over. */
+.ds-modules-list--panel {
+  --tray-ground: var(--ds-bg-neutral-hover);
 }
 
 .ds-modules-list__viewport {

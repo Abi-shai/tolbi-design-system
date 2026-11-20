@@ -1886,7 +1886,7 @@ Before working on any component, read:
 - **ADR-0234**: **a darker tray, a smaller door, what « Rapporter » drew alone** — `Tray` on **`bg-neutral`** (grey 50
   barely left the page); `--on-tray-hover` → new **`bg-neutral-hover`** (gray-light 200 / gray-forest 600; at the ground's
   grey a hovered row was a hole), the plates' hover reads it; `Door` keeps its tray on `bg-neutral-subtle`
-  (`--on-door-tray-ground`). The door's lead is a landmark: coins 64, `MetricValue lg`, `Button md` — two columns, four
+  (`--tray-ground`, renamed by ADR-0244). The door's lead is a landmark: coins 64, `MetricValue lg`, `Button md` — two columns, four
   modules; **`MetricValue xl` and `metric-2xl` deleted** (no consumer); `TrayGrid`'s fade back to 24px (64 washed a whole
   row). `Tray` gains **`bleed="bottom"`** (top corners, no bottom edge or padding, the surface open), **`badge`/`badgeTone`**
   and **`#footer`** (`Dialog`'s foot: inset rule, full-width action, the content in `Scrollbar fade="long"`). Fades read
@@ -1951,6 +1951,10 @@ Before working on any component, read:
 - **ADR-0243**: **the basemap and the avatar are one group** — `MapTopBar`'s end is two groups: the page's (`#action`,
   « Télécharger », « Partager ») │ the map's and the person's (`__mine`: basemap · avatar, `spacing-sm`); **one rule
   between them, only when the first is there**, none inside. No action = the pair alone, no rule.
+- **ADR-0244**: **the modules panel stands off the page** (track D) — `HorizontalNavigation`'s modules panel: its tray on
+  **`bg-neutral-hover`** (one step past the page's `bg-neutral`, which it melted into) and a **`Tray` title** « Modules »
+  (`modulesTitle` → new `ModulesList title`, panel only; the home trays' head, `h2`). Surface, icons, hover, active
+  unchanged. The tray's ground variable is now **`--tray-ground`** (set by `Door` and the panel; the surface resets it).
 
 ## Architecture
 
