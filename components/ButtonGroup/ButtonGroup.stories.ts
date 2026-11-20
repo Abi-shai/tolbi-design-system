@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3'
 import ButtonGroup from './ButtonGroup.vue'
 import ButtonGroupItem from './ButtonGroupItem.vue'
+import { ViewGlyph } from '../ViewGlyph'
 import { InputField } from '../InputField'
 import { InputDropdown, Dropdown, DropdownTrigger, DropdownItem } from '../Dropdown'
 import { Button } from '../Button'
@@ -127,8 +128,8 @@ export const DynamicSegments: Story = {
 export const Sizes: Story = {
   name: 'Sizes',
   render: () => ({
-    setup: () => ({ md: ref('grille'), sm: ref('grille') }),
-    components: { ButtonGroup, ButtonGroupItem },
+    setup: () => ({ md: ref('grille'), sm: ref('grille'), lg: ref('map') }),
+    components: { ButtonGroup, ButtonGroupItem, ViewGlyph },
     template: `
       <div style="display:flex; flex-direction:column; align-items:flex-start; gap:var(--ds-spacing-xl);">
         <ButtonGroup v-model="md" aria-label="Vue, md">
@@ -142,6 +143,12 @@ export const Sizes: Story = {
         <ButtonGroup v-model="sm" size="sm" aria-label="Vue avec libellés, sm">
           <ButtonGroupItem value="grille" icon="layout-grid" label="Grille" />
           <ButtonGroupItem value="tableau" icon="table" label="Tableau" />
+        </ButtonGroup>
+        <!-- lg (ADR-0236) : la bascule centrale d’une barre, 48px, un glyphe de 24 par l’emplacement #icon. -->
+        <ButtonGroup v-model="lg" size="lg" aria-label="Mode, lg">
+          <ButtonGroupItem value="map" label="Explorer"><template #icon="{ selected }"><ViewGlyph view="map" :active="selected" /></template></ButtonGroupItem>
+          <ButtonGroupItem value="analytics" label="Analyser"><template #icon="{ selected }"><ViewGlyph view="analytics" :active="selected" /></template></ButtonGroupItem>
+          <ButtonGroupItem value="report" label="Rapporter"><template #icon="{ selected }"><ViewGlyph view="report" :active="selected" /></template></ButtonGroupItem>
         </ButtonGroup>
       </div>
     `,

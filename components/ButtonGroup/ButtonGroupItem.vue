@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref, useSlots } from 'vue'
 import { Icon } from '../Icon'
 import type { IconName } from '../Icon'
 import { BUTTON_GROUP_KEY } from './context'
@@ -33,6 +33,12 @@ const emit = defineEmits<{
   click: [event: MouseEvent]
 }>()
 
+defineSlots<{
+  /** A glyph of the product's in place of `icon` — `ViewGlyph` in `MapTopBar` (ADR-0236). Decorative. */
+  icon?: (props: { selected: boolean; size: 16 | 20 | 24 }) => unknown
+}>()
+const slots = useSlots()
+
 const group = inject(BUTTON_GROUP_KEY, null)
 const el = ref<HTMLButtonElement>()
 const key = computed(() => props.value ?? props.label ?? '')
@@ -41,8 +47,10 @@ onMounted(() => { if (group && el.value) group.register(key.value, el.value) })
 onBeforeUnmount(() => group?.unregister(key.value))
 
 const selected = computed(() => group?.isSelected(key.value) ?? false)
-const iconOnly = computed(() => !!props.icon && !props.label)
+const hasIcon = computed(() => !!props.icon || !!slots.icon)
+const iconOnly = computed(() => hasIcon.value && !props.label)
 const size = computed(() => group?.size.value ?? 'md')
+const iconSize = computed(() => (size.value === 'sm' ? 16 : size.value === 'lg' ? 24 : 20))
 const shape = computed(() => group?.shape.value ?? 'rail')
 
 function handleClick(event: MouseEvent) {
@@ -62,16 +70,19 @@ function handleClick(event: MouseEvent) {
       'ds-button-group-item',
       `ds-button-group-item--${size}`,
       iconOnly && 'ds-button-group-item--icon-only',
-      icon && label && 'ds-button-group-item--leading-icon',
+      hasIcon && label && 'ds-button-group-item--leading-icon',
       selected && 'ds-button-group-item--active',
       shape === 'pill' && 'ds-button-group-item--pill',
     ]"
     @click="handleClick"
   >
+    <span v-if="$slots.icon" class="ds-button-group-item__glyph" aria-hidden="true">
+      <slot name="icon" :selected="selected" :size="iconSize" />
+    </span>
     <Icon
-      v-if="icon"
+      v-else-if="icon"
       :name="icon"
-      :size="size === 'sm' ? 16 : 20"
+      :size="iconSize"
       class="ds-button-group-item__icon"
       aria-hidden="true"
     />
@@ -135,6 +146,59 @@ function handleClick(event: MouseEvent) {
 .ds-button-group-item--sm.ds-button-group-item--leading-icon {
   gap: var(--ds-spacing-sm);
   padding: var(--ds-spacing-xxs) var(--ds-spacing-md) var(--ds-spacing-xxs) var(--ds-spacing-sm);
+}
+
+/* ── lg (ADR-0236) ─────────────────────────────────────────────────── */
+/* 40px, so the rail is 48: the 24px line of `label-xl` and the 24px glyph,
+   `spacing-md` above and below; the chosen view in `label-xl-strong`. */
+.ds-button-group-item--lg {
+  min-height: 40px;
+  padding: var(--ds-spacing-md) var(--ds-spacing-2xl);
+  font: var(--ds-font-label-xl);
+}
+
+.ds-button-group-item--lg.ds-button-group-item--leading-icon {
+  gap: var(--ds-spacing-md);
+  padding: var(--ds-spacing-md) var(--ds-spacing-2xl) var(--ds-spacing-md) var(--ds-spacing-xl);
+}
+
+.ds-button-group-item--lg.ds-button-group-item--active {
+  font: var(--ds-font-label-xl-strong);
+}
+
+/* A view at rest under the pointer takes the glass's veil, and its glyph
+   lifts; pressed, the view sinks a little. */
+.ds-button-group-item--lg:not(.ds-button-group-item--active):hover:not(:disabled) {
+  background-color: var(--on-glass-hover, color-mix(in srgb, var(--ds-bg-default) 50%, transparent));
+}
+
+.ds-button-group-item__glyph {
+  display: flex;
+  flex: none;
+  transition: transform var(--ds-motion-duration-quick) var(--ds-motion-easing-out);
+}
+
+.ds-button-group-item--lg:not(.ds-button-group-item--active):hover:not(:disabled) .ds-button-group-item__glyph {
+  transform: translateY(-0.0625rem) scale(1.08);
+}
+
+.ds-button-group-item--lg {
+  transition:
+    background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-out),
+    color            var(--ds-motion-duration-moderate) var(--ds-motion-easing-in-out),
+    box-shadow       var(--ds-motion-duration-instant) var(--ds-motion-easing-default),
+    transform        var(--ds-motion-duration-instant) var(--ds-motion-easing-out);
+}
+
+.ds-button-group-item--lg:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-button-group-item--lg:active:not(:disabled),
+  .ds-button-group-item--lg:not(.ds-button-group-item--active):hover:not(:disabled) .ds-button-group-item__glyph {
+    transform: none;
+  }
 }
 
 /* Pill (ADR-0216): the segment takes the group's round corners, so its hover

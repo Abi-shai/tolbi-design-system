@@ -13,8 +13,9 @@ import { BarTransition } from '../BarTransition'
 import { SwapTransition } from '../SwapTransition'
 
 const VIEWS = [
-  { value: 'map', label: 'Carte', icon: 'map' as const },
-  { value: 'analytics', label: 'Analytics', icon: 'chart-column' as const },
+  { value: 'map', label: 'Explorer', glyph: 'map' as const },
+  { value: 'analytics', label: 'Analyser', glyph: 'analytics' as const },
+  { value: 'report', label: 'Rapporter', glyph: 'report' as const },
 ]
 
 const BASEMAPS = [
@@ -27,7 +28,7 @@ const TOOLS = [{ value: 'filters', icon: 'filter' as const, label: 'Filtres' }]
 
 /* The map under the bar: the whole surface, no column margins (ADR-0216). */
 const MAP =
-  'position:relative; height:720px; overflow:hidden; --ds-map-overlay-top: calc(3.5rem + var(--ds-spacing-lg)); ' +
+  'position:relative; height:720px; overflow:hidden; --ds-map-overlay-top: calc(var(--ds-map-top-bar-height) + var(--ds-spacing-lg)); ' +
   "background:url('./stories/map-loading/parcels.webp') center / cover no-repeat, url('./stories/map-loading/base.webp') center / cover no-repeat;"
 
 const BAR = 'position:absolute; inset:0 0 auto 0; z-index:2'
@@ -43,10 +44,10 @@ const meta: Meta<typeof MapTopBar> = {
       description: {
         component:
           'La barre d’un projet SIG (ADR-0216, redessinée en ADR-0221) : dans Carbone (Inset), la zone d’éligibilité et ' +
-          'la Dynamic baseline, la barre globale cède la place à celle du projet, posée sur la carte. 56 px, toute la ' +
-          'largeur, verre de lecture, un filet et une ombre en bas. À gauche le logo du module — un menu : ses crédits ' +
+          'la Dynamic baseline, la barre globale cède la place à celle du projet, posée sur la carte. 60 px ' +
+          '(`--ds-map-top-bar-height`), toute la largeur, le verre des contrôles de carte, un filet et une ombre en bas. À gauche le logo du module — un menu : ses crédits ' +
           '(`DropdownCredits`), puis les lignes du produit —, « Retour » et le nom du projet ; au centre la bascule ' +
-          '« Carte | Analytics » ; à droite trois groupes séparés d’un filet : l’action du projet, la carte (Rechercher, ' +
+          'Explorer · Analyser · Rapporter, son élément central (ADR-0236 : `ButtonGroup lg`, un `ViewGlyph` par mode) ; à droite trois groupes séparés d’un filet : l’action du projet, la carte (Rechercher, ' +
           'le fond de carte), le fichier (Télécharger, Partager). Plus de profil ni de ⋯. Tout en `sm`.',
       },
     },
@@ -59,8 +60,9 @@ type Story = StoryObj<typeof meta>
 /**
  * Sur la carte : la barre, puis le panneau, la légende et les outils qui descendent sous elle. Le logo ouvre le menu du
  * module — ses crédits en tête, l’action lourde en dernier après un séparateur ; le fond de carte se choisit par son
- * image ; Télécharger tient ce que tenait ⋯. « Analytics » remplace la carte entière (`SwapTransition rise`) et la barre
- * devient opaque, sans ombre, ses contrôles hors du verre (ADR-0223) ; « Carte » rend le verre.
+ * image ; Télécharger tient ce que tenait ⋯. « Analyser » remplace la carte entière (`SwapTransition rise`) et la barre
+ * devient opaque, sans ombre, ses contrôles hors du verre (ADR-0223) ; « Explorer » rend le verre. Le glyphe de la vue
+ * choisie joue son arrivée (ADR-0236).
  */
 export const OnTheMap: Story = {
   name: 'Sur la carte',
@@ -90,8 +92,8 @@ export const OnTheMap: Story = {
               <MapNavigator v-model:zoom="zoom" :tools="TOOLS" />
             </MapOverlay>
           </div>
-          <div v-else key="analytics" style="height:720px; box-sizing:border-box; padding:calc(3.5rem + var(--ds-spacing-3xl)) var(--ds-spacing-xl) 0; background:var(--ds-bg-neutral); font:var(--ds-font-body-md); color:var(--ds-text-default)">
-            Toutes les données du projet — la vue Analytics remplace la carte entièrement.
+          <div v-else :key="view" style="height:720px; box-sizing:border-box; padding:calc(var(--ds-map-top-bar-height) + var(--ds-spacing-3xl)) var(--ds-spacing-xl) 0; background:var(--ds-bg-neutral); font:var(--ds-font-body-md); color:var(--ds-text-default)">
+            {{ view === 'report' ? 'Le rapport du projet — la vue Rapporter remplace la carte.' : 'Toutes les données du projet — la vue Analyser remplace la carte entièrement.' }}
           </div>
         </SwapTransition>
         <div :style="BAR">
@@ -151,9 +153,10 @@ export const OnTheMap: Story = {
 
     /* Off the map the bar is opaque, with no shadow (ADR-0223), derived from the view. */
     const bar = canvasElement.querySelector('.ds-map-top-bar') as HTMLElement
-    await userEvent.click(canvas.getByRole('button', { name: /Analytics/ }))
+    await userEvent.click(canvas.getByRole('button', { name: /Analyser/ }))
     await expect(bar).toHaveClass('ds-map-top-bar--solid')
-    await userEvent.click(canvas.getByRole('button', { name: /^Carte/ }))
+    await expect(canvas.getByRole('button', { name: /Analyser/ }).querySelector('.ds-view-glyph--arrived')).toBeTruthy()
+    await userEvent.click(canvas.getByRole('button', { name: /^Explorer/ }))
     await expect(bar).not.toHaveClass('ds-map-top-bar--solid')
   },
 }
@@ -217,7 +220,7 @@ export const EnterAndLeave: Story = {
           </BarTransition>
         </div>
         <div :style="{
-          position: 'relative', marginTop: inProject ? '-3.5rem' : 'var(--ds-spacing-lg)',
+          position: 'relative', marginTop: inProject ? 'calc(-1 * var(--ds-map-top-bar-height))' : 'var(--ds-spacing-lg)',
           borderRadius: inProject ? '0' : 'var(--ds-radius-surface)', overflow: 'hidden',
           background: 'url(./stories/map-loading/parcels.webp) center / cover no-repeat, url(./stories/map-loading/base.webp) center / cover no-repeat',
         }">

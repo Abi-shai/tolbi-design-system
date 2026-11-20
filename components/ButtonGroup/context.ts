@@ -1,7 +1,10 @@
 import type { InjectionKey, Ref } from 'vue'
 
-/** `md` 42px, `sm` 38px — the rail stands as tall as the fields beside it. */
-export type ButtonGroupSize = 'sm' | 'md'
+/**
+ * `md` 42px, `sm` 38px — the rail stands as tall as the fields beside it.
+ * `lg` 48px — a switch that is the bar's centre: `MapTopBar`'s views (ADR-0236).
+ */
+export type ButtonGroupSize = 'sm' | 'md' | 'lg'
 
 /**
  * `rail` — the recessed rail with a rounded pill (ADR-0084). `pill` — rail,

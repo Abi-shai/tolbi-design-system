@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Button } from '../Button'
 import { ButtonGroup, ButtonGroupItem } from '../ButtonGroup'
 import { Dropdown } from '../Dropdown'
@@ -9,6 +9,7 @@ import { IconButton } from '../IconButton'
 import type { IconName } from '../Icon'
 import { ModuleIcon, type ModuleName } from '../ModuleIcon'
 import { Tooltip } from '../Tooltip'
+import { ViewGlyph, type ViewGlyphView } from '../ViewGlyph'
 import MapBasemapPicker, { type MapBasemapOption } from './MapBasemapPicker.vue'
 
 /** One view the bar switches between — « Carte », « Analytics ». */
@@ -16,6 +17,8 @@ export interface MapTopBarView {
   value: string
   label: string
   icon?: IconName
+  /** The mode's glyph (ADR-0236) — in place of `icon`: `map`, `analytics`, `report`. */
+  glyph?: ViewGlyphView
 }
 
 /**
@@ -24,9 +27,11 @@ export interface MapTopBarView {
  * app's bar (`HorizontalNavigation`) gives its place to the project's own,
  * laid on the map, as Felt does. `BarTransition` swaps the two.
  *
- * **The bar.** 56px, the whole width, no corners; the map passes under it.
- * Reading glass (`bg-map-read` under `backdrop-map-read`), a `border-inset`
- * rule along its foot and `shadow-md` under it (ADR-0220). `spacing-xl` in from
+ * **The bar.** 60px (`--ds-map-top-bar-height`, 3.75rem, public — what starts
+ * under the bar reads it; ADR-0236), the whole width, no corners; the map
+ * passes under it. **The map controls' glass** (`bg-map-control` under
+ * `backdrop-map-control`, ADR-0236 — it was the reading glass at 90 %), a
+ * `border-inset` rule along its foot and `shadow-md` under it (ADR-0220). `spacing-xl` in from
  * both sides. Three zones: the start and the end share what is left, the
  * centre sits in the bar's middle.
  *
@@ -38,8 +43,15 @@ export interface MapTopBarView {
  * `arrow-left`) and **the project's name** (`label-lg-strong`, one line, cut
  * — given whole in a tooltip only when cut).
  *
- * **Centre** — the views (`views` + `v-model:view`): `ButtonGroup shape="pill"`.
- * Or the product's own `#center`.
+ * **Centre** — the views (`views` + `v-model:view`), **the bar's central
+ * element** (ADR-0236): the SIG has three modes — Explorer, Analyser,
+ * Rapporter — and the switch says so. `ButtonGroup size="lg"` (48px, Tabs'
+ * corners, not a pill), each view with its `ViewGlyph` (`glyph`) or an `icon`.
+ * On glass the rail is the glass recessed (`--on-glass-sunk` + a 4 % inner
+ * line) and the chosen view a raised tile (`--on-glass-raised`,
+ * `elevation-map-selected`, a 6 % inner line); on a solid bar, `bg-neutral`
+ * and `bg-default`. A view just chosen plays its glyph's arrival — never on
+ * load, never on choosing the shown view again. Or the product's own `#center`.
  *
  * **End** — three groups, `spacing-sm` apart inside, a 20px rule between them:
  * 1. **the project's action** (`#action`, one `Button sm`), with an optional
@@ -65,7 +77,12 @@ export interface MapTopBarView {
  * over `enter`, `easing-out`; nothing moves.
  *
  * The map's instruments move down under it: on the map's container, the product
- * sets `--ds-map-overlay-top: calc(3.5rem + var(--ds-spacing-lg))`.
+ * sets `--ds-map-overlay-top: calc(var(--ds-map-top-bar-height) + var(--ds-spacing-lg))`.
+ *
+ * One size only: 48px was retained; 44 (with a 56 bar) and 52 (with a 64 bar)
+ * were tried in the product, and 52 was too exposed. A bar whose height changed
+ * between projects would be ADR-0042's defect, so the row is 3.75rem with or
+ * without views.
  */
 export type MapTopBarSurface = 'glass' | 'solid'
 
@@ -175,6 +192,12 @@ const solid = computed(() =>
 
 const moduleName = computed(() => props.moduleLabel ?? props.module)
 
+/* The view just chosen plays its glyph's arrival (ADR-0236) — not on load, not
+   on choosing the shown view again. */
+const glyphsReady = ref(false)
+const arrived = ref<string | null>(null)
+watch(() => props.view, (value) => { if (glyphsReady.value) arrived.value = value ?? null })
+
 /* The groups at the end, and a rule only between two that are there. */
 const hasAction = computed(() => !!slots.action)
 const hasMap = computed(() => props.search || props.basemaps.length > 1)
@@ -194,6 +217,7 @@ function measure() {
   nameCut.value = !!el && el.scrollWidth > el.clientWidth
 }
 onMounted(() => {
+  requestAnimationFrame(() => { glyphsReady.value = true })
   measure()
   if (nameEl.value && typeof ResizeObserver !== 'undefined') {
     observer = new ResizeObserver(measure)
@@ -257,12 +281,17 @@ onBeforeUnmount(() => observer?.disconnect())
       <slot name="center">
         <ButtonGroup
           v-if="views.length"
-          shape="pill"
+          size="lg"
           :model-value="view"
           :aria-label="viewsLabel"
+          class="ds-map-top-bar__views"
           @update:model-value="emit('update:view', $event)"
         >
-          <ButtonGroupItem v-for="v in views" :key="v.value" :value="v.value" :label="v.label" :icon="v.icon" />
+          <ButtonGroupItem v-for="v in views" :key="v.value" :value="v.value" :label="v.label" :icon="v.glyph ? undefined : v.icon">
+            <template v-if="v.glyph" #icon="{ selected }">
+              <ViewGlyph :view="v.glyph" :active="selected" :arrived="arrived === v.value" />
+            </template>
+          </ButtonGroupItem>
         </ButtonGroup>
       </slot>
     </div>
@@ -318,7 +347,9 @@ onBeforeUnmount(() => observer?.disconnect())
 .ds-map-top-bar {
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  /* The end never runs under the switch (ADR-0236): when its controls need more
+     than half of what is left, the switch moves aside and the name gives. */
+  grid-template-columns: minmax(0, 1fr) auto minmax(min-content, 1fr);
   align-items: center;
   gap: var(--ds-spacing-lg);
   width: 100%;
@@ -326,7 +357,7 @@ onBeforeUnmount(() => observer?.disconnect())
      0 (`BarTransition variant="reveal"`, ADR-0217): a declared height would be
      the row's floor. And the rule is drawn inside, not a border — a border is
      a floor too, and held 1px of glass over the map while it waited. */
-  grid-template-rows: 3.5rem;
+  grid-template-rows: var(--ds-map-top-bar-height, 3.75rem);
   padding-inline: var(--ds-spacing-xl);
   /* A line and a shadow, not a rim of light (ADR-0220): `border-map-edge`
      (white 55 %) on 90 % white glass did not show, on the basemap's beige nor
@@ -335,9 +366,12 @@ onBeforeUnmount(() => observer?.disconnect())
   box-shadow:
     inset 0 calc(-1 * var(--ds-border-width-default)) 0 var(--ds-border-inset),
     var(--ds-shadow-md);
-  background: var(--ds-bg-map-read);
-  -webkit-backdrop-filter: var(--ds-backdrop-map-read);
-  backdrop-filter: var(--ds-backdrop-map-read);
+  /* The map controls' glass (ADR-0236): the switch stands off it better than
+     off the reading glass, and place names under it still stay apart from the
+     project's name (no ground at all mixed them). */
+  background: var(--ds-bg-map-control);
+  -webkit-backdrop-filter: var(--ds-backdrop-map-control);
+  backdrop-filter: var(--ds-backdrop-map-control);
   /* Glass ↔ solid (ADR-0223): the ground and the shadow fade, nothing moves.
      The shadow is the bar's elevation, not a focus ring. */
   /* token-lint-disable-next-line focus-ring-instant — the bar's elevation fading with its ground, not a focus ring (ADR-0223) */
@@ -352,10 +386,14 @@ onBeforeUnmount(() => observer?.disconnect())
   --ds-text-subtlest: var(--ds-text-subtle);
   --on-glass-focus: var(--ds-focus-ring-map);
   --on-glass-hover: color-mix(in srgb, var(--ds-text-strong) 7%, transparent);
+  /* The map panel's layers (ADR-0236): the rail a hollow with a 4 % inner
+     line, the chosen view a raised tile with a 6 % one. */
   --on-glass-sunk: var(--ds-bg-map-sunk);
-  --on-glass-sunk-border: var(--ds-border-map-edge);
+  --on-glass-sunk-border: transparent;
+  --on-glass-sunk-edge: inset 0 0 0 var(--ds-border-width-default) color-mix(in srgb, var(--ds-text-strong) 4%, transparent);
   --on-glass-raised: var(--ds-bg-map-raised);
-  --on-glass-raised-shadow: var(--ds-elevation-map-raised);
+  --on-glass-raised-edge: color-mix(in srgb, var(--ds-text-strong) 6%, transparent);
+  --on-glass-raised-shadow: var(--ds-elevation-map-selected);
   --on-glass-field-bg: var(--ds-bg-map-raised);
   --on-glass-field-border: color-mix(in srgb, var(--ds-text-strong) 16%, transparent);
   --on-glass-field-shadow: var(--ds-elevation-map-raised);
@@ -374,8 +412,9 @@ onBeforeUnmount(() => observer?.disconnect())
   --ds-text-subtlest: inherit;
   --on-glass-focus: initial;
   --on-glass-hover: initial;
-  --on-glass-sunk: initial;
-  --on-glass-sunk-border: initial;
+  /* The switch on a solid bar (ADR-0236): the rail `bg-neutral`, the tile
+     `bg-default`, both inner lines kept. */
+  --on-glass-sunk: var(--ds-bg-neutral);
   --on-glass-raised: initial;
   --on-glass-raised-shadow: initial;
   --on-glass-field-bg: initial;
@@ -495,5 +534,14 @@ onBeforeUnmount(() => observer?.disconnect())
   height: var(--ds-spacing-2xl);
   margin-inline: var(--ds-spacing-xs);
   background: var(--ds-border-subtle);
+}
+</style>
+
+<style>
+/* The bar's height, public (ADR-0236): what starts under the bar reads it —
+   the map's overlay top, a view laid under it. 3.75rem: the 48px switch with
+   6px of glass above and below. */
+:root {
+  --ds-map-top-bar-height: 3.75rem;
 }
 </style>

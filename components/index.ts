@@ -12,6 +12,8 @@ export { FileTile } from './FileTile'
 export { FileGlyph } from './FileGlyph'
 export type { FileGlyphFormat } from './FileGlyph'
 export { FileViewer } from './FileViewer'
+export { ViewGlyph } from './ViewGlyph'
+export type { ViewGlyphView } from './ViewGlyph'
 export type {
   BrandPatternSurface,
   BrandPatternScale,

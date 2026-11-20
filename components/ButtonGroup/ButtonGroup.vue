@@ -18,6 +18,14 @@ import { BUTTON_GROUP_KEY, type ButtonGroupContext, type ButtonGroupShape, type 
  * `md` controls, `sm` (38px) next to `InputField` / `InputDropdown` `sm` — the
  * rail's 4px inset and border stay, the segments go 32 → 28.
  *
+ * `size="lg"` (ADR-0236) is a switch that **is** what the bar is about —
+ * `MapTopBar`'s three modes: 48px, segments of 40 (`label-xl`, a 24px glyph,
+ * `spacing-md` / `2xl` / `md` / `xl` in), the rail drawn **inside** (an inset
+ * edge, `--on-glass-sunk-edge`, in place of the border, so 48 is the height),
+ * the chosen tile raised with its own inset edge (`--on-glass-raised-edge`).
+ * The indicator travels over `moderate`, `easing-in-out`, as the glyphs' tones
+ * do. Tabs' corners, the rail's (not the pill).
+ *
  * `shape="pill"` (ADR-0216) rounds the rail, the indicator and the segments: a
  * switch laid on a map (« Carte | Analytics » in `MapTopBar`), in the legend's
  * and the timeline's shape. On map glass the group takes the glass's levels
@@ -29,7 +37,7 @@ interface Props {
   /** The selected item's value. */
   modelValue?: string
   ariaLabel?: string
-  /** `md` 42px, `sm` 38px — the height of the fields beside it. */
+  /** `md` 42px, `sm` 38px — the height of the fields beside it; `lg` 48px, a bar's centre (ADR-0236). */
   size?: ButtonGroupSize
   /** `rail` (default) or `pill` — every corner round, for a switch on a map (ADR-0216). */
   shape?: ButtonGroupShape
@@ -143,9 +151,28 @@ watch(values, async () => { await nextTick(); measure() }, { deep: true })
   border-radius: var(--ds-radius-pill);
 }
 
+/* lg (ADR-0236): 48px, the rail drawn inside — an inset edge in place of the
+   border, so the declared height is the height; the chosen tile raised with
+   its own inset edge. */
+.ds-button-group--lg {
+  border: 0;
+  box-shadow: var(--on-glass-sunk-edge, inset 0 0 0 var(--ds-border-width-default) var(--ds-border-subtle));
+}
+
+.ds-button-group--lg .ds-button-group__indicator {
+  box-shadow:
+    var(--on-glass-raised-shadow, var(--ds-elevation-surface)),
+    inset 0 0 0 var(--ds-border-width-default) var(--on-glass-raised-edge, transparent);
+}
+
 .ds-button-group__indicator--animated {
   transition:
     transform var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out),
     width     var(--ds-motion-duration-enter) var(--ds-motion-easing-in-out);
+}
+
+/* The bar's switch travels with its glyphs' tones (ADR-0236). */
+.ds-button-group--lg .ds-button-group__indicator--animated {
+  transition-duration: var(--ds-motion-duration-moderate);
 }
 </style>

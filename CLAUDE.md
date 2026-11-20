@@ -1904,6 +1904,16 @@ Before working on any component, read:
   heavy document's content resolves in its frame, plain swap); the pages' column fades and arrives with its document,
   widths never animate; the same key replays nothing. `SwapTransition rise` is that handoff everywhere (its exit moved
   `quick`/`out` → `exit`/`in`).
+- **ADR-0236**: **the GIS views switch, at the centre of the bar** — **`ViewGlyph`** (`map|analytics|report`, `active`,
+  `arrived`): Fluent Color's paths (MIT), one gradient in one frame for all shapes + pale flat details, lit brand
+  100/300/600, rest gray-light 300/400/500 (categorical primitives) — **a gradient, an exception to the charter, accepted**;
+  its piece moves on arrival (meridians turn, bars rise 50ms apart, lines write; settle 80 → 100 %), never on load or
+  re-choice. **`ButtonGroup size="lg"`** (48: segments 40, `label-xl` / `-strong`, glyph 24 via `ButtonGroupItem #icon`,
+  rail drawn inside with `--on-glass-sunk-edge`, tile with `--on-glass-raised-edge`, Tabs' corners, indicator at
+  `moderate`; hover veil + glyph lift, press 0.97) — ADR-0001, not a redrawn switch. `MapTopBar`: views with `glyph`,
+  rail = glass hollow + 4 %, tile raised + `elevation-map-selected` + 6 % (solid: `bg-neutral` / `bg-default`); **map
+  controls' glass** (72 %); row **3.75rem** always, public **`--ds-map-top-bar-height`**; one size (44 and 52 tried, no
+  prop); the end column `minmax(min-content, 1fr)` so it never runs under the switch.
 
 ## Architecture
 
