@@ -125,3 +125,27 @@ In etolbi:
   already inert.
 
 `ButtonGroup` with `shape="pill"` stays for whoever uses it; `MapTopBar` no longer does.
+
+## Amended (20 Nov., the owner's answer)
+
+**`viewsSize` after all** (`sm | md | lg`, default `md`). It sets the switch and the row together, and
+`--ds-map-top-bar-height` follows on `:root` (`:has()` on the bar's size class):
+
+| `viewsSize` | Switch | Row | Notes |
+|---|---|---|---|
+| `sm` | 44 (`ButtonGroup lg-compact`) | 3.5rem | segments 36, `spacing-sm` / `xl` / `sm` / `lg` in |
+| `md` | 48 (`ButtonGroup lg`) | 3.75rem | retained |
+| `lg` | 52 (`ButtonGroup xl`) | 4rem | segments 44, a 28px glyph, **`label-2xl` / `label-2xl-strong`** |
+
+`label-2xl` and `label-2xl-strong` are minted (20/28, medium / semibold, web and mobile): « heading-lg's size at a
+label's weight », which the role-completeness rule allows no other way to write (ADR-0011).
+
+§4's « no prop » is reversed: the owner keeps the way back to 44 or 52 open. The row still does not depend on whether
+there are views.
+
+**No shadow under the bar.** On the map controls' glass the `border-inset` rule is the only edge: the map shows through,
+and the bar reads as one of the map's controls rather than a layer over them. This amends ADR-0220, and §3's « the rule
+and `shadow-md` stay » is reversed. The solid bar was already without one.
+
+Measured at 1 440: bars of 56 / 60 / 64, switches 440 × 44 / 464 × 48 / 503 × 52, chosen segments 36 / 40 / 44, glyph
+24 / 24 / 28, label 18 / 18 / 20px, and the bar's shadow the inset rule alone.

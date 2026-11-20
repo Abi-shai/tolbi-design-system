@@ -35,7 +35,7 @@ const emit = defineEmits<{
 
 defineSlots<{
   /** A glyph of the product's in place of `icon` — `ViewGlyph` in `MapTopBar` (ADR-0236). Decorative. */
-  icon?: (props: { selected: boolean; size: 16 | 20 | 24 }) => unknown
+  icon?: (props: { selected: boolean; size: 16 | 20 | 24 | 28 }) => unknown
 }>()
 const slots = useSlots()
 
@@ -50,7 +50,10 @@ const selected = computed(() => group?.isSelected(key.value) ?? false)
 const hasIcon = computed(() => !!props.icon || !!slots.icon)
 const iconOnly = computed(() => hasIcon.value && !props.label)
 const size = computed(() => group?.size.value ?? 'md')
-const iconSize = computed(() => (size.value === 'sm' ? 16 : size.value === 'lg' ? 24 : 20))
+const bar = computed(() => ['lg-compact', 'lg', 'xl'].includes(size.value))
+const iconSize = computed<16 | 20 | 24 | 28>(() =>
+  size.value === 'sm' ? 16 : size.value === 'xl' ? 28 : bar.value ? 24 : 20,
+)
 const shape = computed(() => group?.shape.value ?? 'rail')
 
 function handleClick(event: MouseEvent) {
@@ -69,6 +72,7 @@ function handleClick(event: MouseEvent) {
     :class="[
       'ds-button-group-item',
       `ds-button-group-item--${size}`,
+      bar && 'ds-button-group-item--bar',
       iconOnly && 'ds-button-group-item--icon-only',
       hasIcon && label && 'ds-button-group-item--leading-icon',
       selected && 'ds-button-group-item--active',
@@ -82,7 +86,7 @@ function handleClick(event: MouseEvent) {
     <Icon
       v-else-if="icon"
       :name="icon"
-      :size="iconSize"
+      :size="iconSize === 28 ? 24 : iconSize"
       class="ds-button-group-item__icon"
       aria-hidden="true"
     />
@@ -148,27 +152,48 @@ function handleClick(event: MouseEvent) {
   padding: var(--ds-spacing-xxs) var(--ds-spacing-md) var(--ds-spacing-xxs) var(--ds-spacing-sm);
 }
 
-/* ── lg (ADR-0236) ─────────────────────────────────────────────────── */
-/* 40px, so the rail is 48: the 24px line of `label-xl` and the 24px glyph,
+/* ── A bar's centre (ADR-0236): lg-compact 44, lg 48, xl 52 ─────────── */
+/* lg — 40px, so the rail is 48: the 24px line of `label-xl` and the 24px glyph,
    `spacing-md` above and below; the chosen view in `label-xl-strong`. */
-.ds-button-group-item--lg {
+.ds-button-group-item--bar {
   min-height: 40px;
   padding: var(--ds-spacing-md) var(--ds-spacing-2xl);
   font: var(--ds-font-label-xl);
 }
 
-.ds-button-group-item--lg.ds-button-group-item--leading-icon {
+.ds-button-group-item--bar.ds-button-group-item--leading-icon {
   gap: var(--ds-spacing-md);
   padding: var(--ds-spacing-md) var(--ds-spacing-2xl) var(--ds-spacing-md) var(--ds-spacing-xl);
 }
 
-.ds-button-group-item--lg.ds-button-group-item--active {
+.ds-button-group-item--bar.ds-button-group-item--active {
   font: var(--ds-font-label-xl-strong);
+}
+
+/* lg-compact — 36px, so the rail is 44: less air, the same type and glyph. */
+.ds-button-group-item--lg-compact {
+  min-height: 36px;
+}
+
+.ds-button-group-item--lg-compact,
+.ds-button-group-item--lg-compact.ds-button-group-item--leading-icon {
+  padding: var(--ds-spacing-sm) var(--ds-spacing-xl) var(--ds-spacing-sm) var(--ds-spacing-lg);
+}
+
+/* xl — 44px, so the rail is 52: `label-2xl` (heading-lg's size at a label's
+   weight) on its 28px line, a 28px glyph. */
+.ds-button-group-item--xl {
+  min-height: 44px;
+  font: var(--ds-font-label-2xl);
+}
+
+.ds-button-group-item--xl.ds-button-group-item--active {
+  font: var(--ds-font-label-2xl-strong);
 }
 
 /* A view at rest under the pointer takes the glass's veil, and its glyph
    lifts; pressed, the view sinks a little. */
-.ds-button-group-item--lg:not(.ds-button-group-item--active):hover:not(:disabled) {
+.ds-button-group-item--bar:not(.ds-button-group-item--active):hover:not(:disabled) {
   background-color: var(--on-glass-hover, color-mix(in srgb, var(--ds-bg-default) 50%, transparent));
 }
 
@@ -178,11 +203,11 @@ function handleClick(event: MouseEvent) {
   transition: transform var(--ds-motion-duration-quick) var(--ds-motion-easing-out);
 }
 
-.ds-button-group-item--lg:not(.ds-button-group-item--active):hover:not(:disabled) .ds-button-group-item__glyph {
+.ds-button-group-item--bar:not(.ds-button-group-item--active):hover:not(:disabled) .ds-button-group-item__glyph {
   transform: translateY(-0.0625rem) scale(1.08);
 }
 
-.ds-button-group-item--lg {
+.ds-button-group-item--bar {
   transition:
     background-color var(--ds-motion-duration-quick) var(--ds-motion-easing-out),
     color            var(--ds-motion-duration-moderate) var(--ds-motion-easing-in-out),
@@ -190,13 +215,13 @@ function handleClick(event: MouseEvent) {
     transform        var(--ds-motion-duration-instant) var(--ds-motion-easing-out);
 }
 
-.ds-button-group-item--lg:active:not(:disabled) {
+.ds-button-group-item--bar:active:not(:disabled) {
   transform: scale(0.97);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-button-group-item--lg:active:not(:disabled),
-  .ds-button-group-item--lg:not(.ds-button-group-item--active):hover:not(:disabled) .ds-button-group-item__glyph {
+  .ds-button-group-item--bar:active:not(:disabled),
+  .ds-button-group-item--bar:not(.ds-button-group-item--active):hover:not(:disabled) .ds-button-group-item__glyph {
     transform: none;
   }
 }

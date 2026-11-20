@@ -1912,8 +1912,10 @@ Before working on any component, read:
   rail drawn inside with `--on-glass-sunk-edge`, tile with `--on-glass-raised-edge`, Tabs' corners, indicator at
   `moderate`; hover veil + glyph lift, press 0.97) — ADR-0001, not a redrawn switch. `MapTopBar`: views with `glyph`,
   rail = glass hollow + 4 %, tile raised + `elevation-map-selected` + 6 % (solid: `bg-neutral` / `bg-default`); **map
-  controls' glass** (72 %); row **3.75rem** always, public **`--ds-map-top-bar-height`**; one size (44 and 52 tried, no
-  prop); the end column `minmax(min-content, 1fr)` so it never runs under the switch.
+  controls' glass** (72 %), **no shadow** (the rule alone, amends ADR-0220); public **`--ds-map-top-bar-height`**;
+  **amended**: **`viewsSize`** `sm | md | lg` = switch 44 / 48 / 52 (`ButtonGroup lg-compact | lg | xl`) in a row of
+  3.5 / 3.75 / 4rem, `md` retained; `xl` uses minted **`label-2xl`** / `-strong` (20/28); the end column
+  `minmax(min-content, 1fr)` so it never runs under the switch.
 
 ## Architecture
 

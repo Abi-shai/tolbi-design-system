@@ -20,8 +20,10 @@ import { BUTTON_GROUP_KEY, type ButtonGroupContext, type ButtonGroupShape, type 
  *
  * `size="lg"` (ADR-0236) is a switch that **is** what the bar is about —
  * `MapTopBar`'s three modes: 48px, segments of 40 (`label-xl`, a 24px glyph,
- * `spacing-md` / `2xl` / `md` / `xl` in), the rail drawn **inside** (an inset
- * edge, `--on-glass-sunk-edge`, in place of the border, so 48 is the height),
+ * `spacing-md` / `2xl` / `md` / `xl` in); `lg-compact` 44 (`spacing-sm` above
+ * and below, `xl` / `lg` beside) and `xl` 52 (`label-2xl`, a 28px glyph) are
+ * the same switch a step down and up. The rail is drawn **inside** (an inset
+ * edge, `--on-glass-sunk-edge`, in place of the border, so the size is the height),
  * the chosen tile raised with its own inset edge (`--on-glass-raised-edge`).
  * The indicator travels over `moderate`, `easing-in-out`, as the glyphs' tones
  * do. Tabs' corners, the rail's (not the pill).
@@ -37,7 +39,7 @@ interface Props {
   /** The selected item's value. */
   modelValue?: string
   ariaLabel?: string
-  /** `md` 42px, `sm` 38px — the height of the fields beside it; `lg` 48px, a bar's centre (ADR-0236). */
+  /** `md` 42px, `sm` 38px — the height of the fields beside it; `lg-compact` 44, `lg` 48, `xl` 52 — a bar's centre (ADR-0236). */
   size?: ButtonGroupSize
   /** `rail` (default) or `pill` — every corner round, for a switch on a map (ADR-0216). */
   shape?: ButtonGroupShape
@@ -51,6 +53,9 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
+
+/* The sizes that make a bar's centre (ADR-0236). */
+const BAR_SIZES: ButtonGroupSize[] = ['lg-compact', 'lg', 'xl']
 
 const values = ref<string[]>([])
 const activeIndex = computed(() => values.value.indexOf(props.modelValue ?? ''))
@@ -82,7 +87,7 @@ watch(values, async () => { await nextTick(); measure() }, { deep: true })
 </script>
 
 <template>
-  <div ref="containerRef" class="ds-button-group" :class="[`ds-button-group--${size}`, `ds-button-group--${shape}`]" role="group" :aria-label="ariaLabel">
+  <div ref="containerRef" class="ds-button-group" :class="[`ds-button-group--${size}`, `ds-button-group--${shape}`, { 'ds-button-group--bar': BAR_SIZES.includes(size) }]" role="group" :aria-label="ariaLabel">
     <!-- Sliding selection — behind the items, like Tabs' indicator -->
     <div
       v-if="activeIndex !== -1"
@@ -151,15 +156,15 @@ watch(values, async () => { await nextTick(); measure() }, { deep: true })
   border-radius: var(--ds-radius-pill);
 }
 
-/* lg (ADR-0236): 48px, the rail drawn inside — an inset edge in place of the
+/* A bar's centre (ADR-0236 — lg-compact, lg, xl): the rail drawn inside — an inset edge in place of the
    border, so the declared height is the height; the chosen tile raised with
    its own inset edge. */
-.ds-button-group--lg {
+.ds-button-group--bar {
   border: 0;
   box-shadow: var(--on-glass-sunk-edge, inset 0 0 0 var(--ds-border-width-default) var(--ds-border-subtle));
 }
 
-.ds-button-group--lg .ds-button-group__indicator {
+.ds-button-group--bar .ds-button-group__indicator {
   box-shadow:
     var(--on-glass-raised-shadow, var(--ds-elevation-surface)),
     inset 0 0 0 var(--ds-border-width-default) var(--on-glass-raised-edge, transparent);
@@ -172,7 +177,7 @@ watch(values, async () => { await nextTick(); measure() }, { deep: true })
 }
 
 /* The bar's switch travels with its glyphs' tones (ADR-0236). */
-.ds-button-group--lg .ds-button-group__indicator--animated {
+.ds-button-group--bar .ds-button-group__indicator--animated {
   transition-duration: var(--ds-motion-duration-moderate);
 }
 </style>

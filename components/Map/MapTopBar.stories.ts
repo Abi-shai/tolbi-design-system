@@ -231,3 +231,20 @@ export const EnterAndLeave: Story = {
       </div>`,
   }),
 }
+
+/**
+ * Les trois tailles de la bascule (ADR-0236) : `viewsSize` règle la bascule et la rangée ensemble — `sm` 44 dans
+ * 3,5rem, `md` 48 dans 3,75rem (retenue), `lg` 52 dans 4rem (glyphe 28, `label-2xl`). La hauteur est publique,
+ * `--ds-map-top-bar-height`.
+ */
+export const ViewsSizes: Story = {
+  name: 'Tailles de la bascule',
+  render: () => ({
+    components: { MapTopBar },
+    setup: () => ({ VIEWS, view: ref('map'), SIZES: ['sm', 'md', 'lg'] as const }),
+    template: `
+      <div style="display:flex;flex-direction:column;gap:var(--ds-spacing-xl);padding:var(--ds-spacing-xl) 0;background:url(./stories/map-loading/base.webp) center / cover">
+        <MapTopBar v-for="s in SIZES" :key="s" :views-size="s" module="Inset" project-name="Bassin arachidier" :views="VIEWS" v-model:view="view" :share="false" />
+      </div>`,
+  }),
+}

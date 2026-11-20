@@ -94,6 +94,16 @@
       "$value": "{typography.font-size.18}",
       "$type": "dimension",
       "$description": "label-xl raised to semibold — buttons, triggers, tooltip titles"
+    },
+    "label-2xl": {
+      "$value": "{typography.font-size.20}",
+      "$type": "dimension",
+      "$description": "The largest label — a bar's central switch at its lg size (MapTopBar viewsSize=\"lg\", ADR-0236): heading-lg's size at a label's weight"
+    },
+    "label-2xl-strong": {
+      "$value": "{typography.font-size.20}",
+      "$type": "dimension",
+      "$description": "label-2xl raised to semibold — the chosen view of that switch"
     }
   },
   "line-height": {
@@ -171,6 +181,14 @@
     },
     "label-xl-strong": {
       "$value": "{typography.line-height.24}",
+      "$type": "dimension"
+    },
+    "label-2xl": {
+      "$value": "{typography.line-height.28}",
+      "$type": "dimension"
+    },
+    "label-2xl-strong": {
+      "$value": "{typography.line-height.28}",
       "$type": "dimension"
     }
   },
@@ -253,6 +271,14 @@
     "label-xl-strong": {
       "$value": "{typography.letter-spacing.none}",
       "$type": "dimension"
+    },
+    "label-2xl": {
+      "$value": "{typography.letter-spacing.none}",
+      "$type": "dimension"
+    },
+    "label-2xl-strong": {
+      "$value": "{typography.letter-spacing.none}",
+      "$type": "dimension"
     }
   },
   "font-weight": {
@@ -331,6 +357,14 @@
       "$type": "fontWeight"
     },
     "label-xl-strong": {
+      "$value": "{typography.font-weight.semibold}",
+      "$type": "fontWeight"
+    },
+    "label-2xl": {
+      "$value": "{typography.font-weight.medium}",
+      "$type": "fontWeight"
+    },
+    "label-2xl-strong": {
       "$value": "{typography.font-weight.semibold}",
       "$type": "fontWeight"
     }

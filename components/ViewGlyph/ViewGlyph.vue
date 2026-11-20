@@ -41,7 +41,8 @@ interface Props {
   active?: boolean
   /** Plays the arrival — set it when the view has just been chosen, not on load. */
   arrived?: boolean
-  size?: IconSize
+  /** On `Icon`'s ladder; 28 for a bar's switch at its largest (`ButtonGroup xl`). */
+  size?: IconSize | 28
 }
 
 withDefaults(defineProps<Props>(), { active: false, arrived: false, size: 24 })

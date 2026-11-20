@@ -27,11 +27,13 @@ export interface MapTopBarView {
  * app's bar (`HorizontalNavigation`) gives its place to the project's own,
  * laid on the map, as Felt does. `BarTransition` swaps the two.
  *
- * **The bar.** 60px (`--ds-map-top-bar-height`, 3.75rem, public — what starts
- * under the bar reads it; ADR-0236), the whole width, no corners; the map
- * passes under it. **The map controls' glass** (`bg-map-control` under
- * `backdrop-map-control`, ADR-0236 — it was the reading glass at 90 %), a
- * `border-inset` rule along its foot and `shadow-md` under it (ADR-0220). `spacing-xl` in from
+ * **The bar.** 60px at `viewsSize="md"` (3.5 / 3.75 / 4rem for `sm` / `md` /
+ * `lg` — `--ds-map-top-bar-height`, public: what starts under the bar reads it;
+ * ADR-0236), the whole width, no corners; the map passes under it. **The map
+ * controls' glass** (`bg-map-control` under `backdrop-map-control`, ADR-0236 —
+ * it was the reading glass at 90 % with `shadow-md`): the map shows through,
+ * the switch stands off it, and the `border-inset` rule along its foot is the
+ * only edge — **no shadow** (amends ADR-0220). `spacing-xl` in from
  * both sides. Three zones: the start and the end share what is left, the
  * centre sits in the bar's middle.
  *
@@ -79,12 +81,19 @@ export interface MapTopBarView {
  * The map's instruments move down under it: on the map's container, the product
  * sets `--ds-map-overlay-top: calc(var(--ds-map-top-bar-height) + var(--ds-spacing-lg))`.
  *
- * One size only: 48px was retained; 44 (with a 56 bar) and 52 (with a 64 bar)
- * were tried in the product, and 52 was too exposed. A bar whose height changed
- * between projects would be ADR-0042's defect, so the row is 3.75rem with or
- * without views.
+ * `viewsSize` sets the switch and the row together: `md` (48 in 3.75rem) was
+ * retained; `sm` (44 in 3.5rem) and `lg` (52 in 4rem) were tried in the
+ * product and stay available. The row does not depend on whether there are
+ * views: a bar whose height changed between projects would be ADR-0042's
+ * defect.
  */
 export type MapTopBarSurface = 'glass' | 'solid'
+
+/**
+ * The views' switch and the bar's row together (ADR-0236): `sm` 44 in 3.5rem,
+ * `md` 48 in 3.75rem (retained), `lg` 52 in 4rem (tried, read too exposed).
+ */
+export type MapTopBarViewsSize = 'sm' | 'md' | 'lg'
 
 interface Props {
   /** The module the project belongs to — its mark at the start. */
@@ -133,6 +142,12 @@ interface Props {
    * Unset: derived from `view` — the first view is the map, any other `solid`.
    */
   surface?: MapTopBarSurface
+  /**
+   * The views' switch and the row with it (ADR-0236): `md` (48 in 3.75rem) by
+   * default, `sm` (44 in 3.5rem), `lg` (52 in 4rem). The row's height is
+   * public, `--ds-map-top-bar-height`.
+   */
+  viewsSize?: MapTopBarViewsSize
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -158,6 +173,7 @@ const props = withDefaults(defineProps<Props>(), {
   share: true,
   shareLabel: 'Partager',
   surface: undefined,
+  viewsSize: 'md',
 })
 
 const emit = defineEmits<{
@@ -191,6 +207,9 @@ const solid = computed(() =>
 )
 
 const moduleName = computed(() => props.moduleLabel ?? props.module)
+
+/* The switch's size for each of the bar's (ADR-0236). */
+const SWITCH_SIZE = { sm: 'lg-compact', md: 'lg', lg: 'xl' } as const
 
 /* The view just chosen plays its glyph's arrival (ADR-0236) — not on load, not
    on choosing the shown view again. */
@@ -228,7 +247,7 @@ onBeforeUnmount(() => observer?.disconnect())
 </script>
 
 <template>
-  <header class="ds-map-top-bar" :class="{ 'ds-map-top-bar--solid': solid }">
+  <header class="ds-map-top-bar" :class="[`ds-map-top-bar--views-${viewsSize}`, { 'ds-map-top-bar--solid': solid }]">
     <div class="ds-map-top-bar__start">
       <Dropdown
         v-if="module && $slots['module-menu']"
@@ -281,7 +300,7 @@ onBeforeUnmount(() => observer?.disconnect())
       <slot name="center">
         <ButtonGroup
           v-if="views.length"
-          size="lg"
+          :size="SWITCH_SIZE[viewsSize]"
           :model-value="view"
           :aria-label="viewsLabel"
           class="ds-map-top-bar__views"
@@ -289,7 +308,7 @@ onBeforeUnmount(() => observer?.disconnect())
         >
           <ButtonGroupItem v-for="v in views" :key="v.value" :value="v.value" :label="v.label" :icon="v.glyph ? undefined : v.icon">
             <template v-if="v.glyph" #icon="{ selected }">
-              <ViewGlyph :view="v.glyph" :active="selected" :arrived="arrived === v.value" />
+              <ViewGlyph :view="v.glyph" :active="selected" :arrived="arrived === v.value" :size="viewsSize === 'lg' ? 28 : 24" />
             </template>
           </ButtonGroupItem>
         </ButtonGroup>
@@ -357,15 +376,13 @@ onBeforeUnmount(() => observer?.disconnect())
      0 (`BarTransition variant="reveal"`, ADR-0217): a declared height would be
      the row's floor. And the rule is drawn inside, not a border — a border is
      a floor too, and held 1px of glass over the map while it waited. */
-  grid-template-rows: var(--ds-map-top-bar-height, 3.75rem);
+  grid-template-rows: 3.75rem;
   padding-inline: var(--ds-spacing-xl);
-  /* A line and a shadow, not a rim of light (ADR-0220): `border-map-edge`
-     (white 55 %) on 90 % white glass did not show, on the basemap's beige nor
-     on the panel under it. The rule is `border-inset` (black 8 %), which sits
-     on glass without dirtying it; `shadow-md` lifts the bar over the map. */
-  box-shadow:
-    inset 0 calc(-1 * var(--ds-border-width-default)) 0 var(--ds-border-inset),
-    var(--ds-shadow-md);
+  /* A line, not a rim of light (ADR-0220): `border-map-edge` did not show. The
+     rule is `border-inset` (black 8 %), which sits on glass without dirtying
+     it. No shadow since ADR-0236: on the map controls' glass the map shows
+     through, and the bar reads as one of the map's controls, not over them. */
+  box-shadow: inset 0 calc(-1 * var(--ds-border-width-default)) 0 var(--ds-border-inset);
   /* The map controls' glass (ADR-0236): the switch stands off it better than
      off the reading glass, and place names under it still stay apart from the
      project's name (no ground at all mixed them). */
@@ -397,6 +414,15 @@ onBeforeUnmount(() => observer?.disconnect())
   --on-glass-field-bg: var(--ds-bg-map-raised);
   --on-glass-field-border: color-mix(in srgb, var(--ds-text-strong) 16%, transparent);
   --on-glass-field-shadow: var(--ds-elevation-map-raised);
+}
+
+/* The row follows the switch (ADR-0236): 44 in 3.5rem, 48 in 3.75rem, 52 in 4rem. */
+.ds-map-top-bar--views-sm {
+  grid-template-rows: 3.5rem;
+}
+
+.ds-map-top-bar--views-lg {
+  grid-template-rows: 4rem;
 }
 
 /* Off the map (ADR-0223): opaque, nothing blurred, no shadow — the rule alone.
@@ -539,9 +565,17 @@ onBeforeUnmount(() => observer?.disconnect())
 
 <style>
 /* The bar's height, public (ADR-0236): what starts under the bar reads it —
-   the map's overlay top, a view laid under it. 3.75rem: the 48px switch with
-   6px of glass above and below. */
+   the map's overlay top, Tolbi xAI, a view laid under it. It follows
+   `viewsSize`: 3.5 / 3.75 / 4rem. */
 :root {
   --ds-map-top-bar-height: 3.75rem;
+}
+
+:root:has(.ds-map-top-bar--views-sm) {
+  --ds-map-top-bar-height: 3.5rem;
+}
+
+:root:has(.ds-map-top-bar--views-lg) {
+  --ds-map-top-bar-height: 4rem;
 }
 </style>

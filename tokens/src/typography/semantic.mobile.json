@@ -77,6 +77,14 @@
     "label-xl-strong": {
       "$value": "{typography.font-size.17}",
       "$type": "dimension"
+    },
+    "label-2xl": {
+      "$value": "{typography.font-size.20}",
+      "$type": "dimension"
+    },
+    "label-2xl-strong": {
+      "$value": "{typography.font-size.20}",
+      "$type": "dimension"
     }
   },
   "line-height": {
@@ -154,6 +162,14 @@
     },
     "label-xl-strong": {
       "$value": "{typography.line-height.24}",
+      "$type": "dimension"
+    },
+    "label-2xl": {
+      "$value": "{typography.line-height.28}",
+      "$type": "dimension"
+    },
+    "label-2xl-strong": {
+      "$value": "{typography.line-height.28}",
       "$type": "dimension"
     }
   }
