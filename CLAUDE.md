@@ -1925,6 +1925,11 @@ Before working on any component, read:
   line (`ChartLegend` horizontal: mark 20 then name, wrapping, `spacing-md` / `2xl`, names `label-md` via
   `--reading-secondary-font`), so « Point du / projet » no longer breaks for nothing; any `value` = the columns (mark,
   figure, name) as before. Width unchanged (560). Dropping the columns was set aside: the data decides.
+- **ADR-0239**: **a chosen year is a position, not an action** (track B of four) — `MapTimeline`'s indicator and current /
+  chosen years take **`bg-brand-subtle` + `text-on-brand-subtle`** (the solid green is « Comparer »'s, the action beside
+  it; the current item of a sequence is a brand tint, ADR-0230), weight unchanged; years at rest **`text-subtle`**
+  (`text-default` on hover), hover **`--on-glass-hover`**; data dots solid **`text-subtle`** (a status), the empty ring
+  kept. Compare and dense follow. A raised tile (C) lost the shown year on 72 % glass.
 
 ## Architecture
 

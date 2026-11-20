@@ -647,13 +647,15 @@ function exitCompare() {
   min-height: 32px;
 }
 
-/* The chosen period: the brand's solid pill, which slides (ADR-0024). */
+/* The chosen period: the brand's tint, which slides (ADR-0024). A position, not
+   an action (ADR-0239): the solid green is « Comparer »'s, beside it — the
+   current item of a sequence is a brand tint, as the chosen basemap's row. */
 .ds-map-timeline__pill {
   position: absolute;
   left: 0;
   top: 0;
   border-radius: var(--ds-radius-pill);
-  background: var(--ds-bg-brand-solid);
+  background: var(--ds-bg-brand-subtle);
   pointer-events: none;
 }
 
@@ -683,7 +685,8 @@ function exitCompare() {
   border-radius: var(--ds-radius-pill);
   background: transparent;
   font: var(--ds-font-label-lg);
-  color: var(--ds-text-strong);
+  /* A period not chosen recedes, as an option does everywhere else (ADR-0239). */
+  color: var(--ds-text-subtle);
   white-space: nowrap;
   cursor: pointer;
   outline: none;
@@ -705,8 +708,10 @@ function exitCompare() {
   color: var(--ds-text-subtle);
 }
 
+/* Hover takes the glass's veil, as the arrows and chips do (ADR-0239). */
 .ds-map-timeline__tick:hover:not(.ds-map-timeline__tick--current):not(.ds-map-timeline__tick--chosen):not([aria-disabled]) {
-  background: var(--ds-bg-hover);
+  background: var(--on-glass-hover, var(--ds-bg-hover));
+  color: var(--ds-text-default);
 }
 
 .ds-map-timeline__tick:focus-visible {
@@ -718,19 +723,19 @@ function exitCompare() {
   cursor: default;
 }
 
-/* Chosen: the pill's ink, a step stronger — the same box: the pill is the
-   target, it does not grow. */
+/* Chosen: the tint's exact ink, a step stronger — the same box: the pill is
+   the target, it does not grow. */
 .ds-map-timeline__tick--current,
 .ds-map-timeline__tick--chosen,
 .ds-map-timeline--dense .ds-map-timeline__tick--current,
 .ds-map-timeline--dense .ds-map-timeline__tick--chosen {
   font: var(--ds-font-label-lg-strong);
-  color: var(--ds-text-on-brand-solid);
+  color: var(--ds-text-on-brand-subtle);
 }
 
 /* The compared period wears the pill too; it does not slide — it is placed. */
 .ds-map-timeline__tick--chosen {
-  background: var(--ds-bg-brand-solid);
+  background: var(--ds-bg-brand-subtle);
 }
 
 /* A day between the labelled ones is its dot; chosen, it is a pill again. */
@@ -776,7 +781,8 @@ function exitCompare() {
   width: 6px;
   height: 6px;
   border-radius: var(--ds-radius-pill);
-  background: var(--ds-bg-brand-solid);
+  /* A measure exists: a status, not an action (ADR-0239) — the receding ink, solid. */
+  background: var(--ds-text-subtle);
 }
 
 /* A day between the labelled ones *is* its dot: there it stays in the flow. */
