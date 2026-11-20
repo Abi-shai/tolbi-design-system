@@ -13,7 +13,7 @@ export interface MapBasemapOption {
 
 /**
  * The basemap, chosen by its picture (ADR-0221, its panel drawn again in
- * ADR-0222 and ADR-0229). The trigger **is** the active basemap — a 28px thumbnail in a 2px
+ * ADR-0222 and ADR-0229). The trigger **is** the active basemap — a 36px thumbnail (ADR-0242; 28 before) in a 3px
  * white frame, `radius-inner`, a `border-subtle` hairline and
  * `elevation-control`, the basemap alone with no project data; open, it takes
  * the brand ring (`border-brand-solid`, 2px) and a light halo.
@@ -50,7 +50,7 @@ interface Props {
   modelValue?: string
   /** What the control chooses — the trigger's name (with the active basemap after it) and the tray's title. */
   label?: string
-  /** `square` (the bar's, 28px) or `round` (the tools column's, 36px — ADR-0241). */
+  /** `square` (the bar's, 36px) or `round` (the tools column's, 36px — ADR-0241). */
   shape?: 'square' | 'round'
   /** Where the tray opens: `below` the trigger, or `left` of the tools column. */
   side?: DropdownSide
@@ -139,13 +139,15 @@ function step(e: KeyboardEvent) {
 </template>
 
 <style scoped>
-/* The active basemap, 28px: a 2px white frame round the picture. */
+/* The active basemap, 36px (ADR-0242 — it was 28, small beside the bar's 36px
+   buttons and its 40px avatar): a 3px white frame round the picture, a rounded
+   square (`radius-inner`) so it never reads as a second avatar. */
 .ds-map-basemap-picker__trigger {
   box-sizing: border-box;
   display: inline-flex;
-  width: 28px;
-  height: 28px;
-  padding: var(--ds-spacing-xxs);
+  width: 36px;
+  height: 36px;
+  padding: 3px;
   border: var(--ds-border-width-default) solid var(--ds-border-subtle);
   border-radius: var(--ds-radius-inner);
   background: var(--ds-bg-default);

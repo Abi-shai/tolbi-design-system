@@ -40,7 +40,7 @@ At 1 440 (« Sur la carte »):
 | What | Value |
 |---|---|
 | End order | action, rule, basemap, rule, avatar |
-| Basemap thumbnail | 28 × 28, radius 6 (`radius-inner`) |
+| Basemap thumbnail | 28 × 28, radius 6 (`radius-inner`) — 36 × 36 since the amendment |
 | Avatar | 40 × 40 |
 | Column | no basemap |
 
@@ -59,3 +59,13 @@ In etolbi:
 - the three maps stop passing a basemap to `MapNavigator`.
 
 Opened from the avatar, the GIS bar's menu and the app's are the same.
+
+## Amended (the same day, the owner: « pas trop petit »)
+
+**The basemap thumbnail goes 28 → 36px**, the bar's icon buttons' size. At 28 it was small beside 36px buttons and the
+40px avatar. It keeps `radius-inner` (a rounded square, never a second avatar) and a 3px white frame round the picture.
+This applies to the square shape everywhere; only the bar uses it.
+
+**The avatar stays at 40**, the app's own.
+
+Measured at 1 440: the thumbnail is 36 × 36 with radius 6, and the avatar 40 × 40.
