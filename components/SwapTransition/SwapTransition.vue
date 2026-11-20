@@ -16,7 +16,16 @@
  * `rise` (ADR-0216) is for a **view** replacing another, not a state: the map
  * giving way to its analytics, under a bar that does not move. The arriver
  * comes up 8px as it fades in, over `enter` (`easing-out`) — a view arrives,
- * where a skeleton only resolves; the leaver still fades over `quick`.
+ * where a skeleton only resolves.
+ *
+ * **It is the handoff of anything that shows one thing at a time** (ADR-0235):
+ * a viewer changing document, a parcel's sheet changing parcel, a window
+ * changing tab. A handoff, not a move — the things handed over are not in a
+ * sequence, so a sideways slide (« next / previous ») would say what is not
+ * true. The leaver only fades, over `exit` on `easing-in` (ADR-0021: the exit
+ * is shorter than the entrance); the arriver comes up 8px over `enter` on
+ * `easing-out`. No bounce. Key the slotted element by what it shows, so
+ * choosing the same thing again replays nothing.
  */
 interface Props {
   /** The arriver comes up 8px over `enter` — a view, not a state (ADR-0216). */
@@ -34,7 +43,7 @@ withDefaults(defineProps<Props>(), { rise: false })
 
 <style>
 .ds-swap-rise-leave-active {
-  transition: opacity var(--ds-motion-duration-quick) var(--ds-motion-easing-out);
+  transition: opacity var(--ds-motion-duration-exit) var(--ds-motion-easing-in);
 }
 
 .ds-swap-rise-enter-active {

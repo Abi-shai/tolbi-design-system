@@ -1894,6 +1894,16 @@ Before working on any component, read:
   name, format; the whole tile chooses, `aria-current`; download `IconButton xs surface` on hover/focus-visible/touch;
   active = brand tint + raised + ringed picture) and **`PageThumbs`** (`v-model` from 1, `#page`, A4, the page on screen
   in the same mark, `aria-current="page"`, kept in view), both `Navigation`.
+- **ADR-0235**: **file glyphs, a name that leads, a document's handoff** — `FileTile layout="header"` (glyph 20 + name on
+  one line, the picture under it on `bg-default`, nothing below; `glyph` or `#glyph` for an issuer's mark; the active
+  state at `instant` — the tile answers first). **`FileGlyph`** (`pdf|doc|csv|json|geo|points|kml|file`, `Icon`'s ladder):
+  mdi's boxes (Apache 2.0) in the formats' known colours — categorical primitives, named suppressions, white letters in
+  both modes; geospatial = the box with `GEO`/`PTS` (brand-500) or `KML` (blue-light-700) written in it; no teal.
+  **`FileViewer`** carries the handoff (`documentKey`, `pages` → `PageThumbs`, `v-model:page`, `loading`): not a slide (no
+  order) — the arriver fades up 8px over `enter`/`out`, the leaver fades over **`exit`/`in`**; one handoff per gesture (a
+  heavy document's content resolves in its frame, plain swap); the pages' column fades and arrives with its document,
+  widths never animate; the same key replays nothing. `SwapTransition rise` is that handoff everywhere (its exit moved
+  `quick`/`out` → `exit`/`in`).
 
 ## Architecture
 

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import { ref } from 'vue'
 import { within, userEvent, expect, fn } from '@storybook/test'
 import FileTile from './FileTile.vue'
+import { ModuleIcon } from '../ModuleIcon'
 import { FILES, PREVIEWS } from '../../stories/fixtures/report-files'
 
 const meta: Meta<typeof FileTile> = {
@@ -75,4 +76,35 @@ export const NotDownloadable: Story = {
         </FileTile>
       </div>`,
   }),
+}
+
+/**
+ * En tête (ADR-0235, les cartes d’Obvious) : le glyphe du format et le nom sur une ligne, puis l’image, sur blanc quel
+ * que soit le fichier ; rien dessous. Un document d’un organisme connu prend sa marque à la place du glyphe (`#glyph`,
+ * à 20) — ici une marque de module pour l’exemple.
+ */
+export const Header: Story = {
+  name: 'En tête',
+  render: () => ({
+    components: { FileTile, ModuleIcon },
+    setup: () => ({ active: ref('report'), FILES, PREVIEWS }),
+    template: `
+      <div style="max-width:28rem;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ds-spacing-sm)">
+        <FileTile
+          v-for="f in FILES" :key="f.id" layout="header"
+          :name="f.name" :glyph="f.glyph" :active="active === f.id" @select="active = f.id"
+        >
+          <template v-if="f.preview" #picture><div style="width:100%;height:100%" v-html="PREVIEWS[f.preview]" /></template>
+        </FileTile>
+        <FileTile layout="header" name="Description de projet (PD)" :active="active === 'pd'" @select="active = 'pd'">
+          <template #glyph><ModuleIcon module="Inset" variant="illustration" :size="20" :aria-label="null" /></template>
+          <template #picture><div style="width:100%;height:100%" v-html="PREVIEWS.doc" /></template>
+        </FileTile>
+      </div>`,
+  }),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: /Zones exclues/ }))
+    await expect(canvas.getByRole('button', { name: /Zones exclues/ })).toHaveAttribute('aria-current', 'true')
+  },
 }

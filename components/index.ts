@@ -9,6 +9,9 @@ export type { LogoVariant } from './Logo'
 export { BrandPattern } from './BrandPattern'
 export { Door } from './Door'
 export { FileTile } from './FileTile'
+export { FileGlyph } from './FileGlyph'
+export type { FileGlyphFormat } from './FileGlyph'
+export { FileViewer } from './FileViewer'
 export type {
   BrandPatternSurface,
   BrandPatternScale,

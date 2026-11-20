@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useId } from 'vue'
 import { Icon, type IconName } from '../Icon'
+import { FileGlyph, type FileGlyphFormat } from '../FileGlyph'
 import { IconButton } from '../IconButton'
 import { Tooltip } from '../Tooltip'
 
@@ -33,6 +34,18 @@ import { Tooltip } from '../Tooltip'
  *
  * Hover takes the tray's hover (`--on-tray-hover`, ADR-0199/0234) and the
  * picture's hairline steps to `border-default`.
+ *
+ * **`layout="header"`** (ADR-0235, the cards of Obvious): the name **leads** —
+ * the format's glyph (`glyph`, a `FileGlyph` at 20, or `#glyph` for an
+ * issuer's mark at the same size) and the name on one line, cut by an
+ * ellipsis — and the picture comes under it. Nothing under the picture: the
+ * format repeated the glyph, and a modified date was tried and withdrawn. The
+ * picture's ground is `bg-default` whatever the file — no plate, no grey.
+ * Everything else is the tile's: no frame, the hover, the active state, the
+ * download on the picture's top end.
+ *
+ * **The active state arrives at `instant`** (ADR-0235): the tile answers the
+ * press before the viewer beside it starts its handoff.
  */
 interface Props {
   /** The file's name, as the reader knows it — « Rapport de suivi 2026 ». */
@@ -49,6 +62,10 @@ interface Props {
   downloadLabel?: string
   /** `false`: no download on the tile. */
   downloadable?: boolean
+  /** `header`: the glyph and the name lead, the picture under them (ADR-0235). */
+  layout?: 'picture' | 'header'
+  /** The format's glyph before the name, in `layout="header"` — or the `#glyph` slot. */
+  glyph?: FileGlyphFormat
 }
 
 withDefaults(defineProps<Props>(), {
@@ -58,6 +75,8 @@ withDefaults(defineProps<Props>(), {
   active: false,
   downloadLabel: 'Télécharger',
   downloadable: true,
+  layout: 'picture',
+  glyph: undefined,
 })
 
 const emit = defineEmits<{
@@ -70,21 +89,29 @@ const emit = defineEmits<{
 defineSlots<{
   /** The file in miniature, in place of `src` — decorative. */
   picture?: () => unknown
+  /** Before the name in `layout="header"`, in place of `glyph`: an issuer's mark, 20px. Decorative. */
+  glyph?: () => unknown
 }>()
 
 const nameId = `ds-file-tile-name-${useId()}`
 </script>
 
 <template>
-  <div class="ds-file-tile" :class="{ 'ds-file-tile--active': active }">
+  <div class="ds-file-tile" :class="[`ds-file-tile--${layout}`, { 'ds-file-tile--active': active }]">
     <button type="button" class="ds-file-tile__choose" :aria-current="active ? 'true' : undefined" @click="emit('select')">
+      <span v-if="layout === 'header'" class="ds-file-tile__head">
+        <span v-if="$slots.glyph || glyph" class="ds-file-tile__glyph" aria-hidden="true">
+          <slot name="glyph"><FileGlyph v-if="glyph" :format="glyph" :size="20" /></slot>
+        </span>
+        <span :id="nameId" class="ds-file-tile__name">{{ name }}</span>
+      </span>
       <span class="ds-file-tile__picture" aria-hidden="true">
         <slot name="picture">
           <img v-if="src" :src="src" alt="" />
-          <span v-else class="ds-file-tile__plate"><Icon :name="icon" :size="24" /></span>
+          <span v-else-if="layout === 'picture'" class="ds-file-tile__plate"><Icon :name="icon" :size="24" /></span>
         </slot>
       </span>
-      <span class="ds-file-tile__text">
+      <span v-if="layout === 'picture'" class="ds-file-tile__text">
         <span :id="nameId" class="ds-file-tile__name">{{ name }}</span>
         <span v-if="format" class="ds-file-tile__format">
           <Icon :name="icon" :size="16" />
@@ -213,6 +240,9 @@ const nameId = `ds-file-tile-name-${useId()}`
 .ds-file-tile--active:hover {
   background: var(--ds-bg-brand-subtle);
   box-shadow: var(--ds-elevation-raised);
+  /* The tile answers first (ADR-0235): the active state arrives at `instant`,
+     before the viewer starts its handoff. */
+  transition-duration: var(--ds-motion-duration-instant);
 }
 
 .ds-file-tile--active .ds-file-tile__picture,
@@ -248,6 +278,45 @@ const nameId = `ds-file-tile-name-${useId()}`
 .ds-file-tile:hover .ds-file-tile__download,
 .ds-file-tile:has(:focus-visible) .ds-file-tile__download {
   opacity: 1;
+}
+
+/* ── layout="header" (ADR-0235): the glyph and the name lead ───────── */
+.ds-file-tile--header {
+  /* The head's line (glyph 20, the name's 20px line box) and its gap: where
+     the picture starts, and so where the download sits. */
+  --file-tile-head: calc(1.25rem + var(--ds-spacing-sm));
+}
+
+.ds-file-tile__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-sm);
+  min-width: 0;
+}
+
+.ds-file-tile__glyph {
+  display: flex;
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* An issuer's mark at the glyph's size. */
+.ds-file-tile__glyph :deep(img) {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.ds-file-tile--header .ds-file-tile__name {
+  display: block;
+  min-width: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ds-file-tile--header .ds-file-tile__download {
+  top: calc(var(--file-tile-head) + 2 * var(--ds-spacing-sm));
 }
 
 @media (hover: none) {
